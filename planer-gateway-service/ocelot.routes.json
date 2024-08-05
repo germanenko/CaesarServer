@@ -1,34 +1,6 @@
 {
     "Routes":[
         {
-            "DownstreamPathTemplate": "/google-login",
-            "DangerousAcceptAnyServerCertificateValidator": true,
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8888
-                }
-            ],
-            "UpstreamPathTemplate": "/google-login",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-
-        {
-            "DownstreamPathTemplate": "/singin-google",
-            "DangerousAcceptAnyServerCertificateValidator": true,
-            "DownstreamScheme": "https",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8888
-                }
-            ],
-            "UpstreamPathTemplate": "/singin-google",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-
-        {
             "DownstreamPathTemplate": "/mail-login",
             "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",
