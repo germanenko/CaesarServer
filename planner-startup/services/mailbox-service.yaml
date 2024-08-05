@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  planer-mailbox-service:
+    image: planer-mailbox-service
+    restart: always
+    ports:
+      - "5001:80"
+    depends_on:
+      planner-mail-credentials-db:
+        condition: service_started
+      planner-rabbitmq-service:
+        condition: service_healthy
+    environment:
+      - MAIL_CREDENTIALS_DB_CONNECTION_STRING=Host=${MAIL_CREDENTIALS_DB_HOST};Port=5432;Database=${MAIL_CREDENTIALS_DB_DATABASE};Username=${MAIL_CREDENTIALS_DB_USERNAME};Password=${MAIL_CREDENTIALS_DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+
+      - JWT_AUTH_SECRET=${JWT_AUTH_SECRET}
+      - JWT_AUTH_ISSUER=${JWT_AUTH_ISSUER}
+      - JWT_AUTH_AUDIENCE=${JWT_AUTH_AUDIENCE}
+
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+
+      - MAILRU_CLIENT_ID=${MAILRU_CLIENT_ID}
+      - MAILRU_CLIENT_SECRET=${MAILRU_CLIENT_SECRET}
+      - MAILRU_REDIRECT_URI=${MAILRU_REDIRECT_URI}
+
+      - RABBITMQ_HOSTNAME=rabbitmq
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - RABBITMQ_QUEUE_NAME=${RABBITMQ_MAIL_CREDENTIALS_QUEUE_NAME}

@@ -1,0 +1,72 @@
+version: '3.8'
+
+services:
+  planer-email-service:
+    extends:
+      file: services/email-service.yaml
+      service: planer-email-service
+
+  planer-mailbox-service:
+    extends:
+      file: services/mailbox-service.yaml
+      service: planer-mailbox-service
+  
+  planner-mail-credentials-db:
+    extends:
+      file: services/mail-credentials-db.yaml
+      service: planner-mail-credentials-db
+
+  planner-chat-service:
+    extends:
+      file: services/chat-service.yaml
+      service: planner-chat-service
+
+  planner-notify-service:
+    extends:
+      file: services/notify-service.yaml
+      service: planner-notify-service
+
+  planner-auth-service:
+    extends:
+      file: services/auth-service.yaml
+      service: planner-auth-service
+
+  planner-auth-db:
+    extends:
+      file: services/auth-db.yaml
+      service: planner-auth-db
+
+  planner-chat-db:
+    extends:
+      file: services/chat-db.yaml
+      service: planner-chat-db
+
+  planner-rabbitmq-service:
+    extends:
+      file: services/rabbitmq-service.yaml
+      service: rabbitmq
+
+  planner-file-service:
+    extends:
+      file: services/file-service.yaml
+      service: planner-file-server
+
+  planner-task-board-service:
+    extends:
+      file: services/task-board-service.yaml
+      service: planner-task-board
+
+  planner-task-board-db:
+    extends:
+      file: services/task-board-db.yaml
+      service: planner-content-db
+
+volumes:
+  planner-auth-data:
+  planner-content-data:
+  planner-mail-credentials-data:
+  planner-chat-data:
+
+  planner-file-server-data:
+  planner-rabbitmq:
+  data-protection-keys:

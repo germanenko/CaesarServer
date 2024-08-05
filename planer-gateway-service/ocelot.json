@@ -1,0 +1,12 @@
+{
+    "Routes": [],
+    "DynamicRoutes": {
+        "PollingInterval": 10000
+    },
+    "GlobalConfiguration": {
+        "BaseUrl": "https://localhost:5000"
+    },
+    "Includes": [
+        "ocelot.routes.json"
+    ]
+}

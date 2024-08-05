@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0AB69804-E6A5-492D-9C84-9593284D494B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer_mailbox_service.Api", "src\Planer_mailbox_service.Api\Planer_mailbox_service.Api.csproj", "{2D823B0C-858C-4A4B-B198-2AAB57B86286}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer_mailbox_service.App", "src\Planer_mailbox_service.App\Planer_mailbox_service.App.csproj", "{CED22671-8958-41EE-B114-C465F21E76EA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer_mailbox_service.Core", "src\Planer_mailbox_service.Core\Planer_mailbox_service.Core.csproj", "{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer_mailbox_service.Infrastructure", "src\Planer_mailbox_service.Infrastructure\Planer_mailbox_service.Infrastructure.csproj", "{161C7FE7-AACE-4F5B-BC89-A783589A52F0}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2D823B0C-858C-4A4B-B198-2AAB57B86286}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D823B0C-858C-4A4B-B198-2AAB57B86286}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D823B0C-858C-4A4B-B198-2AAB57B86286}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D823B0C-858C-4A4B-B198-2AAB57B86286}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CED22671-8958-41EE-B114-C465F21E76EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CED22671-8958-41EE-B114-C465F21E76EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CED22671-8958-41EE-B114-C465F21E76EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CED22671-8958-41EE-B114-C465F21E76EA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685}.Release|Any CPU.Build.0 = Release|Any CPU
+		{161C7FE7-AACE-4F5B-BC89-A783589A52F0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{161C7FE7-AACE-4F5B-BC89-A783589A52F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{161C7FE7-AACE-4F5B-BC89-A783589A52F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{161C7FE7-AACE-4F5B-BC89-A783589A52F0}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2D823B0C-858C-4A4B-B198-2AAB57B86286} = {0AB69804-E6A5-492D-9C84-9593284D494B}
+		{CED22671-8958-41EE-B114-C465F21E76EA} = {0AB69804-E6A5-492D-9C84-9593284D494B}
+		{CA5B5E82-29EB-4BB9-916C-1B6C4BC60685} = {0AB69804-E6A5-492D-9C84-9593284D494B}
+		{161C7FE7-AACE-4F5B-BC89-A783589A52F0} = {0AB69804-E6A5-492D-9C84-9593284D494B}
+	EndGlobalSection
+EndGlobal

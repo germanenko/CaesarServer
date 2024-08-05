@@ -1,0 +1,48 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{22CEE202-D7B2-4B4A-B520-48F9C1E8EC9B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planner-chat-server.Api", "src\Planner-chat-server.Api\Planner-chat-server.Api.csproj", "{EA59EBFD-3762-4A98-AA23-275BEDC04E0F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planner-chat-server.App", "src\Planner-chat-server.App\Planner-chat-server.App.csproj", "{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planner-chat-server.Core", "src\Planner-chat-server.Core\Planner-chat-server.Core.csproj", "{144A8118-A81F-489E-BB3C-C3A31270EFF9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planner-chat-server.Infrastructure", "src\Planner-chat-server.Infrastructure\Planner-chat-server.Infrastructure.csproj", "{8020C1FA-1D05-4971-9C35-E6F755ABC0A8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EA59EBFD-3762-4A98-AA23-275BEDC04E0F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA59EBFD-3762-4A98-AA23-275BEDC04E0F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA59EBFD-3762-4A98-AA23-275BEDC04E0F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA59EBFD-3762-4A98-AA23-275BEDC04E0F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{144A8118-A81F-489E-BB3C-C3A31270EFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{144A8118-A81F-489E-BB3C-C3A31270EFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{144A8118-A81F-489E-BB3C-C3A31270EFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{144A8118-A81F-489E-BB3C-C3A31270EFF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{8020C1FA-1D05-4971-9C35-E6F755ABC0A8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{8020C1FA-1D05-4971-9C35-E6F755ABC0A8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{8020C1FA-1D05-4971-9C35-E6F755ABC0A8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{8020C1FA-1D05-4971-9C35-E6F755ABC0A8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{EA59EBFD-3762-4A98-AA23-275BEDC04E0F} = {22CEE202-D7B2-4B4A-B520-48F9C1E8EC9B}
+		{ED3E1F58-1AD3-4747-81C3-75E7D28B37F2} = {22CEE202-D7B2-4B4A-B520-48F9C1E8EC9B}
+		{144A8118-A81F-489E-BB3C-C3A31270EFF9} = {22CEE202-D7B2-4B4A-B520-48F9C1E8EC9B}
+		{8020C1FA-1D05-4971-9C35-E6F755ABC0A8} = {22CEE202-D7B2-4B4A-B520-48F9C1E8EC9B}
+	EndGlobalSection
+EndGlobal

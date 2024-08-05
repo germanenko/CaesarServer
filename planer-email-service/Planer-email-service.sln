@@ -1,0 +1,41 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{80DBD587-5C22-4EAF-9E40-B132D01A8B71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer-email-service.Api", "src\Planer-email-service.Api\Planer-email-service.Api.csproj", "{D34F5C43-0487-4D10-A432-48D6195E1D91}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer-email-service.App", "src\Planer-email-service.App\Planer-email-service.App.csproj", "{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Planer-email-service.Core", "src\Planer-email-service.Core\Planer-email-service.Core.csproj", "{6FB99BE0-2475-421F-9C77-E772585FE875}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D34F5C43-0487-4D10-A432-48D6195E1D91}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D34F5C43-0487-4D10-A432-48D6195E1D91}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D34F5C43-0487-4D10-A432-48D6195E1D91}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D34F5C43-0487-4D10-A432-48D6195E1D91}.Release|Any CPU.Build.0 = Release|Any CPU
+		{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FB99BE0-2475-421F-9C77-E772585FE875}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FB99BE0-2475-421F-9C77-E772585FE875}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FB99BE0-2475-421F-9C77-E772585FE875}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FB99BE0-2475-421F-9C77-E772585FE875}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D34F5C43-0487-4D10-A432-48D6195E1D91} = {80DBD587-5C22-4EAF-9E40-B132D01A8B71}
+		{49E52199-2CB1-4F0C-AB38-23BA4F2B7D27} = {80DBD587-5C22-4EAF-9E40-B132D01A8B71}
+		{6FB99BE0-2475-421F-9C77-E772585FE875} = {80DBD587-5C22-4EAF-9E40-B132D01A8B71}
+	EndGlobalSection
+EndGlobal

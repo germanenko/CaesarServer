@@ -1,0 +1,1 @@
+docker build -t planner-task-board .
