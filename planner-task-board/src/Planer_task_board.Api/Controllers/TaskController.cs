@@ -122,7 +122,7 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpGet("alltasks"), Authorize]
+        [HttpGet("allTasks"), Authorize]
         [SwaggerOperation("Получить все задачи")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
         [SwaggerResponse(400)]

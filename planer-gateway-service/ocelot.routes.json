@@ -425,6 +425,19 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/board/allColumns",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/board/allColumns",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/board/members",
             "DownstreamScheme": "http",
@@ -555,6 +568,19 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/allTasks",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/allTasks",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/task/performers",
             "DownstreamScheme": "http",
@@ -662,7 +688,7 @@
         },
 
         {
-            "DownstreamPathTemplate": "/api/chat/messages",
+            "DownstreamPathTemplate": "/api/chat/allMessages",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -670,7 +696,7 @@
                     "Port": 8090
                 }
             ],
-            "UpstreamPathTemplate": "/api/chat/messages",
+            "UpstreamPathTemplate": "/api/chat/allMessages",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
