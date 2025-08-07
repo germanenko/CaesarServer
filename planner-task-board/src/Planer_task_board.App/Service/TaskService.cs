@@ -197,6 +197,18 @@ namespace Planer_task_board.App.Service
             };
         }
 
+        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId)
+        {
+            var tasks = await _taskRepository.GetAll();
+
+            return new ServiceResponse<IEnumerable<TaskBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = tasks.Select(e => e.ToTaskBody()),
+                IsSuccess = true
+            };
+        }
+
         public async Task<ServiceResponse<DeletedTaskBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);

@@ -9,7 +9,8 @@ namespace Planner_chat_server.Core.IService
     {
         Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId);
         Task<ServiceResponse<IEnumerable<ChatBody>>> GetChats(Guid accountId, Guid sessionId, ChatType chatType);
-        Task<ServiceResponse<Guid>> CreatePersonalChat(Guid accountId, Guid sessionId, CreateChatBody createChatBody, Guid addedAccountId);
+        Task<ServiceResponse<ChatBody>> CreatePersonalChat(Guid accountId, Guid sessionId, CreateChatBody createChatBody, Guid addedAccountId);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options);
+        Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId);
     }
 }

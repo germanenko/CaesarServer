@@ -25,18 +25,45 @@ namespace Planer_task_board.App.Service
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 
-        public async Task<HttpStatusCode> AddColumn(Guid accountId, Guid boardId, string name)
+        public async Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, Guid boardId, string name)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return HttpStatusCode.Forbidden;
+            {
+                return new ServiceResponse<BoardColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.Forbidden
+                };
+            }
 
             var board = await _boardRepository.GetAsync(boardId);
             if (board == null)
-                return HttpStatusCode.BadRequest;
+            {
+                return new ServiceResponse<BoardColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
 
-            var result = await _boardRepository.AddBoardColumn(board, name);
-            return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
+            var result = await _boardRepository.AddBoardColumn(board, name, accountId);
+
+            if(result == null)
+            {
+                return new ServiceResponse<BoardColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            return new ServiceResponse<BoardColumnBody>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result.ToBoardColumnBody()
+            };
         }
 
         public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
@@ -63,6 +90,18 @@ namespace Planer_task_board.App.Service
         public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId)
         {
             var result = await _boardRepository.GetBoardColumns(boardId);
+
+            return new ServiceResponse<IEnumerable<BoardColumnBody>>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result.Select(b => b.ToBoardColumnBody())
+            };
+        }
+
+        public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid accountId)
+        {
+            var result = await _boardRepository.GetAllBoardColumns(accountId);
 
             return new ServiceResponse<IEnumerable<BoardColumnBody>>
             {

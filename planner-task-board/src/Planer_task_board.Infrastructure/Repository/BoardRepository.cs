@@ -103,6 +103,16 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
+        public async Task<IEnumerable<BoardColumn>> GetAllBoardColumns(Guid accountId)
+        {
+            var availableMemberBoardColumns = await _context.BoardColumnMembers
+                .Include(e => e.Column)
+                .Where(e => e.AccountId == accountId)
+                .ToListAsync();
+
+            return availableMemberBoardColumns.Select(e => e.Column);
+        }
+
         public async Task<BoardColumn?> GetBoardColumn(Guid columnId)
         {
             return await _context.BoardColumns
@@ -128,7 +138,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<BoardColumn?> AddBoardColumn(Board board, string name)
+        public async Task<BoardColumn?> AddBoardColumn(Board board, string name, Guid accountId)
         {
             var boardColumn = new BoardColumn
             {
@@ -137,6 +147,15 @@ namespace Planer_task_board.Infrastructure.Repository
             };
 
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
+
+            var boardColumnMember = new BoardColumnMember()
+            {
+                Column = boardColumn,
+                ColumnId = boardColumn.Id,
+                AccountId = accountId
+            };
+            await _context.BoardColumnMembers.AddAsync(boardColumnMember);
+
             await _context.SaveChangesAsync();
 
             return boardColumn;

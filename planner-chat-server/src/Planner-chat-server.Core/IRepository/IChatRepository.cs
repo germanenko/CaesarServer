@@ -22,6 +22,7 @@ namespace Planner_chat_server.Core.IRepository
         Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatMembershipId);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);
+        Task<List<ChatMessage>> GetAllMessagesAsync();
         Task<bool> UpdateLastViewingChatMembership(ChatMembership chatMembership, DateTime lastViewingDate);
         Task<ChatMembership?> CreateOrGetChatMembershipAsync(Chat chat, Guid accountId);
         Task CreateChatMembershipsAsync(Guid taskId, List<Guid> accountIds);

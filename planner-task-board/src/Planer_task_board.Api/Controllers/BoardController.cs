@@ -75,6 +75,22 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpGet("board/allColumns"), Authorize]
+        [SwaggerOperation("Получить все колонки")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<BoardColumnBody>))]
+
+        public async Task<IActionResult> GetAllColumns(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+            var result = await _boardService.GetAllBoardColumnsAsync(tokenInfo.AccountId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
         [HttpGet("board/members"), Authorize]
         [SwaggerOperation("Получить список участников доски")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]
@@ -120,7 +136,7 @@ namespace Planer_task_board.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _boardService.AddColumn(tokenPayload.AccountId, boardId, name);
-            return StatusCode((int)result);
+            return StatusCode((int)result.StatusCode);
         }
     }
 }

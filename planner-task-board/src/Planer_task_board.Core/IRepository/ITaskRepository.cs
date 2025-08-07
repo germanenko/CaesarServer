@@ -34,6 +34,7 @@ namespace Planer_task_board.Core.IRepository
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId);
+        Task<IEnumerable<TaskModel>> GetAll();
         Task<TaskModel?> ConvertDraftToTask(Guid id, Guid accountId, BoardColumn column);
         Task<TaskModel?> UpdateAsync(
             Guid id,

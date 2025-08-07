@@ -231,6 +231,16 @@ namespace Planner_chat_server.Infrastructure.Repository
                 .ToListAsync();
         }
 
+        public async Task<List<ChatMessage>> GetAllMessagesAsync()
+        {
+            var query = _context.ChatMessages.AsQueryable();
+
+            query = query.OrderByDescending(e => e.SentAt);
+
+            return await query
+                .ToListAsync();
+        }
+
         public async Task<ChatMembership?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId)
         {
             var query = _context.ChatMemberships
