@@ -70,7 +70,7 @@ namespace Planner_chat_server.App.Service
             }
         }
 
-        public async Task<ServiceResponse<Guid>> CreatePersonalChat(
+        public async Task<ServiceResponse<ChatBody>> CreatePersonalChat(
             Guid accountId,
             Guid sessionId,
             CreateChatBody createChatBody,
@@ -85,7 +85,7 @@ namespace Planner_chat_server.App.Service
             var currentDate = DateTime.UtcNow;
             var result = await _chatRepository.AddPersonalChatAsync(participants, createChatBody.Name, currentDate);
             if (result == null)
-                return new ServiceResponse<Guid>
+                return new ServiceResponse<ChatBody>
                 {
                     StatusCode = HttpStatusCode.Conflict,
                     IsSuccess = false,
@@ -109,11 +109,20 @@ namespace Planner_chat_server.App.Service
             };
 
             _notifyService.Publish(createChatEvent, NotifyPublishEvent.AddAccountToChat);
-            return new ServiceResponse<Guid>
+            return new ServiceResponse<ChatBody>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = result.Id
+                Body = new ChatBody()
+                {
+                    Id = result.Id,
+                    ImageUrl = result.Image,
+                    Name = result.Name,
+                    ParticipantIds = participants,
+                    LastMessage = null,
+                    IsSyncedReadStatus = false,
+                    CountOfUnreadMessages = 0
+                }
             };
         }
 
@@ -131,6 +140,17 @@ namespace Planner_chat_server.App.Service
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options)
         {
             var messages = await _chatRepository.GetMessagesAsync(chatId, options.Count, options.LoadPosition);
+            return new ServiceResponse<IEnumerable<MessageBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = messages.Select(e => e.ToMessageBody())
+            };
+        }
+
+        public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId)
+        {
+            var messages = await _chatRepository.GetMessagesAsync();
             return new ServiceResponse<IEnumerable<MessageBody>>
             {
                 StatusCode = HttpStatusCode.OK,

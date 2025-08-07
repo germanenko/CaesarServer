@@ -122,6 +122,24 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpGet("alltasks"), Authorize]
+        [SwaggerOperation("Получить все задачи")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> GetAllTasks(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.GetAllTasks(tokenPayload.AccountId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
         [HttpGet("task/performers"), Authorize]
         [SwaggerOperation("Получить список исполнителей задачи")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]

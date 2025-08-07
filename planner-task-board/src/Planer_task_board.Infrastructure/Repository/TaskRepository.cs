@@ -136,6 +136,16 @@ namespace Planer_task_board.Infrastructure.Repository
             return result.Select(e => e.Task);
         }
 
+        public async Task<IEnumerable<TaskModel>> GetAll()
+        {
+            var result = await _context.BoardColumnTasks
+                .Include(e => e.Task)
+                    .ThenInclude(e => e.AttachedMessages)
+                    .ToListAsync();
+
+            return result.Select(e => e.Task);
+        }
+
         public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
             => await _context.Tasks
                 .Include(e => e.AttachedMessages)

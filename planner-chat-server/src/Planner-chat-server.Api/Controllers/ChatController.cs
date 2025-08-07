@@ -82,7 +82,6 @@ namespace Planner_chat_server.Api.Controllers
         [SwaggerOperation("Получить список сообщений")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
         [SwaggerResponse(403)]
-
         public async Task<IActionResult> GetMessages(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
             [FromQuery, Required] Guid chatId,
@@ -91,6 +90,22 @@ namespace Planner_chat_server.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _chatService.GetMessages(tokenPayload.AccountId, chatId, loadingOptions);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpPost("api/chat/allmessages")]
+        [SwaggerOperation("Получить все сообщения")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> GetAllMessages(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

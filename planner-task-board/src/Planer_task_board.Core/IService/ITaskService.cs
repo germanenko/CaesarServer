@@ -12,6 +12,7 @@ namespace Planer_task_board.Core.IService
         Task<HttpStatusCode> RestoreDeletedTask(Guid deletedTaskId, Guid boardId, Guid accountId);
         Task<ServiceResponse<IEnumerable<DeletedTaskBody>>> GetDeletedTasks(Guid accountId, Guid boardId);
         Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, TaskState? state);
+        Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId);
         Task<ServiceResponse<IEnumerable<Guid>>> GetTaskPerformerIds(Guid accountId, Guid boardId, Guid taskId, int count, int offset);
         Task<HttpStatusCode> AddTaskPerformers(Guid accountId, Guid taskId, Guid boardId, IEnumerable<Guid> performerIds);
         Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid boardId, UpdateTaskBody taskBody);
