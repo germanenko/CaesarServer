@@ -150,7 +150,7 @@ namespace Planner_chat_server.App.Service
 
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId)
         {
-            var messages = await _chatRepository.GetMessagesAsync();
+            var messages = await _chatRepository.GetAllMessagesAsync();
             return new ServiceResponse<IEnumerable<MessageBody>>
             {
                 StatusCode = HttpStatusCode.OK,
