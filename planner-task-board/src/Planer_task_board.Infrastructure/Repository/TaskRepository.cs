@@ -138,16 +138,16 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
-            var result = await _context.BoardColumnMembers
-                .Include(a => a.Column)
-                .ThenInclude(a => a.Tasks)
-                .Where(a => a.AccountId == accountId)
-                .Select(e => e.Column)
-                .ToListAsync();
+            var result = _context.BoardColumns
+                .Include(a => a.Members)
+                .ThenInclude(a => a.Column)
+                .SelectMany(e => e.Members);
 
-            var boardColumnTasks = result.SelectMany(t => t.Tasks);
+            var columns = result.Where(e => e.AccountId == accountId).Select(e=>e.Column);
 
-            return boardColumnTasks.Select(m => m.Task);
+            var tasks = columns.SelectMany(e => e.Tasks);
+
+            return tasks.Select(m => m.Task);
         }
 
         public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
