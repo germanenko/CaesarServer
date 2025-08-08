@@ -697,7 +697,7 @@
                 }
             ],
             "UpstreamPathTemplate": "/api/chat/allMessages",
-            "UpstreamHttpMethod": [ "POST" ]
+            "UpstreamHttpMethod": [ "GET" ]
         },
 
         {
