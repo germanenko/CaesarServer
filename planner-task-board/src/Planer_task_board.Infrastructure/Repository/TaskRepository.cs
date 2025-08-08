@@ -142,7 +142,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Where(m => m.AccountId == accountId)
                     .ToListAsync();
 
-            List<BoardColumnTask> boardColumnTasks = (List<BoardColumnTask>)result.SelectMany(e => e.Column.Tasks);
+            List<BoardColumnTask> boardColumnTasks = (List<BoardColumnTask>)result.Select(e => e.Column.Tasks);
 
             return boardColumnTasks.Select(e => e.Task);
         }
