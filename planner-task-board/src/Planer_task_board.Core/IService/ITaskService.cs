@@ -7,7 +7,7 @@ namespace Planer_task_board.Core.IService
 {
     public interface ITaskService
     {
-        Task<ServiceResponse<TaskBody>> CreateTask(Guid accountId, Guid boardId, Guid columnId, CreateTaskBody taskBody);
+        Task<ServiceResponse<TaskBody>> CreateTask(Guid accountId, Guid columnId, CreateTaskBody taskBody);
         Task<ServiceResponse<DeletedTaskBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId);
         Task<HttpStatusCode> RestoreDeletedTask(Guid deletedTaskId, Guid boardId, Guid accountId);
         Task<ServiceResponse<IEnumerable<DeletedTaskBody>>> GetDeletedTasks(Guid accountId, Guid boardId);

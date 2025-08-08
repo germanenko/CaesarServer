@@ -83,6 +83,10 @@ namespace Planer_task_board.Infrastructure.Repository
             => await _context.BoardMembers
                 .FirstOrDefaultAsync(e => e.BoardId == boardId && e.AccountId == accountId);
 
+        public async Task<BoardColumnMember?> GetColumnMemberAsync(Guid accountId, Guid columnId)
+            => await _context.BoardColumnMembers
+                .FirstOrDefaultAsync(e => e.ColumnId == columnId && e.AccountId == accountId);
+
         public async Task<IEnumerable<Board>> GetAll(Guid accountId)
         {
             var availableMemberBoards = await _context.BoardMembers

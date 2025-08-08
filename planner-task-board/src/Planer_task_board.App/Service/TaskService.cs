@@ -65,7 +65,7 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateTask(Guid accountId, Guid boardId, Guid columnId, CreateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateTask(Guid accountId, Guid columnId, CreateTaskBody taskBody)
         {
             var errors = new List<string>();
             if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -74,10 +74,10 @@ namespace Planer_task_board.App.Service
             if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                 errors.Add("End time format is not correct");
 
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
+            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnId);
+            if (columnMember == null)
             {
-                errors.Add("You are not a member of this board");
+                errors.Add("You are not a member of this column");
                 return new ServiceResponse<TaskBody>
                 {
                     StatusCode = HttpStatusCode.Forbidden,

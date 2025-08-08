@@ -39,7 +39,7 @@ namespace Planer_task_board.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateTask(tokenPayload.AccountId, boardId, columnId, taskBody);
+            var result = await _taskService.CreateTask(tokenPayload.AccountId, columnId, taskBody);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
