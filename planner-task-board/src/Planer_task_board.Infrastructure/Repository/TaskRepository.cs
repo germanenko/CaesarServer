@@ -146,6 +146,10 @@ namespace Planer_task_board.Infrastructure.Repository
             var columns = result.Where(e => e.AccountId == accountId).Select(e=>e.Column);
 
             var tasks = columns.SelectMany(e => e.Tasks);
+            foreach (var task in tasks)
+            {
+                task.Task.Columns = await _context.BoardColumnTasks.Where(x=>x.Task == task.Task).ToListAsync();
+            }
 
             return tasks.Select(m => m.Task);
         }
