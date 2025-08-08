@@ -96,7 +96,7 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpPost("api/chat/allMessages")]
+        [HttpGet("api/chat/allMessages")]
         [SwaggerOperation("Получить все сообщения")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
         [SwaggerResponse(403)]
