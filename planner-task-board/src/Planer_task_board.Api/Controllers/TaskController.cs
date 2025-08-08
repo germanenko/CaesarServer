@@ -33,7 +33,6 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> CreateTask(
             [FromBody] CreateTaskBody taskBody,
-            [FromQuery, Required] Guid boardId,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
