@@ -136,11 +136,11 @@ namespace Planer_task_board.Infrastructure.Repository
             return result.Select(e => e.Task);
         }
 
-        public async Task<IEnumerable<TaskModel>> GetAll()
+        public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
             var result = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
+                .Include(t => t.Column.Members)
+                .ThenInclude(t => t.AccountId == accountId)
                     .ToListAsync();
 
             return result.Select(e => e.Task);

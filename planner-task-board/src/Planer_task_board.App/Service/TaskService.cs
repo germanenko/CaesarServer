@@ -199,7 +199,7 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId)
         {
-            var tasks = await _taskRepository.GetAll();
+            var tasks = await _taskRepository.GetAllTasks(accountId);
 
             return new ServiceResponse<IEnumerable<TaskBody>>
             {
