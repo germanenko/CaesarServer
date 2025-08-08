@@ -1,4 +1,5 @@
 using System.Net;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
@@ -197,14 +198,14 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<TaskModel>>> GetAllTasks(Guid accountId)
         {
             var tasks = await _taskRepository.GetAllTasks(accountId);
 
-            return new ServiceResponse<IEnumerable<TaskBody>>
+            return new ServiceResponse<IEnumerable<TaskModel>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(e => e.ToTaskBody()),
+                Body = tasks,
                 IsSuccess = true
             };
         }
