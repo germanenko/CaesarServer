@@ -136,7 +136,7 @@ namespace Planer_task_board.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _boardService.AddColumn(tokenPayload.AccountId, boardId, name);
-            return StatusCode((int)result.StatusCode);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
     }
 }
