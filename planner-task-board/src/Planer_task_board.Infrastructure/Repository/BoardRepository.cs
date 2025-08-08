@@ -152,7 +152,8 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Column = boardColumn,
                 ColumnId = boardColumn.Id,
-                AccountId = accountId
+                AccountId = accountId,
+                Role = "Common"
             };
             await _context.BoardColumnMembers.AddAsync(boardColumnMember);
 
