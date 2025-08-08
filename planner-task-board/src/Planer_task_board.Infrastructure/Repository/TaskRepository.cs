@@ -138,13 +138,12 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
-            var result = await _context.BoardColumnMembers
-                .Where(m => m.AccountId == accountId)
-                    .ToListAsync();
+            var result = await _context.BoardColumnTasks
+                .Include(e => e.Column.Members)
+                .ThenInclude(e => e.AccountId == accountId)
+                .ToListAsync();
 
-            List<BoardColumnTask> boardColumnTasks = (List<BoardColumnTask>)result.Select(e => e.Column.Tasks);
-
-            return boardColumnTasks.Select(e => e.Task);
+            return result.Select(m => m.Task);
         }
 
         public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
