@@ -16,5 +16,6 @@ namespace Planer_task_board.Core.Entities.Response
         public string? StartDate { get; set; }
         public string? EndDate { get; set; }
         public Guid? ChatId { get; set; }
+        public Guid? ColumnId { get; set; }
     }
 }

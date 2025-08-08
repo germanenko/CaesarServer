@@ -47,7 +47,8 @@ namespace Planer_task_board.Core.Entities.Models
                 Status = Enum.Parse<TaskState>(Status),
                 StartDate = StartDate?.ToString("s"),
                 EndDate = EndDate?.ToString("s"),
-                ChatId = ChatId
+                ChatId = ChatId,
+                ColumnId = Columns.Where(c => c.TaskId == Id).First().ColumnId
             };
         }
     }
