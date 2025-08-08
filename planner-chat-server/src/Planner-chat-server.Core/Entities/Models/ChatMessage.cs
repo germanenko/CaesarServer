@@ -38,6 +38,7 @@ namespace Planner_chat_server.Core.Entities.Models
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
                 Date = SentAt,
                 SenderId = SenderId,
+                ChatId = ChatId
             };
         }
     }

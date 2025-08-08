@@ -9,5 +9,6 @@ namespace Planner_chat_server.Core.Entities.Response
         public string Content { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public Guid SenderId { get; set; }
+        public Guid ChatId { get; set; }
     }
 }
