@@ -4,5 +4,6 @@ namespace Planer_task_board.Core.Entities.Response
     {
         public Guid Id { get; set; }
         public string Name { get; set; }
+        public Guid BoardId { get; set; }
     }
 }

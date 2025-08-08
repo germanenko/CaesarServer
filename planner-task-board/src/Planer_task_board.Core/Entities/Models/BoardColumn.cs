@@ -18,6 +18,7 @@ namespace Planer_task_board.Core.Entities.Models
             {
                 Id = Id,
                 Name = Name,
+                BoardId = BoardId
             };
         }
     }
