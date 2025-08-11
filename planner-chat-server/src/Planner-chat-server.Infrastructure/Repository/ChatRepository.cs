@@ -234,7 +234,7 @@ namespace Planner_chat_server.Infrastructure.Repository
         public async Task<List<ChatMessage>> GetAllMessagesAsync(Guid accountId)
         {
             var query = _context.ChatMemberships.Include(c => c.Chat).ThenInclude(x => x.Messages).Where(cm => cm.AccountId == accountId).Select(c => c.Chat);
-            var messages = query.SelectMany(x => x.Messages);
+            var messages = query.SelectMany(x => x.Messages.Take(30));
 
             return await messages
                 .ToListAsync();
