@@ -31,5 +31,7 @@ namespace Planer_task_board.Core.Entities.Request
         public string? HexColor { get; set; }
 
         public List<Guid> MessageIds { get; set; } = new();
+
+        public Guid ColumnId { get; set; }
     }
 }

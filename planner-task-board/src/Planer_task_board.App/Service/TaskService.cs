@@ -1,4 +1,5 @@
 using System.Net;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
@@ -128,6 +129,80 @@ namespace Planer_task_board.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = result.ToTaskBody(),
+                IsSuccess = true
+            };
+        }
+
+        public async Task<ServiceResponse<List<TaskBody>>> CreateTasks(Guid accountId, List<CreateTaskBody> taskBodies)
+        {
+            var errors = new List<string>();
+            List<TaskModel> tasks = new List<TaskModel>();
+            foreach (var taskBody in taskBodies)
+            {
+                if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                    errors.Add("Start time format is not correct");
+
+                if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                    errors.Add("End time format is not correct");
+
+                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                if (columnMember == null)
+                {
+                    errors.Add("You are not a member of this column");
+                    return new ServiceResponse<List<TaskBody>>
+                    {
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Errors = errors.ToArray(),
+                        IsSuccess = false
+                    };
+                }
+
+                var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
+                if (column == null)
+                {
+                    errors.Add("Column not found");
+                    return new ServiceResponse<List<TaskBody>>
+                    {
+                        StatusCode = HttpStatusCode.NotFound,
+                        Errors = errors.ToArray(),
+                        IsSuccess = false
+                    };
+                }
+
+                DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+                DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+
+                var result = await _taskRepository.AddAsync(
+                    taskBody.Title,
+                    taskBody.Description,
+                    taskBody.PriorityOrder,
+                    taskBody.Status,
+                    taskBody.Type,
+                    startDate,
+                    endDate,
+                    taskBody.HexColor,
+                    column,
+                    accountId,
+                    taskBody.MessageIds);
+
+                if (result == null)
+                {
+                    errors.Add("Task not created");
+                    return new ServiceResponse<List<TaskBody>>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        Errors = errors.ToArray(),
+                        IsSuccess = false
+                    };
+                }
+
+                tasks.Add(result);
+            }
+
+            return new ServiceResponse<List<TaskBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = tasks.Select(x => x.ToTaskBody()).ToList(),
                 IsSuccess = true
             };
         }

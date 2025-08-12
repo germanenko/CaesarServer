@@ -46,6 +46,26 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpPost("createTasks"), Authorize]
+        [SwaggerOperation("Создать задачи")]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> CreateTasks(
+            [FromBody] List<CreateTaskBody> taskBodies,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.CreateTasks(tokenPayload.AccountId, taskBodies);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
         [HttpDelete("task")]
         [SwaggerOperation("Удалить задачу")]
         [SwaggerResponse(200, Type = typeof(DeletedTaskBody))]
