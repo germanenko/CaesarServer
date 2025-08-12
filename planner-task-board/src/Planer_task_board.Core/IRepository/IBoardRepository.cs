@@ -1,4 +1,5 @@
 using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Request;
 
 namespace Planer_task_board.Core.IRepository
 {
@@ -17,5 +18,6 @@ namespace Planer_task_board.Core.IRepository
         Task<IEnumerable<BoardMember>> GetBoardMembers(IEnumerable<Guid> memberIds, Guid boardId);
         Task<BoardMember?> AddBoardMember(Guid accountId, Guid boardId);
         Task<BoardColumn?> AddBoardColumn(Board board, string name, Guid accountId);
+        Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId);
     }
 }

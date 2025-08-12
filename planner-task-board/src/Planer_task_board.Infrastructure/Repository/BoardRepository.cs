@@ -1,6 +1,8 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
@@ -187,6 +189,37 @@ namespace Planer_task_board.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             return boardColumn;
+        }
+
+        public async Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
+        {
+            var boardColumns = new List<BoardColumn>();
+            var boardColumnMembers = new List<BoardColumnMember>();
+
+            foreach (var column in columns)
+            {
+                BoardColumn newColumn = new BoardColumn()
+                {
+                    Board = _context.Boards.Where(b => b.Id == column.BoardId).First(),
+                    Name = column.Name,
+                };
+                boardColumns.Add(newColumn);
+
+                boardColumnMembers.Add(new BoardColumnMember()
+                {
+                    Column = newColumn,
+                    ColumnId = newColumn.Id,
+                    AccountId = accountId
+                });
+            }
+
+            await _context.BoardColumns.AddRangeAsync(boardColumns);
+
+            await _context.BoardColumnMembers.AddRangeAsync(boardColumnMembers);
+
+            await _context.SaveChangesAsync();
+
+            return boardColumns;
         }
     }
 }

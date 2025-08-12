@@ -14,5 +14,6 @@ namespace Planer_task_board.Core.IService
         Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset);
         Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId);
         Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, Guid boardId, string name);
+        Task<ServiceResponse<List<BoardColumnBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns);
     }
 }

@@ -1,8 +1,10 @@
-using System.Net;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
+using System.Net;
+using System.Xml.Linq;
 
 namespace Planer_task_board.App.Service
 {
@@ -63,6 +65,51 @@ namespace Planer_task_board.App.Service
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
                 Body = result.ToBoardColumnBody()
+            };
+        }
+
+        public async Task<ServiceResponse<List<BoardColumnBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
+        {
+            List<BoardColumn>? newColumns = new List<BoardColumn>();
+            foreach (var column in columns)
+            {
+                var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
+                if (boardMember == null)
+                {
+                    return new ServiceResponse<List<BoardColumnBody>>
+                    {
+                        IsSuccess = false,
+                        StatusCode = HttpStatusCode.Forbidden
+                    };
+                }
+
+                var board = await _boardRepository.GetAsync(column.BoardId);
+                if (board == null)
+                {
+                    return new ServiceResponse<List<BoardColumnBody>>
+                    {
+                        IsSuccess = false,
+                        StatusCode = HttpStatusCode.BadRequest
+                    };
+                } 
+            }
+
+            newColumns = await _boardRepository.AddBoardColumns(columns, accountId);
+
+            if (newColumns == null)
+            {
+                return new ServiceResponse<List<BoardColumnBody>>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            return new ServiceResponse<List<BoardColumnBody>>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = newColumns.Select(x => x.ToBoardColumnBody()).ToList()
             };
         }
 

@@ -490,6 +490,19 @@
             "UpstreamHttpMethod": [ "POST" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/board/createColumns",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/board/createColumns",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/draft",
             "DownstreamScheme": "http",

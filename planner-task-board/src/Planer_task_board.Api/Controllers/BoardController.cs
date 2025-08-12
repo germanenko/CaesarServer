@@ -157,5 +157,19 @@ namespace Planer_task_board.Api.Controllers
             var result = await _boardService.AddColumn(tokenPayload.AccountId, boardId, name);
             return StatusCode((int)result.StatusCode, result.Body);
         }
+
+        [HttpPost("board/createColumns"), Authorize]
+        [SwaggerOperation("Создать колонки")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> AddColumns(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery, Required] List<CreateColumnBody> columns
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _boardService.AddColumns(tokenPayload.AccountId, columns);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
     }
 }
