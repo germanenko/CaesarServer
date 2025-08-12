@@ -209,7 +209,8 @@ namespace Planer_task_board.Infrastructure.Repository
                 {
                     Column = newColumn,
                     ColumnId = newColumn.Id,
-                    AccountId = accountId
+                    AccountId = accountId,
+                    Role = "Common"
                 });
             }
 
