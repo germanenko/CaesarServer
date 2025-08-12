@@ -87,6 +87,27 @@ namespace Planer_task_board.App.Service
             };
         }
 
+        public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
+        {
+            var result = await _boardRepository.AddRangeAsync(bodies.Select(b => b.Name).ToList(), accountId);
+
+            if (result is null)
+            {
+                return new ServiceResponse<List<BoardBody>>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                };
+            }
+
+            return new ServiceResponse<List<BoardBody>>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result.Select(x => x.ToBoardBody()).ToList()
+            };
+        }
+
         public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId)
         {
             var result = await _boardRepository.GetBoardColumns(boardId);

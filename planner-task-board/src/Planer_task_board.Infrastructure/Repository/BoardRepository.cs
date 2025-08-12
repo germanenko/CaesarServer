@@ -39,6 +39,30 @@ namespace Planer_task_board.Infrastructure.Repository
             return board;
         }
 
+        public async Task<List<Board>?> AddRangeAsync(List<string> boardNames, Guid accountId)
+        {
+            List<Board> boards = new List<Board>();
+            foreach (var boardName in boardNames)
+            {
+                var board = new Board()
+                {
+                    Name = boardName,
+                    Members = new List<BoardMember>
+                    {
+                        new() {
+                            Role = BoardMemberRoles.Admin.ToString(),
+                            AccountId = accountId
+                        }
+                    }
+                };
+                boards.Add(board);
+            }
+            await _context.Boards.AddRangeAsync(boards);
+            await _context.SaveChangesAsync();
+
+            return boards;
+        }
+
         public async Task<BoardMember?> AddBoardMember(Guid accountId, Guid boardId)
         {
             var board = await GetAsync(boardId);
@@ -156,8 +180,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Column = boardColumn,
                 ColumnId = boardColumn.Id,
-                AccountId = accountId,
-                Role = "Common"
+                AccountId = accountId
             };
             await _context.BoardColumnMembers.AddAsync(boardColumnMember);
 

@@ -44,6 +44,25 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpPost("createBoards"), Authorize]
+        [SwaggerOperation("Создать доски")]
+        [SwaggerResponse(200)]
+        [SwaggerResponse(400)]
+
+        public async Task<IActionResult> CreateBoards(
+            List<CreateBoardBody> boardBodies,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+
+            var result = await _boardService.CreateBoardsAsync(boardBodies, tokenInfo.AccountId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
         [HttpGet("boards"), Authorize]
         [SwaggerOperation("Получить список досок")]
         [SwaggerResponse(200)]

@@ -7,6 +7,7 @@ namespace Planer_task_board.Core.IService
     public interface IBoardService
     {
         Task<ServiceResponse<BoardBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId);
+        Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId);
         Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId);
         Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId);
         Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid boardId);
