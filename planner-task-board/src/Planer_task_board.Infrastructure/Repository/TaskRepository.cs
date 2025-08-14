@@ -248,15 +248,17 @@ namespace Planer_task_board.Infrastructure.Repository
             task.Status = taskState.ToString();
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
-            task.Columns = _context.BoardColumnTasks.ToList();
 
-            //var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
-            //if (boardColumnTask.ColumnId != columnId)
-            //{
-            //    boardColumnTask.ColumnId = columnId;
-            //}
+            var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
+            if (boardColumnTask.ColumnId != columnId)
+            {
+                boardColumnTask.ColumnId = columnId;
+            }
 
             await _context.SaveChangesAsync();
+
+            task.Columns = _context.BoardColumnTasks.ToList();
+
             return task;
         }
 
