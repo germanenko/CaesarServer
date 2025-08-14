@@ -182,7 +182,8 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Column = boardColumn,
                 ColumnId = boardColumn.Id,
-                AccountId = accountId
+                AccountId = accountId,
+                Role = "Admin"
             };
             await _context.BoardColumnMembers.AddAsync(boardColumnMember);
 
@@ -210,7 +211,7 @@ namespace Planer_task_board.Infrastructure.Repository
                     Column = newColumn,
                     ColumnId = newColumn.Id,
                     AccountId = accountId,
-                    Role = "Common"
+                    Role = "Admin"
                 });
             }
 
