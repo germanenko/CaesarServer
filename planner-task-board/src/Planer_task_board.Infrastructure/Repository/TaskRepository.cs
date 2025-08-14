@@ -250,11 +250,11 @@ namespace Planer_task_board.Infrastructure.Repository
             task.EndDate = endDate;
             task.Columns = _context.BoardColumnTasks.ToList();
 
-            var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
-            if (boardColumnTask.ColumnId != columnId)
-            {
-                boardColumnTask.ColumnId = columnId;
-            }
+            //var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
+            //if (boardColumnTask.ColumnId != columnId)
+            //{
+            //    boardColumnTask.ColumnId = columnId;
+            //}
 
             await _context.SaveChangesAsync();
             return task;
