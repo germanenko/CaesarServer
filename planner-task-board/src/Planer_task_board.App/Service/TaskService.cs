@@ -394,5 +394,53 @@ namespace Planer_task_board.App.Service
                 IsSuccess = true
             };
         }
+
+        public async Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<UpdateTaskBody> taskBodies)
+        {
+            var errors = new List<string>();
+            List<TaskModel> result = new List<TaskModel>();
+            foreach (var taskBody in taskBodies)
+            {
+                if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                    errors.Add("Start time format is not correct");
+
+                if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                    errors.Add("End time format is not correct");
+
+                if (errors.Any())
+                    return new ServiceResponse<List<TaskBody>>
+                    {
+                        Errors = errors.ToArray(),
+                        StatusCode = HttpStatusCode.BadRequest,
+                        IsSuccess = false
+                    };
+
+                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                if (columnMember == null)
+                    return new ServiceResponse<List<TaskBody>>
+                    {
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Errors = new string[] { "You are not a member of this column" },
+                        IsSuccess = false
+                    };
+
+                DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+                DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+
+                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId));
+            }
+            
+            return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Errors = new string[] { "Not all tasks updated" },
+                IsSuccess = false
+            } : new ServiceResponse<List<TaskBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result.Select(x => x.ToTaskBody()).ToList(),
+                IsSuccess = true
+            };
+        }
     }
 }

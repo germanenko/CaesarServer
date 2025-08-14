@@ -217,6 +217,25 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpPut("updateTasks"), Authorize]
+        [SwaggerOperation("Обновить задачи")]
+        [SwaggerResponse(200, Type = typeof(List<TaskBody>))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> UpdateTasks(
+            List<UpdateTaskBody> taskBodies,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.UpdateTasks(tokenPayload.AccountId, taskBodies);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
         [HttpPost("task/column"), Authorize]
         [SwaggerOperation("Добавить задачу в колонку любой доски")]
         [SwaggerResponse(200)]
