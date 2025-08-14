@@ -248,7 +248,7 @@ namespace Planer_task_board.Infrastructure.Repository
             task.Status = taskState.ToString();
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
-            //task.Columns = _context.BoardColumnTasks.ToList();
+            task.Columns = _context.BoardColumnTasks.ToList();
 
             //var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
             //if (boardColumnTask.ColumnId != columnId)
