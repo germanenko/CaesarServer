@@ -351,7 +351,7 @@ namespace Planer_task_board.App.Service
             return result != false ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid boardId, UpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid columnId, UpdateTaskBody taskBody)
         {
             var errors = new List<string>();
 
@@ -369,19 +369,19 @@ namespace Planer_task_board.App.Service
                     IsSuccess = false
                 };
 
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
+            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnId);
+            if (columnMember == null)
                 return new ServiceResponse<TaskBody>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this board" },
+                    Errors = new string[] { "You are not a member of this column" },
                     IsSuccess = false
                 };
 
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor);
+            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId);
             return result == null ? new ServiceResponse<TaskBody>
             {
                 StatusCode = HttpStatusCode.BadRequest,

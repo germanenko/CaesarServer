@@ -24,5 +24,7 @@ namespace Planer_task_board.Core.Entities.Request
 
         [RegularExpression("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$")]
         public string? HexColor { get; set; }
+
+        public Guid ColumnId { get; set; }
     }
 }

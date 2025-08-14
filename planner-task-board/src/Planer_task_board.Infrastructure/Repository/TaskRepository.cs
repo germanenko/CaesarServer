@@ -233,7 +233,8 @@ namespace Planer_task_board.Infrastructure.Repository
             TaskState taskState,
             DateTime? startDate,
             DateTime? endDate,
-            string? hexColor)
+            string? hexColor,
+            Guid columnId)
         {
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDraft);
@@ -247,6 +248,13 @@ namespace Planer_task_board.Infrastructure.Repository
             task.Status = taskState.ToString();
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
+            task.Columns = _context.BoardColumnTasks.ToList();
+
+            var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
+            if (boardColumnTask.ColumnId != columnId)
+            {
+                boardColumnTask.ColumnId = columnId;
+            }
 
             await _context.SaveChangesAsync();
             return task;
