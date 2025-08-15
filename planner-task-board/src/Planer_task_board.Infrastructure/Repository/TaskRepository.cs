@@ -249,11 +249,11 @@ namespace Planer_task_board.Infrastructure.Repository
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
 
-            var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
+            var boardColumnTask = _context.BoardColumnTasks.Where(x => x.TaskId == task.Id).First();
             if (boardColumnTask.ColumnId != columnId)
             {
                 await RemoveTaskFromColumn(task.Id, boardColumnTask.ColumnId);
-                var column = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.ColumnId == columnId);
+                var column = _context.BoardColumnTasks.Where(x => x.ColumnId == columnId).First();
                 await AssignTaskToColumn(task, column.Column);
             }
 
