@@ -252,7 +252,9 @@ namespace Planer_task_board.Infrastructure.Repository
             var boardColumnTask = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.TaskId == task.Id);
             if (boardColumnTask.ColumnId != columnId)
             {
-                boardColumnTask.ColumnId = columnId;
+                await RemoveTaskFromColumn(task.Id, boardColumnTask.ColumnId);
+                var column = await _context.BoardColumnTasks.FirstOrDefaultAsync(x => x.ColumnId == columnId);
+                await AssignTaskToColumn(task, column.Column);
             }
 
             await _context.SaveChangesAsync();
