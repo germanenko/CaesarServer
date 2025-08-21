@@ -279,7 +279,7 @@ namespace Planner_Auth.App.Service
         public async Task<HttpStatusCode> AddGoogleToken(string token, Guid accountId)
         {
             var result = await _accountRepository.AddAsync(token, accountId);
-            return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
+            return result == null ? HttpStatusCode.NotAcceptable : HttpStatusCode.OK;
         }
 
         public async Task<ServiceResponse<string>> GetGoogleToken(Guid accountId)
