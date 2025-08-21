@@ -275,5 +275,33 @@ namespace Planner_Auth.App.Service
                 session = await _accountRepository.GetSessionAsync(account.Id, deviceId);
             return session?.Id;
         }
+
+        public async Task<HttpStatusCode> AddGoogleToken(string token, Guid accountId)
+        {
+            var result = await _accountRepository.AddAsync(token, accountId);
+            return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
+        }
+
+        public async Task<ServiceResponse<string>> GetGoogleToken(Guid accountId)
+        {
+            var result = await _accountRepository.GetGoogleTokenAsync(accountId);
+            if (result != null)
+            {
+                return new ServiceResponse<string>
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Body = result.Token
+                };
+            }
+            else
+            {
+                return new ServiceResponse<string>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+        }
     }
 }

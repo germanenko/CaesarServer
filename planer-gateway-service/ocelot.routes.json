@@ -56,6 +56,34 @@
             "UpstreamHttpMethod": [ "POST" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/addGoogleToken",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8888
+                }
+            ],
+            "UpstreamPathTemplate": "/api/addGoogleToken",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/getGoogleToken",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8888
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getGoogleToken",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/token",
             "DangerousAcceptAnyServerCertificateValidator": true,

@@ -1,9 +1,12 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planner_Auth.App.Service;
 using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 
 namespace Planner_Auth.Api.Controllers.Api
 {
@@ -12,10 +15,12 @@ namespace Planner_Auth.Api.Controllers.Api
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
+        private readonly IJwtService _jwtService;
 
-        public AuthController(IAuthService authService)
+        public AuthController(IAuthService authService, IJwtService jwtService)
         {
             _authService = authService;
+            _jwtService = jwtService;
         }
 
 
@@ -47,6 +52,39 @@ namespace Planner_Auth.Api.Controllers.Api
             var result = await _authService.SignIn(signInBody, AuthenticationProvider.Default);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [SwaggerOperation("Добавить Google токен"), Authorize]
+        [SwaggerResponse(200, "Успешно добавлен", Type = typeof(OutputAccountCredentialsBody))]
+        [SwaggerResponse(400, "Токен не валиден или активирован")]
+
+        [HttpPost("addGoogleToken")]
+        public async Task<IActionResult> AddGoogleTokenAsync(string googleToken,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token)
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+
+            var result = await _authService.AddGoogleToken(googleToken, tokenInfo.AccountId);
+            if (result == HttpStatusCode.OK)
+                return Ok(result);
+
+            return StatusCode((int)result);
+        }
+
+        [SwaggerOperation("Получить Google токен"), Authorize]
+        [SwaggerResponse(200, "Успешно получен", Type = typeof(OutputAccountCredentialsBody))]
+
+        [HttpGet("getGoogleToken")]
+        public async Task<IActionResult> GetGoogleTokenAsync(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token)
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+
+            var result = await _authService.GetGoogleToken(tokenInfo.AccountId);
+            if (result.IsSuccess)
+                return Ok(result.Body);
 
             return StatusCode((int)result.StatusCode, result.Errors);
         }

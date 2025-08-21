@@ -163,5 +163,26 @@ namespace Planner_Auth.Infrastructure.Repository
             return await _context.Accounts.Where(e => ids.Contains(e.Id))
                 .ToListAsync();
         }
+
+        public async Task<GoogleToken?> AddAsync(string token, Guid accountId)
+        {
+            var account = await GetAsync(accountId);
+            if (account != null)
+                return null;
+
+            var googleToken = new GoogleToken
+            {
+                Token = token,
+                UserId = accountId
+            };
+
+            var result = await _context.GoogleTokens.AddAsync(googleToken);
+            await _context.SaveChangesAsync();
+            return result?.Entity;
+        }
+
+        public async Task<GoogleToken?> GetGoogleTokenAsync(Guid userId)
+            => await _context.GoogleTokens
+                .FirstOrDefaultAsync(e => e.UserId == userId);
     }
 }

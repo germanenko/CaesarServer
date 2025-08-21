@@ -21,5 +21,7 @@ namespace Planner_Auth.Core.IRepository
         Task<string?> UpdateTokenAsync(string refreshToken, Guid sessionId, TimeSpan? duration = null);
         Task<AccountSession?> GetSessionByTokenAndAccount(string refreshTokenHash);
         Task<Account?> UpdateProfileIconAsync(Guid accountId, string filename);
+        Task<GoogleToken?> AddAsync(string token, Guid accountId);
+        Task<GoogleToken?> GetGoogleTokenAsync(Guid userId);
     }
 }
