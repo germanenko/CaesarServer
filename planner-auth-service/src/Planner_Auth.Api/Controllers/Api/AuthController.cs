@@ -70,7 +70,7 @@ namespace Planner_Auth.Api.Controllers.Api
             if (result.IsSuccess == true)
                 return Ok(result);
 
-            return StatusCode((int)result.StatusCode);
+            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [SwaggerOperation("Получить Google токен"), Authorize]
