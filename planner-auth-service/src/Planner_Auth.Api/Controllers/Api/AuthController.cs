@@ -108,8 +108,8 @@ namespace Planner_Auth.Api.Controllers.Api
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [SwaggerOperation("Google аутентификация"), Authorize]
-        [SwaggerResponse(200, "Успешно получен", Type = typeof(OutputAccountCredentialsBody))]
+        [SwaggerOperation("Google аутентификация")]
+        [SwaggerResponse(200, "Успешно авторизован", Type = typeof(OutputAccountCredentialsBody))]
         [HttpPost("googleAuth")]
         public async Task<IActionResult> GoogleAuthAsync(string googleToken,
             [FromHeader(Name = "DeviceId")] string deviceId,
