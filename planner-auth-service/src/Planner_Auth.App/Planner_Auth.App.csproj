@@ -13,10 +13,10 @@
 
   <ItemGroup>
     <Reference Include="Planer-email-service.App">
-      <HintPath>..\..\obj\Planer-email-service.App.dll</HintPath>
+      <HintPath>..\..\Planer-email-service.App.dll</HintPath>
     </Reference>
     <Reference Include="Planer-email-service.Core">
-      <HintPath>..\..\obj\Planer-email-service.Core.dll</HintPath>
+      <HintPath>..\..\Planer-email-service.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 
