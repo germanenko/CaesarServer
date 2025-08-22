@@ -278,17 +278,6 @@ namespace Planner_Auth.App.Service
 
         public async Task<ServiceResponse<string>> AddGoogleToken(string token, Guid accountId)
         {
-            var regex = new Regex("[\\d|a-f]{8}-([\\d|a-f]{4}-){3}[\\d|a-f]{12}");
-            if (!regex.IsMatch(token))
-            {
-                return new ServiceResponse<string>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Errors = new [] { "Token not valid" }
-                };
-            }
-
             var result = await _accountRepository.AddAsync(token, accountId);
 
             if (result == null)
