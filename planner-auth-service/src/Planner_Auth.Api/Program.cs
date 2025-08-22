@@ -59,12 +59,6 @@ void ConfigureServices(IServiceCollection services)
     var googleClientId = GetEnvVar("GOOGLE_CLIENT_ID");
     var googleClientSecret = GetEnvVar("GOOGLE_CLIENT_SECRET");
 
-    var emailSenderName = GetEnvVar("EMAIL_SENDER_NAME");
-    var emailSenderEmail = GetEnvVar("EMAIL_SENDER_EMAIL");
-    var emailSmtpServer = GetEnvVar("EMAIL_SMTP_SERVER");
-    var emailSmtpPort = int.Parse(GetEnvVar("EMAIL_SMTP_PORT"));
-    var emailSenderPassword = GetEnvVar("EMAIL_SENDER_PASSWORD");
-
     var mailruClientId = GetEnvVar("MAILRU_CLIENT_ID");
     var mailruClientSecret = GetEnvVar("MAILRU_CLIENT_SECRET");
     var mailruRedirectUri = GetEnvVar("MAILRU_REDIRECT_URI");
