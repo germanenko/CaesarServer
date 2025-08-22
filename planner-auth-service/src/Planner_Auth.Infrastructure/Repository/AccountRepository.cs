@@ -166,9 +166,16 @@ namespace Planner_Auth.Infrastructure.Repository
 
         public async Task<GoogleToken?> AddAsync(string token, Guid accountId)
         {
-            var account = await GetAsync(accountId);
-            if (account != null)
-                return null;
+            try
+            {
+                var account = await GetAsync(accountId);
+                if (account != null)
+                    return null;
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex);
+            }
 
             var googleToken = new GoogleToken
             {
