@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -7,6 +6,8 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Planer_email_service.App.Service;
+using Planer_email_service.Core.IService;
 using Planner_Auth.App.Service;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
@@ -14,6 +15,9 @@ using Planner_Auth.Infrastructure.Data;
 using Planner_Auth.Infrastructure.Repository;
 using Planner_Auth.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
+using IJwtService = Planner_Auth.Core.IService.IJwtService;
+using JwtService = Planner_Auth.App.Service.JwtService;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -54,6 +58,12 @@ void ConfigureServices(IServiceCollection services)
 
     var googleClientId = GetEnvVar("GOOGLE_CLIENT_ID");
     var googleClientSecret = GetEnvVar("GOOGLE_CLIENT_SECRET");
+
+    var emailSenderName = GetEnvVar("EMAIL_SENDER_NAME");
+    var emailSenderEmail = GetEnvVar("EMAIL_SENDER_EMAIL");
+    var emailSmtpServer = GetEnvVar("EMAIL_SMTP_SERVER");
+    var emailSmtpPort = int.Parse(GetEnvVar("EMAIL_SMTP_PORT"));
+    var emailSenderPassword = GetEnvVar("EMAIL_SENDER_PASSWORD");
 
     var mailruClientId = GetEnvVar("MAILRU_CLIENT_ID");
     var mailruClientSecret = GetEnvVar("MAILRU_CLIENT_SECRET");
@@ -150,6 +160,14 @@ void ConfigureServices(IServiceCollection services)
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });
     });
+
+    services.AddSingleton<IEmailService, EmailService>(sp => new EmailService(
+        emailSenderEmail,
+        emailSenderPassword,
+        emailSenderName,
+        emailSmtpServer,
+        emailSmtpPort,
+        sp.GetRequiredService<ILogger<EmailService>>()));
 
     services.AddSingleton<IHashPasswordService, HashPasswordService>(sp => new HashPasswordService(passwordHashKey));
     services.AddSingleton<RabbitMqService>(provider =>
