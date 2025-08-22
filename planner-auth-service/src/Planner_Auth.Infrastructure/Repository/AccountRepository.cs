@@ -166,22 +166,11 @@ namespace Planner_Auth.Infrastructure.Repository
 
         public async Task<GoogleToken?> AddAsync(string token, Guid accountId)
         {
-            try
-            {
-                var account = await GetAsync(accountId);
-                if (account != null)
-                    return null;
-            }
-            catch (Exception ex)
-            {
-                var error = new GoogleToken
-                {
-                    Token = ex.Message,
-                    UserId = accountId
-                };
 
-                return error;
-            }
+            var account = await GetAsync(accountId);
+            if (account == null)
+                return null;
+
 
             var googleToken = new GoogleToken
             {

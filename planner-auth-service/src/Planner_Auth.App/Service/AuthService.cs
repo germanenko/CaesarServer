@@ -285,8 +285,7 @@ namespace Planner_Auth.App.Service
                 return new ServiceResponse<string>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest,
-                    
+                    StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
