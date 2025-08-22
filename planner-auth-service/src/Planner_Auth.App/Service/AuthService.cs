@@ -21,7 +21,7 @@ namespace Planner_Auth.App.Service
         private readonly IJwtService _jwtService;
         private readonly IHashPasswordService _hashPasswordService;
         private readonly INotifyService _notifyService;
-        private readonly EmailService _emailService;
+        //private readonly EmailService _emailService;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService
@@ -30,8 +30,8 @@ namespace Planner_Auth.App.Service
             IJwtService jwtService,
             IHashPasswordService hashPasswordService,
             INotifyService notifyService,
-            ILogger<AuthService> logger,
-            EmailService emailService
+            ILogger<AuthService> logger
+            //EmailService emailService
         )
         {
             _accountRepository = accountRepository;
@@ -39,7 +39,7 @@ namespace Planner_Auth.App.Service
             _hashPasswordService = hashPasswordService;
             _notifyService = notifyService;
             _logger = logger;
-            _emailService = emailService;
+            //_emailService = emailService;
         }
 
         public async Task<ServiceResponse<OutputAccountCredentialsBody>> RestoreToken(
@@ -413,7 +413,7 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                await _emailService.SendMessage(userInfo.Email, "Временный пароль", "К вашему аккаунту применен временный пароль, измените его");
+                //await _emailService.SendMessage(userInfo.Email, "Временный пароль", "К вашему аккаунту применен временный пароль, измените его");
             }
             else
             {

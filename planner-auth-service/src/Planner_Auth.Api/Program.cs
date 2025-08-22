@@ -6,8 +6,8 @@ using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Planer_email_service.App.Service;
-using Planer_email_service.Core.IService;
+//using Planer_email_service.App.Service;
+//using Planer_email_service.Core.IService;
 using Planner_Auth.App.Service;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
@@ -161,13 +161,13 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
-    services.AddSingleton<IEmailService, EmailService>(sp => new EmailService(
-        emailSenderEmail,
-        emailSenderPassword,
-        emailSenderName,
-        emailSmtpServer,
-        emailSmtpPort,
-        sp.GetRequiredService<ILogger<EmailService>>()));
+    //services.AddSingleton<IEmailService, EmailService>(sp => new EmailService(
+    //    emailSenderEmail,
+    //    emailSenderPassword,
+    //    emailSenderName,
+    //    emailSmtpServer,
+    //    emailSmtpPort,
+    //    sp.GetRequiredService<ILogger<EmailService>>()));
 
     services.AddSingleton<IHashPasswordService, HashPasswordService>(sp => new HashPasswordService(passwordHashKey));
     services.AddSingleton<RabbitMqService>(provider =>
