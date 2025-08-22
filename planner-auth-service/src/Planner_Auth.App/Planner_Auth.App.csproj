@@ -3,8 +3,6 @@
   <ItemGroup>
     <ProjectReference Include="..\Planner_Auth.Core\Planner_Auth.Core.csproj" />
     <ProjectReference Include="..\Planner_Auth.Infrastructure\Planner_Auth.Infrastructure.csproj" />
-	  <ProjectReference Include="..\..\..\planer-email-service\src\Planer-email-service.App\Planer-email-service.App.csproj" />
-    	  <ProjectReference Include="..\..\..\planer-email-service\src\Planer-email-service.Core\Planer-email-service.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
