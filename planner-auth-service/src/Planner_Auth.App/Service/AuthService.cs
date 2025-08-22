@@ -2,7 +2,7 @@ using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json.Linq;
-using Planer_email_service.App.Service;
+//using Planer_email_service.App.Service;
 using Planner_Auth.Core.Entities.Events;
 using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
