@@ -57,6 +57,20 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/googleAuth",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8888
+                }
+            ],
+            "UpstreamPathTemplate": "/api/googleAuth",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/addGoogleToken",
             "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",

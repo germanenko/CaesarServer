@@ -1,12 +1,16 @@
-using System.Net;
-using System.Text.RegularExpressions;
+using Google.Apis.Auth.OAuth2;
+using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
 using Planner_Auth.Core.Entities.Events;
 using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
+using System.Net;
+using System.Security.Cryptography;
+using System.Text.RegularExpressions;
 
 namespace Planner_Auth.App.Service
 {
@@ -317,6 +321,113 @@ namespace Planner_Auth.App.Service
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
+        }
+
+        private async Task<ServiceResponse<OutputAccountCredentialsBody>> SignInWithHash(SignInBody body, AuthenticationProvider provider)
+        {
+            var isValidIdentifier = IsValidAuthenticationIdentifier(body.Identifier, body.Method);
+            if (!isValidIdentifier)
+                return new ServiceResponse<OutputAccountCredentialsBody>
+                {
+                    Errors = new string[] { "Identifier is not correct format" },
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var isValidDeviceId = IsValidDeviceId(body.DeviceId, body.DeviceTypeId);
+            if (!isValidDeviceId)
+                return new ServiceResponse<OutputAccountCredentialsBody>
+                {
+                    Errors = new string[] { "DeviceId is not correct format" },
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var account = await _accountRepository.GetAsync(body.Identifier);
+            if (account == null)
+                return new ServiceResponse<OutputAccountCredentialsBody>
+                {
+                    Errors = new string[] { "Account not found" },
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound
+                };
+
+            if (account.AuthorizationProvider != provider.ToString())
+                return new ServiceResponse<OutputAccountCredentialsBody>
+                {
+                    Errors = new string[] { "Account created by another provider" },
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.Conflict
+                };
+
+            if (account.PasswordHash != body.Password)
+                return new ServiceResponse<OutputAccountCredentialsBody>
+                {
+                    Errors = new string[] { "Password is not correct" },
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var sessionId = await CreateSession(body.DeviceId, account.Id);
+            var outputAccountCredentials = await UpdateToken(account.RoleName, account.Id, sessionId.Value);
+            return new ServiceResponse<OutputAccountCredentialsBody>
+            {
+                Body = outputAccountCredentials,
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK
+            };
+        }
+
+        public async Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(
+            string token, DeviceTypeId deviceTypeId, string deviceId)
+        {
+            var userCredential = GoogleCredential.FromAccessToken(token);
+
+            var oauthSerivce = new Google.Apis.Oauth2.v2.Oauth2Service(
+                new BaseClientService.Initializer()
+                {
+                    HttpClientInitializer = userCredential
+                });
+
+            var userInfo = await oauthSerivce.Userinfo.Get().ExecuteAsync();
+
+            var account = _accountRepository.GetAsync(userInfo.Email).Result;
+
+            ServiceResponse<OutputAccountCredentialsBody> tokenPair;
+
+            if (account == null)
+            {
+                tokenPair = await SignUp(new SignUpBody()
+                {
+                    Identifier = userInfo.Email,
+                    Nickname = userInfo.Name,
+                    Method = DefaultAuthenticationMethod.Email,
+                    Password = Guid.NewGuid().ToString(),
+                    DeviceId = deviceId,
+                    DeviceTypeId = deviceTypeId
+                },
+                "User",
+                AuthenticationProvider.Google);
+            }
+            else
+            {
+                tokenPair = await SignInWithHash(new SignInBody()
+                {
+                    Identifier = userInfo.Email,
+                    Method = DefaultAuthenticationMethod.Email,
+                    Password = account.PasswordHash,
+                    DeviceId = deviceId,
+                    DeviceTypeId = deviceTypeId
+                },
+                AuthenticationProvider.Google);
+            }
+
+            return new ServiceResponse<OutputAccountCredentialsBody>
+            {
+                Body = tokenPair.Body,
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK
+            };
         }
     }
 }
