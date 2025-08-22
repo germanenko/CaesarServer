@@ -276,10 +276,26 @@ namespace Planner_Auth.App.Service
             return session?.Id;
         }
 
-        public async Task<HttpStatusCode> AddGoogleToken(string token, Guid accountId)
+        public async Task<ServiceResponse<string>> AddGoogleToken(string token, Guid accountId)
         {
             var result = await _accountRepository.AddAsync(token, accountId);
-            return result == null ? HttpStatusCode.NotAcceptable : HttpStatusCode.OK;
+
+            if (result == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    
+                };
+            }
+
+            return new ServiceResponse<string>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result.Token
+            };
         }
 
         public async Task<ServiceResponse<string>> GetGoogleToken(Guid accountId)

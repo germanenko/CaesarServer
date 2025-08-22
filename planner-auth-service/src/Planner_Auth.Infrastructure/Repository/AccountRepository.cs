@@ -174,7 +174,13 @@ namespace Planner_Auth.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex);
+                var error = new GoogleToken
+                {
+                    Token = ex.Message,
+                    UserId = accountId
+                };
+
+                return error;
             }
 
             var googleToken = new GoogleToken

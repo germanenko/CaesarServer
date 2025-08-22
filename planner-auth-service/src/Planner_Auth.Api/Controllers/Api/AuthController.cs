@@ -67,10 +67,10 @@ namespace Planner_Auth.Api.Controllers.Api
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
             var result = await _authService.AddGoogleToken(googleToken, tokenInfo.AccountId);
-            if (result == HttpStatusCode.OK)
+            if (result.IsSuccess == true)
                 return Ok(result);
 
-            return StatusCode((int)result);
+            return StatusCode((int)result.StatusCode);
         }
 
         [SwaggerOperation("Получить Google токен"), Authorize]
