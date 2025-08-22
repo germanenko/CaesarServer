@@ -11,15 +11,6 @@
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Reference Include="Planer-email-service.App">
-      <HintPath>..\..\Planer-email-service.App.dll</HintPath>
-    </Reference>
-    <Reference Include="Planer-email-service.Core">
-      <HintPath>..\..\Planer-email-service.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>Planner_Auth.App</RootNamespace>

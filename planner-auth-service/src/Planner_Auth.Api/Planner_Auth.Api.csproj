@@ -15,14 +15,6 @@
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="8.0.2" />
     <PackageReference Include="Swashbuckle.AspNetCore.Swagger" Version="6.6.2" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="Planer-email-service.App">
-      <HintPath>..\..\Planer-email-service.App.dll</HintPath>
-    </Reference>
-    <Reference Include="Planer-email-service.Core">
-      <HintPath>..\..\Planer-email-service.Core.dll</HintPath>
-    </Reference>
-  </ItemGroup>
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <Nullable>enable</Nullable>
