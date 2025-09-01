@@ -21,11 +21,12 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<Board?> AddAsync(string boardName, Guid accountId)
+        public async Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
         {
             var board = new Board
             {
-                Name = boardName,
+                Id = createBoardBody.Id,
+                Name = createBoardBody.Name,
                 Members = new List<BoardMember>
                 {
                     new() {

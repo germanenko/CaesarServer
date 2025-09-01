@@ -115,7 +115,7 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
         {
-            var result = await _boardRepository.AddAsync(body.Name, accountId);
+            var result = await _boardRepository.AddAsync(body, accountId);
 
             if (result is null)
             {
