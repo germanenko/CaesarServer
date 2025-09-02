@@ -1,4 +1,5 @@
 using Planner_chat_server.Core.Entities.Models;
+using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 
@@ -29,7 +30,7 @@ namespace Planner_chat_server.Core.IRepository
         Task<ChatMembership?> GetChatMembershipAsync(Guid chatId, Guid accountId);
         Task<List<ChatBody>> GetChatBodies(Guid accountId, Guid userSessionId, ChatType chatType);
         Task<ChatMembership?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId);
-        Task<Chat?> AddPersonalChatAsync(List<Guid> participants, string name, DateTime date);
+        Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date);
         Task<Chat?> GetByTaskIdAsync(Guid taskId);
     }
 }

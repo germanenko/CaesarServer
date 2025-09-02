@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Planner_chat_server.Core;
 using Planner_chat_server.Core.Entities.Models;
+using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
@@ -50,7 +51,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             return message;
         }
 
-        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, string name, DateTime date)
+        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date)
         {
             if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
                 return null;
@@ -65,7 +66,8 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             var chat = new Chat
             {
-                Name = name,
+                Id = createChatBody.Id,
+                Name = createChatBody.Name,
                 Type = ChatType.Personal.ToString(),
                 ChatMemberships = memberships,
             };

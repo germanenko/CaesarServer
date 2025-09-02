@@ -83,7 +83,7 @@ namespace Planner_chat_server.App.Service
             };
 
             var currentDate = DateTime.UtcNow;
-            var result = await _chatRepository.AddPersonalChatAsync(participants, createChatBody.Name, currentDate);
+            var result = await _chatRepository.AddPersonalChatAsync(participants, createChatBody, currentDate);
             if (result == null)
                 return new ServiceResponse<ChatBody>
                 {
