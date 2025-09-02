@@ -6,6 +6,7 @@ namespace Planer_task_board.Core.IRepository
     public interface ITaskRepository
     {
         Task<TaskModel?> AddAsync(
+            Guid id,
             string title,
             string description,
             int priorityOrder,
@@ -18,6 +19,7 @@ namespace Planer_task_board.Core.IRepository
             Guid creatorId,
             List<Guid> messages);
         Task<TaskModel?> AddAsync(
+            Guid id,
             string title,
             string description,
             string? hexColor,

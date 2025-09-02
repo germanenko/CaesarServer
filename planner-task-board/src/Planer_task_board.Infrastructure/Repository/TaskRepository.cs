@@ -22,6 +22,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> AddAsync
         (
+            Guid id,
             string title,
             string description,
             int priorityOrder,
@@ -37,6 +38,7 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var task = new TaskModel
             {
+                Id = id,
                 Title = title,
                 Description = description,
                 HexColor = hexColor,
@@ -62,6 +64,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> AddAsync
         (
+            Guid id,
             string title,
             string description,
             string? hexColor,
@@ -76,6 +79,7 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var task = new TaskModel
             {
+                Id = id,
                 Title = title,
                 Description = description,
                 HexColor = hexColor,

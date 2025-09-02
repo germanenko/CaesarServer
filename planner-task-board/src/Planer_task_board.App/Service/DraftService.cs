@@ -108,6 +108,7 @@ namespace Planer_task_board.App.Service
 
 
             var result = await _taskRepository.AddAsync(
+                body.Id,
                 body.Title,
                 body.Description,
                 body.HexColor,

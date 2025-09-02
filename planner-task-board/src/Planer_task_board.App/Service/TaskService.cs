@@ -119,6 +119,7 @@ namespace Planer_task_board.App.Service
             }
 
             var result = await _taskRepository.AddAsync(
+                taskBody.Id,
                 taskBody.Title,
                 taskBody.Description,
                 taskBody.PriorityOrder,
@@ -205,6 +206,7 @@ namespace Planer_task_board.App.Service
                 }
 
                 var result = await _taskRepository.AddAsync(
+                    taskBody.Id,
                     taskBody.Title,
                     taskBody.Description,
                     taskBody.PriorityOrder,
