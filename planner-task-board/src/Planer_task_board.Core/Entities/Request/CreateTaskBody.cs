@@ -6,6 +6,9 @@ namespace Planer_task_board.Core.Entities.Request
     public class CreateTaskBody
     {
         [Required]
+        public Guid Id { get; set; }
+
+        [Required]
         [MaxLength(128)]
         public string Title { get; set; }
 

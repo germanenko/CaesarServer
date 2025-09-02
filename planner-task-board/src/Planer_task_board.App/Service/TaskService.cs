@@ -66,7 +66,7 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateTask(Guid accountId, Guid columnId, CreateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, Guid columnId, CreateTaskBody taskBody)
         {
             var errors = new List<string>();
             if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -102,6 +102,22 @@ namespace Planer_task_board.App.Service
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
+            if(await _taskRepository.GetAsync(taskBody.Id, false) != null)
+            {
+                var task = await UpdateTask(accountId, columnId, new UpdateTaskBody() 
+                {
+                    Id = taskBody.Id,
+                    Title = taskBody.Title,
+                    Description = taskBody.Description,
+                    PriorityOrder = taskBody.PriorityOrder,
+                    Status = taskBody.Status,
+                    HexColor = taskBody.HexColor,
+                    ColumnId = taskBody.ColumnId
+                });
+
+                return task;
+            }
+
             var result = await _taskRepository.AddAsync(
                 taskBody.Title,
                 taskBody.Description,
@@ -133,10 +149,10 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateTasks(Guid accountId, List<CreateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateTaskBody> taskBodies)
         {
             var errors = new List<string>();
-            List<TaskModel> tasks = new List<TaskModel>();
+            List<TaskBody> tasks = new List<TaskBody>();
             foreach (var taskBody in taskBodies)
             {
                 if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -172,6 +188,22 @@ namespace Planer_task_board.App.Service
                 DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
                 DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
+                if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
+                {
+                    var task = await UpdateTask(accountId, taskBody.ColumnId, new UpdateTaskBody()
+                    {
+                        Id = taskBody.Id,
+                        Title = taskBody.Title,
+                        Description = taskBody.Description,
+                        PriorityOrder = taskBody.PriorityOrder,
+                        Status = taskBody.Status,
+                        HexColor = taskBody.HexColor,
+                        ColumnId = taskBody.ColumnId
+                    });
+
+                    tasks.Add(task.Body);
+                }
+
                 var result = await _taskRepository.AddAsync(
                     taskBody.Title,
                     taskBody.Description,
@@ -196,13 +228,13 @@ namespace Planer_task_board.App.Service
                     };
                 }
 
-                tasks.Add(result);
+                tasks.Add(result.ToTaskBody());
             }
 
             return new ServiceResponse<List<TaskBody>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(x => x.ToTaskBody()).ToList(),
+                Body = tasks,
                 IsSuccess = true
             };
         }
