@@ -149,7 +149,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery, Required] CreateColumnBody column
+            CreateColumnBody column
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
