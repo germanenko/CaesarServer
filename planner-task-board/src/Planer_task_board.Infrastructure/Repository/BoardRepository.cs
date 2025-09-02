@@ -42,14 +42,15 @@ namespace Planer_task_board.Infrastructure.Repository
             return board;
         }
 
-        public async Task<List<Board>?> AddRangeAsync(List<string> boardNames, Guid accountId)
+        public async Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
         {
-            List<Board> boards = new List<Board>();
-            foreach (var boardName in boardNames)
+            List<Board> newBoards = new List<Board>();
+            foreach (var board in boards)
             {
-                var board = new Board()
+                var newBoard = new Board()
                 {
-                    Name = boardName,
+                    Id = board.Id,
+                    Name = board.Name,
                     Members = new List<BoardMember>
                     {
                         new() {
@@ -58,12 +59,12 @@ namespace Planer_task_board.Infrastructure.Repository
                         }
                     }
                 };
-                boards.Add(board);
+                newBoards.Add(newBoard);
             }
-            await _context.Boards.AddRangeAsync(boards);
+            await _context.Boards.AddRangeAsync(newBoards);
             await _context.SaveChangesAsync();
 
-            return boards;
+            return newBoards;
         }
 
         public async Task<BoardMember?> AddBoardMember(Guid accountId, Guid boardId)
@@ -169,12 +170,13 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<BoardColumn?> AddBoardColumn(Board board, string name, Guid accountId)
+        public async Task<BoardColumn?> AddBoardColumn(Board board, CreateColumnBody column, Guid accountId)
         {
             var boardColumn = new BoardColumn
             {
+                Id = column.Id,
                 Board = board,
-                Name = name,
+                Name = column.Name
             };
 
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
@@ -202,6 +204,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 BoardColumn newColumn = new BoardColumn()
                 {
+                    Id = column.Id,
                     Board = _context.Boards.Where(b => b.Id == column.BoardId).First(),
                     Name = column.Name,
                 };

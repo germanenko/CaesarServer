@@ -27,9 +27,9 @@ namespace Planer_task_board.App.Service
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, Guid boardId, string name)
+        public async Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, CreateColumnBody column)
         {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
+            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
             if (boardMember == null)
             {
                 return new ServiceResponse<BoardColumnBody>
@@ -39,7 +39,7 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            var board = await _boardRepository.GetAsync(boardId);
+            var board = await _boardRepository.GetAsync(column.BoardId);
             if (board == null)
             {
                 return new ServiceResponse<BoardColumnBody>
@@ -49,7 +49,7 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            var result = await _boardRepository.AddBoardColumn(board, name, accountId);
+            var result = await _boardRepository.AddBoardColumn(board, column, accountId);
 
             if(result == null)
             {
@@ -136,7 +136,7 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
         {
-            var result = await _boardRepository.AddRangeAsync(bodies.Select(b => b.Name).ToList(), accountId);
+            var result = await _boardRepository.AddRangeAsync(bodies, accountId);
 
             if (result is null)
             {
