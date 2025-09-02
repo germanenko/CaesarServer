@@ -203,6 +203,7 @@ namespace Planer_task_board.App.Service
                     });
 
                     tasks.Add(task.Body);
+                    continue;
                 }
 
                 var result = await _taskRepository.AddAsync(
