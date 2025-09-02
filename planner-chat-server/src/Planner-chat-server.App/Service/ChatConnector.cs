@@ -127,7 +127,7 @@ namespace Planner_chat_server.App.Service
                 }
                 else
                 {
-                    var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId);
+                    var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId, messageBody.Id);
                     await SendMessage(sessions, chatMessage.ToMessageBody(), WebSocketMessageType.Text, allUserIds, chat);
                     return chatMessage.SentAt;
                 }

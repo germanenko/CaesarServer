@@ -5,6 +5,8 @@ namespace Planner_chat_server.Core.Entities.Request
 {
     public class CreateMessageBody
     {
+        public Guid Id { get; set; }
+
         public MessageType Type { get; set; }
 
         [Required]

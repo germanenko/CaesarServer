@@ -14,7 +14,7 @@ namespace Planner_chat_server.Core.IRepository
         Task<List<ChatMembership>> GetChatMembershipsByAccountIdAsync(Guid accountId);
         Task<ChatMembership?> GetMembershipAsync(Guid chatId, Guid accountId);
         Task<List<ChatMessage>> GetMessages(IEnumerable<Guid> messageIds);
-        Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId);
+        Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId);
         Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatMembership chatMembership, DateTime date);
         Task CreateAccountChatSessionsAsync(Guid session);
         Task<ChatMessage?> GetMessageAsync(Guid id);

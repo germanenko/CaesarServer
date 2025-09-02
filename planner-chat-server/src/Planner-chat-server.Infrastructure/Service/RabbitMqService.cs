@@ -181,7 +181,7 @@ namespace Planner_chat_server.Infrastructure.Service
             if (chat == null)
                 return;
 
-            var chatMessage = await chatRepository.AddMessageAsync(MessageType.File, chatAttachment.FileName, chat, chatAttachment.AccountId);
+            var chatMessage = await chatRepository.AddMessageAsync(MessageType.File, chatAttachment.FileName, chat, chatAttachment.AccountId, Guid.NewGuid());
             if (chatMessage == null)
                 return;
 

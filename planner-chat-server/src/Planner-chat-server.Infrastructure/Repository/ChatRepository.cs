@@ -35,10 +35,11 @@ namespace Planner_chat_server.Infrastructure.Repository
             return chatMembership;
         }
 
-        public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId)
+        public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId)
         {
             var message = new ChatMessage
             {
+                Id = messageId,
                 Chat = chat,
                 Type = messageType.ToString(),
                 Content = content,
