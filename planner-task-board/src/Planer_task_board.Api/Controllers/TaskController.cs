@@ -26,12 +26,12 @@ namespace Planer_task_board.Api.Controllers
         }
 
         [HttpPost("task"), Authorize]
-        [SwaggerOperation("Создать задачу")]
+        [SwaggerOperation("Создать/обновить задачу")]
         [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
-        public async Task<IActionResult> CreateTask(
+        public async Task<IActionResult> CreateOrUpdateTask(
             [FromBody] CreateTaskBody taskBody,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
@@ -46,13 +46,13 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpPost("createTasks"), Authorize]
-        [SwaggerOperation("Создать задачи")]
+        [HttpPost("createOrUpdateTasks"), Authorize]
+        [SwaggerOperation("Создать/обновить задачи")]
         [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
-        public async Task<IActionResult> CreateTasks(
+        public async Task<IActionResult> CreateOrUpdateTasks(
             [FromBody] List<CreateTaskBody> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )

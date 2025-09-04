@@ -611,7 +611,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/createTasks",
+            "DownstreamPathTemplate": "/api/createOrUpdateTasks",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -619,7 +619,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/api/createTasks",
+            "UpstreamPathTemplate": "/api/createOrUpdateTasks",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
