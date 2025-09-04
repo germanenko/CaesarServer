@@ -336,6 +336,8 @@ namespace Planer_task_board.Infrastructure.Repository
 
             _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
 
+            task.Columns.Add(boardColumnTask);
+
             return task;
         }
 
