@@ -4,10 +4,8 @@ using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class TaskModel
+    public class TaskModel : ModelBase
     {
-        public Guid Id { get; set; }
-
         [MaxLength(128)]
         public string Title { get; set; }
         public string Description { get; set; }
@@ -48,7 +46,8 @@ namespace Planer_task_board.Core.Entities.Models
                 StartDate = StartDate?.ToString("s"),
                 EndDate = EndDate?.ToString("s"),
                 ChatId = ChatId,
-                ColumnId = Columns.FirstOrDefault(x => x.TaskId == Id).ColumnId
+                ColumnId = Columns.FirstOrDefault(x => x.TaskId == Id).ColumnId,
+                ChangeDate = ChangeDate
             };
         }
     }

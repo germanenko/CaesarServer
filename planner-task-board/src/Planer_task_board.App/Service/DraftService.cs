@@ -118,7 +118,8 @@ namespace Planer_task_board.App.Service
                 column,
                 accountId,
                 body.MessageIds,
-                draftOfTask);
+                draftOfTask,
+                body.ChangeDate);
 
             if (result == null)
                 return new ServiceResponse<TaskBody>
@@ -199,7 +200,7 @@ namespace Planer_task_board.App.Service
 
             DateTime? startDate = body.StartDate != null ? DateTime.Parse(body.StartDate) : null;
             DateTime? endDate = body.EndDate != null ? DateTime.Parse(body.EndDate) : null;
-            var result = await _taskRepository.UpdateAsync(body.Id, body.Title, body.Description, startDate, endDate, body.HexColor, draftOfTask);
+            var result = await _taskRepository.UpdateAsync(body.Id, body.Title, body.Description, startDate, endDate, body.HexColor, draftOfTask, body.ChangeDate);
             return result == null ? new ServiceResponse<TaskBody>
             {
                 Errors = new[] { "Failed to update draft" },

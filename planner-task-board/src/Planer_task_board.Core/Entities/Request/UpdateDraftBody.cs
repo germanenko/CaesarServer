@@ -1,12 +1,10 @@
+using Planer_task_board.Core.Entities.Models;
 using System.ComponentModel.DataAnnotations;
 
 namespace Planer_task_board.Core.Entities.Request
 {
-    public class UpdateDraftBody
+    public class UpdateDraftBody : ModelBase
     {
-        [Required]
-        public Guid Id { get; set; }
-
         [Required]
         public string Title { get; set; }
 

@@ -1,13 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Request
 {
-    public class UpdateTaskBody
+    public class UpdateTaskBody : ModelBase
     {
-        [Required]
-        public Guid Id { get; set; }
-
         [Required]
         [MaxLength(128)]
         public string Title { get; set; }

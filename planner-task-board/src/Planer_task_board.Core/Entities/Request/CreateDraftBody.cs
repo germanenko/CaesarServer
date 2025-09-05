@@ -1,12 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Request
 {
-    public class CreateDraftBody
+    public class CreateDraftBody : ModelBase
     {
-        [Required]
-        public Guid Id { get; set; }
         [Required]
         public string Title { get; set; }
 

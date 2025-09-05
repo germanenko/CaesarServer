@@ -33,7 +33,8 @@ namespace Planer_task_board.Infrastructure.Repository
             string? hexColor,
             BoardColumn column,
             Guid creatorId,
-            List<Guid> messages
+            List<Guid> messages,
+            DateTime changeDate
         )
         {
             var task = new TaskModel
@@ -49,6 +50,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 StartDate = startDate?.ToUniversalTime(),
                 EndDate = endDate?.ToUniversalTime(),
                 Type = taskType.ToString(),
+                ChangeDate = changeDate
             };
 
             var setMessages = messages.Distinct().ToList();
@@ -74,7 +76,8 @@ namespace Planer_task_board.Infrastructure.Repository
             BoardColumn column,
             Guid creatorId,
             List<Guid> messages,
-            TaskModel? parentTask
+            TaskModel? parentTask,
+            DateTime changeDate
         )
         {
             var task = new TaskModel
@@ -91,6 +94,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 EndDate = endDate?.ToUniversalTime(),
                 DraftOfTask = parentTask,
                 Type = taskType.ToString(),
+                ChangeDate = changeDate
             };
 
             var setMessages = messages.Distinct().ToList();
@@ -238,7 +242,8 @@ namespace Planer_task_board.Infrastructure.Repository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            Guid columnId)
+            Guid columnId,
+            DateTime changeDate)
         {
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id && !e.IsDraft);
@@ -252,6 +257,7 @@ namespace Planer_task_board.Infrastructure.Repository
             task.Status = taskState.ToString();
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
+            task.ChangeDate = changeDate;
 
             var boardColumnTask = _context.BoardColumnTasks.Where(x => x.TaskId == task.Id).First();
             if (boardColumnTask.ColumnId != columnId)
@@ -273,7 +279,8 @@ namespace Planer_task_board.Infrastructure.Repository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            TaskModel? draftOfTask)
+            TaskModel? draftOfTask,
+            DateTime changeDate)
         {
             var draft = await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id && e.IsDraft);
@@ -287,6 +294,7 @@ namespace Planer_task_board.Infrastructure.Repository
             draft.EndDate = endDate;
             draft.IsDraft = false;
             draft.DraftOfTask = draft;
+            draft.ChangeDate = changeDate;
 
             await _context.SaveChangesAsync();
             return draft;

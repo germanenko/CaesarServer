@@ -17,7 +17,8 @@ namespace Planer_task_board.Core.IRepository
             string? hexColor,
             BoardColumn column,
             Guid creatorId,
-            List<Guid> messages);
+            List<Guid> messages,
+            DateTime changeDate);
         Task<TaskModel?> AddAsync(
             Guid id,
             string title,
@@ -29,7 +30,8 @@ namespace Planer_task_board.Core.IRepository
             BoardColumn column,
             Guid creatorId,
             List<Guid> messages,
-            TaskModel? parentTask);
+            TaskModel? parentTask,
+            DateTime changeDate);
         Task<TaskModel?> GetAsync(Guid id, bool isDraft);
         Task<bool> RemoveAsync(Guid id, bool isDraft);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, TaskState? status, bool isDraft = false);
@@ -47,7 +49,8 @@ namespace Planer_task_board.Core.IRepository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            Guid columnId);
+            Guid columnId,
+            DateTime changeDate);
         Task<TaskModel?> UpdateAsync(
             Guid id,
             string title,
@@ -55,7 +58,8 @@ namespace Planer_task_board.Core.IRepository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            TaskModel? draftOfTask);
+            TaskModel? draftOfTask,
+            DateTime changeDate);
         Task<TaskPerformer?> LinkPerformerToTaskAsync(TaskModel task, Guid performerId);
         Task<IEnumerable<TaskPerformer>> LinkPerformersToTaskAsync(TaskModel task, IEnumerable<Guid> performerIds);
         Task<TaskPerformer?> GetTaskPerformer(Guid performerId, Guid taskId);
