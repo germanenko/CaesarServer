@@ -1,8 +1,9 @@
+using Planer_task_board.Core.Entities.Models;
+
 namespace Planer_task_board.Core.Entities.Response
 {
-    public class BoardBody
+    public class BoardBody : ModelBase
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
     }
 }

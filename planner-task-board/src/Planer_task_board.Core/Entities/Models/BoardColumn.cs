@@ -2,9 +2,8 @@ using Planer_task_board.Core.Entities.Response;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class BoardColumn
+    public class BoardColumn : ModelBase
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
 
         public Board Board { get; set; }
@@ -18,7 +17,8 @@ namespace Planer_task_board.Core.Entities.Models
             {
                 Id = Id,
                 Name = Name,
-                BoardId = BoardId
+                BoardId = BoardId,
+                ChangeDate = ChangeDate
             };
         }
     }

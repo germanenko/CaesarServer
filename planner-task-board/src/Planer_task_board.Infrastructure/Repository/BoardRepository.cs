@@ -178,7 +178,8 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = column.Id,
                 Board = board,
-                Name = column.Name
+                Name = column.Name,
+                ChangeDate = column.ChangeDate
             };
 
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
