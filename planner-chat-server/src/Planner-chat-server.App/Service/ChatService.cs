@@ -158,5 +158,16 @@ namespace Planner_chat_server.App.Service
                 Body = messages.Select(e => e.ToMessageBody())
             };
         }
+
+        public async Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage)
+        {
+            var message = await _chatRepository.UpdateMessage(accountId, updatedMessage);
+            return new ServiceResponse<MessageBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = message.ToMessageBody()
+            };
+        }
     }
 }

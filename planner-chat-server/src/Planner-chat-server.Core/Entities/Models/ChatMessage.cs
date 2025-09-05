@@ -4,9 +4,8 @@ using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Core.Entities.Models
 {
-    public class ChatMessage
+    public class ChatMessage : ModelBase
     {
-        public Guid Id { get; set; }
         public string Type { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;

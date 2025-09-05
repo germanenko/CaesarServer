@@ -781,6 +781,19 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/chat/editMessage",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/chat/editMessage",
+            "UpstreamHttpMethod": [ "PUT" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/chat/allMessages",
             "DownstreamScheme": "http",

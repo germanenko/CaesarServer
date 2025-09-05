@@ -96,6 +96,23 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
+        [HttpPut("api/chat/editMessage")]
+        [SwaggerOperation("Редактировать сообщение")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> EditMessage(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromBody, Required] MessageBody updatedMessage
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.EditMessage(tokenPayload.AccountId, updatedMessage);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
         [HttpGet("api/chat/allMessages")]
         [SwaggerOperation("Получить все сообщения")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]

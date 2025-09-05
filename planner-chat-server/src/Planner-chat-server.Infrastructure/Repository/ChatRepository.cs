@@ -367,5 +367,32 @@ namespace Planner_chat_server.Infrastructure.Repository
             await _context.ChatMemberships.AddRangeAsync(newChatMemberships);
             await _context.SaveChangesAsync();
         }
+
+        public async Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody updatedMessage)
+        {
+            var query = _context.ChatMemberships
+                .Include(e => e.Chat)
+                .Where(user => user.AccountId == accountId);
+
+            if(query.Count() == 0)
+            {
+                return null;
+            }
+
+            var message = _context.ChatMessages
+                .Where(m => m.Id == updatedMessage.Id).FirstOrDefault();
+
+            if(message == null)
+            {
+                return null;
+            }
+
+            message.Content = updatedMessage.Content;
+            message.ChangeDate = updatedMessage.ChangeDate;
+
+            await _context.SaveChangesAsync();
+
+            return message;
+        }
     }
 }

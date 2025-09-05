@@ -12,5 +12,6 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<ChatBody>> CreatePersonalChat(Guid accountId, Guid sessionId, CreateChatBody createChatBody, Guid addedAccountId);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId);
+        Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage);
     }
 }
