@@ -8,5 +8,7 @@ namespace Planer_task_board.Core.Entities.Request
         public Guid Id { get; set; }
         [Required]
         public string Name { get; set; }
+        [Required]
+        public DateTime ChangeDate { get; set; }
     }
 }
