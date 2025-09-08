@@ -444,7 +444,7 @@ namespace Planner_Auth.App.Service
         {
             var client  = new HttpClient()
             {
-                BaseAddress = new Uri("http://localhost:5000/api/"),
+                BaseAddress = new Uri("http://127.0.0.1:5000/api/"),
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
