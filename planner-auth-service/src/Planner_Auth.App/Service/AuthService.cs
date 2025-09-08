@@ -444,7 +444,7 @@ namespace Planner_Auth.App.Service
         {
             var client  = new HttpClient()
             {
-                BaseAddress = new Uri("https://busfy.ru/api/"),
+                BaseAddress = new Uri("http://localhost:5000/api/"),
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
@@ -461,7 +461,6 @@ namespace Planner_Auth.App.Service
                 Console.WriteLine($"Сообщение не отправлено на электронную почту - {response.Content.ReadAsStringAsync().Result}");
                 return false;
             }
-
         }
     }
 }
