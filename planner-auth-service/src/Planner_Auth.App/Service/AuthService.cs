@@ -443,7 +443,7 @@ namespace Planner_Auth.App.Service
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
-            string responseString = await response.Content.ReadAsStringAsync();
+            string responseString = response.RequestMessage.ToString();
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
