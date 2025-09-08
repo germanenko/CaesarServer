@@ -226,7 +226,7 @@
 
 
 	{
-  		"DownstreamPathTemplate": "/api/message/serviceMessage",
+  		"DownstreamPathTemplate": "/api/message/serviceEmail",
   		"DownstreamScheme": "http",
   		"DownstreamHostAndPorts": [
     			{
@@ -234,7 +234,7 @@
       				"Port": 5000
     			}
   		],
-  		"UpstreamPathTemplate": "/api/message/serviceMessage",
+  		"UpstreamPathTemplate": "/api/message/serviceEmail",
   		"UpstreamHttpMethod": [ "POST" ]
 	},
 

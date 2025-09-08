@@ -1,11 +1,12 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planer_email_service.Api.CustomAttributes;
 using Planer_email_service.Core.Entities;
 using Planer_email_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Text.RegularExpressions;
 
 namespace Planer_email_service.Api.Controllers
 {
@@ -55,6 +56,25 @@ namespace Planer_email_service.Api.Controllers
                 return StatusCode((int)result.StatusCode);
 
             return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [SwaggerOperation("Отправить служебное письмо на почту")]
+        [LocalOnly]
+        [SwaggerResponse(200)]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(401)]
+
+        [HttpPost("api/message/serviceEmail")]
+        public async Task<IActionResult> SendServiceMessageByEmail(
+            SentMessageBody message,
+            [FromQuery, EmailAddress] string email
+        )
+        {
+            var response = await _emailService.SendMessage(email, message.Subject, message.Content);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode);
+
+            return StatusCode((int)response.StatusCode, response.Errors);
         }
 
         private bool IsValidEMail(string email) => Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
