@@ -441,12 +441,12 @@ namespace Planner_Auth.App.Service
         {
             var client  = new HttpClient()
             {
-                BaseAddress = new Uri("http://localhost:5000/api/"),
+                BaseAddress = new Uri("https://busfy.ru/api/"),
             };
 
             var s = $"{{ \"subject\": \"{email}\", \"content\": \"{contentText}\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
-            var response = await client.PostAsync("message/email" + $" ? email={email}", content);
+            var response = await client.PostAsync("message/email" + $"?email={email}", content);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
