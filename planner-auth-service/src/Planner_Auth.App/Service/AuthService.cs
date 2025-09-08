@@ -409,7 +409,7 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                await NotifyAboutTempPassword(tokenPair.Body.AccessToken.Replace("Bearer ", ""), userInfo.Email, "Вашему аккаунту присвоен временный пароль, смените его в приложении!");
+                await NotifyAboutTempPassword(userInfo.Email);
             }
             else
             {
@@ -430,17 +430,16 @@ namespace Planner_Auth.App.Service
             return tokenPair;
         }
 
-        public static async Task<bool> NotifyAboutTempPassword(string token, string email, string contentText)
+        public static async Task<bool> NotifyAboutTempPassword(string email)
         {
             var client  = new HttpClient()
             {
                 BaseAddress = new Uri("http://planer-email-service:80/api/"),
             };
-            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
-            var s = $"{{ \"subject\": \"{email}\", \"content\": \"{contentText}\"}}";
+            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль!\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
-            var response = await client.PostAsync("message/email" + $"?email={email}", content);
+            var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
