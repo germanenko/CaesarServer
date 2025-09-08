@@ -424,15 +424,14 @@ namespace Planner_Auth.App.Service
                 AuthenticationProvider.Google);
             }
 
-            var notifiedString = await NotifyAboutTempPassword(userInfo.Email);
+            await NotifyAboutTempPassword(userInfo.Email);
 
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
-            tokenPair.Body.RefreshToken = notifiedString;
             return tokenPair;
         }
 
-        public static async Task<string> NotifyAboutTempPassword(string email)
+        public static async Task<bool> NotifyAboutTempPassword(string email)
         {
             var client  = new HttpClient()
             {
@@ -447,11 +446,11 @@ namespace Planner_Auth.App.Service
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return "Message sent";
+                return true;
             }
             else
             {
-                return responseString;
+                return false;
             }
         }
     }
