@@ -9,12 +9,10 @@ namespace Planer_email_service.Api.CustomAttributes
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var remoteIp = context.HttpContext.Connection.RemoteIpAddress;
-            var isLocal = remoteIp.Equals(IPAddress.Loopback) ||
-                         remoteIp.Equals(IPAddress.IPv6Loopback) ||
-                         IPAddress.IsLoopback(remoteIp);
+            var requestHost = context.HttpContext.Request.Host.Host;
+            var allowedHosts = new[] { "localhost", "127.0.0.1", "::1", "planner-auth-service" };
 
-            if (!isLocal)
+            if (!allowedHosts.Contains(requestHost))
             {
                 context.Result = new ForbidResult();
             }
