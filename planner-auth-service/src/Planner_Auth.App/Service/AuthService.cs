@@ -10,6 +10,7 @@ using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
 using System.Net;
+using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
