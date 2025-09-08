@@ -409,7 +409,7 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                
+                await NotifyAboutTempPassword(userInfo.Email);
             }
             else
             {
@@ -423,8 +423,6 @@ namespace Planner_Auth.App.Service
                 },
                 AuthenticationProvider.Google);
             }
-
-            await NotifyAboutTempPassword(userInfo.Email);
 
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
