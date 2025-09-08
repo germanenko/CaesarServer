@@ -445,7 +445,7 @@ namespace Planner_Auth.App.Service
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return null;
+                return "Message sent";
             }
             else
             {
