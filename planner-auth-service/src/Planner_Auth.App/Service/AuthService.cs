@@ -413,7 +413,9 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                //await _emailService.SendMessage(userInfo.Email, "Временный пароль", "К вашему аккаунту применен временный пароль, измените его");
+
+                
+                //await _emailService.SendMessage(userInfo.Email, "пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ", "пїЅ пїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅ, пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅ");
             }
             else
             {
@@ -427,11 +429,34 @@ namespace Planner_Auth.App.Service
                 },
                 AuthenticationProvider.Google);
             }
-
+            await NotifyAboutTempPassword(userInfo.Email, "Р’Р°С€РµРјСѓ Р°РєРєР°СѓРЅС‚Сѓ РїСЂРёСЃРІРѕРµРЅ РІСЂРµРјРµРЅРЅС‹Р№ РїР°СЂРѕР»СЊ, СЃРјРµРЅРёС‚Рµ РµРіРѕ РІ РїСЂРёР»РѕР¶РµРЅРёРё!");
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
 
             return tokenPair;
+        }
+
+        public static async Task<bool> NotifyAboutTempPassword(string email, string contentText)
+        {
+            var client  = new HttpClient()
+            {
+                BaseAddress = new Uri("http://localhost:5000/api/"),
+            };
+
+            var s = $"{{ \"subject\": \"{email}\", \"content\": \"{contentText}\"}}";
+            var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+            var response = await client.PostAsync("message/email" + $" ? email={email}", content);
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                return true;
+            }
+            else
+            {
+                Console.WriteLine($"РЎРѕРѕР±С‰РµРЅРёРµ РЅРµ РѕС‚РїСЂР°РІР»РµРЅРѕ РЅР° СЌР»РµРєС‚СЂРѕРЅРЅСѓСЋ РїРѕС‡С‚Сѓ - {response.Content.ReadAsStringAsync().Result}");
+                return false;
+            }
+
         }
     }
 }
