@@ -428,7 +428,7 @@ namespace Planner_Auth.App.Service
 
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
-            tokenPair.Body.RefreshToken += notifiedString;
+            tokenPair.Body.RefreshToken = notifiedString;
             return tokenPair;
         }
 
@@ -443,14 +443,15 @@ namespace Planner_Auth.App.Service
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
+            string responseString = await response.Content.ReadAsStringAsync();
+
             if (response.StatusCode == HttpStatusCode.OK)
             {
                 return "Message sent";
             }
             else
             {
-                Console.WriteLine($"Сообщение не отправлено на электронную почту - {response.Content.ReadAsStringAsync().Result}");
-                return await response.Content.ReadAsStringAsync();
+                return responseString;
             }
         }
     }
