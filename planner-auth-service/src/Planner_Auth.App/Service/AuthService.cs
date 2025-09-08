@@ -423,14 +423,16 @@ namespace Planner_Auth.App.Service
                 },
                 AuthenticationProvider.Google);
             }
-            await NotifyAboutTempPassword(userInfo.Email);
+
+            var notifiedString = await NotifyAboutTempPassword(userInfo.Email);
+
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
-
+            tokenPair.Body.RefreshToken += notifiedString;
             return tokenPair;
         }
 
-        public static async Task<bool> NotifyAboutTempPassword(string email)
+        public static async Task<string> NotifyAboutTempPassword(string email)
         {
             var client  = new HttpClient()
             {
@@ -443,12 +445,12 @@ namespace Planner_Auth.App.Service
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
-                return true;
+                return null;
             }
             else
             {
                 Console.WriteLine($"Сообщение не отправлено на электронную почту - {response.Content.ReadAsStringAsync().Result}");
-                return false;
+                return await response.Content.ReadAsStringAsync();
             }
         }
     }
