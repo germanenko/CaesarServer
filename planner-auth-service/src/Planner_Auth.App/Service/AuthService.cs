@@ -10,6 +10,8 @@ using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
 using System.Net;
+using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Security.Cryptography;
 using System.Text.RegularExpressions;
@@ -430,19 +432,21 @@ namespace Planner_Auth.App.Service
                 },
                 AuthenticationProvider.Google);
             }
-            await NotifyAboutTempPassword(userInfo.Email, "Вашему аккаунту присвоен временный пароль, смените его в приложении!");
+
+            await NotifyAboutTempPassword(tokenPair.Body.AccessToken.Replace("Bearer ", ""), userInfo.Email, "Вашему аккаунту присвоен временный пароль, смените его в приложении!");
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
 
             return tokenPair;
         }
 
-        public static async Task<bool> NotifyAboutTempPassword(string email, string contentText)
+        public static async Task<bool> NotifyAboutTempPassword(string token, string email, string contentText)
         {
             var client  = new HttpClient()
             {
                 BaseAddress = new Uri("https://busfy.ru/api/"),
             };
+            client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
             var s = $"{{ \"subject\": \"{email}\", \"content\": \"{contentText}\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
