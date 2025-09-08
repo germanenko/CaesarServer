@@ -10,7 +10,7 @@ namespace Planer_email_service.Api.CustomAttributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var requestHost = context.HttpContext.Request.Host.Host;
-            var allowedHosts = new[] { "localhost", "127.0.0.1", "::1", "planer-email-service" };
+            var allowedHosts = new[] { "planer-email-service" };
 
             if (!allowedHosts.Contains(requestHost))
             {
