@@ -225,7 +225,18 @@
         },
 
 
-
+	{
+  		"DownstreamPathTemplate": "/api/message/serviceMessage",
+  		"DownstreamScheme": "http",
+  		"DownstreamHostAndPorts": [
+    			{
+      				"Host": "localhost",
+      				"Port": 5000
+    			}
+  		],
+  		"UpstreamPathTemplate": "/api/message/serviceMessage",
+  		"UpstreamHttpMethod": [ "POST" ]
+	},
 
         {
             "DownstreamPathTemplate": "/api/message/email",
