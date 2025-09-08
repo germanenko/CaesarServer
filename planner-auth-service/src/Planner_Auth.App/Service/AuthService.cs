@@ -444,7 +444,7 @@ namespace Planner_Auth.App.Service
         {
             var client  = new HttpClient()
             {
-                BaseAddress = new Uri("https://busfy.ru/api/"),
+                BaseAddress = new Uri("http://planer-email-service/api/"),
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
