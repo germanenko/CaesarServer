@@ -136,6 +136,71 @@ namespace Planer_mailbox_service.App.Service
             }
         }
 
+        public async Task<ServiceResponse<string>> SendServiceMessage(
+            string toEmail,
+            string subject,
+            string message,
+            string password,
+            EmailProvider emailProvider)
+        {
+
+            string smtpServer = "smtp.gmail.com";
+            int port = 587;
+
+            if (emailProvider == EmailProvider.MailRu)
+            {
+                smtpServer = "smtp.mail.ru";
+                port = 465;
+            }
+
+            try
+            {
+                var emailMessage = new MimeMessage();
+                emailMessage.From.Add(new MailboxAddress("NewCaesar", "caesar@gmail.com"));
+                emailMessage.To.Add(new MailboxAddress("User", toEmail));
+                emailMessage.Subject = subject;
+                emailMessage.Body = new TextPart("plain") { Text = message };
+
+                using var client = new SmtpClient();
+                await client.ConnectAsync(smtpServer, port, SecureSocketOptions.StartTls);
+                if (!client.IsConnected)
+                    return new ServiceResponse<string>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        IsSuccess = false,
+                        Errors = new string[] { "Failed to connect to SMTP server" }
+                    };
+
+                var oauth2 = new SaslMechanismOAuth2("caesar@gmail.com", password);
+                await client.AuthenticateAsync(oauth2);
+                if (!client.IsAuthenticated)
+                    return new ServiceResponse<string>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        IsSuccess = false,
+                        Errors = new string[] { "Failed to authenticate" }
+                    };
+
+                await client.SendAsync(emailMessage);
+                await client.DisconnectAsync(true);
+
+                return new ServiceResponse<string>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true
+                };
+            }
+            catch (Exception e)
+            {
+                _logger.LogError($"Failed to send message: {e.Message}");
+                return new ServiceResponse<string>
+                {
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    IsSuccess = false,
+                };
+            }
+        }
+
         private async Task<ServiceResponse<string>> ConnectToServer(ImapClient client, string email, string accessToken, string imapServer, int port)
         {
             await client.ConnectAsync(imapServer, port, SecureSocketOptions.SslOnConnect);

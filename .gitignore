@@ -4,3 +4,4 @@
 /**/.env
 /**/publish/
 /planner-task-board/src/Planer_task_board.Api/Migrations
+/planer-mailbox-service/.vs

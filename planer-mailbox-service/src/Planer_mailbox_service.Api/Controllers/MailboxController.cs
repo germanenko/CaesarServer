@@ -1,11 +1,14 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Filters;
+using Planer_mailbox_service.Api.CustomAttributes;
 using Planer_mailbox_service.Core.Entities.Request;
 using Planer_mailbox_service.Core.Entities.Response;
 using Planer_mailbox_service.Core.Enums;
 using Planer_mailbox_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace Planer_mailbox_service.Api.Controllers
 {
@@ -124,6 +127,41 @@ namespace Planer_mailbox_service.Api.Controllers
 
             string password = emailCredentials.AccessToken;
             var result = await _mailboxService.SendMessage(emailCredentials.Email, "", body.ToEmail, "", body.Subject, body.Message, password, emailProvider);
+            if (!result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Errors);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpPost("serviceMessage"), Authorize]
+        [LocalOnly]
+        [SwaggerOperation("Отправить служебное сообщение на почту")]
+        [SwaggerResponse(200, "Успешно")]
+        [SwaggerResponse(400, "Некорректные данные")]
+        [SwaggerResponse(401, "Неавторизованный доступ")]
+        [SwaggerResponse(404, "Нет подключенных ящиков")]
+        [SwaggerResponse(415, "Неподдерживаемый формат почты")]
+        public async Task<IActionResult> SendServiceMessage(
+            [FromHeader(Name = "Authorization")] string token,
+            [FromBody] CreateMailMessageDto body)
+        {
+            var accountId = _jwtService.GetTokenPayload(token).AccountId;
+            var response = await _mailCredentialsService.GetMailCredentials(accountId);
+            if (!response.IsSuccess)
+                return StatusCode((int)response.StatusCode, response.Errors);
+
+            var emailCredentials = response.Body?.FirstOrDefault();
+            if (emailCredentials == null)
+                return NotFound("Mail credentials not found");
+
+            var emailProvider = Enum.Parse<EmailProvider>(emailCredentials.EmailProvider);
+            var tokenSource = await _tokenService.GetUpdatedTokens(emailCredentials, emailProvider);
+            if (tokenSource == null)
+                return BadRequest("Failed to update tokens");
+
+            string password = emailCredentials.AccessToken;
+
+            var result = await _mailboxService.SendServiceMessage(body.ToEmail, body.Subject, body.Message, password, emailProvider);
             if (!result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Errors);
 
