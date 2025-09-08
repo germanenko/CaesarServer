@@ -1,8 +1,6 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
-using Newtonsoft.Json.Linq;
-//using Planer_email_service.App.Service;
 using Planner_Auth.Core.Entities.Events;
 using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
@@ -10,10 +8,8 @@ using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
 using System.Net;
-using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Mime;
-using System.Security.Cryptography;
 using System.Text.RegularExpressions;
 
 namespace Planner_Auth.App.Service
@@ -24,7 +20,6 @@ namespace Planner_Auth.App.Service
         private readonly IJwtService _jwtService;
         private readonly IHashPasswordService _hashPasswordService;
         private readonly INotifyService _notifyService;
-        //private readonly EmailService _emailService;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService
@@ -34,7 +29,6 @@ namespace Planner_Auth.App.Service
             IHashPasswordService hashPasswordService,
             INotifyService notifyService,
             ILogger<AuthService> logger
-            //EmailService emailService
         )
         {
             _accountRepository = accountRepository;
@@ -42,7 +36,6 @@ namespace Planner_Auth.App.Service
             _hashPasswordService = hashPasswordService;
             _notifyService = notifyService;
             _logger = logger;
-            //_emailService = emailService;
         }
 
         public async Task<ServiceResponse<OutputAccountCredentialsBody>> RestoreToken(
@@ -416,9 +409,7 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-
-                
-                //await _emailService.SendMessage(userInfo.Email, "��������� ������", "� ������ �������� �������� ��������� ������, �������� ���");
+                await NotifyAboutTempPassword(tokenPair.Body.AccessToken.Replace("Bearer ", ""), userInfo.Email, "Вашему аккаунту присвоен временный пароль, смените его в приложении!");
             }
             else
             {
@@ -433,7 +424,6 @@ namespace Planner_Auth.App.Service
                 AuthenticationProvider.Google);
             }
 
-            await NotifyAboutTempPassword(tokenPair.Body.AccessToken.Replace("Bearer ", ""), userInfo.Email, "Вашему аккаунту присвоен временный пароль, смените его в приложении!");
             var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
 
@@ -444,7 +434,7 @@ namespace Planner_Auth.App.Service
         {
             var client  = new HttpClient()
             {
-                BaseAddress = new Uri("http://planer-email-service/api/"),
+                BaseAddress = new Uri("http://planer-email-service:80/api/"),
             };
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
 
