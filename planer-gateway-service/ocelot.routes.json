@@ -713,7 +713,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/sendFromEmail",
+            "DownstreamPathTemplate": "/api/sendFromEmail",
             "DownstreamScheme": "ws",
             "DownstreamHostAndPorts": [
                 {
@@ -721,7 +721,7 @@
                     "Port": 8090
                 }
             ],
-            "UpstreamPathTemplate": "/sendFromEmail",
+            "UpstreamPathTemplate": "/api/sendFromEmail",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
