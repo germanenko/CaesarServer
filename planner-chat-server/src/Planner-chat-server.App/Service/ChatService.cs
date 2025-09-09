@@ -1,11 +1,12 @@
-using System.Net;
-using System.Net.WebSockets;
+using Microsoft.AspNetCore.Http;
 using Planner_chat_server.Core.Entities.Events;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
+using System.Net;
+using System.Net.WebSockets;
 
 namespace Planner_chat_server.App.Service
 {
@@ -162,6 +163,27 @@ namespace Planner_chat_server.App.Service
         public async Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage)
         {
             var message = await _chatRepository.UpdateMessage(accountId, updatedMessage);
+            return new ServiceResponse<MessageBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = message.ToMessageBody()
+            };
+        }
+
+        public async Task<ServiceResponse<MessageBody>> SendMessageFromEmail(
+            Guid senderId, Guid receiverId, string content)
+        {
+            var chat = await _chatRepository.GetPersonalChatAsync(senderId, receiverId);
+
+            var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
+
+            _notifyService.Publish(message, NotifyPublishEvent.MessageSentToChat);
+
+            var lobby = _chatConnectionService.GetConnections(chat.ChatId);
+
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+
             return new ServiceResponse<MessageBody>
             {
                 StatusCode = HttpStatusCode.OK,

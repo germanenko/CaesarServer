@@ -13,5 +13,6 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId);
         Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage);
+        Task<ServiceResponse<MessageBody>> SendMessageFromEmail(Guid senderId, Guid receiverid, string content);
     }
 }

@@ -48,7 +48,7 @@ namespace Planer_email_service.App.Service
             {
                 using var emailMessage = new MimeMessage();
                 emailMessage.Subject = subject;
-                emailMessage.From.Add(new MailboxAddress("", fromEmail));
+                emailMessage.From.Add(new MailboxAddress("NewCaesar", fromEmail));
                 emailMessage.To.Add(new MailboxAddress("", toEmail));
                 emailMessage.Body = new TextPart()
                 {

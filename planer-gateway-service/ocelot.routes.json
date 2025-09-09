@@ -712,7 +712,18 @@
             "UpstreamHttpMethod": [ "DELETE", "POST" ]
         },
 
-
+	{
+            "DownstreamPathTemplate": "/sendFromEmail",
+            "DownstreamScheme": "ws",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/sendFromEmail",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
 
         {
             "DownstreamPathTemplate": "/chat",

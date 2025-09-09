@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planner_chat_server.Api.CustomAttributes;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
@@ -39,6 +40,18 @@ namespace Planner_chat_server.Api.Controllers
             var ws = await websocketManager.AcceptWebSocketAsync();
 
             await _chatService.ConnectToChat(tokenPayload.AccountId, chatId, ws, tokenPayload.SessionId);
+        }
+
+        [HttpPost("sendFromEmail")]
+        [SwaggerOperation("Дублирование письма в чат")]
+        //[LocalOnly]
+        public async Task SendMessageFromEmail(
+            [FromQuery] Guid senderId,
+            [FromQuery] Guid receiverId,
+            [FromQuery] string content
+        )
+        {
+            await _chatService.SendMessageFromEmail(senderId, receiverId, content);
         }
 
 
