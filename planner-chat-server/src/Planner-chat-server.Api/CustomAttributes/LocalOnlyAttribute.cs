@@ -10,7 +10,7 @@ namespace Planner_chat_server.Api.CustomAttributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var requestHost = context.HttpContext.Request.Host.Host;
-            var allowedHosts = new[] { "localhost" };
+            var allowedHosts = new[] { "0.0.0.0", "planner-chat-server" };
 
             if (!allowedHosts.Contains(requestHost))
             {
