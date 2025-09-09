@@ -178,8 +178,6 @@ namespace Planner_chat_server.App.Service
 
             var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
 
-            _notifyService.Publish(message, NotifyPublishEvent.MessageSentToChat);
-
             var lobby = _chatConnectionService.GetConnections(chat.ChatId);
 
             await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
