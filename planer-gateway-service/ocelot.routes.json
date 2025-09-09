@@ -714,7 +714,7 @@
 
 	{
             "DownstreamPathTemplate": "/api/sendFromEmail",
-            "DownstreamScheme": "ws",
+            "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
