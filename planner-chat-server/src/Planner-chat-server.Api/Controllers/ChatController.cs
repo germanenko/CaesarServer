@@ -43,10 +43,10 @@ namespace Planner_chat_server.Api.Controllers
         }
 
         [HttpPost("api/sendFromEmail")]
+        [LocalOnly]
         [SwaggerOperation("Дублирование письма в чат")]
         [SwaggerResponse(200, Type = typeof(Guid))]
         [SwaggerResponse(404)]
-        [LocalOnly]
         public async Task<IActionResult> SendMessageFromEmail(
             [FromQuery] Guid senderId,
             [FromQuery] Guid receiverId,
