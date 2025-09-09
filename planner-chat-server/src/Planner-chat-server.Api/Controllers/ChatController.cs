@@ -42,16 +42,23 @@ namespace Planner_chat_server.Api.Controllers
             await _chatService.ConnectToChat(tokenPayload.AccountId, chatId, ws, tokenPayload.SessionId);
         }
 
-        [HttpPost("sendFromEmail")]
+        [HttpPost("api/sendFromEmail")]
         [SwaggerOperation("Дублирование письма в чат")]
+        [SwaggerResponse(200, Type = typeof(Guid))]
+        [SwaggerResponse(404)]
         //[LocalOnly]
-        public async Task SendMessageFromEmail(
+        public async Task<IActionResult> SendMessageFromEmail(
             [FromQuery] Guid senderId,
             [FromQuery] Guid receiverId,
             [FromQuery] string content
         )
         {
-            await _chatService.SendMessageFromEmail(senderId, receiverId, content);
+            var result = await _chatService.SendMessageFromEmail(senderId, receiverId, content);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
         }
 
 
