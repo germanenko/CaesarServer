@@ -178,7 +178,7 @@ namespace Planner_chat_server.App.Service
 
             var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
 
-            ChatLobby lobby = null;
+            ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
 
             if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
             {
