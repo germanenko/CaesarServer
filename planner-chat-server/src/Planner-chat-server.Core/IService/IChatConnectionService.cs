@@ -7,6 +7,7 @@ namespace Planner_chat_server.Core.IService
         ChatLobby? AddLobby(Guid chatId, List<Guid> allUserIds);
         bool LobbyIsExist(Guid chatId);
         ChatLobby? AddSessionToLobby(Guid chatId, ChatSession session);
+        void RemoveLobby(Guid chatId);
         void RemoveConnection(Guid chatId, ChatSession session);
         ChatLobby? GetConnections(Guid chatId);
     }

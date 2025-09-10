@@ -53,6 +53,14 @@ namespace Planner_chat_server.App.Service
             return ChatLobbies.GetOrAdd(chatId, new ChatLobby { AllChatUsers = allUserIds });
         }
 
+        public void RemoveLobby(Guid chatId)
+        {
+            if (ChatLobbies.TryGetValue(chatId, out var chat))
+            {
+                ChatLobbies.Remove(chatId, out var _);
+            }
+        }
+
         public bool LobbyIsExist(Guid chatId)
         {
             return ChatLobbies.ContainsKey(chatId);

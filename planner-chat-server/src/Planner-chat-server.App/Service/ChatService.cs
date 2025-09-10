@@ -178,9 +178,18 @@ namespace Planner_chat_server.App.Service
 
             var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
 
-            var lobby = _chatConnectionService.GetConnections(chat.ChatId);
+            ChatLobby lobby = null;
+
+            if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
+            {
+                var chatMemberships = await _chatRepository.GetChatMembershipsAsync(chat.ChatId);
+                var userIds = chatMemberships.Select(e => e.AccountId).ToList();
+                lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
+            }
 
             await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+
+            _chatConnectionService.RemoveLobby(chat.ChatId);
 
             return new ServiceResponse<MessageBody>
             {
