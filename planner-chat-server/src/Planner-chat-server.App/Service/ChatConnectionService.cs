@@ -57,7 +57,7 @@ namespace Planner_chat_server.App.Service
         {
             if (ChatLobbies.TryGetValue(chatId, out var chat))
             {
-                if(chat.ActiveSessions.Count == 0)
+                if(!chat.ActiveSessions.Any())
                     ChatLobbies.Remove(chatId, out var _);
             }
         }
