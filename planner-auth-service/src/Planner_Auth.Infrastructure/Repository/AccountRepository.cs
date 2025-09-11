@@ -173,14 +173,14 @@ namespace Planner_Auth.Infrastructure.Repository
             var gToken = await GetGoogleTokenAsync(accountId);
             if(gToken != null)
             {
-                gToken.Token = token;
+                gToken.AccessToken = token;
                 await _context.SaveChangesAsync();
                 return gToken;
             }
 
             var googleToken = new GoogleToken
             {
-                Token = token,
+                AccessToken = token,
                 UserId = accountId
             };
 

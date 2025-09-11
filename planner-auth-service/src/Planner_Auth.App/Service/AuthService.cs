@@ -297,7 +297,7 @@ namespace Planner_Auth.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.Token
+                Body = result.AccessToken
             };
         }
 
@@ -310,7 +310,7 @@ namespace Planner_Auth.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Body = result.Token
+                    Body = result.AccessToken
                 };
             }
             else
