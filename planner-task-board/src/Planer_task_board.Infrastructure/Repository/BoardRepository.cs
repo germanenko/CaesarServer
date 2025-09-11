@@ -27,7 +27,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = createBoardBody.Id,
                 Name = createBoardBody.Name,
-                UpdatedAt = createBoardBody.ChangeDate,
+                UpdatedAt = createBoardBody.UpdatedAt,
                 Members = new List<BoardMember>
                 {
                     new() {
@@ -52,7 +52,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 {
                     Id = board.Id,
                     Name = board.Name,
-                    UpdatedAt = board.ChangeDate,
+                    UpdatedAt = board.UpdatedAt,
                     Members = new List<BoardMember>
                     {
                         new() {
