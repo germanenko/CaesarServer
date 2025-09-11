@@ -388,7 +388,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             }
 
             message.Content = updatedMessage.Content;
-            message.ChangeDate = updatedMessage.ChangeDate;
+            message.UpdatedAt = updatedMessage.UpdatedAt;
 
             await _context.SaveChangesAsync();
 

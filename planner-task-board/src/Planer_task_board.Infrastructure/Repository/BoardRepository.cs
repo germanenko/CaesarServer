@@ -27,7 +27,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = createBoardBody.Id,
                 Name = createBoardBody.Name,
-                ChangeDate = createBoardBody.ChangeDate,
+                UpdatedAt = createBoardBody.ChangeDate,
                 Members = new List<BoardMember>
                 {
                     new() {
@@ -52,7 +52,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 {
                     Id = board.Id,
                     Name = board.Name,
-                    ChangeDate = board.ChangeDate,
+                    UpdatedAt = board.ChangeDate,
                     Members = new List<BoardMember>
                     {
                         new() {
@@ -179,7 +179,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Id = column.Id,
                 Board = board,
                 Name = column.Name,
-                ChangeDate = column.ChangeDate
+                UpdatedAt = column.UpdatedAt
             };
 
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;

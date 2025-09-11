@@ -113,7 +113,7 @@ namespace Planer_task_board.App.Service
                     Status = taskBody.Status,
                     HexColor = taskBody.HexColor,
                     ColumnId = taskBody.ColumnId,
-                    ChangeDate = taskBody.ChangeDate
+                    UpdatedAt = taskBody.UpdatedAt
                 });
 
                 return task;
@@ -132,7 +132,7 @@ namespace Planer_task_board.App.Service
                 column,
                 accountId,
                 taskBody.MessageIds,
-                taskBody.ChangeDate);
+                taskBody.UpdatedAt);
             if (result == null)
             {
                 errors.Add("Task not created");
@@ -221,7 +221,7 @@ namespace Planer_task_board.App.Service
                     column,
                     accountId,
                     taskBody.MessageIds,
-                    taskBody.ChangeDate);
+                    taskBody.UpdatedAt);
 
                 if (result == null)
                 {
@@ -419,7 +419,7 @@ namespace Planer_task_board.App.Service
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.ChangeDate);
+            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.UpdatedAt);
             return result == null ? new ServiceResponse<TaskBody>
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -465,7 +465,7 @@ namespace Planer_task_board.App.Service
                 DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
                 DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.ChangeDate));
+                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.UpdatedAt));
             }
             
             return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>

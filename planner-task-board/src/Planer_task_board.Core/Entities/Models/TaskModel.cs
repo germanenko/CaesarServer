@@ -47,7 +47,7 @@ namespace Planer_task_board.Core.Entities.Models
                 EndDate = EndDate?.ToString("s"),
                 ChatId = ChatId,
                 ColumnId = Columns.FirstOrDefault(x => x.TaskId == Id).ColumnId,
-                ChangeDate = ChangeDate
+                UpdatedAt = UpdatedAt
             };
         }
     }

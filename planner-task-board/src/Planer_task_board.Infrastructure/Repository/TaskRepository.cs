@@ -50,7 +50,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 StartDate = startDate?.ToUniversalTime(),
                 EndDate = endDate?.ToUniversalTime(),
                 Type = taskType.ToString(),
-                ChangeDate = changeDate
+                UpdatedAt = changeDate
             };
 
             var setMessages = messages.Distinct().ToList();
@@ -94,7 +94,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 EndDate = endDate?.ToUniversalTime(),
                 DraftOfTask = parentTask,
                 Type = taskType.ToString(),
-                ChangeDate = changeDate
+                UpdatedAt = changeDate
             };
 
             var setMessages = messages.Distinct().ToList();
@@ -257,7 +257,7 @@ namespace Planer_task_board.Infrastructure.Repository
             task.Status = taskState.ToString();
             task.StartDate = startDate?.ToUniversalTime();
             task.EndDate = endDate;
-            task.ChangeDate = changeDate;
+            task.UpdatedAt = changeDate;
 
             var boardColumnTask = _context.BoardColumnTasks.Where(x => x.TaskId == task.Id).First();
             if (boardColumnTask.ColumnId != columnId)
@@ -294,7 +294,7 @@ namespace Planer_task_board.Infrastructure.Repository
             draft.EndDate = endDate;
             draft.IsDraft = false;
             draft.DraftOfTask = draft;
-            draft.ChangeDate = changeDate;
+            draft.UpdatedAt = changeDate;
 
             await _context.SaveChangesAsync();
             return draft;
