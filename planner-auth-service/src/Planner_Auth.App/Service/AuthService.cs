@@ -338,7 +338,7 @@ namespace Planner_Auth.App.Service
             if (!isValidDeviceId)
                 return new ServiceResponse<OutputAccountCredentialsBody>
                 {
-                    Errors = new string[] { "DeviceId is not correct format" },
+                    Errors = new string[] { $"DeviceId is not correct format = {body.DeviceId}:{body.DeviceTypeId}" },
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
