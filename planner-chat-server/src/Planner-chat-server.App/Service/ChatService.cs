@@ -176,6 +176,16 @@ namespace Planner_chat_server.App.Service
         {
             var chat = await _chatRepository.GetPersonalChatAsync(senderId, receiverId);
 
+            if(chat == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Errors = new[] { "Chat not found" }
+                };
+            }
+
             var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
 
             ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
