@@ -424,7 +424,6 @@ namespace Planner_Auth.App.Service
                 AuthenticationProvider.Google);
             }
 
-            var newUser = _accountRepository.GetAsync(tokenPair.Body.AccessToken).Result;
             _accountRepository.AddAsync(token, account.Id);
             return tokenPair;
         }
