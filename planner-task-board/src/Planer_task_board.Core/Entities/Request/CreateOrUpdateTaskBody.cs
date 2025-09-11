@@ -4,7 +4,7 @@ using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Request
 {
-    public class CreateTaskBody : ModelBase
+    public class CreateOrUpdateTaskBody : ModelBase
     {
         [Required]
         [MaxLength(128)]

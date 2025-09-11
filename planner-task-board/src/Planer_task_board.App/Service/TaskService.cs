@@ -66,7 +66,7 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, Guid columnId, CreateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, Guid columnId, CreateOrUpdateTaskBody taskBody)
         {
             var errors = new List<string>();
             if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -152,7 +152,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
         {
             var errors = new List<string>();
             List<TaskBody> tasks = new List<TaskBody>();

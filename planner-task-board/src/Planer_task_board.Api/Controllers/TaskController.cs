@@ -32,7 +32,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] CreateTaskBody taskBody,
+            [FromBody] CreateOrUpdateTaskBody taskBody,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
@@ -53,7 +53,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTasks(
-            [FromBody] List<CreateTaskBody> taskBodies,
+            [FromBody] List<CreateOrUpdateTaskBody> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
