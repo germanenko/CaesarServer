@@ -11,8 +11,8 @@ namespace Planner_Auth.Core.IService
         Task<ServiceResponse<OutputAccountCredentialsBody>> SignIn(SignInBody body, AuthenticationProvider provider);
         Task<ServiceResponse<OutputAccountCredentialsBody>> RestoreToken(string refreshToken, string deviceId, DeviceTypeId deviceTypeId);
         Task<HttpStatusCode> CreateMailCredentials(string email, string? access_token, string? refresh_token, EmailProvider provider);
-        Task<ServiceResponse<string>> AddGoogleToken(string token, Guid accountId);
+        Task<ServiceResponse<string>> AddGoogleToken(GoogleTokenBody token, Guid accountId);
         Task<ServiceResponse<string>> GetGoogleToken(Guid accountId);
-        Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(string token, DeviceTypeId deviceTypeId, string deviceId);
+        Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(GoogleTokenBody token, DeviceTypeId deviceTypeId, string deviceId);
     }
 }

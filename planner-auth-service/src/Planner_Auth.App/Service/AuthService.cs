@@ -280,7 +280,7 @@ namespace Planner_Auth.App.Service
             return session?.Id;
         }
 
-        public async Task<ServiceResponse<string>> AddGoogleToken(string token, Guid accountId)
+        public async Task<ServiceResponse<string>> AddGoogleToken(GoogleTokenBody token, Guid accountId)
         {
             var result = await _accountRepository.AddAsync(token, accountId);
 
@@ -379,9 +379,9 @@ namespace Planner_Auth.App.Service
         }
 
         public async Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(
-            string token, DeviceTypeId deviceTypeId, string deviceId)
+            GoogleTokenBody token, DeviceTypeId deviceTypeId, string deviceId)
         {
-            var userCredential = GoogleCredential.FromAccessToken(token);
+            var userCredential = GoogleCredential.FromAccessToken(token.AccessToken);
 
             var oauthSerivce = new Google.Apis.Oauth2.v2.Oauth2Service(
                 new BaseClientService.Initializer()

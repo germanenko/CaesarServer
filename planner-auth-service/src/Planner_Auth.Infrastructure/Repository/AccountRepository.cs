@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Planner_Auth.Core.Entities.Models;
+using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Infrastructure.Data;
@@ -164,7 +165,7 @@ namespace Planner_Auth.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<GoogleToken?> AddAsync(string token, Guid accountId)
+        public async Task<GoogleToken?> AddAsync(GoogleTokenBody token, Guid accountId)
         {
             var account = await GetAsync(accountId);
             if (account == null)
@@ -173,14 +174,16 @@ namespace Planner_Auth.Infrastructure.Repository
             var gToken = await GetGoogleTokenAsync(accountId);
             if(gToken != null)
             {
-                gToken.AccessToken = token;
+                gToken.AccessToken = token.AccessToken;
+                gToken.RefreshToken = token.RefreshToken;
                 await _context.SaveChangesAsync();
                 return gToken;
             }
 
             var googleToken = new GoogleToken
             {
-                AccessToken = token,
+                AccessToken = token.AccessToken,
+                RefreshToken = token.RefreshToken,
                 UserId = accountId
             };
 

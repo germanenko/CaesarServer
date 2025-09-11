@@ -1,4 +1,5 @@
 using Planner_Auth.Core.Entities.Models;
+using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Enums;
 
 namespace Planner_Auth.Core.IRepository
@@ -21,7 +22,7 @@ namespace Planner_Auth.Core.IRepository
         Task<string?> UpdateTokenAsync(string refreshToken, Guid sessionId, TimeSpan? duration = null);
         Task<AccountSession?> GetSessionByTokenAndAccount(string refreshTokenHash);
         Task<Account?> UpdateProfileIconAsync(Guid accountId, string filename);
-        Task<GoogleToken?> AddAsync(string token, Guid accountId);
+        Task<GoogleToken?> AddAsync(GoogleTokenBody token, Guid accountId);
         Task<GoogleToken?> GetGoogleTokenAsync(Guid userId);
     }
 }

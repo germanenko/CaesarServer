@@ -61,7 +61,7 @@ namespace Planner_Auth.Api.Controllers.Api
         [SwaggerResponse(400, "Токен не валиден или активирован")]
 
         [HttpPost("addGoogleToken")]
-        public async Task<IActionResult> AddGoogleTokenAsync(string googleToken,
+        public async Task<IActionResult> AddGoogleTokenAsync(GoogleTokenBody googleToken,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token)
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
@@ -111,7 +111,7 @@ namespace Planner_Auth.Api.Controllers.Api
         [SwaggerOperation("Google аутентификация")]
         [SwaggerResponse(200, "Успешно авторизован", Type = typeof(OutputAccountCredentialsBody))]
         [HttpPost("googleAuth")]
-        public async Task<IActionResult> GoogleAuthAsync(string googleToken,
+        public async Task<IActionResult> GoogleAuthAsync(GoogleTokenBody googleToken,
             [FromHeader(Name = "DeviceId")] string deviceId,
             [FromHeader(Name = "DeviceTypeId")] DeviceTypeId deviceTypeId)
         {
