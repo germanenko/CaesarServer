@@ -186,7 +186,7 @@ namespace Planner_chat_server.App.Service
                 };
             }
 
-            var message = await _chatRepository.AddMessageAsync(MessageType.Text, content, chat.Chat, senderId, Guid.NewGuid());
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid());
 
             ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
 

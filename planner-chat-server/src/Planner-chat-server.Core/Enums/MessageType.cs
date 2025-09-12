@@ -6,6 +6,7 @@ namespace Planner_chat_server.Core.Enums
     public enum MessageType
     {
         Text,
-        File
+        File,
+        Mail
     }
 }
