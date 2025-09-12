@@ -111,6 +111,17 @@ namespace Planner_Auth.Infrastructure.Repository
             return account;
         }
 
+        public async Task<Account?> UpdateAuthorizationProviderAsync(Guid accountId, string authorizationProvider)
+        {
+            var account = await GetAsync(accountId);
+            if (account == null)
+                return null;
+
+            account.AuthorizationProvider = authorizationProvider;
+            await _context.SaveChangesAsync();
+            return account;
+        }
+
         public async Task<string?> UpdateTokenAsync(string refreshToken, Guid sessionId, TimeSpan? duration = null)
         {
             var session = await GetSessionAsync(sessionId);

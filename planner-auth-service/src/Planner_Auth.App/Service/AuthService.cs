@@ -352,13 +352,16 @@ namespace Planner_Auth.App.Service
                     StatusCode = HttpStatusCode.NotFound
                 };
 
-            if (account.AuthorizationProvider != provider.ToString())
+
+            if (account.AuthorizationProvider != "Default" && account.AuthorizationProvider != provider.ToString())
                 return new ServiceResponse<OutputAccountCredentialsBody>
                 {
                     Errors = new string[] { "Account created by another provider" },
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.Conflict
                 };
+            else
+                _accountRepository.UpdateAuthorizationProviderAsync(account.Id, provider.ToString());
 
             if (account.PasswordHash != body.Password)
                 return new ServiceResponse<OutputAccountCredentialsBody>
@@ -391,7 +394,7 @@ namespace Planner_Auth.App.Service
 
             var userInfo = await oauthSerivce.Userinfo.Get().ExecuteAsync();
 
-            var account = _accountRepository.GetAsync(userInfo.Email).Result;
+            var account = await _accountRepository.GetAsync(userInfo.Email);
 
             ServiceResponse<OutputAccountCredentialsBody> tokenPair;
 

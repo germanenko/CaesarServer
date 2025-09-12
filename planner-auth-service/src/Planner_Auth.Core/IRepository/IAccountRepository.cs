@@ -18,6 +18,7 @@ namespace Planner_Auth.Core.IRepository
         Task<List<Account>> GetAccountsAsync(IEnumerable<Guid> ids);
         Task<List<Account>> GetAccountsByPatternIdentifier(string identifier);
         Task<Account?> UpdateAccountTagAsync(Guid id, string accountTag);
+        Task<Account?> UpdateAuthorizationProviderAsync(Guid id, string authorizationProvider);
         Task<Account?> GetAsync(string identifier);
         Task<string?> UpdateTokenAsync(string refreshToken, Guid sessionId, TimeSpan? duration = null);
         Task<AccountSession?> GetSessionByTokenAndAccount(string refreshTokenHash);
