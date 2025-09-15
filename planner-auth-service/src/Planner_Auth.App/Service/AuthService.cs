@@ -361,7 +361,7 @@ namespace Planner_Auth.App.Service
                     StatusCode = HttpStatusCode.Conflict
                 };
             else
-                _accountRepository.UpdateAuthorizationProviderAsync(account.Id, provider.ToString());
+                await _accountRepository.UpdateAuthorizationProviderAsync(account.Id, provider.ToString());
 
             if (account.PasswordHash != body.Password)
                 return new ServiceResponse<OutputAccountCredentialsBody>
@@ -427,7 +427,7 @@ namespace Planner_Auth.App.Service
                 AuthenticationProvider.Google);
             }
 
-            _accountRepository.AddAsync(token, account.Id);
+            await _accountRepository.AddAsync(token, account.Id);
             return tokenPair;
         }
 
