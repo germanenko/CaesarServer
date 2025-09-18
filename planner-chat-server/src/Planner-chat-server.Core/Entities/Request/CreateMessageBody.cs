@@ -17,5 +17,6 @@ namespace Planner_chat_server.Core.Entities.Request
     {
         public CreateMessageBody? MessageBody { get; set; }
         public Guid? LastMessageReadId { get; set; }
+        public Guid? DeviceId { get; set; }
     }
 }

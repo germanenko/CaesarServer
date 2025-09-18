@@ -26,7 +26,7 @@ namespace Planner_chat_server.Core.Entities.Models
             };
         }
 
-        public MessageBody ToMessageBody()
+        public MessageBody ToMessageBody(Guid? deviceId = null)
         {
             var messageType = Enum.Parse<MessageType>(Type);
 
@@ -37,7 +37,8 @@ namespace Planner_chat_server.Core.Entities.Models
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
                 Date = SentAt,
                 SenderId = SenderId,
-                ChatId = ChatId
+                ChatId = ChatId,
+                SenderDeviceId = deviceId
             };
         }
     }

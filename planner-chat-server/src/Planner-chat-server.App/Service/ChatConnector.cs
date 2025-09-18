@@ -121,14 +121,14 @@ namespace Planner_chat_server.App.Service
                     var message = await _chatRepository.GetMessageAsync(messageId);
                     if (message != null)
                     {
-                        await SendMessage(sessions, message.ToMessageBody(), WebSocketMessageType.Text, allUserIds, chat);
+                        await SendMessage(sessions, message.ToMessageBody(sentMessage.DeviceId), WebSocketMessageType.Text, allUserIds, chat);
                         return message.SentAt;
                     }
                 }
                 else
                 {
                     var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId, messageBody.Id);
-                    await SendMessage(sessions, chatMessage.ToMessageBody(), WebSocketMessageType.Text, allUserIds, chat);
+                    await SendMessage(sessions, chatMessage.ToMessageBody(sentMessage.DeviceId), WebSocketMessageType.Text, allUserIds, chat);
                     return chatMessage.SentAt;
                 }
             }
