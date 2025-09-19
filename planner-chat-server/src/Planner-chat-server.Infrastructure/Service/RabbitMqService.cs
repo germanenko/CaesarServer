@@ -100,7 +100,7 @@ namespace Planner_chat_server.Infrastructure.Service
                 var message = Encoding.UTF8.GetString(body);
                 await handler(message);
             };
-            _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+            _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
