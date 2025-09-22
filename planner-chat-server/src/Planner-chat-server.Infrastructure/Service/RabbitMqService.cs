@@ -62,7 +62,7 @@ namespace Planner_chat_server.Infrastructure.Service
             InitializeRabbitMQ();
         }
 
-        private async void InitializeRabbitMQ()
+        private void InitializeRabbitMQ()
         {
             var factory = new ConnectionFactory()
             {
@@ -79,8 +79,6 @@ namespace Planner_chat_server.Infrastructure.Service
             DeclareQueue(_chatImageQueue);
             DeclareQueue(_chatAddAccountsToTaskChats);
             DeclareQueue(_createTaskChatQueue);
-
-            await ExecuteAsync(CancellationToken.None);
         }
 
         private void DeclareQueue(string queueName)
