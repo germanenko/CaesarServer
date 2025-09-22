@@ -104,13 +104,13 @@ namespace Planner_Auth.App.Service
                     StatusCode = HttpStatusCode.NotFound
                 };
 
-            if (account.AuthorizationProvider != provider.ToString())
-                return new ServiceResponse<OutputAccountCredentialsBody>
-                {
-                    Errors = new string[] { "Account created by another provider" },
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.Conflict
-                };
+            //if (account.AuthorizationProvider != provider.ToString())
+            //    return new ServiceResponse<OutputAccountCredentialsBody>
+            //    {
+            //        Errors = new string[] { "Account created by another provider" },
+            //        IsSuccess = false,
+            //        StatusCode = HttpStatusCode.Conflict
+            //    };
 
             var inputPasswordHash = _hashPasswordService.HashPassword(body.Password);
             if (account.PasswordHash != inputPasswordHash)
