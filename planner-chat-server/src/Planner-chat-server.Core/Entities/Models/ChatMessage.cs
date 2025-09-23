@@ -39,7 +39,8 @@ namespace Planner_chat_server.Core.Entities.Models
                 Date = SentAt,
                 SenderId = SenderId,
                 ChatId = ChatId,
-                SenderDeviceId = deviceId
+                SenderDeviceId = deviceId,
+                HasBeenRead = HasBeenRead
             };
         }
     }

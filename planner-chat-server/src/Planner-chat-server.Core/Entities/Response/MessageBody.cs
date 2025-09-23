@@ -11,5 +11,6 @@ namespace Planner_chat_server.Core.Entities.Response
         public Guid SenderId { get; set; }
         public Guid ChatId { get; set; }
         public Guid? SenderDeviceId { get; set; }
+        public bool HasBeenRead { get; set; }
     }
 }
