@@ -134,6 +134,7 @@ namespace Planner_chat_server.App.Service
             }
 
             var lastMessage = await _chatRepository.GetMessageAsync((Guid)sentMessage.LastMessageReadId);
+            await _chatRepository.SetMessageIsRead(lastMessage);
             return lastMessage?.SentAt;
         }
 

@@ -33,5 +33,6 @@ namespace Planner_chat_server.Core.IRepository
         Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date);
         Task<Chat?> GetByTaskIdAsync(Guid taskId);
         Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody message);
+        Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
     }
 }

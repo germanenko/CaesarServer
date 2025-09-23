@@ -13,6 +13,7 @@ namespace Planner_chat_server.Core.Entities.Models
         public Guid SenderId { get; set; }
 
         public Guid ChatId { get; set; }
+        public bool HasBeenRead { get; set; }
         public Chat Chat { get; set; }
 
         public CreateMessageBody ToCreateMessageBody()

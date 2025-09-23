@@ -394,5 +394,22 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             return message;
         }
+
+        public async Task<ChatMessage?> SetMessageIsRead(ChatMessage readMessage)
+        {
+            var message = _context.ChatMessages
+                .Where(m => m.Id == readMessage.Id).FirstOrDefault();
+
+            if (message == null)
+            {
+                return null;
+            }
+
+            message.HasBeenRead = true;
+
+            await _context.SaveChangesAsync();
+
+            return message;
+        }
     }
 }
