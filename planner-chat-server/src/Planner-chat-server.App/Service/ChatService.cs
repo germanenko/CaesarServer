@@ -224,16 +224,16 @@ namespace Planner_chat_server.App.Service
                 Body = result
             };
         }
-        public async Task<ServiceResponse<MessageDraft>> GetMessageDraft(Guid accountId, Guid chatId)
+        public async Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId)
         {
             var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
             var draft = await _chatRepository.GetMessageDraft(membership);
 
-            return new ServiceResponse<MessageDraft>
+            return new ServiceResponse<MessageDraftBody>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = draft
+                Body = draft.ToMessageDraftBody()
             };
         }
     }

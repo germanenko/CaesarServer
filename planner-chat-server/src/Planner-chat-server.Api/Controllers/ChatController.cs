@@ -180,7 +180,7 @@ namespace Planner_chat_server.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
+            var result = await _chatService.GetMessageDraft(tokenPayload.AccountId, chatId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 
