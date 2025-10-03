@@ -20,5 +20,6 @@ namespace Planner_chat_server.Infrastructure.Data
         public DbSet<AccountChatSession> AccountChatSessions { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
+        public DbSet<MessageDraft> MessageDrafts { get; set; }
     }
 }

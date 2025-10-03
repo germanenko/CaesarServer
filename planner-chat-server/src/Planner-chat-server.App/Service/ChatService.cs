@@ -1,10 +1,12 @@
 using Microsoft.AspNetCore.Http;
 using Planner_chat_server.Core.Entities.Events;
+using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
+using System;
 using System.Net;
 using System.Net.WebSockets;
 
@@ -93,10 +95,10 @@ namespace Planner_chat_server.App.Service
                     Errors = new string[] { "chat exist" }
                 };
 
-            var chatMemberships = new List<ChatMembership>();
+            var chatMemberships = new List<Core.Entities.Events.ChatMembership>();
             foreach (var chatMembership in result.ChatMemberships)
             {
-                chatMemberships.Add(new ChatMembership
+                chatMemberships.Add(new Core.Entities.Events.ChatMembership
                 {
                     AccountId = chatMembership.AccountId,
                     ChatMembershipId = chatMembership.Id
@@ -206,6 +208,32 @@ namespace Planner_chat_server.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = message.ToMessageBody()
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content)
+        {
+            var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
+
+            var result = await _chatRepository.CreateOrUpdateMessageDraft(membership, content);
+
+            return new ServiceResponse<bool>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = result
+            };
+        }
+        public async Task<ServiceResponse<MessageDraft>> GetMessageDraft(Guid accountId, Guid chatId)
+        {
+            var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
+            var draft = await _chatRepository.GetMessageDraft(membership);
+
+            return new ServiceResponse<MessageDraft>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = draft
             };
         }
     }

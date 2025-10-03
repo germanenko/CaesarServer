@@ -3,6 +3,7 @@ using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planner_chat_server.Api.CustomAttributes;
+using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
@@ -140,6 +141,42 @@ namespace Planner_chat_server.Api.Controllers
         [SwaggerResponse(403)]
         public async Task<IActionResult> GetAllMessages(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpPost("api/createOrUpdateDraftMessage"), Authorize]
+        [SwaggerOperation("Создать/обновить черновик сообщения")]
+        [SwaggerResponse(200, Type = typeof(Guid))]
+        [SwaggerResponse(404)]
+
+        public async Task<IActionResult> CreateOrUpdateMessageDraft(
+            [FromBody, Required] Guid chatId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromHeader, Required] string content
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.CreateOrUpdateMessageDraft(tokenPayload.AccountId, chatId, content);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpGet("api/getDraftMessage")]
+        [SwaggerOperation("Получить черновик сообщения")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> GetMessageDraft(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromBody, Required] Guid chatId
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

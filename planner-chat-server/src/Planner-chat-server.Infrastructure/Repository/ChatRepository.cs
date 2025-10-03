@@ -411,5 +411,44 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             return message;
         }
+
+        public async Task<bool> CreateOrUpdateMessageDraft(ChatMembership membership, string content)
+        {
+            var result = await _context.MessageDrafts
+                .FirstOrDefaultAsync(e => e.MembershipId == membership.Id);
+
+            if (result != null)
+            {
+                if(content == "")
+                {
+                    _context.Remove(result);
+                    await _context.SaveChangesAsync();
+                    return true;
+                }
+
+                result.Content = content;
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+            result = new MessageDraft
+            {
+                Content = content,
+                MembershipId = membership.Id,
+                ChatMembership = membership
+            };
+
+            result = (await _context.MessageDrafts.AddAsync(result))?.Entity;
+            await _context.SaveChangesAsync();
+
+            return result != null;
+        }
+
+        public Task<MessageDraft?> GetMessageDraft(ChatMembership membership)
+        {
+            return _context.MessageDrafts.FirstOrDefaultAsync(e => e.MembershipId == membership.Id);
+        }
     }
 }
