@@ -172,7 +172,7 @@ namespace Planner_chat_server.Api.Controllers
 
         [HttpGet("api/getDraftMessage")]
         [SwaggerOperation("Получить черновик сообщения")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraft>))]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> GetMessageDraft(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
