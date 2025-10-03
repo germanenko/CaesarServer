@@ -16,6 +16,6 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage);
         Task<ServiceResponse<MessageBody>> SendMessageFromEmail(Guid senderId, Guid receiverid, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content);
-        Task<ServiceResponse<MessageDraft>> GetMessageDraft(Guid accountId, Guid chatId);
+        Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId);
     }
 }
