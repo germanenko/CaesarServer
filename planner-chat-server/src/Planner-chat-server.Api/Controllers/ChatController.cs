@@ -153,13 +153,13 @@ namespace Planner_chat_server.Api.Controllers
 
         [HttpPost("api/createOrUpdateDraftMessage"), Authorize]
         [SwaggerOperation("Создать/обновить черновик сообщения")]
-        [SwaggerResponse(200, Type = typeof(Guid))]
+        [SwaggerResponse(200, Type = typeof(bool))]
         [SwaggerResponse(404)]
 
         public async Task<IActionResult> CreateOrUpdateMessageDraft(
             [FromBody, Required] Guid chatId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromHeader, Required] string content
+            [FromBody, Required] string content
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
