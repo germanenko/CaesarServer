@@ -187,8 +187,8 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpGet("api/getMessageDraft")]
-        [SwaggerOperation("Получить черновики сообщений")]
+        [HttpGet("api/getMessageDrafts")]
+        [SwaggerOperation("Получить все черновики сообщений")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> GetMessageDrafts(

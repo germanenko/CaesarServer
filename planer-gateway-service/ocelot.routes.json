@@ -791,7 +791,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getDraftMessage",
+            "DownstreamPathTemplate": "/api/getMessageDraft",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -799,7 +799,20 @@
                     "Port": 8090
                 }
             ],
-            "UpstreamPathTemplate": "/api/getDraftMessage",
+            "UpstreamPathTemplate": "/api/getMessageDraft",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/getMessageDrafts",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getMessageDrafts",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
