@@ -159,7 +159,7 @@ namespace Planner_chat_server.Api.Controllers
         public async Task<IActionResult> CreateOrUpdateMessageDraft(
             [FromBody, Required] Guid chatId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromBody, Required] string content
+            string content
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
