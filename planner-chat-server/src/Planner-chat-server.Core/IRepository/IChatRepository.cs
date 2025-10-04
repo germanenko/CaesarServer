@@ -36,5 +36,6 @@ namespace Planner_chat_server.Core.IRepository
         Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
         Task<bool> CreateOrUpdateMessageDraft(ChatMembership chatMembership, string content);
         Task<MessageDraft?> GetMessageDraft(ChatMembership membership);
+        Task<List<MessageDraft>> GetMessageDrafts(Guid accountId);
     }
 }

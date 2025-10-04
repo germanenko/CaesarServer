@@ -450,5 +450,10 @@ namespace Planner_chat_server.Infrastructure.Repository
         {
             return _context.MessageDrafts.FirstOrDefaultAsync(e => e.MembershipId == membership.Id);
         }
+
+        public async Task<List<MessageDraft>> GetMessageDrafts(Guid accountId)
+        {
+            return await _context.MessageDrafts.Where(x => x.ChatMembership.AccountId == accountId).ToListAsync();
+        }
     }
 }

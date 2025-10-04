@@ -224,6 +224,7 @@ namespace Planner_chat_server.App.Service
                 Body = result
             };
         }
+
         public async Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId)
         {
             var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
@@ -234,6 +235,18 @@ namespace Planner_chat_server.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = draft.ToMessageDraftBody()
+            };
+        }
+
+        public async Task<ServiceResponse<List<MessageDraftBody>>> GetMessageDrafts(Guid accountId)
+        {
+            var drafts = await _chatRepository.GetMessageDrafts(accountId);
+
+            return new ServiceResponse<List<MessageDraftBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = drafts.Select(x => x.ToMessageDraftBody()).ToList()
             };
         }
     }
