@@ -170,7 +170,7 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpPost("api/createOrUpdateMessageDraft"), Authorize]
+        [HttpPost("api/createOrUpdateMessageDrafts"), Authorize]
         [SwaggerOperation("Создать/обновить список черновиков")]
         [SwaggerResponse(200, Type = typeof(bool))]
         [SwaggerResponse(404)]

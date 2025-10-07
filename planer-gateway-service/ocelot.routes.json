@@ -791,6 +791,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/createOrUpdateMessageDrafts",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/createOrUpdateMessageDrafts",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/getMessageDraft",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
