@@ -225,6 +225,23 @@ namespace Planner_chat_server.App.Service
             };
         }
 
+        public async Task<ServiceResponse<bool>> CreateOrUpdateMessageDrafts(Guid accountId, List<MessageDraftBody> drafts)
+        {
+            foreach (var draft in drafts)
+            {
+                var membership = await _chatRepository.GetMembershipAsync(draft.ChatId, accountId);
+
+                var result = await _chatRepository.CreateOrUpdateMessageDraft(membership, draft.Content);
+            }
+
+            return new ServiceResponse<bool>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = true
+            };
+        }
+
         public async Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId)
         {
             var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);

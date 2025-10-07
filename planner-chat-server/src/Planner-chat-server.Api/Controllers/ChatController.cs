@@ -170,6 +170,24 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
+        [HttpPost("api/createOrUpdateMessageDraft"), Authorize]
+        [SwaggerOperation("Создать/обновить список черновиков")]
+        [SwaggerResponse(200, Type = typeof(bool))]
+        [SwaggerResponse(404)]
+
+        public async Task<IActionResult> CreateOrUpdateMessageDrafts(
+            [FromBody, Required] List<MessageDraftBody> drafts,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.CreateOrUpdateMessageDrafts(tokenPayload.AccountId, drafts);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
         [HttpGet("api/getMessageDraft")]
         [SwaggerOperation("Получить черновик сообщения")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
