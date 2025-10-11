@@ -40,11 +40,11 @@ ApplyMigrations(app);
 
 app.MapGet("/", () => $"Auth server work");
 
-//app.MapGet("/reset-password", async (HttpContext context) =>
-//{
-//    context.Response.ContentType = "text/html";
-//    await context.Response.SendFileAsync("wwwroot/reset-password.html");
-//});
+app.MapGet("/reset-password", async (HttpContext context) =>
+{
+    context.Response.ContentType = "text/html";
+    await context.Response.SendFileAsync("wwwroot/reset-password.html");
+});
 
 app.Run();
 
