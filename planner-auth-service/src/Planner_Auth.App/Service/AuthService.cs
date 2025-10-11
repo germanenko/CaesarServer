@@ -72,7 +72,7 @@ namespace Planner_Auth.App.Service
             var account = session.Account;
             var accountCredentials = await UpdateToken(account.RoleName, account.Id, session.Id);
 
-            await NotifyAboutTempPassword(account.Identifier);
+            await NotifyAboutTempPassword(account.Identifier, account.Id);
 
             return new ServiceResponse<OutputAccountCredentialsBody>
             {
@@ -419,7 +419,7 @@ namespace Planner_Auth.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                await NotifyAboutTempPassword(userInfo.Email);
+                await NotifyAboutTempPassword(userInfo.Email, account.Id);
             }
             else
             {
@@ -438,14 +438,14 @@ namespace Planner_Auth.App.Service
             return tokenPair;
         }
 
-        public static async Task<bool> NotifyAboutTempPassword(string email)
+        public async Task<bool> NotifyAboutTempPassword(string email, Guid accountId)
         {
             var client  = new HttpClient()
             {
                 BaseAddress = new Uri("http://planer-email-service:80/api/"),
             };
 
-            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: https://busfy.ru/auth/reset-password\"}}";
+            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(accountId)}\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
@@ -461,10 +461,10 @@ namespace Planner_Auth.App.Service
             }
         }
 
-        public string GenerateResetLink([FromBody] string accountId)
+        public string GenerateResetLink(Guid accountId)
         {
             // Генерация JWT токена вместо случайной строки
-            var token = _jwtService.GeneratePasswordResetToken(accountId);
+            var token = _jwtService.GeneratePasswordResetToken(accountId.ToString());
             var payload = _jwtService.GetPasswordResetTokenPayload(token);
 
             var resetLink = $"https://busfy.ru/auth/reset-password?token={Uri.EscapeDataString(token)}";
