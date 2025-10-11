@@ -122,7 +122,7 @@ namespace Planner_Auth.App.Service
 
                 return new PasswordResetTokenPayload
                 {
-                    UserId = claims.FirstOrDefault(c => c.Type == "userId")?.Value,
+                    UserId = Guid.Parse(claims.FirstOrDefault(c => c.Type == "userId")?.Value),
                     TokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value,
                     ExpiresAt = GetTokenExpiration(token)
                 };
