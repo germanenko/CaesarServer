@@ -8,8 +8,7 @@ namespace Planner_Auth.Core.Entities.Response
 {
     public class PasswordResetTokenPayload
     {
-        public string Email { get; set; }
-        public string UserId { get; set; }
+        public Guid UserId { get; set; }
         public string TokenId { get; set; }
         public DateTime ExpiresAt { get; set; }
         public bool IsExpired => ExpiresAt < DateTime.UtcNow;

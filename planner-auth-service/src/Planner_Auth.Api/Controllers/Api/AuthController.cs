@@ -122,16 +122,16 @@ namespace Planner_Auth.Api.Controllers.Api
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpPut("resetPassword"), Authorize]
+        [HttpPut("resetPassword")]
         [SwaggerOperation("Сброс пароля")]
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
         public async Task<IActionResult> ResetPassword(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromHeader(Name = "X-Reset-Token")] string token,
             [FromBody] string newPassword
         )
         {
-            var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _authService.ChangeTempPassword(tokenInfo.AccountId, newPassword);
+            var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
+            var response = await _authService.ChangeTempPassword(tokenInfo.UserId, newPassword);
 
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
