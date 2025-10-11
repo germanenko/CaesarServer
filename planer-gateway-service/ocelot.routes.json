@@ -43,16 +43,28 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/reset-password",
-            "DangerousAcceptAnyServerCertificateValidator": true,
+      	    "DownstreamPathTemplate": "/",
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8888
-                }
+                 {
+                      "Host": "planner-auth", 
+                      "Port": 8888
+                 }
             ],
-            "UpstreamPathTemplate": "/reset-password",
+            "UpstreamPathTemplate": "/auth",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
+      	    "DownstreamPathTemplate": "/reset-password",
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                 {
+                      "Host": "planner-auth", 
+                      "Port": 8888
+                 }
+            ],
+            "UpstreamPathTemplate": "/auth/reset-password",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
