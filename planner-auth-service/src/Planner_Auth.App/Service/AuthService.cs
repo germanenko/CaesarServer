@@ -1,7 +1,9 @@
 using Google.Apis.Auth.OAuth2;
 using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Org.BouncyCastle.Asn1.Ocsp;
 using Planner_Auth.Core.Entities.Events;
 using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
@@ -457,6 +459,17 @@ namespace Planner_Auth.App.Service
             {
                 return false;
             }
+        }
+
+        public string GenerateResetLink([FromBody] string accountId)
+        {
+            // Генерация JWT токена вместо случайной строки
+            var token = _jwtService.GeneratePasswordResetToken(accountId);
+            var payload = _jwtService.GetPasswordResetTokenPayload(token);
+
+            var resetLink = $"https://busfy.ru/auth/reset-password?token={Uri.EscapeDataString(token)}";
+
+            return resetLink;
         }
 
         public async Task<ServiceResponse<bool>> ChangeTempPassword(Guid accountId, string newPassword)

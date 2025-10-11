@@ -71,5 +71,75 @@ namespace Planner_Auth.App.Service
                 SessionId = Guid.Parse(claims.FirstOrDefault(claim => claim.Type == "SessionId")?.Value),
             };
         }
+
+        public string GeneratePasswordResetToken(string userId)
+        {
+            var claims = new Dictionary<string, string>
+        {
+            { "userId", userId },
+            { "purpose", "password_reset" }, // явно указываем цель токена
+            { "tokenId", Guid.NewGuid().ToString() } // ”никальный ID токена
+        };
+
+            // “окен действует 1 час
+            var timeSpan = TimeSpan.FromHours(1);
+
+            return GenerateAccessToken(claims, timeSpan);
+        }
+
+        // ¬алидаци€ токена сброса парол€
+        public bool ValidatePasswordResetToken(string token, string expectedEmail = null)
+        {
+            try
+            {
+                var claims = GetClaims(token);
+
+                var purpose = claims.FirstOrDefault(c => c.Type == "purpose")?.Value;
+                if (purpose != "password_reset")
+                    return false;
+
+                var expClaim = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+                if (expClaim != null && long.TryParse(expClaim, out long exp))
+                {
+                    var expiryDate = DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
+                    if (expiryDate < DateTime.UtcNow)
+                        return false;
+                }
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        public PasswordResetTokenPayload GetPasswordResetTokenPayload(string token)
+        {
+            try
+            {
+                var claims = GetClaims(token);
+
+                return new PasswordResetTokenPayload
+                {
+                    UserId = claims.FirstOrDefault(c => c.Type == "userId")?.Value,
+                    TokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value,
+                    ExpiresAt = GetTokenExpiration(token)
+                };
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        private DateTime GetTokenExpiration(string token)
+        {
+            var claims = GetClaims(token);
+            var expClaim = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+            return expClaim != null && long.TryParse(expClaim, out long exp)
+                ? DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime
+                : DateTime.MinValue;
+        }
     }
 }
