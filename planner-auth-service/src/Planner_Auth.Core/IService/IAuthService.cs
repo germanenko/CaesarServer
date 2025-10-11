@@ -14,5 +14,6 @@ namespace Planner_Auth.Core.IService
         Task<ServiceResponse<string>> AddGoogleToken(GoogleTokenBody token, Guid accountId);
         Task<ServiceResponse<string>> GetGoogleToken(Guid accountId);
         Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(GoogleTokenBody token, DeviceTypeId deviceTypeId, string deviceId);
+        Task<ServiceResponse<bool>> ChangeTempPassword(Guid accountId, string newPassword);
     }
 }

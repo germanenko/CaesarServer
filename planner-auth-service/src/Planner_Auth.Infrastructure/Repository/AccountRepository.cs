@@ -206,5 +206,14 @@ namespace Planner_Auth.Infrastructure.Repository
         public async Task<GoogleToken?> GetGoogleTokenAsync(Guid userId)
             => await _context.GoogleTokens
                 .FirstOrDefaultAsync(e => e.UserId == userId);
+
+        public async Task<Account?> ChangePassword(Account account, string newPasswordHash)
+        {
+            account.PasswordHash = newPasswordHash;
+
+            await _context.SaveChangesAsync();
+
+            return account;
+        }
     }
 }

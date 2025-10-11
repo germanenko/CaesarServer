@@ -121,5 +121,22 @@ namespace Planner_Auth.Api.Controllers.Api
 
             return StatusCode((int)result.StatusCode, result.Errors);
         }
+
+        [HttpPut("changeTempPassword"), Authorize]
+        [SwaggerOperation("Смена временного пароля")]
+        [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
+        public async Task<IActionResult> GetProfileAsync(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromBody] string newPassword
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+            var response = await _authService.ChangeTempPassword(tokenInfo.AccountId, newPassword);
+
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, response.Body);
+
+            return StatusCode((int)response.StatusCode);
+        }
     }
 }

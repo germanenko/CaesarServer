@@ -25,5 +25,6 @@ namespace Planner_Auth.Core.IRepository
         Task<Account?> UpdateProfileIconAsync(Guid accountId, string filename);
         Task<GoogleToken?> AddAsync(GoogleTokenBody token, Guid accountId);
         Task<GoogleToken?> GetGoogleTokenAsync(Guid userId);
+        Task<Account?> ChangePassword(Account account, string newPasswordHash);
     }
 }

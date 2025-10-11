@@ -11,6 +11,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Planner_Auth.App.Service
 {
@@ -451,6 +452,34 @@ namespace Planner_Auth.App.Service
             else
             {
                 return false;
+            }
+        }
+
+        public async Task<ServiceResponse<bool>> ChangeTempPassword(Guid accountId, string newPassword)
+        {
+            var account = await _accountRepository.GetAsync(accountId);
+
+            var newPasswordHash = _hashPasswordService.HashPassword(newPassword);
+
+            var result = await _accountRepository.ChangePassword(account, newPasswordHash);
+
+            if (result != null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Body = true
+                };
+            }
+            else
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Body = false
+                };
             }
         }
     }
