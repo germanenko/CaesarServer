@@ -463,7 +463,6 @@ namespace Planner_Auth.App.Service
 
         public string GenerateResetLink(Guid accountId)
         {
-            // Генерация JWT токена вместо случайной строки
             var token = _jwtService.GeneratePasswordResetToken(accountId.ToString());
             var payload = _jwtService.GetPasswordResetTokenPayload(token);
 

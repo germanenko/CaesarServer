@@ -123,7 +123,7 @@ namespace Planner_Auth.Api.Controllers.Api
         }
 
         [HttpPut("changeTempPassword"), Authorize]
-        [SwaggerOperation("Смена временного пароля")]
+        [SwaggerOperation("Сброс пароля")]
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
         public async Task<IActionResult> GetProfileAsync(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
@@ -137,6 +137,24 @@ namespace Planner_Auth.Api.Controllers.Api
                 return StatusCode((int)response.StatusCode, response.Body);
 
             return StatusCode((int)response.StatusCode);
+        }
+
+        [HttpGet("validateResetToken")]
+        [SwaggerOperation("Проверка валидности токена сброса пароля")]
+        [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
+        public IActionResult ValidateResetToken(
+            [FromQuery] string token
+        )
+        {
+            var isValid = _jwtService.ValidatePasswordResetToken(token);
+            var payload = _jwtService.GetPasswordResetTokenPayload(token);
+
+            return Ok(new
+            {
+                Valid = isValid,
+                ExpiresAt = payload?.ExpiresAt,
+                TimeRemaining = payload != null ? payload.ExpiresAt - DateTime.UtcNow : TimeSpan.Zero
+            });
         }
     }
 }
