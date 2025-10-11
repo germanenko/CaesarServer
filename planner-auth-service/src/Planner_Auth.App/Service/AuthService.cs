@@ -1,4 +1,5 @@
 using Google.Apis.Auth.OAuth2;
+using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
 using Microsoft.Extensions.Logging;
 using Planner_Auth.Core.Entities.Events;
@@ -68,6 +69,9 @@ namespace Planner_Auth.App.Service
 
             var account = session.Account;
             var accountCredentials = await UpdateToken(account.RoleName, account.Id, session.Id);
+
+            await NotifyAboutTempPassword(account.Identifier);
+
             return new ServiceResponse<OutputAccountCredentialsBody>
             {
                 Body = accountCredentials,
@@ -439,7 +443,7 @@ namespace Planner_Auth.App.Service
                 BaseAddress = new Uri("http://planer-email-service:80/api/"),
             };
 
-            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль!\"}}";
+            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: https://busfy.ru/auth/reset-password\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
