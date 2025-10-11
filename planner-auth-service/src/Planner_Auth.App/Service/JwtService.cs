@@ -133,7 +133,7 @@ namespace Planner_Auth.App.Service
             }
         }
 
-        private DateTime GetTokenExpiration(string token)
+        public DateTime GetTokenExpiration(string token)
         {
             var claims = GetClaims(token);
             var expClaim = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
