@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 //using Planer_email_service.App.Service;
@@ -201,7 +202,8 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IJwtService, JwtService>(sp => new JwtService(
         jwtSecret,
         jwtIssuer,
-        jwtAudience));
+        jwtAudience,
+        cache: sp.GetRequiredService<IMemoryCache>()));
 
 
     services.AddScoped<IAuthService, AuthService>();

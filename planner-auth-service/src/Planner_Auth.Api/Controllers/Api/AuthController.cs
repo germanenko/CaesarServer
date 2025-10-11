@@ -134,8 +134,11 @@ namespace Planner_Auth.Api.Controllers.Api
             var response = await _authService.ChangeTempPassword(tokenInfo.UserId, newPassword);
 
             if (response.IsSuccess)
+            {
+                _jwtService.InvalidatePasswordResetToken(token);
                 return StatusCode((int)response.StatusCode, response.Body);
-
+            }
+               
             return StatusCode((int)response.StatusCode);
         }
 

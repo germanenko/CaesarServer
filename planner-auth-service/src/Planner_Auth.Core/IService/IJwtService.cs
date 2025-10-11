@@ -10,5 +10,6 @@ namespace Planner_Auth.Core.IService
         bool ValidatePasswordResetToken(string token, string expectedEmail = null);
         PasswordResetTokenPayload GetPasswordResetTokenPayload(string token);
         DateTime GetTokenExpiration(string token);
+        void InvalidatePasswordResetToken(string token);
     }
 }

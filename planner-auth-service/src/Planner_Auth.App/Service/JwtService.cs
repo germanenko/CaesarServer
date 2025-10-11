@@ -1,9 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+п»їusing Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IService;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using System.Text;
 
 namespace Planner_Auth.App.Service
 {
@@ -12,13 +13,15 @@ namespace Planner_Auth.App.Service
         private readonly SigningCredentials _signingCredentials;
         private readonly string _issuer;
         private readonly string _audience;
+        private readonly IMemoryCache _cache;
 
-        public JwtService(string key, string issuer, string audience)
+        public JwtService(string key, string issuer, string audience, IMemoryCache cache)
         {
             var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key));
             _signingCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             _issuer = issuer;
             _audience = audience;
+            _cache = cache;
         }
 
         private string GenerateAccessToken(Dictionary<string, string> claims, TimeSpan timeSpan)
@@ -74,20 +77,23 @@ namespace Planner_Auth.App.Service
 
         public string GeneratePasswordResetToken(string userId)
         {
+            var tokenId = Guid.NewGuid().ToString();
             var claims = new Dictionary<string, string>
-        {
-            { "userId", userId },
-            { "purpose", "password_reset" }, // Явно указываем цель токена
-            { "tokenId", Guid.NewGuid().ToString() } // Уникальный ID токена
-        };
+            {
+                { "userId", userId },
+                { "purpose", "password_reset" }, 
+                { "tokenId", Guid.NewGuid().ToString() } 
+            };
 
-            // Токен действует 1 час
+            
             var timeSpan = TimeSpan.FromHours(1);
+
+            _cache.Set($"reset_token_{tokenId}", true, timeSpan);
 
             return GenerateAccessToken(claims, timeSpan);
         }
 
-        // Валидация токена сброса пароля
+        // Р’Р°Р»РёРґР°С†РёСЏ С‚РѕРєРµРЅР° СЃР±СЂРѕСЃР° РїР°СЂРѕР»СЏ
         public bool ValidatePasswordResetToken(string token, string expectedEmail = null)
         {
             try
@@ -105,6 +111,13 @@ namespace Planner_Auth.App.Service
                     if (expiryDate < DateTime.UtcNow)
                         return false;
                 }
+   
+                var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
+                if (string.IsNullOrEmpty(tokenId))
+                    return false;
+
+                if (!_cache.TryGetValue($"reset_token_{tokenId}", out bool isValid))
+                    return false;
 
                 return true;
             }
@@ -140,6 +153,24 @@ namespace Planner_Auth.App.Service
             return expClaim != null && long.TryParse(expClaim, out long exp)
                 ? DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime
                 : DateTime.MinValue;
+        }
+
+        public void InvalidatePasswordResetToken(string token)
+        {
+            try
+            {
+                var claims = GetClaims(token);
+                var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
+
+                if (!string.IsNullOrEmpty(tokenId))
+                {
+                    _cache.Remove($"reset_token_{tokenId}");
+                }
+            }
+            catch
+            {
+                
+            }
         }
     }
 }
