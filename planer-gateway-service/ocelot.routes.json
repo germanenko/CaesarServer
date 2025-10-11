@@ -53,6 +53,12 @@
             ],
             "UpstreamPathTemplate": "/auth",
             "UpstreamHttpMethod": [ "GET" ]
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "HttpHandlerOptions": {
+        	"AllowAutoRedirect": true,
+        	"UseCookieContainer": true,
+        	"UseTracing": true,
+        	"UseProxy": true
         },
 
 	{
