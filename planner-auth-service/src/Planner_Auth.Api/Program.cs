@@ -22,6 +22,8 @@ using JwtService = Planner_Auth.App.Service.JwtService;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddMemoryCache();
+
 var host = GetEnvVar("HOST");
 builder.WebHost.UseUrls(host);
 builder.WebHost.UseKestrel(options =>
