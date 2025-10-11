@@ -84,11 +84,8 @@ namespace Planner_Auth.App.Service
                 { "purpose", "password_reset" }, 
                 { "tokenId", Guid.NewGuid().ToString() } 
             };
-
             
             var timeSpan = TimeSpan.FromHours(1);
-
-            _cache.Set($"reset_token_{tokenId}", true, timeSpan);
 
             return GenerateAccessToken(claims, timeSpan);
         }
