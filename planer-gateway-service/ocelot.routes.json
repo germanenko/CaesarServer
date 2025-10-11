@@ -58,7 +58,8 @@
         	"AllowAutoRedirect": true,
         	"UseCookieContainer": true,
         	"UseTracing": true,
-        	"UseProxy": true
+        	"UseProxy": true 
+            }
         },
 
 	{
