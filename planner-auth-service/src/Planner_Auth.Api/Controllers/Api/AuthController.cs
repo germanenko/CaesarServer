@@ -122,10 +122,10 @@ namespace Planner_Auth.Api.Controllers.Api
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpPut("changeTempPassword"), Authorize]
+        [HttpPut("resetPassword"), Authorize]
         [SwaggerOperation("Сброс пароля")]
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
-        public async Task<IActionResult> GetProfileAsync(
+        public async Task<IActionResult> ResetPassword(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
             [FromBody] string newPassword
         )

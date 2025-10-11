@@ -82,6 +82,19 @@
             }
         },
 
+	{
+      	    "DownstreamPathTemplate": "/api/resetPassword",
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                 {
+                      "Host": "localhost", 
+                      "Port": 8888
+                 }
+            ],
+            "UpstreamPathTemplate": "/api/resetPassword",
+            "UpstreamHttpMethod": [ "PUT" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/signin",
             "DangerousAcceptAnyServerCertificateValidator": true,
