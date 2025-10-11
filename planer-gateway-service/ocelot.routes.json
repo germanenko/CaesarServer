@@ -84,6 +84,7 @@
 
 	{
       	    "DownstreamPathTemplate": "/api/resetPassword",
+            "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                  {
