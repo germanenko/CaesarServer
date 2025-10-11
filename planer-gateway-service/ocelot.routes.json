@@ -52,7 +52,7 @@
                  }
             ],
             "UpstreamPathTemplate": "/auth",
-            "UpstreamHttpMethod": [ "GET" ]
+            "UpstreamHttpMethod": [ "GET" ],
             "DangerousAcceptAnyServerCertificateValidator": true,
             "HttpHandlerOptions": {
         	"AllowAutoRedirect": true,
