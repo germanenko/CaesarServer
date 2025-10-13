@@ -484,7 +484,7 @@ namespace Planner_Auth.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Body = "Password changed successfully"
+                    Body = "Пароль успешно изменён"
                 };
             }
             else
@@ -493,7 +493,7 @@ namespace Planner_Auth.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
-                    Body = "Error"
+                    Body = "Ошибка"
                 };
             }
         }

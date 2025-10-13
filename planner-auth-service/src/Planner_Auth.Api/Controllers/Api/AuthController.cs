@@ -124,7 +124,7 @@ namespace Planner_Auth.Api.Controllers.Api
 
         [HttpPut("resetPassword")]
         [SwaggerOperation("Сброс пароля")]
-        [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
+        [SwaggerResponse(200, Description = "Успешно", Type = typeof(string))]
         public async Task<IActionResult> ResetPassword(
             [FromHeader(Name = "X-Reset-Token")] string token,
             [FromBody] string newPassword
@@ -150,7 +150,7 @@ namespace Planner_Auth.Api.Controllers.Api
                 if (response.IsSuccess)
                 {
                     _jwtService.InvalidatePasswordResetToken(token);
-                    return Ok(response.Body);
+                    return Ok();
                 }
 
                 return StatusCode((int)response.StatusCode, response.Errors);
