@@ -132,29 +132,23 @@ namespace Planner_Auth.Api.Controllers.Api
         {
             try
             {
-                // 1. Валидация токена
                 if (string.IsNullOrEmpty(token))
                     return BadRequest("Token is required");
 
-                // 2. Проверка валидности токена
                 if (!_jwtService.ValidatePasswordResetToken(token))
                     return BadRequest("Invalid or expired token");
 
-                // 3. Получение payload с проверкой на null
                 var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
                 if (tokenInfo == null)
                     return BadRequest("Invalid token payload");
 
-                // 4. Проверка срока действия
                 if (tokenInfo.ExpiresAt < DateTime.UtcNow)
                     return BadRequest("Token has expired");
 
-                // 5. Вызов сервиса
                 var response = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
 
                 if (response.IsSuccess)
                 {
-                    // Инвалидация токена только после успешного сброса
                     _jwtService.InvalidatePasswordResetToken(token);
                     return Ok(response.Body);
                 }
@@ -163,8 +157,6 @@ namespace Planner_Auth.Api.Controllers.Api
             }
             catch (Exception ex)
             {
-                // Логирование ошибки
-                // _logger.LogError(ex, "Error resetting password for token: {Token}", token);
                 return StatusCode(500, "Internal server error");
             }
         }
