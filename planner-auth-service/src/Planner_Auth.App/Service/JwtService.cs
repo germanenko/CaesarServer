@@ -78,15 +78,23 @@ namespace Planner_Auth.App.Service
 
         public string GeneratePasswordResetToken(string userId)
         {
+            var expiration = TimeSpan.FromHours(1);
+
             var tokenId = Guid.NewGuid().ToString();
+
             var claims = new Dictionary<string, string>
             {
                 { "userId", userId },
                 { "purpose", "password_reset" }, 
-                { "tokenId", Guid.NewGuid().ToString() } 
+                { "tokenId", tokenId } 
             };
-            
-            var timeSpan = TimeSpan.FromHours(1);
+
+            _cache.Set($"reset_token_{tokenId}", true, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = expiration
+            });
+
+            var timeSpan = expiration;
 
             return GenerateAccessToken(claims, timeSpan);
         }
@@ -116,7 +124,7 @@ namespace Planner_Auth.App.Service
 
                 _cache.TryGetValue($"reset_token_{tokenId}", out bool inCache);
 
-                if (inCache)
+                if (!inCache)
                     return false;
 
                 return true;
@@ -162,7 +170,7 @@ namespace Planner_Auth.App.Service
 
             if (!string.IsNullOrEmpty(tokenId))
             {
-                _cache.Set($"reset_token_{tokenId}", true);
+                _cache.Remove($"reset_token_{tokenId}");
             }
         }
     }
