@@ -150,7 +150,7 @@ namespace Planner_Auth.Api.Controllers.Api
                 if (response.IsSuccess)
                 {
                     _jwtService.InvalidatePasswordResetToken(token);
-                    return Ok();
+                    return StatusCode((int)response.StatusCode);
                 }
 
                 return StatusCode((int)response.StatusCode, response.Errors);
