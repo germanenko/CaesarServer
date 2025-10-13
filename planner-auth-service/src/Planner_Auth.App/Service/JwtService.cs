@@ -141,14 +141,12 @@ namespace Planner_Auth.App.Service
             {
                 var claims = GetClaims(token);
 
-                //var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
-                //if (string.IsNullOrEmpty(tokenId))
-                //    return null;
+                var valid = ValidatePasswordResetToken(token);
 
-                //_cache.TryGetValue($"reset_token_{tokenId}", out bool inCache);
-
-                //if (!inCache)
-                //    return null;
+                if (!valid)
+                {
+                    return null;
+                }
 
                 return new PasswordResetTokenPayload
                 {
