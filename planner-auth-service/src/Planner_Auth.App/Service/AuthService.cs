@@ -464,7 +464,6 @@ namespace Planner_Auth.App.Service
         public string GenerateResetLink(Guid accountId)
         {
             var token = _jwtService.GeneratePasswordResetToken(accountId.ToString());
-            var payload = _jwtService.GetPasswordResetTokenPayload(token);
 
             var resetLink = $"https://busfy.ru/auth/reset-password?token={Uri.EscapeDataString(token)}";
 

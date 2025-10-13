@@ -141,7 +141,9 @@ namespace Planner_Auth.App.Service
             {
                 var claims = GetClaims(token);
 
-                if (!ValidatePasswordResetToken(token))
+                var valid = ValidatePasswordResetToken(token);
+
+                if (!valid)
                 {
                     return null;
                 }
