@@ -470,7 +470,7 @@ namespace Planner_Auth.App.Service
             return resetLink;
         }
 
-        public async Task<ServiceResponse<bool>> ResetPassword(Guid accountId, string newPassword)
+        public async Task<ServiceResponse<string>> ResetPassword(Guid accountId, string newPassword)
         {
             var account = await _accountRepository.GetAsync(accountId);
 
@@ -480,25 +480,25 @@ namespace Planner_Auth.App.Service
 
             if (result != null)
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<string>
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Body = true
+                    Body = "Пароль успешно изменён"
                 };
             }
             else
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<string>
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
-                    Body = false
+                    Body = "Ошибка"
                 };
             }
         }
 
-        public async Task<ServiceResponse<bool>> ChangePassword(Guid accountId, string oldPassword, string newPassword)
+        public async Task<ServiceResponse<string>> ChangePassword(Guid accountId, string oldPassword, string newPassword)
         {
             var account = await _accountRepository.GetAsync(accountId);
 
@@ -506,11 +506,11 @@ namespace Planner_Auth.App.Service
 
             if(oldPasswordHash != account.PasswordHash)
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<string>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest,
-                    Body = false
+                    Body = "Старый пароль неверный"
                 };
             }
 
