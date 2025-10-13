@@ -131,7 +131,7 @@ namespace Planner_Auth.Api.Controllers.Api
         )
         {
             var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
-            var response = await _authService.ChangeTempPassword(tokenInfo.UserId, newPassword);
+            var response = await _authService.ChangeTempPassword(tokenInfo.AccountId, newPassword);
 
             if (response.IsSuccess)
             {
@@ -139,6 +139,23 @@ namespace Planner_Auth.Api.Controllers.Api
                 return StatusCode((int)response.StatusCode, response.Body);
             }
                
+            return StatusCode((int)response.StatusCode);
+        }
+
+        [HttpPut("resetPassword"), Authorize]
+        [SwaggerOperation("Сброс пароля")]
+        [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
+        public async Task<IActionResult> ResetPasswordFromApp(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromBody] string newPassword
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+            var response = await _authService.ChangeTempPassword(tokenInfo.AccountId, newPassword);
+
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, response.Body);
+
             return StatusCode((int)response.StatusCode);
         }
 
