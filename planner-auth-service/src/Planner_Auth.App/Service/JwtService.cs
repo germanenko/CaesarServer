@@ -141,13 +141,9 @@ namespace Planner_Auth.App.Service
             {
                 var claims = GetClaims(token);
 
-                var expClaim = claims.FirstOrDefault(c => c.Type == "exp")?.Value;
-
-                if (expClaim != null && long.TryParse(expClaim, out long exp))
+                if (!ValidatePasswordResetToken(token))
                 {
-                    var expiryDate = DateTimeOffset.FromUnixTimeSeconds(exp).UtcDateTime;
-                    if (expiryDate < DateTime.UtcNow)
-                        return null;
+                    return null;
                 }
 
                 return new PasswordResetTokenPayload
