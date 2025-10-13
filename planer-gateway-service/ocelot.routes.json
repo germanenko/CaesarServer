@@ -97,7 +97,7 @@
         },
 
 	{
-      	    "DownstreamPathTemplate": "/api/resetPasswordFromApp",
+      	    "DownstreamPathTemplate": "/api/changePassword",
             "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
@@ -106,7 +106,7 @@
                       "Port": 8888
                  }
             ],
-            "UpstreamPathTemplate": "/api/resetPasswordFromApp",
+            "UpstreamPathTemplate": "/api/changePassword",
             "UpstreamHttpMethod": [ "PUT" ]
         },
 
