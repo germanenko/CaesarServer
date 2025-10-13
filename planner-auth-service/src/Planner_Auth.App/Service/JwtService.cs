@@ -84,7 +84,7 @@ namespace Planner_Auth.App.Service
 
             var claims = new Dictionary<string, string>
             {
-                { "userId", userId },
+                { "accountId", userId },
                 { "purpose", "password_reset" }, 
                 { "tokenId", tokenId } 
             };
@@ -150,7 +150,7 @@ namespace Planner_Auth.App.Service
 
                 return new PasswordResetTokenPayload
                 {
-                    AccountId = Guid.Parse(claims.FirstOrDefault(c => c.Type == "userId")?.Value),
+                    AccountId = Guid.Parse(claims.FirstOrDefault(c => c.Type == "accountId")?.Value),
                     TokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value,
                     ExpiresAt = GetTokenExpiration(token)
                 };
