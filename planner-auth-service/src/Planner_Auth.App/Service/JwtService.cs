@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IService;
+using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -113,7 +114,9 @@ namespace Planner_Auth.App.Service
                 if (string.IsNullOrEmpty(tokenId))
                     return false;
 
-                if (_cache.TryGetValue($"reset_token_{tokenId}", out bool isValid))
+                _cache.TryGetValue($"reset_token_{tokenId}", out bool inCache);
+
+                if (inCache)
                     return false;
 
                 return true;
@@ -154,19 +157,12 @@ namespace Planner_Auth.App.Service
 
         public void InvalidatePasswordResetToken(string token)
         {
-            try
-            {
-                var claims = GetClaims(token);
-                var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
+            var claims = GetClaims(token);
+            var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
 
-                if (!string.IsNullOrEmpty(tokenId))
-                {
-                    _cache.Remove($"reset_token_{tokenId}");
-                }
-            }
-            catch
+            if (!string.IsNullOrEmpty(tokenId))
             {
-                
+                _cache.Set($"reset_token_{tokenId}", true);
             }
         }
     }
