@@ -142,7 +142,7 @@ namespace Planner_Auth.Api.Controllers.Api
             return StatusCode((int)response.StatusCode);
         }
 
-        [HttpPut("resetPassword"), Authorize]
+        [HttpPut("resetPasswordFromApp"), Authorize]
         [SwaggerOperation("Сброс пароля")]
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
         public async Task<IActionResult> ResetPasswordFromApp(

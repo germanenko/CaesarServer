@@ -96,6 +96,20 @@
             "UpstreamHttpMethod": [ "PUT" ]
         },
 
+	{
+      	    "DownstreamPathTemplate": "/api/resetPasswordFromApp",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                 {
+                      "Host": "localhost", 
+                      "Port": 8888
+                 }
+            ],
+            "UpstreamPathTemplate": "/api/resetPasswordFromApp",
+            "UpstreamHttpMethod": [ "PUT" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/signin",
             "DangerousAcceptAnyServerCertificateValidator": true,
