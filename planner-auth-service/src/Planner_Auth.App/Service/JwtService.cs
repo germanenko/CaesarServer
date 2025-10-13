@@ -113,7 +113,7 @@ namespace Planner_Auth.App.Service
                 if (string.IsNullOrEmpty(tokenId))
                     return false;
 
-                if (!_cache.TryGetValue($"reset_token_{tokenId}", out bool isValid))
+                if (_cache.TryGetValue($"reset_token_{tokenId}", out bool isValid))
                     return false;
 
                 return true;
