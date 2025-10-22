@@ -480,14 +480,14 @@ namespace Planer_task_board.App.Service
                 IsSuccess = true
             };
         }
-        public async Task<ServiceResponse<IEnumerable<BoardColumnTask>>> GetColumnTaskMembership(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<BoardColumnTaskBody>>> GetColumnTaskMembership(Guid accountId)
         {
             var memberships = await _taskRepository.GetColumnTaskMembership(accountId);
 
-            return new ServiceResponse<IEnumerable<BoardColumnTask>>
+            return new ServiceResponse<IEnumerable<BoardColumnTaskBody>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = memberships,
+                Body = memberships.Select(x => x.ToBoardColumnTaskBody()),
                 IsSuccess = true
             };
         }

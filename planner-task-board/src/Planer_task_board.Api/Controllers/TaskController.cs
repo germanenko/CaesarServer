@@ -162,7 +162,7 @@ namespace Planer_task_board.Api.Controllers
 
         [HttpGet("columnTaskMemberships"), Authorize]
         [SwaggerOperation("Получить отношения задач к колонкам")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<BoardColumnTask>))]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<BoardColumnTaskBody>))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 

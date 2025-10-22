@@ -1,3 +1,5 @@
+using Planer_task_board.Core.Entities.Response;
+
 namespace Planer_task_board.Core.Entities.Models
 {
     public class BoardColumnTask
@@ -7,5 +9,14 @@ namespace Planer_task_board.Core.Entities.Models
 
         public TaskModel Task { get; set; }
         public Guid TaskId { get; set; }
+
+        public BoardColumnTaskBody ToBoardColumnTaskBody()
+        {
+            return new BoardColumnTaskBody
+            {
+                ColumnId = ColumnId,
+                TaskId = TaskId
+            };
+        }
     }
 }
