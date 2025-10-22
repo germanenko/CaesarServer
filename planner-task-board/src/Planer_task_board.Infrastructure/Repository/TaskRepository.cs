@@ -459,5 +459,21 @@ namespace Planer_task_board.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return task;
         }
+
+        public async Task<IEnumerable<BoardColumnTask>> GetColumnTaskMembership(Guid accountId)
+        {
+            var result = _context.BoardColumns
+                .Include(a => a.Members)
+                .ThenInclude(a => a.Column)
+                .SelectMany(e => e.Members);
+
+            var columns = result.Where(e => e.AccountId == accountId).Select(e => e.Column).ToList();
+
+            var columnIds = columns.Select(x => x.Id).ToList();
+
+            var columnTaskMembership = await _context.BoardColumnTasks.Where(x => columnIds.Contains(x.ColumnId)).ToListAsync();
+
+            return columnTaskMembership;
+        }
     }
 }

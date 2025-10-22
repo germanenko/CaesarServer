@@ -1,4 +1,5 @@
 using System.Net;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
@@ -20,5 +21,6 @@ namespace Planer_task_board.Core.IService
         Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<UpdateTaskBody> taskBodies);
         Task<HttpStatusCode> AddTaskToColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
         Task<HttpStatusCode> RemoveTaskFromColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
+        Task<ServiceResponse<IEnumerable<BoardColumnTask>>> GetColumnTaskMembership(Guid accountId);
     }
 }
