@@ -130,35 +130,28 @@ namespace Planner_Auth.Api.Controllers.Api
             [FromBody] string newPassword
         )
         {
-            try
+            if (string.IsNullOrEmpty(token))
+                return BadRequest("Token is required");
+
+            if (!_jwtService.ValidatePasswordResetToken(token))
+                return BadRequest("Invalid or expired token");
+
+            var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
+            if (tokenInfo == null)
+                return BadRequest("Invalid token payload");
+
+            if (tokenInfo.ExpiresAt < DateTime.UtcNow)
+                return BadRequest("Token has expired");
+
+            var response = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
+
+            if (response.IsSuccess)
             {
-                if (string.IsNullOrEmpty(token))
-                    return BadRequest("Token is required");
-
-                if (!_jwtService.ValidatePasswordResetToken(token))
-                    return BadRequest("Invalid or expired token");
-
-                var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
-                if (tokenInfo == null)
-                    return BadRequest("Invalid token payload");
-
-                if (tokenInfo.ExpiresAt < DateTime.UtcNow)
-                    return BadRequest("Token has expired");
-
-                var response = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
-
-                if (response.IsSuccess)
-                {
-                    _jwtService.InvalidatePasswordResetToken(token);
-                    return StatusCode((int)response.StatusCode);
-                }
-
-                return StatusCode((int)response.StatusCode, response.Errors);
+                _jwtService.InvalidatePasswordResetToken(token);
+                return StatusCode((int)response.StatusCode);
             }
-            catch (Exception ex)
-            {
-                return StatusCode(500, "Internal server error");
-            }
+
+            return StatusCode((int)response.StatusCode, response.Errors);
         }
 
         [HttpPut("changePassword"), Authorize]

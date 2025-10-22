@@ -8,6 +8,6 @@ namespace Planer_task_board.Core.Enums
         Meeting,
         Task,
         Reminder,
-        Inform
+        Information
     }
 }
