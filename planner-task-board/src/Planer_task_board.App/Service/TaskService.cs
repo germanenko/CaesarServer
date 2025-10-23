@@ -181,16 +181,6 @@ namespace Planer_task_board.App.Service
                 
 
                 var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
-                if (column == null)
-                {
-                    errors.Add("Column not found");
-                    return new ServiceResponse<List<TaskBody>>
-                    {
-                        StatusCode = HttpStatusCode.NotFound,
-                        Errors = errors.ToArray(),
-                        IsSuccess = false
-                    };
-                }
 
                 DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
                 DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);

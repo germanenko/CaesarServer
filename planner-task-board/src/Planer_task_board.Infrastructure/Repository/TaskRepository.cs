@@ -32,7 +32,7 @@ namespace Planer_task_board.Infrastructure.Repository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            BoardColumn column,
+            BoardColumn? column,
             Guid creatorId,
             List<Guid> messages,
             DateTime changeDate
@@ -304,7 +304,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         private async Task<TaskModel?> AddTaskAsync(
             TaskModel task,
-            BoardColumn column,
+            BoardColumn? column,
             IEnumerable<TaskAttachedMessage> taskAttachedMessages)
         {
             if (task == null)
@@ -312,13 +312,20 @@ namespace Planer_task_board.Infrastructure.Repository
 
             task.AttachedMessages = taskAttachedMessages.ToList();
 
-            var boardColumnTask = new BoardColumnTask
-            {
-                Column = column,
-                Task = task
-            };
             task = (await _context.Tasks.AddAsync(task))?.Entity;
-            boardColumnTask = (await _context.BoardColumnTasks.AddAsync(boardColumnTask))?.Entity;
+
+            if(column != null)
+            {
+                var boardColumnTask = new BoardColumnTask
+                {
+                    Column = column,
+                    Task = task
+                };
+                boardColumnTask = (await _context.BoardColumnTasks.AddAsync(boardColumnTask))?.Entity;
+
+                task.Columns.Add(boardColumnTask);
+            }
+            
             await _context.SaveChangesAsync();
 
             var createTaskChatEvent = new CreateTaskChatEvent
@@ -344,8 +351,6 @@ namespace Planer_task_board.Infrastructure.Repository
             };
 
             _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
-
-            task.Columns.Add(boardColumnTask);
 
             return task;
         }
