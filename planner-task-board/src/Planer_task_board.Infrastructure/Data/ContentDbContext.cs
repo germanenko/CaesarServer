@@ -7,7 +7,7 @@ namespace Planer_task_board.Infrastructure.Data
     {
         public ContentDbContext(DbContextOptions<ContentDbContext> options) : base(options)
         {
-
+            AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
