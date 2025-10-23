@@ -50,7 +50,7 @@ namespace Planer_task_board.Core.IRepository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            Guid columnId,
+            Guid? columnId,
             DateTime changeDate);
         Task<TaskModel?> UpdateAsync(
             Guid id,

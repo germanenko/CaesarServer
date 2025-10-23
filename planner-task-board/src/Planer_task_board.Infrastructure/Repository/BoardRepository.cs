@@ -113,7 +113,7 @@ namespace Planer_task_board.Infrastructure.Repository
             => await _context.BoardMembers
                 .FirstOrDefaultAsync(e => e.BoardId == boardId && e.AccountId == accountId);
 
-        public async Task<BoardColumnMember?> GetColumnMemberAsync(Guid accountId, Guid columnId)
+        public async Task<BoardColumnMember?> GetColumnMemberAsync(Guid accountId, Guid? columnId)
             => await _context.BoardColumnMembers
                 .FirstOrDefaultAsync(e => e.ColumnId == columnId && e.AccountId == accountId);
 
@@ -147,7 +147,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return availableMemberBoardColumns.Select(e => e.Column);
         }
 
-        public async Task<BoardColumn?> GetBoardColumn(Guid columnId)
+        public async Task<BoardColumn?> GetBoardColumn(Guid? columnId)
         {
             return await _context.BoardColumns
                 .FirstOrDefaultAsync(e => e.Id == columnId);

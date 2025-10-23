@@ -243,7 +243,7 @@ namespace Planer_task_board.Infrastructure.Repository
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
-            Guid columnId,
+            Guid? columnId,
             DateTime changeDate)
         {
             var task = await _context.Tasks

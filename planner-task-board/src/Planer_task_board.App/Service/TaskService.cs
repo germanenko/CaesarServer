@@ -389,7 +389,7 @@ namespace Planer_task_board.App.Service
             return result != false ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid columnId, UpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid? columnId, UpdateTaskBody taskBody)
         {
             var errors = new List<string>();
 
