@@ -10,7 +10,6 @@ namespace Planer_task_board.Core.Entities.Request
         [MaxLength(128)]
         public string Title { get; set; }
 
-        [Required]
         public string Description { get; set; }
 
         [Range(0, 10)]
