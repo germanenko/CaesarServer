@@ -491,5 +491,57 @@ namespace Planer_task_board.App.Service
                 IsSuccess = true
             };
         }
+
+        public async Task<ServiceResponse<BoardColumnTaskBody>> UpdateColumnTaskMembership(Guid accountId, BoardColumnTaskBody columnTaskMembership)
+        {
+            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnTaskMembership.ColumnId);
+            if (columnMember == null)
+                return new ServiceResponse<BoardColumnTaskBody>
+                {
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new string[] { "You are not a member of this column" },
+                    IsSuccess = false
+                };
+
+
+            var result = await _taskRepository.UpdateColumnTaskMembership(columnTaskMembership);
+            return result == null ? new ServiceResponse<BoardColumnTaskBody>
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Errors = new string[] { "ColumnTaskMembership not updated" },
+                IsSuccess = false
+            } : new ServiceResponse<BoardColumnTaskBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result.ToBoardColumnTaskBody(),
+                IsSuccess = true
+            };
+        }
+
+        public async Task<ServiceResponse<List<BoardColumnTaskBody>>> UpdateColumnTaskMemberships(Guid accountId, List<BoardColumnTaskBody> columnTaskMemberships)
+        {
+            List<BoardColumnTaskBody> result = new List<BoardColumnTaskBody>();
+
+            foreach (var membership in columnTaskMemberships)
+            {
+                var columnTask = await UpdateColumnTaskMembership(accountId, membership);
+
+                if(columnTask != null)
+                    result.Add(columnTask.Body);
+            }
+
+            
+            return result.Count == 0 ? new ServiceResponse<List<BoardColumnTaskBody>>
+            {
+                StatusCode = HttpStatusCode.BadRequest,
+                Errors = new string[] { "ColumnTaskMemberships not updated" },
+                IsSuccess = false
+            } : new ServiceResponse<List<BoardColumnTaskBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result,
+                IsSuccess = true
+            };
+        }
     }
 }

@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
@@ -264,7 +265,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 await RemoveTaskFromColumn(task.Id, boardColumnTask.ColumnId);
                 var column = _context.BoardColumns.Where(x => x.Id == columnId).First();
-                await AssignTaskToColumn(task, column);
+                await AssignTaskToColumn(task, column); 
             }
 
             await _context.SaveChangesAsync();
@@ -474,6 +475,19 @@ namespace Planer_task_board.Infrastructure.Repository
             var columnTaskMembership = await _context.BoardColumnTasks.Where(x => columnIds.Contains(x.ColumnId)).ToListAsync();
 
             return columnTaskMembership;
+        }
+
+        public async Task<BoardColumnTask?> UpdateColumnTaskMembership(BoardColumnTaskBody boardColumnTaskBody)
+        {
+            var columnTask = await _context.BoardColumnTasks
+                .FirstOrDefaultAsync(e => e.TaskId == boardColumnTaskBody.TaskId);
+
+            if (columnTask == null)
+                return null;
+
+            columnTask.ColumnId = boardColumnTaskBody.ColumnId;
+            await _context.SaveChangesAsync();
+            return columnTask;
         }
     }
 }
