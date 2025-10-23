@@ -152,77 +152,91 @@ namespace Planer_task_board.App.Service
             List<TaskBody> tasks = new List<TaskBody>();
             foreach (var taskBody in taskBodies)
             {
-                if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-                    errors.Add("Start time format is not correct");
+                var result = await CreateOrUpdateTask(accountId, taskBody);
 
-                if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-                    errors.Add("End time format is not correct");
+                //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                //    errors.Add("Start time format is not correct");
 
-                if (taskBody.ColumnId != null)
+                //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                //    errors.Add("End time format is not correct");
+
+                //if (taskBody.ColumnId != null)
+                //{
+                //    var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                //    if (columnMember == null)
+                //    {
+                //        errors.Add("You are not a member of this column");
+                //        return new ServiceResponse<List<TaskBody>>
+                //        {
+                //            StatusCode = HttpStatusCode.Forbidden,
+                //            Errors = errors.ToArray(),
+                //            IsSuccess = false
+                //        };
+                //    }
+                //}
+
+
+                //var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
+
+                //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+                //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+
+                //if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
+                //{
+                //    var task = await UpdateTask(accountId, new UpdateTaskBody()
+                //    {
+                //        Id = taskBody.Id,
+                //        Title = taskBody.Title,
+                //        Description = taskBody.Description,
+                //        PriorityOrder = taskBody.PriorityOrder,
+                //        Status = taskBody.Status,
+                //        HexColor = taskBody.HexColor,
+                //        ColumnId = taskBody.ColumnId
+                //    });
+
+                //    tasks.Add(task.Body);
+                //    continue;
+                //}
+
+                //var result = await _taskRepository.AddAsync(
+                //    taskBody.Id,
+                //    taskBody.Title,
+                //    taskBody.Description,
+                //    taskBody.PriorityOrder,
+                //    taskBody.Status,
+                //    taskBody.Type,
+                //    startDate,
+                //    endDate,
+                //    taskBody.HexColor,
+                //    column,
+                //    accountId,
+                //    taskBody.MessageIds,
+                //    taskBody.UpdatedAt);
+
+                //if (result == null)
+                //{
+                //    errors.Add("Task not created");
+                //    return new ServiceResponse<List<TaskBody>>
+                //    {
+                //        StatusCode = HttpStatusCode.BadRequest,
+                //        Errors = errors.ToArray(),
+                //        IsSuccess = false
+                //    };
+                //}
+
+                if (result.IsSuccess)
                 {
-                    var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-                    if (columnMember == null)
-                    {
-                        errors.Add("You are not a member of this column");
-                        return new ServiceResponse<List<TaskBody>>
-                        {
-                            StatusCode = HttpStatusCode.Forbidden,
-                            Errors = errors.ToArray(),
-                            IsSuccess = false
-                        };
-                    }
+                    tasks.Add(result.Body);
                 }
-                
-
-                var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
-
-                DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-                DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
-
-                if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
+                else
                 {
-                    var task = await UpdateTask(accountId, new UpdateTaskBody()
-                    {
-                        Id = taskBody.Id,
-                        Title = taskBody.Title,
-                        Description = taskBody.Description,
-                        PriorityOrder = taskBody.PriorityOrder,
-                        Status = taskBody.Status,
-                        HexColor = taskBody.HexColor,
-                        ColumnId = taskBody.ColumnId
-                    });
-
-                    tasks.Add(task.Body);
-                    continue;
-                }
-
-                var result = await _taskRepository.AddAsync(
-                    taskBody.Id,
-                    taskBody.Title,
-                    taskBody.Description,
-                    taskBody.PriorityOrder,
-                    taskBody.Status,
-                    taskBody.Type,
-                    startDate,
-                    endDate,
-                    taskBody.HexColor,
-                    column,
-                    accountId,
-                    taskBody.MessageIds,
-                    taskBody.UpdatedAt);
-
-                if (result == null)
-                {
-                    errors.Add("Task not created");
                     return new ServiceResponse<List<TaskBody>>
                     {
                         StatusCode = HttpStatusCode.BadRequest,
-                        Errors = errors.ToArray(),
-                        IsSuccess = false
+                        IsSuccess = false,
+                        Errors = result.Errors
                     };
                 }
-
-                tasks.Add(result.ToTaskBody());
             }
 
             return new ServiceResponse<List<TaskBody>>
