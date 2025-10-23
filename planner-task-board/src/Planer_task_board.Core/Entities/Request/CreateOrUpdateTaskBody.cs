@@ -33,6 +33,6 @@ namespace Planer_task_board.Core.Entities.Request
 
         public List<Guid> MessageIds { get; set; } = new();
 
-        public Guid ColumnId { get; set; }
+        public Guid? ColumnId { get; set; }
     }
 }
