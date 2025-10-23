@@ -75,29 +75,23 @@ namespace Planer_task_board.App.Service
             if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                 errors.Add("End time format is not correct");
 
-            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-            if (columnMember == null)
+            if(taskBody.ColumnId != null)
             {
-                errors.Add("You are not a member of this column");
-                return new ServiceResponse<TaskBody>
+                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                if (columnMember == null)
                 {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = errors.ToArray(),
-                    IsSuccess = false
-                };
+                    errors.Add("You are not a member of this column");
+                    return new ServiceResponse<TaskBody>
+                    {
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Errors = errors.ToArray(),
+                        IsSuccess = false
+                    };
+                }
             }
+            
 
             var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
-            if (column == null)
-            {
-                errors.Add("Column not found");
-                return new ServiceResponse<TaskBody>
-                {
-                    StatusCode = HttpStatusCode.NotFound,
-                    Errors = errors.ToArray(),
-                    IsSuccess = false
-                };
-            }
 
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
