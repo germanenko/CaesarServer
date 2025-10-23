@@ -34,12 +34,11 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> CreateOrUpdateTask(
             [FromBody] CreateOrUpdateTaskBody taskBody,
-            [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, columnId, taskBody);
+            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
@@ -224,12 +223,11 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> UpdateTask(
             UpdateTaskBody taskBody,
-            [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.UpdateTask(tokenPayload.AccountId, columnId, taskBody);
+            var result = await _taskService.UpdateTask(tokenPayload.AccountId, taskBody);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

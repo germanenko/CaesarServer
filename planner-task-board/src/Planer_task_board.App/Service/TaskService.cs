@@ -66,7 +66,7 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, Guid columnId, CreateOrUpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
         {
             var errors = new List<string>();
             if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -75,7 +75,7 @@ namespace Planer_task_board.App.Service
             if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                 errors.Add("End time format is not correct");
 
-            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnId);
+            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
             if (columnMember == null)
             {
                 errors.Add("You are not a member of this column");
@@ -87,7 +87,7 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            var column = await _boardRepository.GetBoardColumn(columnId);
+            var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
             if (column == null)
             {
                 errors.Add("Column not found");
@@ -104,7 +104,7 @@ namespace Planer_task_board.App.Service
 
             if(await _taskRepository.GetAsync(taskBody.Id, false) != null)
             {
-                var task = await UpdateTask(accountId, columnId, new UpdateTaskBody() 
+                var task = await UpdateTask(accountId, new UpdateTaskBody() 
                 {
                     Id = taskBody.Id,
                     Title = taskBody.Title,
@@ -164,17 +164,21 @@ namespace Planer_task_board.App.Service
                 if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                     errors.Add("End time format is not correct");
 
-                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-                if (columnMember == null)
+                if (taskBody.ColumnId != null)
                 {
-                    errors.Add("You are not a member of this column");
-                    return new ServiceResponse<List<TaskBody>>
+                    var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                    if (columnMember == null)
                     {
-                        StatusCode = HttpStatusCode.Forbidden,
-                        Errors = errors.ToArray(),
-                        IsSuccess = false
-                    };
+                        errors.Add("You are not a member of this column");
+                        return new ServiceResponse<List<TaskBody>>
+                        {
+                            StatusCode = HttpStatusCode.Forbidden,
+                            Errors = errors.ToArray(),
+                            IsSuccess = false
+                        };
+                    }
                 }
+                
 
                 var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
                 if (column == null)
@@ -193,7 +197,7 @@ namespace Planer_task_board.App.Service
 
                 if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
                 {
-                    var task = await UpdateTask(accountId, taskBody.ColumnId, new UpdateTaskBody()
+                    var task = await UpdateTask(accountId, new UpdateTaskBody()
                     {
                         Id = taskBody.Id,
                         Title = taskBody.Title,
@@ -389,7 +393,7 @@ namespace Planer_task_board.App.Service
             return result != false ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, Guid? columnId, UpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, UpdateTaskBody taskBody)
         {
             var errors = new List<string>();
 
@@ -407,7 +411,7 @@ namespace Planer_task_board.App.Service
                     IsSuccess = false
                 };
 
-            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnId);
+            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
             if (columnMember == null)
                 return new ServiceResponse<TaskBody>
                 {
