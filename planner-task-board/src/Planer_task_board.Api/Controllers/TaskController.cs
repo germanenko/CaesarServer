@@ -326,5 +326,23 @@ namespace Planer_task_board.Api.Controllers
 
             return StatusCode((int)result.StatusCode, result.Errors);
         }
+
+        [HttpGet("getTasksAttachedMessages"), Authorize]
+        [SwaggerOperation("Получить отношения задач к сообщения")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskAttachedMessageBody>))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> GetTasksAttachedMessages(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.GetTasksAttachedMessages(tokenPayload.AccountId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
     }
 }

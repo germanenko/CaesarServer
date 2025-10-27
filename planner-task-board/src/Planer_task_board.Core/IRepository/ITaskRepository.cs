@@ -71,5 +71,6 @@ namespace Planer_task_board.Core.IRepository
         Task<TaskModel?> UpdateTaskChatId(Guid taskId, Guid chatId);
         Task<IEnumerable<BoardColumnTask>> GetColumnTaskMembership(Guid accountId);
         Task<BoardColumnTask?> UpdateColumnTaskMembership(BoardColumnTaskBody boardColumnTaskBody);
+        Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId);
     }
 }

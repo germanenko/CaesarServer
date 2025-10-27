@@ -499,5 +499,26 @@ namespace Planer_task_board.Infrastructure.Repository
             await _context.SaveChangesAsync();
             return columnTask;
         }
+
+        public async Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId)
+        {
+            var result = _context.BoardColumns
+                .Include(a => a.Members)
+                .ThenInclude(a => a.Column)
+                .SelectMany(e => e.Members);
+
+            var columns = result.Where(e => e.AccountId == accountId).Select(e => e.Column);
+
+            var tasks = columns.SelectMany(e => e.Tasks);
+
+            var taskIds = tasks.Select(e => e.TaskId);
+
+            var attaches = _context.Tasks
+                .Include(t => t.AttachedMessages)
+                .Where(x => taskIds.Contains(x.Id))
+                .SelectMany(t => t.AttachedMessages);
+
+            return attaches;
+        }
     }
 }
