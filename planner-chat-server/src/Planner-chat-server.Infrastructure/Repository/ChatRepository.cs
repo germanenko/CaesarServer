@@ -167,7 +167,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                 var dateLastViewing = userSession.DateLastViewing;
 
                 var countOfUnreadMessages = await _context.ChatMessages
-                    .CountAsync(e => e.SentAt > dateLastViewing && e.ChatId == chatId);
+                     .CountAsync(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false);
 
                 var lastMessage = await _context.ChatMessages
                         .Where(e => e.SentAt > dateLastViewing && e.ChatId == chatId)
@@ -181,13 +181,48 @@ namespace Planner_chat_server.Infrastructure.Repository
                     ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
                     CountOfUnreadMessages = countOfUnreadMessages,
                     IsSyncedReadStatus = userSession.DateLastViewing == userMembership.DateLastViewing,
-                    ParticipantIds = chatMembership.Select(e => e.AccountId).ToList(),
+                    ParticipantIds = chatMembership.Where(x => x.AccountId != accountId).Select(e => e.AccountId).ToList(),
                     LastMessage = lastMessage?.ToMessageBody()
                 };
+
                 result.Add(chatBody);
             }
 
             return result;
+        }
+
+        public async Task<ChatBody> GetChat(Guid accountId, Guid userSessionId, Guid chatId)
+        {
+            var chatMembership = await _context.ChatMemberships
+                .Include(e => e.Chat)
+                .Where(e => e.AccountId == accountId && e.ChatId == chatId)
+                .FirstOrDefaultAsync();
+
+            var userSession = await CreateOrGetAccountChatSessionAsync(userSessionId, chatMembership.Id, chatMembership.DateLastViewing);
+
+            var chat = chatMembership.Chat;
+            var dateLastViewing = userSession.DateLastViewing;
+
+            var countOfUnreadMessages = await _context.ChatMessages
+                .CountAsync(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false);
+
+            var lastMessage = await _context.ChatMessages
+                    .Where(e => e.SentAt > dateLastViewing && e.ChatId == chatId)
+                    .OrderByDescending(e => e.SentAt)
+                    .FirstOrDefaultAsync();
+
+            var chatBody = new ChatBody
+            {
+                Id = chat.Id,
+                Name = chat.Name,
+                ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
+                CountOfUnreadMessages = countOfUnreadMessages,
+                IsSyncedReadStatus = userSession.DateLastViewing == chatMembership.DateLastViewing,
+                ParticipantIds = _context.ChatMemberships.Where(x => x.ChatId == chatId && x.AccountId != accountId).Select(e => e.AccountId).ToList(),
+                LastMessage = lastMessage?.ToMessageBody()
+            };
+
+            return chatBody;
         }
 
         public async Task<List<ChatMembership>> GetChatMembershipsAsync(Guid chatId)

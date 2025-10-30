@@ -80,6 +80,23 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
+        [HttpGet("api/chat"), Authorize]
+        [SwaggerOperation("Получить чат")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<ChatBody>))]
+
+        public async Task<IActionResult> GetChat(
+            [FromBody] Guid chatId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.GetChat(tokenInfo.AccountId, tokenInfo.SessionId, chatId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
         [HttpPost("api/chat"), Authorize]
         [SwaggerOperation("Создать личный чат")]
         [SwaggerResponse(200, Type = typeof(Guid))]

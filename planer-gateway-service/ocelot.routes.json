@@ -926,6 +926,20 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/chat",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/chat",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+
+	{
             "DownstreamPathTemplate": "/api/createOrUpdateMessageDraft",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

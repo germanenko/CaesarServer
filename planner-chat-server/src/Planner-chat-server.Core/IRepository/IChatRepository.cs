@@ -29,6 +29,7 @@ namespace Planner_chat_server.Core.IRepository
         Task CreateChatMembershipsAsync(Guid taskId, List<Guid> accountIds);
         Task<ChatMembership?> GetChatMembershipAsync(Guid chatId, Guid accountId);
         Task<List<ChatBody>> GetChatBodies(Guid accountId, Guid userSessionId, ChatType chatType);
+        Task<ChatBody> GetChat(Guid accountId, Guid userSessionId, Guid chatId);
         Task<ChatMembership?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId);
         Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date);
         Task<Chat?> GetByTaskIdAsync(Guid taskId);

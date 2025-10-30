@@ -140,6 +140,17 @@ namespace Planner_chat_server.App.Service
             };
         }
 
+        public async Task<ServiceResponse<ChatBody>> GetChat(Guid accountId, Guid userSessionId, Guid chatId)
+        {
+            var chat = await _chatRepository.GetChat(accountId, userSessionId, chatId);
+            return new ServiceResponse<ChatBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = chat
+            };
+        }
+
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options)
         {
             var messages = await _chatRepository.GetMessagesAsync(chatId, options.Count, options.LoadPosition);
