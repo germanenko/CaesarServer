@@ -82,10 +82,10 @@ namespace Planner_chat_server.Api.Controllers
 
         [HttpGet("api/chat"), Authorize]
         [SwaggerOperation("Получить чат")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<ChatBody>))]
+        [SwaggerResponse(200, Type = typeof(ChatBody))]
 
         public async Task<IActionResult> GetChat(
-            [FromBody] Guid chatId,
+            [FromQuery] Guid chatId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
