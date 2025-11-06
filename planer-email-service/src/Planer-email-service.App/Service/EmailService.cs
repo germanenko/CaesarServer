@@ -94,7 +94,7 @@ namespace Planer_email_service.App.Service
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
-                    Errors = new string[] { "General error" }
+                    Errors = new string[] { $"General error {ex.Message}" }
                 };
             }
         }
