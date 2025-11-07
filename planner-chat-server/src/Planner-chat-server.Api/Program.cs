@@ -17,7 +17,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-FirebaseApp.Create();
 ConfigureServices(builder.Services);
 var app = builder.Build();
 app = ConfigureApplication(app);
@@ -25,7 +24,7 @@ ApplyMigrations(app);
 app.Run();
 
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
-async void ConfigureServices(IServiceCollection services)
+void ConfigureServices(IServiceCollection services)
 {
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
