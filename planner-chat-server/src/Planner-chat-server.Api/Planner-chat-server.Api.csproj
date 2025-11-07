@@ -5,12 +5,6 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>Planner_chat_server.Api</RootNamespace>
   </PropertyGroup>
-	<ItemGroup>
-		<Content Remove="service-account-key.json" />
-	</ItemGroup>
-	<ItemGroup>
-		<None Include="service-account-key.json" />
-	</ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
