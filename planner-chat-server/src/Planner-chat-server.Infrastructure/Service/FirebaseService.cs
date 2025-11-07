@@ -13,12 +13,8 @@ namespace Planner_chat_server.Infrastructure.Service
 {
     public class FirebaseService : IFirebaseService
     {
-        private readonly ILogger<FirebaseService> _logger;
-
-        public FirebaseService(ILogger<FirebaseService> logger, string fbProjectId, string fbClientEmail, string fbPrivateKey)
+        public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey)
         {
-            _logger = logger;
-
             if (FirebaseApp.DefaultInstance == null)
             {
                 var formattedPrivateKey = fbPrivateKey?.Replace("\\n", "\n");
@@ -38,7 +34,6 @@ namespace Planner_chat_server.Infrastructure.Service
                     Credential = credential,
                     ProjectId = fbProjectId
                 });
-                _logger.LogInformation("Firebase Admin SDK initialized");
             }
         }
 
@@ -58,12 +53,10 @@ namespace Planner_chat_server.Infrastructure.Service
                 };
 
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                _logger.LogInformation("Firebase notification sent successfully: {MessageId}", response);
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send Firebase notification to token: {Token}", token);
                 throw;
             }
         }
@@ -79,12 +72,10 @@ namespace Planner_chat_server.Infrastructure.Service
                 };
 
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                _logger.LogInformation("Firebase data message sent successfully: {MessageId}", response);
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send Firebase data message to token: {Token}", token);
                 throw;
             }
         }
@@ -105,14 +96,11 @@ namespace Planner_chat_server.Infrastructure.Service
                 };
 
                 var response = await FirebaseMessaging.DefaultInstance.SendMulticastAsync(message);
-                _logger.LogInformation("Firebase multicast notification sent. Success: {SuccessCount}, Failure: {FailureCount}",
-                    response.SuccessCount, response.FailureCount);
 
                 return response;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Failed to send Firebase multicast notification to {TokenCount} tokens", tokens.Count);
                 throw;
             }
         }

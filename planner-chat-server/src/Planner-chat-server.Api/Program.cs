@@ -94,7 +94,6 @@ void ConfigureServices(IServiceCollection services)
             messageSentToChatQueue
         ));
     services.AddSingleton<IFirebaseService, FirebaseService>(sp => new FirebaseService(
-        sp.GetRequiredService<ILogger<FirebaseService>>(),
         firebaseProjectId,
         firebaseClientEmail,
         firebasePrivateKey
