@@ -23,7 +23,7 @@ namespace Planner_chat_server.Infrastructure.Service
             {
                 FirebaseApp.Create(new AppOptions()
                 {
-                    Credential = GoogleCredential.FromFile("caesar-e293e-a5f456b321c2.json"),
+                    Credential = GoogleCredential.FromFile("caesar-e293e-2e87b3b2b1a1.json"),
                     ProjectId = "caesar-e293e"
                 });
                 _logger.LogInformation("Firebase Admin SDK initialized");
