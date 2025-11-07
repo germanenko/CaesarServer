@@ -21,6 +21,9 @@ ConfigureServices(builder.Services);
 var app = builder.Build();
 app = ConfigureApplication(app);
 ApplyMigrations(app);
+
+FirebaseApp.Create();
+
 app.Run();
 
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
