@@ -26,7 +26,7 @@ ApplyMigrations(app);
 FirebaseApp.Create(new AppOptions()
 {
     ServiceAccountId = "firebase-adminsdk-fbsvc@caesar-e293e.iam.gserviceaccount.com",
-    Credential = GoogleCredential.GetApplicationDefault(),
+    Credential = GoogleCredential.FromFile("service-account-key.json"),
     ProjectId = "caesar-e293e"
 });
 
