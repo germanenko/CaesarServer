@@ -15,16 +15,28 @@ namespace Planner_chat_server.Infrastructure.Service
     {
         private readonly ILogger<FirebaseService> _logger;
 
-        public FirebaseService(ILogger<FirebaseService> logger)
+        public FirebaseService(ILogger<FirebaseService> logger, string fbProjectId, string fbClientEmail, string fbPrivateKey)
         {
             _logger = logger;
 
             if (FirebaseApp.DefaultInstance == null)
             {
+                var formattedPrivateKey = fbPrivateKey?.Replace("\\n", "\n");
+
+                var credential = GoogleCredential.FromJson($$"""
+                    {
+                        "type": "service_account",
+                        "project_id": "{{fbProjectId}}",
+                        "private_key": "{{formattedPrivateKey}}",
+                        "client_email": "{{fbClientEmail}}"
+                    }
+                    """);
+
+
                 FirebaseApp.Create(new AppOptions()
                 {
-                    Credential = GoogleCredential.FromFile("caesar-e293e-2e87b3b2b1a1.json"),
-                    ProjectId = "caesar-e293e"
+                    Credential = credential,
+                    ProjectId = fbProjectId
                 });
                 _logger.LogInformation("Firebase Admin SDK initialized");
             }

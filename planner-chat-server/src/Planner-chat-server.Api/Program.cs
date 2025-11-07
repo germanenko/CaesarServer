@@ -27,6 +27,10 @@ app.Run();
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
+    var firebaseProjectId = GetEnvVar("FIREBASE_PROJECT_ID");
+    var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
+    var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
+
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
@@ -89,7 +93,12 @@ void ConfigureServices(IServiceCollection services)
             createTaskChatResponseQueue,
             messageSentToChatQueue
         ));
-    services.AddSingleton<IFirebaseService, FirebaseService>();
+    services.AddSingleton<IFirebaseService, FirebaseService>(sp => new FirebaseService(
+        sp.GetRequiredService<ILogger<FirebaseService>>(),
+        firebaseProjectId,
+        firebaseClientEmail,
+        firebasePrivateKey
+        ));
 
     services.AddScoped<IChatRepository, ChatRepository>();
     services.AddScoped<IChatService, ChatService>();
