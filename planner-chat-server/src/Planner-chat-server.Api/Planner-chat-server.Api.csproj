@@ -6,6 +6,11 @@
     <RootNamespace>Planner_chat_server.Api</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+	  <Content Include="service-account-key.json">
+		  <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Content>
+  </ItemGroup>
+  <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="7.0.11" />
