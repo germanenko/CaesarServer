@@ -18,17 +18,20 @@ namespace Planner_chat_server.App.Service
         private readonly IChatConnectionService _chatConnectionService;
         private readonly IChatConnector _chatConnector;
         private readonly INotifyService _notifyService;
+        private readonly IFirebaseService _firebaseService;
 
         public ChatService(
             IChatRepository chatRepository,
             IChatConnectionService chatConnectionService,
             IChatConnector chatConnector,
-            INotifyService notifyService)
+            INotifyService notifyService,
+            IFirebaseService firebaseService)
         {
             _chatRepository = chatRepository;
             _chatConnectionService = chatConnectionService;
             _chatConnector = chatConnector;
             _notifyService = notifyService;
+            _firebaseService = firebaseService;
         }
 
         public async Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId)
@@ -153,6 +156,10 @@ namespace Planner_chat_server.App.Service
 
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options)
         {
+            await _firebaseService.SendNotificationAsync("ewlNQHF6R9KefnQtuBqciE:APA91bGqXFEuiFq7t7Ar-102XoVJF7Fzo7dm_AI4LUujm0OBzz5mikPjkbkf5h-Rf9Luy7mxu5wXqsdscltRLRaa2sMeShz3lliQqB9aryHkcIOd1noc5bI",
+                "test",
+                "testing");
+
             var messages = await _chatRepository.GetMessagesAsync(chatId, options.Count, options.LoadPosition);
             return new ServiceResponse<IEnumerable<MessageBody>>
             {
