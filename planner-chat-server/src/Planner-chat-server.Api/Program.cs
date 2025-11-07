@@ -1,6 +1,4 @@
-using FirebaseAdmin;
-using FirebaseAdmin.Messaging;
-using Google.Apis.Auth.OAuth2;
+using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -14,9 +12,9 @@ using Planner_chat_server.Infrastructure.Data;
 using Planner_chat_server.Infrastructure.Repository;
 using Planner_chat_server.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
 
 ConfigureServices(builder.Services);
 var app = builder.Build();
@@ -27,9 +25,9 @@ app.Run();
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
-    var firebaseProjectId = GetEnvVar("FIREBASE_PROJECT_ID");
-    var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
-    var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
+    //var firebaseProjectId = GetEnvVar("FIREBASE_PROJECT_ID");
+    //var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
+    //var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
@@ -93,16 +91,10 @@ void ConfigureServices(IServiceCollection services)
             createTaskChatResponseQueue,
             messageSentToChatQueue
         ));
-    //services.AddSingleton<IFirebaseService, FirebaseService>(sp => new FirebaseService(
-    //    firebaseProjectId,
-    //    firebaseClientEmail,
-    //    firebasePrivateKey
-    //    ));
 
     services.AddScoped<IChatRepository, ChatRepository>();
     services.AddScoped<IChatService, ChatService>();
     services.AddScoped<IChatConnector, ChatConnector>();
-
 
     services.AddHostedService(e => new RabbitMqService(
         e.GetRequiredService<IServiceScopeFactory>(),
