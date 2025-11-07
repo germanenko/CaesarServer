@@ -93,11 +93,11 @@ void ConfigureServices(IServiceCollection services)
             createTaskChatResponseQueue,
             messageSentToChatQueue
         ));
-    services.AddSingleton<IFirebaseService, FirebaseService>(sp => new FirebaseService(
-        firebaseProjectId,
-        firebaseClientEmail,
-        firebasePrivateKey
-        ));
+    //services.AddSingleton<IFirebaseService, FirebaseService>(sp => new FirebaseService(
+    //    firebaseProjectId,
+    //    firebaseClientEmail,
+    //    firebasePrivateKey
+    //    ));
 
     services.AddScoped<IChatRepository, ChatRepository>();
     services.AddScoped<IChatService, ChatService>();
