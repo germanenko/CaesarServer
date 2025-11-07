@@ -23,7 +23,7 @@ var app = builder.Build();
 app = ConfigureApplication(app);
 ApplyMigrations(app);
 
-FirebaseApp.Create(new AppOptions()
+var firebaseApp = FirebaseApp.Create(new AppOptions()
 {
     ServiceAccountId = "firebase-adminsdk-fbsvc@caesar-e293e.iam.gserviceaccount.com",
     Credential = GoogleCredential.FromFile("service-account-key.json"),
@@ -47,7 +47,7 @@ var message = new Message()
 
 // Send a message to the device corresponding to the provided
 // registration token.
-string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+string response = await FirebaseMessaging.GetMessaging(firebaseApp).SendAsync(message);
 // Response is a message ID string.
 Console.WriteLine("Successfully sent message: " + response);
 
