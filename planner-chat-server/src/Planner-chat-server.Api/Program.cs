@@ -1,5 +1,6 @@
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
+using Google.Apis.Auth.OAuth2;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -22,7 +23,12 @@ var app = builder.Build();
 app = ConfigureApplication(app);
 ApplyMigrations(app);
 
-FirebaseApp.Create();
+FirebaseApp.Create(new AppOptions()
+{
+    ServiceAccountId = "firebase-adminsdk-fbsvc@caesar-e293e.iam.gserviceaccount.com",
+    Credential = GoogleCredential.GetApplicationDefault(),
+    ProjectId = "caesar-e293e"
+});
 
 app.Run();
 
