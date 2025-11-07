@@ -29,34 +29,37 @@ var firebaseApp = FirebaseApp.Create(new AppOptions()
     Credential = GoogleCredential.FromFile("service-account-key.json"),
     ProjectId = "caesar-e293e"
 });
+app.Run();
 
-
-// This registration token comes from the client FCM SDKs.
-var registrationToken = "ewlNQHF6R9KefnQtuBqciE:APA91bGqXFEuiFq7t7Ar-102XoVJF7Fzo7dm_AI4LUujm0OBzz5mikPjkbkf5h-Rf9Luy7mxu5wXqsdscltRLRaa2sMeShz3lliQqB9aryHkcIOd1noc5bI";
-
-// See documentation on defining a message payload.
-var message = new Message()
+string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
+async void ConfigureServices(IServiceCollection services)
 {
-    Data = new Dictionary<string, string>()
+
+
+
+    // This registration token comes from the client FCM SDKs.
+    var registrationToken = "ewlNQHF6R9KefnQtuBqciE:APA91bGqXFEuiFq7t7Ar-102XoVJF7Fzo7dm_AI4LUujm0OBzz5mikPjkbkf5h-Rf9Luy7mxu5wXqsdscltRLRaa2sMeShz3lliQqB9aryHkcIOd1noc5bI";
+
+    // See documentation on defining a message payload.
+    var message = new Message()
+    {
+        Data = new Dictionary<string, string>()
     {
         { "score", "850" },
         { "time", "2:45" },
     },
-    Token = registrationToken,
-};
+        Token = registrationToken,
+    };
 
-// Send a message to the device corresponding to the provided
-// registration token.
-string response = await FirebaseMessaging.GetMessaging(firebaseApp).SendAsync(message);
-// Response is a message ID string.
-Console.WriteLine("Successfully sent message: " + response);
+    // Send a message to the device corresponding to the provided
+    // registration token.
+    string response = await FirebaseMessaging.GetMessaging(firebaseApp).SendAsync(message);
+    // Response is a message ID string.
+    Console.WriteLine("Successfully sent message: " + response);
 
 
-app.Run();
 
-string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
-void ConfigureServices(IServiceCollection services)
-{
+
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
