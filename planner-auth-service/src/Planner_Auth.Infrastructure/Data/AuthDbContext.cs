@@ -13,7 +13,6 @@ namespace Planner_Auth.Infrastructure.Data
         public DbSet<Account> Accounts { get; set; }
         public DbSet<AccountSession> AccountSessions { get; set; }
         public DbSet<GoogleToken> GoogleTokens { get; set; }
-        public DbSet<FirebaseToken> FirebaseTokens { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
