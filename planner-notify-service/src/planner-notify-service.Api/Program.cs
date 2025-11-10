@@ -64,6 +64,14 @@ void ConfigureServices(IServiceCollection services)
     ConfigureJwtAuthentication(services, jwtSecret, jwtIssuer, jwtAudience);
     ConfigureSwagger(services);
 
+    services.AddDistributedMemoryCache();
+    services.AddSession(options =>
+    {
+        options.IdleTimeout = TimeSpan.FromMinutes(15);
+        options.Cookie.HttpOnly = true;
+        options.Cookie.IsEssential = true;
+    });
+
     services.AddAuthorization();
 
     services.AddDbContext<NotifyDbContext>(options =>
@@ -105,6 +113,7 @@ WebApplication ConfigureApplication(WebApplication app)
     app.UseWebSockets();
     app.UseCors();
     app.UseAuthentication();
+    app.UseSession();
     app.UseAuthorization();
     app.MapControllers();
 
