@@ -71,6 +71,7 @@ volumes:
   planner-content-data:
   planner-mail-credentials-data:
   planner-chat-data:
+  planner-notify-data:
 
   planner-file-server-data:
   planner-rabbitmq:
