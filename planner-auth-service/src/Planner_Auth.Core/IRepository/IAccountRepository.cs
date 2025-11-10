@@ -26,5 +26,6 @@ namespace Planner_Auth.Core.IRepository
         Task<GoogleToken?> AddAsync(GoogleTokenBody token, Guid accountId);
         Task<GoogleToken?> GetGoogleTokenAsync(Guid userId);
         Task<Account?> ChangePassword(Account account, string newPasswordHash);
+        Task<FirebaseToken?> AddFirebaseToken(Account account, string firebaseToken);
     }
 }

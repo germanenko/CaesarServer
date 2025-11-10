@@ -1,4 +1,5 @@
 using System.Net;
+using Planner_Auth.Core.Entities.Models;
 using Planner_Auth.Core.Entities.Response;
 
 namespace Planner_Auth.Core.IService
@@ -12,5 +13,6 @@ namespace Planner_Auth.Core.IService
         Task<ServiceResponse<ProfileBody>> GetProfileByTag(string tag);
         Task<HttpStatusCode> ChangeAccountTag(Guid accountId, string tag);
         Task<ServiceResponse<ProfileBody>> GetProfile(Guid accountId);
+        Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken);
     }
 }

@@ -278,6 +278,20 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/user/addFirebaseToken",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8888
+                }
+            ],
+            "UpstreamPathTemplate": "/api/user/addFirebaseToken",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/user/{id}",
             "DangerousAcceptAnyServerCertificateValidator": true,

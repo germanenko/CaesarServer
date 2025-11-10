@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planner_Auth.Core.Entities.Models;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
@@ -138,6 +139,23 @@ namespace Planner_Auth.Api.Controllers.Api
         )
         {
             var response = await _userService.GetAllProfilesByPatternIdentifier(identifierPattern);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, response.Body);
+
+            return StatusCode((int)response.StatusCode, response.Errors);
+        }
+
+        [HttpPost("user/addFirebaseToken"), Authorize]
+        [SwaggerOperation("Добавить Firebase токен")]
+        [SwaggerResponse(200, Type = typeof(FirebaseToken))]
+
+        public async Task<IActionResult> AddFirebaseToken(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromQuery, Required] string firebaseToken
+        )
+        {
+            var tokenInfo = _jwtService.GetTokenPayload(token);
+            var response = await _userService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken);
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
 

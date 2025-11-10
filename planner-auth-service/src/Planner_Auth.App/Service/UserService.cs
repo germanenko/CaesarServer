@@ -1,4 +1,5 @@
 using System.Net;
+using Planner_Auth.Core.Entities.Models;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
@@ -112,6 +113,20 @@ namespace Planner_Auth.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = accounts.Select(a => a.ToProfileBody())
+            };
+        }
+
+        public async Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken)
+        {
+            var account = await _accountRepository.GetAsync(accountId);
+
+            var token = await _accountRepository.AddFirebaseToken(account, firebaseToken);
+
+            return new ServiceResponse<FirebaseToken>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = token
             };
         }
     }
