@@ -279,7 +279,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/addFirebaseToken",
+            "DownstreamPathTemplate": "/addFirebaseToken",
             "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
