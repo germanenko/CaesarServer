@@ -39,7 +39,7 @@ namespace planner_notify_service.Api.Controllers
         }
 
 
-        [HttpPost("addFirebaseToken"), Authorize]
+        [HttpPost("api/addFirebaseToken"), Authorize]
         [SwaggerOperation("Добавить Firebase токен")]
         [SwaggerResponse(200, Type = typeof(FirebaseToken))]
 

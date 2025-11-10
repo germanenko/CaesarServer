@@ -279,7 +279,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/addFirebaseToken",
+            "DownstreamPathTemplate": "/api/addFirebaseToken",
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                 {
@@ -287,7 +287,7 @@
                     "Port": 8092
                 }
             ],
-            "UpstreamPathTemplate": "/addFirebaseToken",
+            "UpstreamPathTemplate": "/api/addFirebaseToken",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
