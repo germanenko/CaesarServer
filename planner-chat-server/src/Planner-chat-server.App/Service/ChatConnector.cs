@@ -16,6 +16,8 @@ namespace Planner_chat_server.App.Service
     {
         private readonly IChatRepository _chatRepository;
         private readonly INotifyService _notifyService;
+        private readonly INotifyRepository _notifyRepository;
+        private readonly IFirebaseService _firebaseService;
         private readonly ILogger<ChatConnector> _logger;
         private readonly JsonSerializerOptions options = new()
         {
@@ -26,12 +28,16 @@ namespace Planner_chat_server.App.Service
         public ChatConnector(
             IChatRepository chatRepository,
             INotifyService notifyService,
-            ILogger<ChatConnector> logger
+            ILogger<ChatConnector> logger,
+            INotifyRepository notifyRepository,
+            IFirebaseService firebaseService
         )
         {
             _chatRepository = chatRepository;
             _notifyService = notifyService;
             _logger = logger;
+            _notifyRepository = notifyRepository;
+            _firebaseService = firebaseService;
         }
 
         public async Task Invoke(
@@ -159,6 +165,13 @@ namespace Planner_chat_server.App.Service
             var connectedSessionIds = sessions.Select(e => e.SessionId);
             var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
             var notConnectedAccountIds = userIds.Except(connectedAccountIds);
+
+            var firebaseTokens = await _notifyRepository.GetTokens(connectedAccountIds.ToList());
+
+            foreach (var firebaseToken in firebaseTokens)
+            {
+                await _firebaseService.SendNotificationAsync(firebaseToken.Token, message.SenderId.ToString(), message.Content);
+            }
 
             var bytes = SerializeObject(chatMessageBody);
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);

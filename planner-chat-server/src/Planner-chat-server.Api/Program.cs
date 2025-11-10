@@ -46,7 +46,8 @@ void ConfigureServices(IServiceCollection services)
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
     var jwtAudience = GetEnvVar("JWT_AUTH_AUDIENCE");
 
-    var connectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
+    var chatConnectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
+    var notifyConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
 
 
@@ -67,7 +68,12 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddDbContext<ChatDbContext>(options =>
     {
-        options.UseNpgsql(connectionString);
+        options.UseNpgsql(chatConnectionString);
+    });
+
+    services.AddDbContext<NotifyDbContext>(options =>
+    {
+        options.UseNpgsql(notifyConnectionString);
     });
 
     services.AddWebSockets(options =>
@@ -101,6 +107,7 @@ void ConfigureServices(IServiceCollection services)
 
 
     services.AddScoped<IChatRepository, ChatRepository>();
+    services.AddScoped<INotifyRepository, NotifyRepository>();
     services.AddScoped<IChatService, ChatService>();
     services.AddScoped<IChatConnector, ChatConnector>();
 
