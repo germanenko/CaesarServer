@@ -1,6 +1,4 @@
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
+using FirebaseAdmin.Auth;
 using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core.Entities.Events;
 using Planner_chat_server.Core.Entities.Models;
@@ -9,6 +7,9 @@ using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
 
 namespace Planner_chat_server.App.Service
 {
@@ -166,7 +167,7 @@ namespace Planner_chat_server.App.Service
             var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
             var notConnectedAccountIds = userIds.Except(connectedAccountIds);
 
-            var firebaseTokens = await _notifyRepository.GetTokens(connectedAccountIds.ToList());
+            var firebaseTokens = await _notifyRepository.GetTokens(notConnectedAccountIds.ToList());
 
             foreach (var firebaseToken in firebaseTokens)
             {
