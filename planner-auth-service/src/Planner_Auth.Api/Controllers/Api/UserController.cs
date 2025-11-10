@@ -144,22 +144,5 @@ namespace Planner_Auth.Api.Controllers.Api
 
             return StatusCode((int)response.StatusCode, response.Errors);
         }
-
-        [HttpPost("user/addFirebaseToken"), Authorize]
-        [SwaggerOperation("Добавить Firebase токен")]
-        [SwaggerResponse(200, Type = typeof(FirebaseToken))]
-
-        public async Task<IActionResult> AddFirebaseToken(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery, Required] string firebaseToken
-        )
-        {
-            var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _userService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
-
-            return StatusCode((int)response.StatusCode, response.Errors);
-        }
     }
 }

@@ -215,20 +215,5 @@ namespace Planner_Auth.Infrastructure.Repository
 
             return account;
         }
-
-        public async Task<FirebaseToken?> AddFirebaseToken(Account account, string firebaseToken)
-        {
-            var newToken = new FirebaseToken()
-            {
-                UserId = account.Id,
-                Token = firebaseToken
-            };
-
-            var token = _context.FirebaseTokens.Add(newToken).Entity;
-
-            await _context.SaveChangesAsync();
-
-            return token;
-        }
     }
 }

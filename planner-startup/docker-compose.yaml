@@ -26,6 +26,11 @@ services:
       file: services/notify-service.yaml
       service: planner-notify-service
 
+  planner-notify-db:
+    extends:
+      file: services/notify-db.yaml
+      service: planner-notify-db
+
   planner-auth-service:
     extends:
       file: services/auth-service.yaml

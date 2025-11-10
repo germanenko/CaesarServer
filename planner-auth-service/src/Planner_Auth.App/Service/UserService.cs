@@ -115,19 +115,5 @@ namespace Planner_Auth.App.Service
                 Body = accounts.Select(a => a.ToProfileBody())
             };
         }
-
-        public async Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken)
-        {
-            var account = await _accountRepository.GetAsync(accountId);
-
-            var token = await _accountRepository.AddFirebaseToken(account, firebaseToken);
-
-            return new ServiceResponse<FirebaseToken>
-            {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = token
-            };
-        }
     }
 }

@@ -13,6 +13,5 @@ namespace Planner_Auth.Core.IService
         Task<ServiceResponse<ProfileBody>> GetProfileByTag(string tag);
         Task<HttpStatusCode> ChangeAccountTag(Guid accountId, string tag);
         Task<ServiceResponse<ProfileBody>> GetProfile(Guid accountId);
-        Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken);
     }
 }

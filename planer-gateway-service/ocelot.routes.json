@@ -279,13 +279,13 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/user/addFirebaseToken",
+            "DownstreamPathTemplate": "/api/addFirebaseToken",
             "DangerousAcceptAnyServerCertificateValidator": true,
             "DownstreamScheme": "https",
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 8888
+                    "Port": 8092
                 }
             ],
             "UpstreamPathTemplate": "/api/user/addFirebaseToken",

@@ -1,11 +1,16 @@
 using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_notify_service.App.Service;
+using planner_notify_service.Core.IRepository;
 using planner_notify_service.Core.IService;
+using planner_notify_service.Infrastructure.Data;
+using planner_notify_service.Infrastructure.Repository;
 using planner_notify_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 
@@ -14,11 +19,16 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
 var app = builder.Build();
 app = ConfigureApplication(app);
+
+ApplyMigrations(app);
+
 app.Run();
 
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
+    var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
+
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
@@ -56,11 +66,22 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
+    services.AddDbContext<NotifyDbContext>(options =>
+    {
+        options.UseNpgsql(notifyDbConnectionString, builder =>
+        {
+            builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+        });
+    });
+
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IMainMonitoringService, MainMonitoringService>();
     services.AddSingleton<INotificationService, NotificationService>();
     services.AddSingleton<IMainMonitoringConnector, MainMonitoringConnector>();
     services.AddSingleton<INotificationConnector, NotificationConnector>();
+
+    services.AddScoped<INotifyService, NotifyService>();
+    services.AddScoped<INotifyRepository, NotifyRepository>();
 
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),
@@ -136,4 +157,20 @@ void ConfigureJwtAuthentication(IServiceCollection services, string secret, stri
             ValidIssuer = issuer,
             ValidAudience = audience
         });
+}
+
+void ApplyMigrations(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<NotifyDbContext>();
+        context.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database.");
+    }
 }

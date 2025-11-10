@@ -10,6 +10,7 @@ services:
       planner-rabbitmq-service:
         condition: service_healthy
     environment:
+      - NOTIFY_DB_CONNECTION_STRING=Host=${NOTIFY_DB_HOST};Port=5432;Database=${NOTIFY_DB_DATABASE};Username=${NOTIFY_DB_USERNAME};Password=${NOTIFY_DB_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - JWT_AUTH_SECRET=${JWT_AUTH_SECRET}
