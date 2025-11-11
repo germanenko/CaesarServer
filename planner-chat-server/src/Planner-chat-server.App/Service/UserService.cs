@@ -8,28 +8,31 @@ namespace Planner_chat_server.App.Service
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private HttpClient _httpClient;
+        private readonly HttpClient _httpClient;
 
         public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _httpClient = httpClientFactory.CreateClient();
 
-            _httpClient.BaseAddress = new Uri("https://planner-auth-service:8888/api/");
-
+            // 🔥 СОЗДАЕМ ОДИН HTTPCLIENT С НАСТРОЙКАМИ SSL
             var handler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
             };
-            _httpClient = new HttpClient(handler);
+
+            _httpClient = new HttpClient(handler)
+            {
+                BaseAddress = new Uri("https://planner-auth-service:8888/api/")
+            };
         }
 
         public async Task<string> GetUserName(Guid userId)
         {
             try
             {
-
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
+
+                // 🔥 ИСПОЛЬЗУЕМ ОТНОСИТЕЛЬНЫЙ URL (BaseAddress уже установлен)
                 var response = await _httpClient.GetAsync($"user/{userId}");
 
                 _logger.LogInformation("📡 Response status: {StatusCode}", response.StatusCode);
