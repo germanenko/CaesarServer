@@ -2,6 +2,7 @@
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.IService;
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
@@ -14,66 +15,47 @@ namespace Planner_chat_server.App.Service
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly HttpClient _httpClient;
+        private readonly ConcurrentDictionary<Guid, string> _cache = new();
 
-        public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
+        public Task<string> GetUserName(Guid userId)
         {
-            _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("AuthService");
+            var userName = _cache.GetOrAdd(userId, uid => uid.ToString());
+
+            _ = TryUpdateUserNameAsync(userId);
+
+            return Task.FromResult(userName);
         }
 
-        public async Task<string> GetUserName(Guid userId)
+        private async Task TryUpdateUserNameAsync(Guid userId)
         {
-            const int maxRetries = 3;
+            // Если уже есть нормальное имя (не ID), пропускаем
+            if (_cache.TryGetValue(userId, out var current) && current != userId.ToString())
+                return;
 
-            for (int retry = 0; retry < maxRetries; retry++)
+            try
             {
-                try
+                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+
+                // Добавляем заголовки
+                client.DefaultRequestHeaders.Add("User-Agent", "ChatService");
+
+                var response = await client.GetAsync($"http://planner-auth-service:8888/api/user/{userId}");
+
+                if (response.IsSuccessStatusCode)
                 {
-                    _logger.LogInformation("Getting user name for {UserId} (attempt {Retry})", userId, retry + 1);
+                    var content = await response.Content.ReadAsStringAsync();
+                    var user = JsonSerializer.Deserialize<ProfileBody>(content);
+                    var userName = user?.Nickname ?? userId.ToString();
 
-                    var response = await _httpClient.GetAsync($"user/{userId}");
-
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        var content = await response.Content.ReadAsStringAsync();
-                        var user = JsonSerializer.Deserialize<ProfileBody>(content);
-                        _logger.LogInformation("Successfully retrieved user name: {UserName}", user?.Nickname);
-                        return user?.Nickname ?? userId.ToString();
-                    }
-                    else if (response.StatusCode == HttpStatusCode.NotFound)
-                    {
-                        _logger.LogWarning("User {UserId} not found", userId);
-                        return userId.ToString();
-                    }
-                    else
-                    {
-                        _logger.LogWarning("HTTP {StatusCode} when getting user {UserId}", response.StatusCode, userId);
-
-                        if (retry == maxRetries - 1)
-                            return userId.ToString();
-
-                        await Task.Delay(GetRetryDelay(retry));
-                    }
-                }
-                catch (HttpRequestException ex) when (retry < maxRetries - 1)
-                {
-                    _logger.LogWarning(ex, "Request failed for user {UserId}, retrying...", userId);
-                    await Task.Delay(GetRetryDelay(retry));
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Unexpected error getting user name for {UserId}", userId);
-                    break;
+                    _cache[userId] = userName;
+                    _logger.LogInformation("✅ Cached user name for {UserId}: {Name}", userId, userName);
                 }
             }
-
-            return userId.ToString(); 
-        }
-
-        private TimeSpan GetRetryDelay(int retryCount)
-        {
-            return TimeSpan.FromSeconds(Math.Pow(2, retryCount));
+            catch (Exception ex)
+            {
+                // 🔥 ТИХИЙ fail - не логируем ошибки чтобы не засорять логи
+                // Не пытаемся повторно - просто оставляем ID как имя
+            }
         }
     }
 }
