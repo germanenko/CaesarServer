@@ -16,22 +16,15 @@ namespace Planner_chat_server.App.Service
     {
         private readonly ILogger<UserService> _logger;
         private readonly HttpClient _httpClient;
-        private readonly ConcurrentDictionary<Guid, string> _userCache = new();
 
         public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
             _httpClient = httpClientFactory.CreateClient("AuthService"); // 🔥 Используем именованный клиент
-
-            // Предзаполняем кеш
-            _userCache[Guid.Parse("655f1840-c3b6-4a63-bad1-33f1a31f7a48")] = "CurrentUser";
         }
 
         public async Task<string> GetUserName(Guid userId)
         {
-            if (_userCache.TryGetValue(userId, out var cachedName))
-                return cachedName;
-
             try
             {
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
@@ -43,7 +36,6 @@ namespace Planner_chat_server.App.Service
                     var user = JsonSerializer.Deserialize<ProfileBody>(content);
                     var userName = user?.Nickname ?? userId.ToString();
 
-                    _userCache[userId] = userName;
                     return userName;
                 }
             }
