@@ -57,10 +57,9 @@ namespace planner_notify_service.Api.Controllers
             return StatusCode((int)response.StatusCode, response.Errors);
         }
 
-        [LocalOnly]
-        [HttpPost("api/sendFCMNotification"), Authorize]
+        [HttpPost("api/sendFCMNotification")]
         [SwaggerOperation("Добавить Firebase токен")]
-        [SwaggerResponse(200, Type = typeof(FirebaseToken))]
+        [SwaggerResponse(200, Type = typeof(bool))]
 
         public async Task<IActionResult> SendFCMNotification(
             [FromQuery, Required] string firebaseToken,
