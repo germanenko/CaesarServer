@@ -167,9 +167,6 @@ namespace Planner_chat_server.App.Service
 
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId)
         {
-            var sendResult = await _firebaseService.SendNotificationAsync("ewlNQHF6R9KefnQtuBqciE:APA91bGqXFEuiFq7t7Ar-102XoVJF7Fzo7dm_AI4LUujm0OBzz5mikPjkbkf5h-Rf9Luy7mxu5wXqsdscltRLRaa2sMeShz3lliQqB9aryHkcIOd1noc5bI",
-    "test",
-    "testing");
             var messages = await _chatRepository.GetAllMessagesAsync(accountId);
             return new ServiceResponse<IEnumerable<MessageBody>>
             {

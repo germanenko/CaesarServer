@@ -7,6 +7,8 @@ using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
+using System.Net;
+using System.Net.Mime;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
@@ -19,6 +21,7 @@ namespace Planner_chat_server.App.Service
         private readonly INotifyService _notifyService;
         private readonly INotifyRepository _notifyRepository;
         private readonly IFirebaseService _firebaseService;
+        private readonly IUserService _userService;
         private readonly ILogger<ChatConnector> _logger;
         private readonly JsonSerializerOptions options = new()
         {
@@ -31,7 +34,8 @@ namespace Planner_chat_server.App.Service
             INotifyService notifyService,
             ILogger<ChatConnector> logger,
             INotifyRepository notifyRepository,
-            IFirebaseService firebaseService
+            IFirebaseService firebaseService,
+            IUserService userService
         )
         {
             _chatRepository = chatRepository;
@@ -39,6 +43,7 @@ namespace Planner_chat_server.App.Service
             _logger = logger;
             _notifyRepository = notifyRepository;
             _firebaseService = firebaseService;
+            _userService = userService;
         }
 
         public async Task Invoke(
@@ -169,9 +174,11 @@ namespace Planner_chat_server.App.Service
 
             var firebaseTokens = await _notifyRepository.GetTokens(notConnectedAccountIds.ToList());
 
+            var senderName = await _userService.GetUserName(message.SenderId);
+
             foreach (var firebaseToken in firebaseTokens)
             {
-                await _firebaseService.SendNotificationAsync(firebaseToken.Token, message.SenderId.ToString(), message.Content);
+                await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
             }
 
             var bytes = SerializeObject(chatMessageBody);

@@ -87,6 +87,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
+    services.AddSingleton<IUserService, UserService>();
 
     services.AddSingleton<IFirebaseService, FirebaseService>(sp =>
         new FirebaseService(
@@ -94,6 +95,8 @@ void ConfigureServices(IServiceCollection services)
             firebaseClientEmail,
             firebasePrivateKey
         ));
+
+
 
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
         new RabbitMqNotifyService(
