@@ -85,6 +85,8 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
+    services.AddHttpClient();
+
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
     services.AddScoped<IUserService, UserService>();
