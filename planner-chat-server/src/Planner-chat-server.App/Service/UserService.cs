@@ -10,7 +10,7 @@ namespace Planner_chat_server.App.Service
         private readonly ILogger<UserService> _logger;
         private HttpClient _httpClient;
 
-        public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
+        public UserService(ILogger<UserService> logger)
         {
             _logger = logger;
         }
