@@ -122,11 +122,23 @@ namespace Planner_Auth.Api.Controllers.Api
             [FromRoute, Required] Guid id
         )
         {
-            var response = await _userService.GetProfile(id);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            var response = new
+            {
+                Id = id,
+                Nickname = "TestUser",
+                Identifier = "test@example.com",
+                Role = "User",
+                UrlIcon = (string?)null,
+                UserTag = (string?)null,
+                IdentifierType = "Email"
+            };
+            //var response = await _userService.GetProfile(id);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode(200, response);
+            //if (response.IsSuccess)
+                //return StatusCode((int)response.StatusCode, response.Body);
+
+            //return StatusCode((int)response.StatusCode, response.Errors);
         }
 
 

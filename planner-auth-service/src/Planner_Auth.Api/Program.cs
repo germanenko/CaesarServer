@@ -223,21 +223,6 @@ void ConfigureMiddleware(WebApplication app)
         app.UseSwaggerUI();
     }
 
-    app.Use(async (context, next) =>
-    {
-        var logger = context.RequestServices.GetRequiredService<ILogger<Program>>();
-        try
-        {
-            await next();
-        }
-        catch (Exception ex)
-        {
-            logger.LogCritical(ex, "💥💥💥 GLOBAL EXCEPTION in request: {Path}", context.Request.Path);
-            context.Response.StatusCode = 500;
-            await context.Response.WriteAsync("Internal Server Error");
-        }
-    });
-
     app.UseRouting();
     app.UseCors();
 

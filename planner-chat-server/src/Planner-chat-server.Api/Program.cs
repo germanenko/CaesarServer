@@ -87,7 +87,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddHttpClient("AuthService", client =>
     {
-        client.BaseAddress = new Uri("http://planner-auth-service:8888/api/");
+        client.BaseAddress = new Uri("https://planner-auth-service:8888/api/");
         client.Timeout = TimeSpan.FromSeconds(10);
         client.DefaultRequestHeaders.Add("Accept", "application/json");
     });
