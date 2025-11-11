@@ -14,12 +14,12 @@ namespace Planner_chat_server.App.Service
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly IHttpClientFactory _httpClientFactory;
+        private readonly HttpClient _httpClient;
 
         public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _httpClientFactory = httpClientFactory;
+            _httpClient = httpClientFactory.CreateClient("AuthService");
         }
 
         public async Task<string> GetUserName(Guid userId)
@@ -28,14 +28,11 @@ namespace Planner_chat_server.App.Service
 
             for (int retry = 0; retry < maxRetries; retry++)
             {
-                // Создаем HttpClient через фабрику
-                using var client = _httpClientFactory.CreateClient("UserService");
-
                 try
                 {
                     _logger.LogInformation("Getting user name for {UserId} (attempt {Retry})", userId, retry + 1);
 
-                    var response = await client.PostAsync($"user/{userId}", null);
+                    var response = await _httpClient.PostAsync($"user/{userId}", null);
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
@@ -71,7 +68,7 @@ namespace Planner_chat_server.App.Service
                 }
             }
 
-            return userId.ToString();
+            return userId.ToString(); 
         }
 
         private TimeSpan GetRetryDelay(int retryCount)
