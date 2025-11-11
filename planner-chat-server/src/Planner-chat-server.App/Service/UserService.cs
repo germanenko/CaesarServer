@@ -14,47 +14,23 @@ namespace Planner_chat_server.App.Service
 {
     public class UserService : IUserService
     {
-        private readonly ILogger<UserService> _logger;
-        private readonly ConcurrentDictionary<Guid, string> _cache = new();
-
-        public Task<string> GetUserName(Guid userId)
+        public async Task<string> GetUserName(Guid userId)
         {
-            var userName = _cache.GetOrAdd(userId, uid => uid.ToString());
-
-            _ = TryUpdateUserNameAsync(userId);
-
-            return Task.FromResult(userName);
-        }
-
-        private async Task TryUpdateUserNameAsync(Guid userId)
-        {
-            // Если уже есть нормальное имя (не ID), пропускаем
-            if (_cache.TryGetValue(userId, out var current) && current != userId.ToString())
-                return;
-
-            try
+            var client = new HttpClient()
             {
-                using var client = new HttpClient { Timeout = TimeSpan.FromSeconds(2) };
+                BaseAddress = new Uri("http://planner-auth-service:8888/api/"),
+            };
 
-                // Добавляем заголовки
-                client.DefaultRequestHeaders.Add("User-Agent", "ChatService");
+            var response = await client.GetAsync("user/" + userId);
 
-                var response = await client.GetAsync($"http://planner-auth-service:8888/api/user/{userId}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var user = JsonSerializer.Deserialize<ProfileBody>(content);
-                    var userName = user?.Nickname ?? userId.ToString();
-
-                    _cache[userId] = userName;
-                    _logger.LogInformation("✅ Cached user name for {UserId}: {Name}", userId, userName);
-                }
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var user = JsonSerializer.Deserialize<ProfileBody>(await response.Content.ReadAsStringAsync());
+                return user.Nickname;
             }
-            catch (Exception ex)
+            else
             {
-                // 🔥 ТИХИЙ fail - не логируем ошибки чтобы не засорять логи
-                // Не пытаемся повторно - просто оставляем ID как имя
+                return userId.ToString();
             }
         }
     }
