@@ -85,9 +85,16 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
+    services.AddHttpClient("AuthService", client =>
+    {
+        client.BaseAddress = new Uri("http://planner-auth-service:8888/api/");
+        client.Timeout = TimeSpan.FromSeconds(10);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
+    });
+
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
-    services.AddSingleton<IUserService, UserService>();
+    services.AddScoped<IUserService, UserService>();
 
     services.AddSingleton<IFirebaseService, FirebaseService>(sp =>
         new FirebaseService(

@@ -14,51 +14,42 @@ namespace Planner_chat_server.App.Service
 {
     public class UserService : IUserService
     {
-        private readonly HttpClient _httpClient;
         private readonly ILogger<UserService> _logger;
+        private readonly HttpClient _httpClient;
+        private readonly ConcurrentDictionary<Guid, string> _userCache = new();
 
-        public UserService(ILogger<UserService> logger)
+        public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _httpClient = new HttpClient()
-            {
-                Timeout = TimeSpan.FromSeconds(30),
-                BaseAddress = new Uri("http://127.0.0.1:8888/api/")
-            };
+            _httpClient = httpClientFactory.CreateClient("AuthService"); // 🔥 Используем именованный клиент
+
+            // Предзаполняем кеш
+            _userCache[Guid.Parse("655f1840-c3b6-4a63-bad1-33f1a31f7a48")] = "CurrentUser";
         }
 
         public async Task<string> GetUserName(Guid userId)
         {
+            if (_userCache.TryGetValue(userId, out var cachedName))
+                return cachedName;
+
             try
             {
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
-
                 var response = await _httpClient.GetAsync($"user/{userId}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    _logger.LogInformation("✅ Response received: {Content}", content);
-
                     var user = JsonSerializer.Deserialize<ProfileBody>(content);
-                    return user?.Nickname ?? userId.ToString();
+                    var userName = user?.Nickname ?? userId.ToString();
+
+                    _userCache[userId] = userName;
+                    return userName;
                 }
-                else
-                {
-                    _logger.LogWarning("❌ HTTP {StatusCode} for user {UserId}", response.StatusCode, userId);
-                }
-            }
-            catch (TaskCanceledException)
-            {
-                _logger.LogError("⏰ Request timeout for user {UserId}", userId);
-            }
-            catch (HttpRequestException ex) when (ex.InnerException is IOException)
-            {
-                _logger.LogError("💥 Connection prematurely closed for user {UserId}", userId);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Failed to get user name for {UserId}", userId);
+                _logger.LogError(ex, "Failed to get user name for {UserId}", userId);
             }
 
             return userId.ToString();
