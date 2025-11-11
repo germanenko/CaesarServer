@@ -1,14 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.IService;
-using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Planner_chat_server.App.Service
 {
@@ -20,7 +13,7 @@ namespace Planner_chat_server.App.Service
         public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("AuthService"); // 🔥 Используем именованный клиент
+            _httpClient = httpClientFactory.CreateClient("AuthService"); 
         }
 
         public async Task<string> GetUserName(Guid userId)
@@ -33,7 +26,7 @@ namespace Planner_chat_server.App.Service
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
-                    var user = JsonSerializer.Deserialize<ProfileBody>(content);
+                    var user = JsonConvert.DeserializeObject<ProfileBody>(content);
                     var userName = user?.Nickname ?? userId.ToString();
 
                     return userName;
