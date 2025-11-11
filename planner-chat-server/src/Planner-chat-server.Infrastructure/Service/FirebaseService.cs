@@ -2,17 +2,20 @@
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Logging;
+using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json;
 using System.Threading.Tasks;
 
 namespace Planner_chat_server.Infrastructure.Service
 {
     public class FirebaseService : IFirebaseService
     {
+        private readonly HttpClient _httpClient;
         public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey)
         {
             if (FirebaseApp.DefaultInstance == null)
@@ -34,7 +37,50 @@ namespace Planner_chat_server.Infrastructure.Service
                     Credential = credential,
                     ProjectId = fbProjectId
                 });
+
+                var handler = new HttpClientHandler
+                {
+                    ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+                };
+
+                _httpClient = new HttpClient(handler)
+                {
+                    BaseAddress = new Uri("https://planner-notify-service:8092/api/")
+                };
             }
+        }
+
+        public async Task<string> SendNotification(Guid userId)
+        {
+            try
+            {
+                var response = await _httpClient.PostAsync($"sendFCMNotification", null);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var user = JsonSerializer.Deserialize<ProfileBody>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    var userName = user?.Nickname ?? userId.ToString();
+
+                    return userName;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("❌ HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "❌ Unexpected error for {UserId}", userId);
+            }
+
+            return userId.ToString();
         }
 
         public async Task<string> SendNotificationAsync(string token, string title, string body, Dictionary<string, string>? data = null)
