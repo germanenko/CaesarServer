@@ -1,4 +1,5 @@
-﻿using planner_notify_service.Core.Entities.Models;
+﻿using Microsoft.EntityFrameworkCore;
+using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.IRepository;
 using planner_notify_service.Infrastructure.Data;
 using System;
@@ -20,19 +21,25 @@ namespace planner_notify_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<FirebaseToken?> AddFirebaseToken(Guid account, string firebaseToken)
+        public async Task<FirebaseToken?> AddFirebaseToken(Guid accountId, string firebaseToken)
         {
-            var newToken = new FirebaseToken()
+            var existingToken = await _context.FirebaseTokens
+                .FirstOrDefaultAsync(x => x.UserId == accountId && x.Token == firebaseToken);
+
+            if (existingToken == null)
             {
-                UserId = account,
-                Token = firebaseToken
-            };
+                var newToken = new FirebaseToken()
+                {
+                    UserId = accountId,
+                    Token = firebaseToken
+                };
 
-            var token = _context.FirebaseTokens.Add(newToken).Entity;
+                var token = _context.FirebaseTokens.Add(newToken).Entity;
+                await _context.SaveChangesAsync();
+                return token;
+            }
 
-            await _context.SaveChangesAsync();
-
-            return token;
+            return existingToken;
         }
     }
 }
