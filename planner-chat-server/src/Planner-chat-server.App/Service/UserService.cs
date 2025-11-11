@@ -23,6 +23,8 @@ namespace Planner_chat_server.App.Service
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
                 var response = await _httpClient.GetAsync($"user/{userId}");
 
+                _logger.LogInformation($"Response: {await response.Content.ReadAsStringAsync()}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     var content = await response.Content.ReadAsStringAsync();
