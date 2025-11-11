@@ -10,19 +10,24 @@ namespace Planner_chat_server.App.Service
         private readonly ILogger<UserService> _logger;
         private HttpClient _httpClient;
 
-        public UserService(ILogger<UserService> logger)
+        public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
+            _httpClient = httpClientFactory.CreateClient();
+
+            _httpClient.BaseAddress = new Uri("https://planner-auth-service:8888/api/");
+
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+            _httpClient = new HttpClient(handler);
         }
 
         public async Task<string> GetUserName(Guid userId)
         {
             try
             {
-                _httpClient = new HttpClient()
-                {
-                    BaseAddress = new Uri("http://planner-auth-service:8888/api/"),
-                };
 
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
                 var response = await _httpClient.GetAsync($"user/{userId}");
@@ -34,10 +39,9 @@ namespace Planner_chat_server.App.Service
                     var content = await response.Content.ReadAsStringAsync();
                     _logger.LogInformation("📦 Raw response: {Content}", content);
 
-                    // 🔥 Используйте System.Text.Json вместо Newtonsoft.Json
                     var user = JsonSerializer.Deserialize<ProfileBody>(content, new JsonSerializerOptions
                     {
-                        PropertyNameCaseInsensitive = true // 🔥 Важно!
+                        PropertyNameCaseInsensitive = true
                     });
 
                     var userName = user?.Nickname ?? userId.ToString();
