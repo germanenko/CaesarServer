@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Text.Json;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planner_Auth.Core.Entities.Models;
@@ -15,13 +16,16 @@ namespace Planner_Auth.Api.Controllers.Api
     {
         private readonly IUserService _userService;
         private readonly IJwtService _jwtService;
+        private readonly ILogger<UserController> _logger;
 
         public UserController(
             IUserService userService,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            ILogger<UserController> logger)
         {
             _userService = userService;
             _jwtService = jwtService;
+            _logger = logger;
         }
 
         [HttpGet("profile"), Authorize]
@@ -117,16 +121,38 @@ namespace Planner_Auth.Api.Controllers.Api
         [SwaggerOperation("Получить профиль пользователя по id")]
         [SwaggerResponse(200, Type = typeof(ProfileBody))]
         [SwaggerResponse(404)]
-
-        public async Task<IActionResult> GetUserInfo(
-            [FromRoute, Required] Guid id
-        )
+        public async Task<IActionResult> GetUserInfo([FromRoute, Required] Guid id)
         {
-            var response = await _userService.GetProfile(id);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            _logger.LogInformation("=== 🎯 GetUserInfo STARTED for {Id} ===", id);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            try
+            {
+                _logger.LogInformation("1. Calling _userService.GetProfile...");
+                var response = await _userService.GetProfile(id);
+
+                _logger.LogInformation("2. Service response - Success: {Success}, StatusCode: {StatusCode}",
+                    response.IsSuccess, response.StatusCode);
+
+                if (response.IsSuccess)
+                {
+                    _logger.LogInformation("3. User found: {Body}", JsonSerializer.Serialize(response.Body));
+                    return StatusCode((int)response.StatusCode, response.Body);
+                }
+                else
+                {
+                    _logger.LogWarning("4. User not found or error: {Errors}", response.Errors);
+                    return StatusCode((int)response.StatusCode, response.Errors);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex, "💥 CRITICAL ERROR in GetUserInfo");
+                return StatusCode(500, new { error = ex.Message });
+            }
+            finally
+            {
+                _logger.LogInformation("=== 🏁 GetUserInfo FINISHED ===");
+            }
         }
 
 
