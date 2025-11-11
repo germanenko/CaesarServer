@@ -181,7 +181,8 @@ namespace Planner_chat_server.App.Service
                     var senderName = await _userService.GetUserName(message.SenderId);
                     foreach (var firebaseToken in firebaseTokens)
                     {
-                        await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
+                        //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
+                        await _firebaseService.SendNotification(firebaseToken.Token, senderName, message.Content);
                     }
                 }
                 catch (Exception ex)

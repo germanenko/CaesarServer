@@ -45,42 +45,23 @@ namespace Planner_chat_server.Infrastructure.Service
 
                 _httpClient = new HttpClient(handler)
                 {
-                    BaseAddress = new Uri("https://planner-notify-service:8092/api/")
+                    BaseAddress = new Uri("http://planner-notify-service:8092/api/")
                 };
             }
         }
 
-        public async Task<string> SendNotification(Guid userId)
+        public async Task<bool> SendNotification(string firebaseToken, string title, string content)
         {
-            try
+            var response = await _httpClient.PostAsync($"sendFCMNotification?firebaseToken={firebaseToken}&title={title}&content={content}", null);
+
+            if (response.IsSuccessStatusCode)
             {
-                var response = await _httpClient.PostAsync($"sendFCMNotification", null);
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-
-                    var user = JsonSerializer.Deserialize<ProfileBody>(content, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                    var userName = user?.Nickname ?? userId.ToString();
-
-                    return userName;
-                }
-                else
-                {
-                    var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogWarning("❌ HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
-                }
+                return true;
             }
-            catch (Exception ex)
+            else
             {
-                _logger.LogError(ex, "❌ Unexpected error for {UserId}", userId);
+                return false;
             }
-
-            return userId.ToString();
         }
 
         public async Task<string> SendNotificationAsync(string token, string title, string body, Dictionary<string, string>? data = null)
