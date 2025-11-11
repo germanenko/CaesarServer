@@ -14,11 +14,13 @@ namespace planner_notify_service.App.Service
     public class NotifyService : INotifyService
     {
         private readonly INotifyRepository _notifyRepository;
+        private readonly IFirebaseService _firebaseService;
 
         public NotifyService(
-            INotifyRepository notifyRepository)
+            INotifyRepository notifyRepository, IFirebaseService firebaseService)
         {
             _notifyRepository = notifyRepository;
+            _firebaseService = firebaseService;
         }
 
         public async Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken)
@@ -30,6 +32,18 @@ namespace planner_notify_service.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = token
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> SendFCMNotification(string firebaseToken, string title, string content)
+        {
+            await _firebaseService.SendNotificationAsync(firebaseToken, title, content);
+
+            return new ServiceResponse<bool>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = true
             };
         }
     }

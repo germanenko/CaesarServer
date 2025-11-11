@@ -27,6 +27,10 @@ app.Run();
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
+    var firebaseProjectId = GetEnvVar("FIREBASE_PROJECT_ID");
+    var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
+    var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
+
     var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
@@ -81,6 +85,13 @@ void ConfigureServices(IServiceCollection services)
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });
     });
+
+    services.AddSingleton<IFirebaseService, FirebaseService>(sp =>
+        new FirebaseService(
+            firebaseProjectId,
+            firebaseClientEmail,
+            firebasePrivateKey
+        ));
 
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IMainMonitoringService, MainMonitoringService>();

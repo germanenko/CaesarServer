@@ -290,6 +290,19 @@
             "UpstreamPathTemplate": "/api/addFirebaseToken",
             "UpstreamHttpMethod": [ "POST" ]
         },
+	
+	{
+            "DownstreamPathTemplate": "/api/sendFCMNotification",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8092
+                }
+            ],
+            "UpstreamPathTemplate": "/api/sendFCMNotification",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
 
         {
             "DownstreamPathTemplate": "/api/user/{id}",

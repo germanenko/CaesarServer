@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using planner_notify_service.Api.CustomAttributes;
 using planner_notify_service.App.Service;
 using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.IService;
@@ -50,6 +51,24 @@ namespace planner_notify_service.Api.Controllers
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
             var response = await _notifyService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, response.Body);
+
+            return StatusCode((int)response.StatusCode, response.Errors);
+        }
+
+        [LocalOnly]
+        [HttpPost("api/sendFCMNotification"), Authorize]
+        [SwaggerOperation("Добавить Firebase токен")]
+        [SwaggerResponse(200, Type = typeof(FirebaseToken))]
+
+        public async Task<IActionResult> SendFCMNotification(
+            [FromQuery, Required] string firebaseToken,
+            [FromQuery] string title,
+            [FromQuery] string content
+        )
+        {
+            var response = await _notifyService.SendFCMNotification(firebaseToken, title, content);
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
 
