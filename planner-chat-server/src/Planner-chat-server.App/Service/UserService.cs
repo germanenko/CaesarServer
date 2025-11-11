@@ -8,18 +8,22 @@ namespace Planner_chat_server.App.Service
     public class UserService : IUserService
     {
         private readonly ILogger<UserService> _logger;
-        private readonly HttpClient _httpClient;
+        private HttpClient _httpClient;
 
         public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
         {
             _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("AuthService");
         }
 
         public async Task<string> GetUserName(Guid userId)
         {
             try
             {
+                _httpClient = new HttpClient()
+                {
+                    BaseAddress = new Uri("http://planner-auth-service:8888/api/"),
+                };
+
                 _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
                 var response = await _httpClient.GetAsync($"user/{userId}");
 
