@@ -23,7 +23,7 @@ namespace Planner_chat_server.App.Service
             _httpClient = new HttpClient()
             {
                 Timeout = TimeSpan.FromSeconds(30),
-                BaseAddress = new Uri("http://planner-auth-service:8888/api/")
+                BaseAddress = new Uri("http://127.0.0.1:8888/api/")
             };
         }
 
