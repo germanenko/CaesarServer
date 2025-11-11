@@ -18,25 +18,22 @@ namespace Planner_chat_server.App.Service
 
         public async Task<string> GetUserName(Guid userId)
         {
-            try
+
+            _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
+            var response = await _httpClient.GetAsync($"user/{userId}");
+          
+
+            if (response.IsSuccessStatusCode)
             {
-                _logger.LogInformation("🔍 Getting user name for {UserId}", userId);
-                var response = await _httpClient.GetAsync($"user/{userId}");
+                var content = await response.Content.ReadAsStringAsync();
+                var user = JsonConvert.DeserializeObject<ProfileBody>(content);
+                var userName = user?.Nickname ?? userId.ToString();
 
-                _logger.LogInformation($"Response: {await response.Content.ReadAsStringAsync()}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    var content = await response.Content.ReadAsStringAsync();
-                    var user = JsonConvert.DeserializeObject<ProfileBody>(content);
-                    var userName = user?.Nickname ?? userId.ToString();
-
-                    return userName;
-                }
+                return userName;
             }
-            catch (Exception ex)
+            else 
             {
-                _logger.LogError(ex, "Failed to get user name for {UserId}", userId);
+                _logger.LogInformation($"Response: {await response.Content.ReadAsStringAsync()}");
             }
 
             return userId.ToString();
