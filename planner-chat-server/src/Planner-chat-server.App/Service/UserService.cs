@@ -32,15 +32,19 @@ namespace Planner_chat_server.App.Service
                 {
                     _logger.LogInformation("Getting user name for {UserId} (attempt {Retry})", userId, retry + 1);
 
-                    var absoluteUrl = $"http://planner-auth-service:8888/api/user/{userId}";
-                    var response = await _httpClient.PostAsync(absoluteUrl, null);
+                    var response = await _httpClient.PostAsync($"user/{userId}", null);
 
-                    if (response.IsSuccessStatusCode)
+                    if (response.StatusCode == HttpStatusCode.OK)
                     {
                         var content = await response.Content.ReadAsStringAsync();
                         var user = JsonSerializer.Deserialize<ProfileBody>(content);
                         _logger.LogInformation("Successfully retrieved user name: {UserName}", user?.Nickname);
                         return user?.Nickname ?? userId.ToString();
+                    }
+                    else if (response.StatusCode == HttpStatusCode.NotFound)
+                    {
+                        _logger.LogWarning("User {UserId} not found", userId);
+                        return userId.ToString();
                     }
                     else
                     {
@@ -52,29 +56,19 @@ namespace Planner_chat_server.App.Service
                         await Task.Delay(GetRetryDelay(retry));
                     }
                 }
-                catch (HttpRequestException ex) when (ex.InnerException is IOException)
+                catch (HttpRequestException ex) when (retry < maxRetries - 1)
                 {
-                    _logger.LogWarning("Connection prematurely closed for user {UserId}, retrying... (attempt {Retry})", userId, retry + 1);
-                    await Task.Delay(GetRetryDelay(retry));
-                }
-                catch (TaskCanceledException ex) when (ex.InnerException is TimeoutException)
-                {
-                    _logger.LogWarning("Timeout getting user {UserId}, retrying... (attempt {Retry})", userId, retry + 1);
-                    await Task.Delay(GetRetryDelay(retry));
-                }
-                catch (Exception ex) when (retry < maxRetries - 1)
-                {
-                    _logger.LogWarning(ex, "Request failed for user {UserId}, retrying... (attempt {Retry})", userId, retry + 1);
+                    _logger.LogWarning(ex, "Request failed for user {UserId}, retrying...", userId);
                     await Task.Delay(GetRetryDelay(retry));
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Failed to get user name for {UserId} after {RetryCount} retries", userId, retry + 1);
+                    _logger.LogError(ex, "Unexpected error getting user name for {UserId}", userId);
                     break;
                 }
             }
 
-            return userId.ToString();
+            return userId.ToString(); 
         }
 
         private TimeSpan GetRetryDelay(int retryCount)
