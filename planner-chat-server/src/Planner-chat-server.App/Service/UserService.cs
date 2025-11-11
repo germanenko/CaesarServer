@@ -32,7 +32,7 @@ namespace Planner_chat_server.App.Service
                 {
                     _logger.LogInformation("Getting user name for {UserId} (attempt {Retry})", userId, retry + 1);
 
-                    var response = await _httpClient.PostAsync($"user/{userId}", null);
+                    var response = await _httpClient.GetAsync($"user/{userId}");
 
                     if (response.StatusCode == HttpStatusCode.OK)
                     {
