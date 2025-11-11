@@ -85,11 +85,11 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddHttpClient("UserService", client =>
+    services.AddHttpClient<IUserService, UserService>(client =>
     {
         client.BaseAddress = new Uri("http://planner-auth-service:8888/api/");
-        client.Timeout = TimeSpan.FromSeconds(30); 
-        client.DefaultRequestHeaders.Add("User-Agent", "ChatService");
+        client.Timeout = TimeSpan.FromSeconds(30);
+        client.DefaultRequestHeaders.Add("Accept", "application/json");
     });
 
     services.AddSingleton<IJwtService, JwtService>();

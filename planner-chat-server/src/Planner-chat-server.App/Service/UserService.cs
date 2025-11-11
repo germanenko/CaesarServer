@@ -16,10 +16,10 @@ namespace Planner_chat_server.App.Service
         private readonly ILogger<UserService> _logger;
         private readonly HttpClient _httpClient;
 
-        public UserService(ILogger<UserService> logger, IHttpClientFactory httpClientFactory)
+        public UserService(ILogger<UserService> logger, HttpClient httpClient)
         {
             _logger = logger;
-            _httpClient = httpClientFactory.CreateClient("AuthService");
+            _httpClient = httpClient;
         }
 
         public async Task<string> GetUserName(Guid userId)
@@ -30,8 +30,7 @@ namespace Planner_chat_server.App.Service
             {
                 try
                 {
-                    _logger.LogInformation("Getting user name for {UserId} (attempt {Retry})", userId, retry + 1);
-
+                    // Используем относительный URL, так как BaseAddress уже установлен
                     var response = await _httpClient.PostAsync($"user/{userId}", null);
 
                     if (response.StatusCode == HttpStatusCode.OK)
@@ -68,7 +67,7 @@ namespace Planner_chat_server.App.Service
                 }
             }
 
-            return userId.ToString(); 
+            return userId.ToString();
         }
 
         private TimeSpan GetRetryDelay(int retryCount)
