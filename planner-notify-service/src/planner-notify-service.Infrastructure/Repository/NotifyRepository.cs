@@ -39,9 +39,11 @@ namespace planner_notify_service.Infrastructure.Repository
                 return token;
             }
 
-            existingToken.Token = firebaseToken;
-
-            await _context.SaveChangesAsync();
+            if (existingToken.Token != firebaseToken) 
+            {
+                existingToken.Token = firebaseToken;
+                await _context.SaveChangesAsync();
+            }
 
             return existingToken;
         }
