@@ -41,6 +41,9 @@ namespace planner_notify_service.Infrastructure.Service
         {
             try
             {
+                var notificationData = data ?? new Dictionary<string, string>();
+                notificationData["response_action"] = "true";
+
                 var message = new Message()
                 {
                     Token = token,
@@ -49,7 +52,21 @@ namespace planner_notify_service.Infrastructure.Service
                         Title = title,
                         Body = body
                     },
-                    Data = data ?? new Dictionary<string, string>()
+                    Data = notificationData,
+                    Android = new AndroidConfig()
+                    {
+                        Notification = new AndroidNotification()
+                        {
+                            ClickAction = "REPLY"
+                        }
+                    },
+                    Apns = new ApnsConfig()
+                    {
+                        Aps = new Aps()
+                        {
+                            Category = "MESSAGE_CATEGORY"
+                        }
+                    }
                 };
 
                 string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
