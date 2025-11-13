@@ -41,9 +41,6 @@ namespace planner_notify_service.Infrastructure.Service
         {
             try
             {
-                var notificationData = data ?? new Dictionary<string, string>();
-                notificationData["response_action"] = "true";
-
                 var message = new Message()
                 {
                     Token = token,
@@ -52,19 +49,24 @@ namespace planner_notify_service.Infrastructure.Service
                         Title = title,
                         Body = body
                     },
-                    Data = notificationData,
+                    Data = new Dictionary<string, string>()
+                    {
+                        ["allow_response"] = "true",
+                        ["response_placeholder"] = "Введите ответ",
+                        ["notification_type"] = "interactive"
+                    },
                     Android = new AndroidConfig()
                     {
                         Notification = new AndroidNotification()
                         {
-                            ClickAction = "REPLY"
+                            ClickAction = "REPLY_ACTION"
                         }
                     },
                     Apns = new ApnsConfig()
                     {
                         Aps = new Aps()
                         {
-                            Category = "MESSAGE_CATEGORY"
+                            Category = "WITH_RESPONSE"
                         }
                     }
                 };
