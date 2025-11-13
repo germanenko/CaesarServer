@@ -60,7 +60,6 @@ namespace planner_notify_service.Api.Controllers
         [HttpPost("api/sendFCMNotification")]
         [SwaggerOperation("Отправить FCM уведомление")]
         [SwaggerResponse(200, Type = typeof(bool))]
-
         public async Task<IActionResult> SendFCMNotification(
             [FromQuery, Required] string firebaseToken,
             [FromQuery] string title,

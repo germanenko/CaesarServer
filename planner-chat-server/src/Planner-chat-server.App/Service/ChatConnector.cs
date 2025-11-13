@@ -174,22 +174,19 @@ namespace Planner_chat_server.App.Service
 
             var firebaseTokens = await _notifyRepository.GetTokens(notConnectedAccountIds.ToList());
 
-            _ = Task.Run(async () =>
+            try
             {
-                try
+                var senderName = await _userService.GetUserName(message.SenderId);
+                foreach (var firebaseToken in firebaseTokens)
                 {
-                    var senderName = await _userService.GetUserName(message.SenderId);
-                    foreach (var firebaseToken in firebaseTokens)
-                    {
-                        //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
-                        await _firebaseService.SendNotification(firebaseToken.Token, senderName, message.Content);
-                    }
+                    //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
+                    await _firebaseService.SendNotification(firebaseToken.Token, senderName, message.Content);
                 }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
-                }
-            });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
+            }
 
             var bytes = SerializeObject(chatMessageBody);
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);

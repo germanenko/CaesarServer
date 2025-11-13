@@ -24,7 +24,7 @@ namespace planner_notify_service.Infrastructure.Repository
         public async Task<FirebaseToken?> AddFirebaseToken(Guid accountId, string firebaseToken)
         {
             var existingToken = await _context.FirebaseTokens
-                .FirstOrDefaultAsync(x => x.UserId == accountId && x.Token == firebaseToken);
+                .FirstOrDefaultAsync(x => x.UserId == accountId);
 
             if (existingToken == null)
             {
@@ -38,6 +38,10 @@ namespace planner_notify_service.Infrastructure.Repository
                 await _context.SaveChangesAsync();
                 return token;
             }
+
+            existingToken.Token = firebaseToken;
+
+            await _context.SaveChangesAsync();
 
             return existingToken;
         }

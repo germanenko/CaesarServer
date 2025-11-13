@@ -45,7 +45,7 @@ namespace Planner_chat_server.Infrastructure.Service
 
                 _httpClient = new HttpClient(handler)
                 {
-                    BaseAddress = new Uri("http://planner-notify-service:8092/api/")
+                    BaseAddress = new Uri("http://localhost:8092/api/")
                 };
             }
         }
