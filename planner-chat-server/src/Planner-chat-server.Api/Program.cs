@@ -93,7 +93,8 @@ void ConfigureServices(IServiceCollection services)
         new FirebaseService(
             firebaseProjectId,
             firebaseClientEmail,
-            firebasePrivateKey
+            firebasePrivateKey,
+            sp.GetRequiredService<ILogger<FirebaseService>>()
         ));
 
 

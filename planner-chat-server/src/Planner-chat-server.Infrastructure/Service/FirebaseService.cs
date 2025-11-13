@@ -16,8 +16,12 @@ namespace Planner_chat_server.Infrastructure.Service
     public class FirebaseService : IFirebaseService
     {
         private readonly HttpClient _httpClient;
-        public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey)
+        private readonly ILogger<FirebaseService> _logger;
+
+        public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey, ILogger<FirebaseService> logger)
         {
+            _logger = logger;
+
             if (FirebaseApp.DefaultInstance == null)
             {
                 var formattedPrivateKey = fbPrivateKey?.Replace("\\n", "\n");
@@ -30,7 +34,6 @@ namespace Planner_chat_server.Infrastructure.Service
                         "client_email": "{{fbClientEmail}}"
                     }
                     """);
-
 
                 FirebaseApp.Create(new AppOptions()
                 {
@@ -52,14 +55,33 @@ namespace Planner_chat_server.Infrastructure.Service
 
         public async Task<bool> SendNotification(string firebaseToken, string title, string content)
         {
-            var response = await _httpClient.PostAsync($"sendFCMNotification?firebaseToken={firebaseToken}&title={title}&content={content}", null);
+            _logger.LogInformation("🚀 Отправка уведомления через HTTP. Title: {Title}, Content: {Content}, TokenLength: {TokenLength}",
+                title, content, firebaseToken?.Length);
 
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return true;
+                var url = $"sendFCMNotification?firebaseToken={firebaseToken}&title={title}&content={content}";
+                _logger.LogDebug("📨 HTTP запрос к: {Url}", url);
+
+                var response = await _httpClient.PostAsync(url, null);
+                _logger.LogInformation("📡 HTTP ответ: {StatusCode}", response.StatusCode);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation("✅ Уведомление успешно отправлено через HTTP");
+                    return true;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("❌ Ошибка при отправке уведомления. Status: {StatusCode}, Response: {ErrorContent}",
+                        response.StatusCode, errorContent);
+                    return false;
+                }
             }
-            else
+            catch (Exception ex)
             {
+                _logger.LogError(ex, "💥 Исключение при отправке уведомления через HTTP");
                 return false;
             }
         }
