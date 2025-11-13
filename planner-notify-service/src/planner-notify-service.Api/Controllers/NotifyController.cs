@@ -57,6 +57,7 @@ namespace planner_notify_service.Api.Controllers
             return StatusCode((int)response.StatusCode, response.Errors);
         }
 
+        [LocalOnly]
         [HttpPost("api/sendFCMNotification")]
         [SwaggerOperation("Отправить FCM уведомление")]
         [SwaggerResponse(200, Type = typeof(bool))]
