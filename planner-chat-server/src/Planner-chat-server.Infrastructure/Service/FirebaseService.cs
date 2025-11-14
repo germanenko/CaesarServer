@@ -58,7 +58,7 @@ namespace Planner_chat_server.Infrastructure.Service
 
             try
             {
-                var url = $"sendFCMNotification?firebaseToken={userId}&title={title}&content={content}";
+                var url = $"sendFCMNotification?userId={userId}&title={title}&content={content}";
                 _logger.LogDebug("📨 HTTP запрос к: {Url}", url);
 
                 var response = await _httpClient.PostAsync(url, null);
