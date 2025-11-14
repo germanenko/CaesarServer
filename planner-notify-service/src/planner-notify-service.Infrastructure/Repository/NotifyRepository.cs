@@ -21,17 +21,18 @@ namespace planner_notify_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<FirebaseToken?> AddFirebaseToken(Guid accountId, string firebaseToken)
+        public async Task<FirebaseToken?> AddFirebaseToken(Guid accountId, string firebaseToken, Guid deviceId)
         {
             var existingToken = await _context.FirebaseTokens
-                .FirstOrDefaultAsync(x => x.UserId == accountId);
+                .FirstOrDefaultAsync(x => x.UserId == accountId && x.DeviceId == deviceId);
 
             if (existingToken == null)
             {
                 var newToken = new FirebaseToken()
                 {
                     UserId = accountId,
-                    Token = firebaseToken
+                    Token = firebaseToken,
+                    DeviceId = deviceId
                 };
 
                 var token = _context.FirebaseTokens.Add(newToken).Entity;
@@ -47,7 +48,8 @@ namespace planner_notify_service.Infrastructure.Repository
                 var newToken = new FirebaseToken()
                 {
                     UserId = accountId,
-                    Token = firebaseToken
+                    Token = firebaseToken,
+                    DeviceId = deviceId
                 };
 
                 _context.FirebaseTokens.Add(newToken);
@@ -56,6 +58,13 @@ namespace planner_notify_service.Infrastructure.Repository
             }
 
             return existingToken;
+        }
+
+        public async Task<List<FirebaseToken>?> GetTokens(Guid accountId)
+        {
+            var token = await _context.FirebaseTokens.Where(x => x.UserId == accountId).ToListAsync();
+
+            return token;
         }
     }
 }

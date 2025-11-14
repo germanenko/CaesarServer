@@ -2,6 +2,8 @@
 using FirebaseAdmin.Messaging;
 using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Logging;
+using Newtonsoft.Json.Linq;
+using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.IService;
 using System;
 using System.Collections.Generic;
@@ -37,13 +39,13 @@ namespace planner_notify_service.Infrastructure.Service
             }
         }
 
-        public async Task<string> SendNotificationAsync(string token, string title, string body, Dictionary<string, string>? data = null)
+        public async Task<string> SendNotificationAsync(List<FirebaseToken> tokens, string title, string body, Dictionary<string, string>? data = null)
         {
             try
             {
                 var message = new Message()
                 {
-                    Token = token,
+                    Token = "",
                     Notification = new Notification()
                     {
                         Title = title,
@@ -71,8 +73,13 @@ namespace planner_notify_service.Infrastructure.Service
                     }
                 };
 
-                string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
-                return response;
+                foreach (var token in tokens)
+                {
+                    message.Token = token.Token;
+
+                    string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
+                }
+                return "Уведомления отправлены";
             }
             catch (Exception ex)
             {

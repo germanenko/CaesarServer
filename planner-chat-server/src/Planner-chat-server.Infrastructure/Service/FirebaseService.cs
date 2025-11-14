@@ -53,14 +53,12 @@ namespace Planner_chat_server.Infrastructure.Service
             }
         }
 
-        public async Task<bool> SendNotification(string firebaseToken, string title, string content)
+        public async Task<bool> SendNotification(Guid userId, string title, string content)
         {
-            _logger.LogInformation("🚀 Отправка уведомления через HTTP. Title: {Title}, Content: {Content}, TokenLength: {TokenLength}",
-                title, content, firebaseToken?.Length);
 
             try
             {
-                var url = $"sendFCMNotification?firebaseToken={firebaseToken}&title={title}&content={content}";
+                var url = $"sendFCMNotification?firebaseToken={userId}&title={title}&content={content}";
                 _logger.LogDebug("📨 HTTP запрос к: {Url}", url);
 
                 var response = await _httpClient.PostAsync(url, null);

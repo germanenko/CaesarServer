@@ -46,11 +46,13 @@ namespace planner_notify_service.Api.Controllers
 
         public async Task<IActionResult> AddFirebaseToken(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery, Required] string firebaseToken
+            [FromQuery, Required] string firebaseToken,
+            [FromQuery, Required] Guid deviceId
+
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _notifyService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken);
+            var response = await _notifyService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken, deviceId);
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
 
@@ -62,12 +64,12 @@ namespace planner_notify_service.Api.Controllers
         [SwaggerOperation("Отправить FCM уведомление")]
         [SwaggerResponse(200, Type = typeof(bool))]
         public async Task<IActionResult> SendFCMNotification(
-            [FromQuery, Required] string firebaseToken,
+            [FromQuery, Required] Guid userId,
             [FromQuery] string title,
             [FromQuery] string content
         )
         {
-            var response = await _notifyService.SendFCMNotification(firebaseToken, title, content);
+            var response = await _notifyService.SendFCMNotification(userId, title, content);
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
 

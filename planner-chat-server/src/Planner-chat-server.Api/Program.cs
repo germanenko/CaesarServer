@@ -71,11 +71,6 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(chatConnectionString);
     });
 
-    services.AddDbContext<NotifyDbContext>(options =>
-    {
-        options.UseNpgsql(notifyConnectionString);
-    });
-
     services.AddWebSockets(options =>
     {
         options.KeepAliveInterval = TimeSpan.FromSeconds(120);
@@ -111,7 +106,6 @@ void ConfigureServices(IServiceCollection services)
 
 
     services.AddScoped<IChatRepository, ChatRepository>();
-    services.AddScoped<INotifyRepository, NotifyRepository>();
     services.AddScoped<IChatService, ChatService>();
     services.AddScoped<IChatConnector, ChatConnector>();
 

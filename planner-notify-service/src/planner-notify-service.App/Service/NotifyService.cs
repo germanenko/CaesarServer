@@ -23,9 +23,9 @@ namespace planner_notify_service.App.Service
             _firebaseService = firebaseService;
         }
 
-        public async Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken)
+        public async Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken, Guid deviceId)
         {
-            var token = await _notifyRepository.AddFirebaseToken(accountId, firebaseToken);
+            var token = await _notifyRepository.AddFirebaseToken(accountId, firebaseToken, deviceId);
 
             return new ServiceResponse<FirebaseToken>
             {
@@ -35,9 +35,11 @@ namespace planner_notify_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<bool>> SendFCMNotification(string firebaseToken, string title, string content)
+        public async Task<ServiceResponse<bool>> SendFCMNotification(Guid userId, string title, string content)
         {
-            await _firebaseService.SendNotificationAsync(firebaseToken, title, content);
+            var tokens = await _notifyRepository.GetTokens(userId);
+
+            await _firebaseService.SendNotificationAsync(tokens, title, content);
 
             return new ServiceResponse<bool>
             {

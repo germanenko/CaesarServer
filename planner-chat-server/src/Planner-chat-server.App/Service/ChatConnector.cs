@@ -19,7 +19,6 @@ namespace Planner_chat_server.App.Service
     {
         private readonly IChatRepository _chatRepository;
         private readonly INotifyService _notifyService;
-        private readonly INotifyRepository _notifyRepository;
         private readonly IFirebaseService _firebaseService;
         private readonly IUserService _userService;
         private readonly ILogger<ChatConnector> _logger;
@@ -33,7 +32,6 @@ namespace Planner_chat_server.App.Service
             IChatRepository chatRepository,
             INotifyService notifyService,
             ILogger<ChatConnector> logger,
-            INotifyRepository notifyRepository,
             IFirebaseService firebaseService,
             IUserService userService
         )
@@ -41,7 +39,6 @@ namespace Planner_chat_server.App.Service
             _chatRepository = chatRepository;
             _notifyService = notifyService;
             _logger = logger;
-            _notifyRepository = notifyRepository;
             _firebaseService = firebaseService;
             _userService = userService;
         }
@@ -172,15 +169,13 @@ namespace Planner_chat_server.App.Service
             var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
             var notConnectedAccountIds = userIds.Except(connectedAccountIds);
 
-            var firebaseTokens = await _notifyRepository.GetTokens(notConnectedAccountIds.ToList());
-
             try
             {
                 var senderName = await _userService.GetUserName(message.SenderId);
-                foreach (var firebaseToken in firebaseTokens)
+                foreach (var accountId in notConnectedAccountIds)
                 {
                     //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
-                    await _firebaseService.SendNotification(firebaseToken.Token, senderName, message.Content);
+                    await _firebaseService.SendNotification(accountId, senderName, message.Content);
                 }
             }
             catch (Exception ex)
