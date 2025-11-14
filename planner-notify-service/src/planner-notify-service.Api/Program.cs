@@ -16,8 +16,6 @@ using Swashbuckle.AspNetCore.Filters;
 
 var builder = WebApplication.CreateBuilder(args);
 
-Env.Load();
-
 ConfigureServices(builder.Services);
 var app = builder.Build();
 app = ConfigureApplication(app);
@@ -33,8 +31,7 @@ void ConfigureServices(IServiceCollection services)
     var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
     var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
 
-    //var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
-    var notifyDbConnectionString = "Server=188.225.18.18:5437;Database=planner-notify;User Id=user;Password=*Planner;";
+    var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
@@ -86,7 +83,6 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(notifyDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-            builder.MigrationsAssembly("planner-notify-service.Api");
         });
     });
 
