@@ -51,26 +51,7 @@ namespace planner_notify_service.Infrastructure.Service
                         Title = title,
                         Body = body
                     },
-                    Data = new Dictionary<string, string>()
-                    {
-                        ["allow_response"] = "true",
-                        ["response_placeholder"] = "Введите ответ",
-                        ["notification_type"] = "interactive"
-                    },
-                    Android = new AndroidConfig()
-                    {
-                        Notification = new AndroidNotification()
-                        {
-                            ClickAction = "REPLY_ACTION"
-                        }
-                    },
-                    Apns = new ApnsConfig()
-                    {
-                        Aps = new Aps()
-                        {
-                            Category = "WITH_RESPONSE"
-                        }
-                    }
+                    Data = data
                 };
 
                 foreach (var token in tokens)

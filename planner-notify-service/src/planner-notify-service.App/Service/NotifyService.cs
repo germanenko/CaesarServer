@@ -35,11 +35,11 @@ namespace planner_notify_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<bool>> SendFCMNotification(Guid userId, string title, string content)
+        public async Task<ServiceResponse<bool>> SendFCMNotification(Guid userId, string title, string content, Dictionary<string, string> data)
         {
             var tokens = await _notifyRepository.GetTokens(userId);
 
-            await _firebaseService.SendNotificationAsync(tokens, title, content);
+            await _firebaseService.SendNotificationAsync(tokens, title, content, data);
 
             return new ServiceResponse<bool>
             {

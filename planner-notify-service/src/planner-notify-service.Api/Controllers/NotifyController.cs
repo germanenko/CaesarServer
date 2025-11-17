@@ -66,10 +66,11 @@ namespace planner_notify_service.Api.Controllers
         public async Task<IActionResult> SendFCMNotification(
             [FromQuery, Required] Guid userId,
             [FromQuery] string title,
-            [FromQuery] string content
+            [FromQuery] string content,
+            [FromBody] Dictionary<string, string> data
         )
         {
-            var response = await _notifyService.SendFCMNotification(userId, title, content);
+            var response = await _notifyService.SendFCMNotification(userId, title, content, data);
             if (response.IsSuccess)
                 return StatusCode((int)response.StatusCode, response.Body);
 

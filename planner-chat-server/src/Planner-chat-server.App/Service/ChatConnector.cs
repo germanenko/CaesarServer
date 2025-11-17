@@ -19,7 +19,7 @@ namespace Planner_chat_server.App.Service
     {
         private readonly IChatRepository _chatRepository;
         private readonly INotifyService _notifyService;
-        private readonly IFirebaseService _firebaseService;
+        private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
         private readonly ILogger<ChatConnector> _logger;
         private readonly JsonSerializerOptions options = new()
@@ -32,14 +32,14 @@ namespace Planner_chat_server.App.Service
             IChatRepository chatRepository,
             INotifyService notifyService,
             ILogger<ChatConnector> logger,
-            IFirebaseService firebaseService,
+            INotificationService notificationService,
             IUserService userService
         )
         {
             _chatRepository = chatRepository;
             _notifyService = notifyService;
             _logger = logger;
-            _firebaseService = firebaseService;
+            _notificationService = notificationService;
             _userService = userService;
         }
 
@@ -175,7 +175,17 @@ namespace Planner_chat_server.App.Service
                 foreach (var accountId in notConnectedAccountIds)
                 {
                     //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
-                    await _firebaseService.SendNotification(accountId, senderName, message.Content);
+
+                    Dictionary<string, string> data = new Dictionary<string, string>()
+                    {
+                        { "type", NotificationType.ChatMessage.ToString() },
+                        { "chatId", chat.Id.ToString() },
+                        { "senderName", senderName },
+                        { "messageId", message.Id.ToString() },
+                        { "message", message.Content }
+                    };
+
+                    await _notificationService.SendNotification(accountId, senderName, message.Content, data);
                 }
             }
             catch (Exception ex)

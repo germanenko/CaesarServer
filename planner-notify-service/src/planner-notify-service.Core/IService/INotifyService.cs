@@ -11,6 +11,6 @@ namespace planner_notify_service.Core.IService
     public interface INotifyService
     {
         Task<ServiceResponse<FirebaseToken>> AddFirebaseToken(Guid accountId, string firebaseToken, Guid deviceId);
-        Task<ServiceResponse<bool>> SendFCMNotification(Guid userId, string title, string content);
+        Task<ServiceResponse<bool>> SendFCMNotification(Guid userId, string title, string content, Dictionary<string, string> data);
     }
 }

@@ -18,20 +18,20 @@ namespace Planner_chat_server.App.Service
         private readonly IChatConnectionService _chatConnectionService;
         private readonly IChatConnector _chatConnector;
         private readonly INotifyService _notifyService;
-        private readonly IFirebaseService _firebaseService;
+        private readonly INotificationService _notificationService;
 
         public ChatService(
             IChatRepository chatRepository,
             IChatConnectionService chatConnectionService,
             IChatConnector chatConnector,
             INotifyService notifyService,
-            IFirebaseService firebaseService)
+            INotificationService notificationService)
         {
             _chatRepository = chatRepository;
             _chatConnectionService = chatConnectionService;
             _chatConnector = chatConnector;
             _notifyService = notifyService;
-            _firebaseService = firebaseService;
+            _notificationService = notificationService;
         }
 
         public async Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId)

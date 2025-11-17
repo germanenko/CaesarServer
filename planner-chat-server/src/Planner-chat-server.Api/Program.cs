@@ -84,12 +84,9 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
     services.AddScoped<IUserService, UserService>();
 
-    services.AddSingleton<IFirebaseService, FirebaseService>(sp =>
-        new FirebaseService(
-            firebaseProjectId,
-            firebaseClientEmail,
-            firebasePrivateKey,
-            sp.GetRequiredService<ILogger<FirebaseService>>()
+    services.AddSingleton<INotificationService, NotificationService>(sp =>
+        new NotificationService(
+            sp.GetRequiredService<ILogger<NotificationService>>()
         ));
 
 
