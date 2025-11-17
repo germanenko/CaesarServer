@@ -46,11 +46,11 @@ namespace planner_notify_service.Infrastructure.Service
                 var message = new Message()
                 {
                     Token = "",
-                    Notification = new Notification()
-                    {
-                        Title = title,
-                        Body = body
-                    },
+                    //Notification = new Notification()
+                    //{
+                    //    Title = title,
+                    //    Body = body
+                    //},
                     Data = data
                 };
 
