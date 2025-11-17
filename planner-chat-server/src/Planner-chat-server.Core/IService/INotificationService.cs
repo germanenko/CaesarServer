@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Messaging;
+using Planner_chat_server.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace Planner_chat_server.Core.IService
 {
     public interface INotificationService
     {
-        Task<bool> SendNotification(Guid userId, string title, string content, Dictionary<string, string>? data = null);
+        Task<bool> SendNotification(Guid userId, string title, string content, NotificationType type, Dictionary<string, string>? data = null);
     }
 }

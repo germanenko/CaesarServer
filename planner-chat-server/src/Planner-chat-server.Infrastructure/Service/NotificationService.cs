@@ -4,6 +4,7 @@ using Google.Apis.Auth.OAuth2;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Planner_chat_server.Core.Entities.Response;
+using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IService;
 using System;
 using System.Collections.Generic;
@@ -22,16 +23,33 @@ namespace Planner_chat_server.Infrastructure.Service
 
         public NotificationService(ILogger<NotificationService> logger)
         {
-            _logger = logger;          
+            _logger = logger;
+
+            var handler = new HttpClientHandler
+            {
+                ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => true
+            };
+
+            _httpClient = new HttpClient(handler)
+            {
+                BaseAddress = new Uri("http://planner-notify-service:80/api/")
+            };
         }
 
 
-        public async Task<bool> SendNotification(Guid userId, string title, string content, Dictionary<string, string>? data = null)
+        public async Task<bool> SendNotification(Guid userId, string title, string content, NotificationType type, Dictionary<string, string>? data = null)
         {
 
             try
             {
-                var s = JsonConvert.SerializeObject(data);
+                Dictionary<string, string> baseData = new Dictionary<string, string>()
+                {
+                    { "type", type.ToString() }
+                };
+
+                var mergedData = MergeDictionaries(baseData, data, false);
+
+                var s = JsonConvert.SerializeObject(mergedData);
 
                 var body = new StringContent(s, Encoding.UTF8, MediaTypeNames.Application.Json);
 
@@ -57,6 +75,27 @@ namespace Planner_chat_server.Infrastructure.Service
                 _logger.LogError(ex, "💥 Исключение при отправке уведомления через HTTP");
                 return false;
             }
+        }
+
+        public static Dictionary<TKey, TValue> MergeDictionaries<TKey, TValue>(
+            Dictionary<TKey, TValue> first,
+            Dictionary<TKey, TValue>? second,
+            bool overwrite = true) where TKey : notnull
+        {
+            var result = new Dictionary<TKey, TValue>(first);
+
+            if (second == null)
+                return result;
+
+            foreach (var item in second)
+            {
+                if (overwrite || !result.ContainsKey(item.Key))
+                {
+                    result[item.Key] = item.Value;
+                }
+            }
+
+            return result;
         }
     }
 }

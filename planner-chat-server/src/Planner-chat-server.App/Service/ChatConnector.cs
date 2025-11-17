@@ -185,7 +185,7 @@ namespace Planner_chat_server.App.Service
                         { "message", message.Content }
                     };
 
-                    await _notificationService.SendNotification(accountId, senderName, message.Content, data);
+                    await _notificationService.SendNotification(accountId, senderName, message.Content, NotificationType.ChatMessage, data);
                 }
             }
             catch (Exception ex)
