@@ -25,7 +25,7 @@ namespace Planner_chat_server.App.Service
             };
         }
 
-        public async Task<string> GetUserName(Guid userId)
+        public async Task<ProfileBody?> GetUserData(Guid userId)
         {
             try
             {
@@ -40,9 +40,7 @@ namespace Planner_chat_server.App.Service
                         PropertyNameCaseInsensitive = true
                     });
 
-                    var userName = user?.Nickname ?? userId.ToString();
-
-                    return userName;
+                    return user;
                 }
                 else
                 {
@@ -55,7 +53,7 @@ namespace Planner_chat_server.App.Service
                 _logger.LogError(ex, "❌ Unexpected error for {UserId}", userId);
             }
 
-            return userId.ToString();
+             return null;
         }
     }
 }

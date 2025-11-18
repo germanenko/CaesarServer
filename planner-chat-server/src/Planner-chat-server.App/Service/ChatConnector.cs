@@ -171,7 +171,7 @@ namespace Planner_chat_server.App.Service
 
             try
             {
-                var senderName = await _userService.GetUserName(message.SenderId);
+                var user = await _userService.GetUserData(message.SenderId);
                 foreach (var accountId in notConnectedAccountIds)
                 {
                     //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
@@ -180,12 +180,12 @@ namespace Planner_chat_server.App.Service
                     {
                         { "type", NotificationType.ChatMessage.ToString() },
                         { "chatId", chat.Id.ToString() },
-                        { "senderName", senderName },
+                        { "senderName", user.Nickname },
                         { "messageId", message.Id.ToString() },
                         { "message", message.Content }
                     };
 
-                    await _notificationService.SendNotification(accountId, senderName, message.Content, NotificationType.ChatMessage, data);
+                    await _notificationService.SendNotification(accountId, user.Nickname, message.Content, NotificationType.ChatMessage, data);
                 }
             }
             catch (Exception ex)

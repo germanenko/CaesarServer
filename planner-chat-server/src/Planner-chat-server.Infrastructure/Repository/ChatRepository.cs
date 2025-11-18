@@ -182,6 +182,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                     CountOfUnreadMessages = countOfUnreadMessages,
                     IsSyncedReadStatus = userSession.DateLastViewing == userMembership.DateLastViewing,
                     ParticipantIds = chatMembership.Where(x => x.AccountId != accountId).Select(e => e.AccountId).ToList(),
+                    Type = Enum.Parse<ChatType>(chat.Type),
                     LastMessage = lastMessage?.ToMessageBody()
                 };
 

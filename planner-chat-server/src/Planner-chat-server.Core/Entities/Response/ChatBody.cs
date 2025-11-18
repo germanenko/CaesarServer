@@ -1,3 +1,5 @@
+using Planner_chat_server.Core.Enums;
+
 namespace Planner_chat_server.Core.Entities.Response
 {
     public class ChatBody
@@ -8,7 +10,7 @@ namespace Planner_chat_server.Core.Entities.Response
         public int CountOfUnreadMessages { get; set; }
         public MessageBody? LastMessage { get; set; }
         public bool IsSyncedReadStatus { get; set; }
-
+        public ChatType Type { get; set; }
         public List<Guid> ParticipantIds { get; set; } = new();
     }
 }

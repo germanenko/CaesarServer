@@ -18,20 +18,20 @@ namespace Planner_chat_server.App.Service
         private readonly IChatConnectionService _chatConnectionService;
         private readonly IChatConnector _chatConnector;
         private readonly INotifyService _notifyService;
-        private readonly INotificationService _notificationService;
+        private readonly IUserService _userService;
 
         public ChatService(
             IChatRepository chatRepository,
             IChatConnectionService chatConnectionService,
             IChatConnector chatConnector,
             INotifyService notifyService,
-            INotificationService notificationService)
+            IUserService userService)
         {
             _chatRepository = chatRepository;
             _chatConnectionService = chatConnectionService;
             _chatConnector = chatConnector;
             _notifyService = notifyService;
-            _notificationService = notificationService;
+            _userService = userService;
         }
 
         public async Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId)
@@ -135,6 +135,16 @@ namespace Planner_chat_server.App.Service
         public async Task<ServiceResponse<IEnumerable<ChatBody>>> GetChats(Guid accountId, Guid sessionId, ChatType chatType)
         {
             var chats = await _chatRepository.GetChatBodies(accountId, sessionId, chatType);
+
+            foreach (var chat in chats)
+            {
+                if(chat.Type == ChatType.Personal)
+                {
+                    var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
+                    chat.ImageUrl = user.UrlIcon;
+                }
+            }
+
             return new ServiceResponse<IEnumerable<ChatBody>>
             {
                 StatusCode = HttpStatusCode.OK,
