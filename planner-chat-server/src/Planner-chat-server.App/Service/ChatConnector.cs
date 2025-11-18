@@ -182,7 +182,8 @@ namespace Planner_chat_server.App.Service
                         { "chatId", chat.Id.ToString() },
                         { "senderName", user.Nickname },
                         { "messageId", message.Id.ToString() },
-                        { "message", message.Content }
+                        { "message", message.Content },
+                        { "iconUrl", user.UrlIcon }
                     };
 
                     await _notificationService.SendNotification(accountId, user.Nickname, message.Content, NotificationType.ChatMessage, data);
