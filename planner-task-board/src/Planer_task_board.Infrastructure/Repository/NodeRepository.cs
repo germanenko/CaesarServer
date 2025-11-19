@@ -1,0 +1,46 @@
+using Microsoft.EntityFrameworkCore;
+using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Enums;
+using Planer_task_board.Core.IRepository;
+using Planer_task_board.Infrastructure.Data;
+
+namespace Planer_task_board.Infrastructure.Repository
+{
+    public class NodeRepository : INodeRepository
+    {
+        private readonly ContentDbContext _context;
+
+        public NodeRepository(ContentDbContext context)
+        {
+            _context = context;
+        }
+
+        public async Task<Node?> AddNode(Guid parentId, Guid childId, RelationType relationType)
+        {
+            var newNode = new Node()
+            {
+                ParentId = parentId,
+                ChildId = childId,
+                RelationType = relationType
+            };
+
+            var node = await _context.Nodes.AddAsync(newNode);
+
+            _context.SaveChanges();
+
+            return node.Entity;
+        }
+
+        public async Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null)
+        {
+            var query = _context.Nodes.Where(x => x.ParentId == parentId);
+
+            if (relationType.HasValue)
+            {
+                query = query.Where(x => x.RelationType == relationType.Value);
+            }
+
+            return await query.Select(x => x.ChildId).ToListAsync();
+        }
+    }
+}

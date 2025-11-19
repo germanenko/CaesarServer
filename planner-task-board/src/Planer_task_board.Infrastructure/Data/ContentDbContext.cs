@@ -25,5 +25,6 @@ namespace Planer_task_board.Infrastructure.Data
         public DbSet<Board> Boards { get; set; }
         public DbSet<BoardMember> BoardMembers { get; set; }
         public DbSet<TaskPerformer> TaskPerformers { get; set; }
+        public DbSet<Node> Nodes { get; set; }
     }
 }

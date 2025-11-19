@@ -7,6 +7,7 @@ using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using Planer_task_board.Infrastructure.Data;
+using System.Xml.Linq;
 
 namespace Planer_task_board.Infrastructure.Repository
 {
@@ -89,7 +90,7 @@ namespace Planer_task_board.Infrastructure.Repository
             boardMember = (await _context.BoardMembers.AddAsync(boardMember))?.Entity;
             await _context.SaveChangesAsync();
 
-            var columnIds = await _context.BoardColumns.Where(e => e.BoardId == boardId)
+            var columnIds = await _context.Nodes.Where(e => e.ParentId == boardId)
                 .Select(e => e.Id)
                 .ToListAsync();
 
@@ -132,9 +133,13 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<BoardColumn>> GetBoardColumns(Guid boardId)
         {
-            return await _context.BoardColumns
-                .Where(e => e.BoardId == boardId)
-                .ToListAsync();
+            var nodes = await _context.Nodes.Where(x => x.ParentId == boardId).Select(x => x.ChildId).ToListAsync();
+
+            return await _context.BoardColumns.Where(x => nodes.Contains(x.Id)).ToListAsync();
+
+            //return await _context.BoardColumns
+            //    .Where(e => e.BoardId == boardId)
+            //    .ToListAsync();
         }
 
         public async Task<IEnumerable<BoardColumn>> GetAllBoardColumns(Guid accountId)
@@ -177,21 +182,28 @@ namespace Planer_task_board.Infrastructure.Repository
             var boardColumn = new BoardColumn
             {
                 Id = column.Id,
-                Board = board,
                 Name = column.Name,
                 UpdatedAt = column.UpdatedAt
             };
 
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
 
-            var boardColumnMember = new BoardColumnMember()
+            //var boardColumnMember = new BoardColumnMember()
+            //{
+            //    Column = boardColumn,
+            //    ColumnId = boardColumn.Id,
+            //    AccountId = accountId,
+            //    Role = "Admin"
+            //};
+            //await _context.BoardColumnMembers.AddAsync(boardColumnMember);
+
+            var node = new Node()
             {
-                Column = boardColumn,
-                ColumnId = boardColumn.Id,
-                AccountId = accountId,
-                Role = "Admin"
+                ParentId = board.Id,
+                ChildId = column.Id,
+                RelationType = RelationType.Contains
             };
-            await _context.BoardColumnMembers.AddAsync(boardColumnMember);
+            await _context.Nodes.AddAsync(node);
 
             await _context.SaveChangesAsync();
 
@@ -201,30 +213,41 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
         {
             var boardColumns = new List<BoardColumn>();
-            var boardColumnMembers = new List<BoardColumnMember>();
+
+            //var boardColumnMembers = new List<BoardColumnMember>();
+
+            var nodes = new List<Node>();
 
             foreach (var column in columns)
             {
                 BoardColumn newColumn = new BoardColumn()
                 {
                     Id = column.Id,
-                    Board = _context.Boards.Where(b => b.Id == column.BoardId).First(),
                     Name = column.Name,
                 };
                 boardColumns.Add(newColumn);
 
-                boardColumnMembers.Add(new BoardColumnMember()
+                
+                nodes.Add(new Node()
                 {
-                    Column = newColumn,
-                    ColumnId = newColumn.Id,
-                    AccountId = accountId,
-                    Role = "Admin"
+                    ParentId = column.BoardId,
+                    ChildId = column.Id,
+                    RelationType = RelationType.Contains
                 });
+
+                //boardColumnMembers.Add(new BoardColumnMember()
+                //{
+                //    Column = newColumn,
+                //    ColumnId = newColumn.Id,
+                //    AccountId = accountId,
+                //    Role = "Admin"
+                //});
             }
 
             await _context.BoardColumns.AddRangeAsync(boardColumns);
 
-            await _context.BoardColumnMembers.AddRangeAsync(boardColumnMembers);
+            //await _context.BoardColumnMembers.AddRangeAsync(boardColumnMembers);
+            await _context.Nodes.AddRangeAsync(nodes);
 
             await _context.SaveChangesAsync();
 

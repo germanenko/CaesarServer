@@ -14,10 +14,6 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.HasMany(e => e.Members)
                 .WithOne(e => e.Column)
                 .HasForeignKey(e => e.ColumnId);
-
-            builder.HasOne(e => e.Board)
-                .WithMany(e => e.Columns)
-                .HasForeignKey(e => e.BoardId);
         }
     }
 }

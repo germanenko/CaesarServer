@@ -5,9 +5,6 @@ namespace Planer_task_board.Core.Entities.Models
     public class BoardColumn : ModelBase
     {
         public string Name { get; set; }
-
-        public Board Board { get; set; }
-        public Guid BoardId { get; set; }
         public List<BoardColumnMember> Members { get; set; } = new();
         public List<BoardColumnTask> Tasks { get; set; } = new();
 
@@ -17,7 +14,6 @@ namespace Planer_task_board.Core.Entities.Models
             {
                 Id = Id,
                 Name = Name,
-                BoardId = BoardId,
                 UpdatedAt = UpdatedAt
             };
         }

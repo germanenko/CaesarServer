@@ -41,7 +41,7 @@ void ConfigureServices(IServiceCollection services)
     var hostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var username = GetEnvVar("RABBITMQ_USERNAME");
     var password = GetEnvVar("RABBITMQ_PASSWORD");
-    var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE");
+    var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE_NAME");
     var createTaskChatResponseQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_RESPONSE_QUEUE");
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
 
@@ -97,6 +97,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IBoardRepository, BoardRepository>();
     services.AddScoped<IDeletedTaskRepository, DeletedTaskRepository>();
     services.AddScoped<ITaskRepository, TaskRepository>();
+    services.AddScoped<INodeRepository, NodeRepository>();
 
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService

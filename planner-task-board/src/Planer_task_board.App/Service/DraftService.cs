@@ -83,15 +83,16 @@ namespace Planer_task_board.App.Service
                     StatusCode = HttpStatusCode.NotFound,
                     IsSuccess = false
                 };
-
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
-            if (boardMember == null)
-                return new ServiceResponse<TaskBody>
-                {
-                    Errors = new[] { "You are not a member of this board" },
-                    StatusCode = HttpStatusCode.Forbidden,
-                    IsSuccess = false
-                };
+            
+            //! вернуть при разработке логики доступов
+            //var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
+            //if (boardMember == null)
+            //    return new ServiceResponse<TaskBody>
+            //    {
+            //        Errors = new[] { "You are not a member of this board" },
+            //        StatusCode = HttpStatusCode.Forbidden,
+            //        IsSuccess = false
+            //    };
 
             TaskModel? draftOfTask = null;
             if (body.ModifiedTaskId != null)

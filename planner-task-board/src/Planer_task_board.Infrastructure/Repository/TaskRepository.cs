@@ -341,20 +341,20 @@ namespace Planer_task_board.Infrastructure.Repository
 
             _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
 
-            if(column != null)
-            {
-                var boardMembers = await _context.BoardMembers.Where(e => e.BoardId == column.BoardId)
-                .ToListAsync();
+            //if(column != null)
+            //{
+            //    var boardMembers = await _context.BoardMembers.Where(e => e.BoardId == column.BoardId)
+            //    .ToListAsync();
 
 
-                var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
-                {
-                    AccountIds = boardMembers.Select(e => e.AccountId).ToList(),
-                    TaskIds = new List<Guid> { task.Id },
-                };
+            //    var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
+            //    {
+            //        AccountIds = boardMembers.Select(e => e.AccountId).ToList(),
+            //        TaskIds = new List<Guid> { task.Id },
+            //    };
 
-                _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
-            }
+            //    _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
+            //}
             
 
             return task;
