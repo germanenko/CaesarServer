@@ -145,11 +145,14 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<IEnumerable<BoardColumn>> GetAllBoardColumns(Guid accountId)
         {
             var availableMemberBoardColumns = await _context.BoardColumnMembers
-                .Include(e => e.Column)
+                //.Include(e => e.Column)
                 .Where(e => e.AccountId == accountId)
+                .Select(x => x.ColumnId)
                 .ToListAsync();
 
-            return availableMemberBoardColumns.Select(e => e.Column);
+            var columns = await _context.BoardColumns.Where(x => availableMemberBoardColumns.Contains(x.Id)).ToListAsync();
+
+            return columns;
         }
 
         public async Task<BoardColumn?> GetBoardColumn(Guid? columnId)
