@@ -5,7 +5,6 @@ namespace Planer_task_board.Core.Entities.Models
     public class Board : ModelBase
     { 
         public string Name { get; set; }
-        public List<BoardColumn> Columns { get; set; } = new();
 
         public BoardBody ToBoardBody()
         {
