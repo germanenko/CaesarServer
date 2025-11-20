@@ -147,18 +147,13 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
-            var result = _context.BoardColumns
-                .Include(a => a.Members)
-                .ThenInclude(a => a.Column)
-                .SelectMany(e => e.Members);
-            
-            var columns = result.Where(e => e.AccountId == accountId).Select(e=>e.Column);
+            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
+
+            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
+
+            var columns = await _context.BoardColumns.Where(x => columnIds.Contains(x.Id)).ToListAsync();
 
             var tasks = columns.SelectMany(e => e.Tasks);
-            foreach (var task in tasks)
-            {
-                //task.Task.Columns = await _context.BoardColumnTasks.Where(x=>x.Task == task.Task).ToListAsync();
-            }
 
             return tasks.Select(m => m.Task);
         }
@@ -341,7 +336,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
 
-            //if(column != null)
+            //if (column != null)
             //{
             //    var boardMembers = await _context.BoardMembers.Where(e => e.BoardId == column.BoardId)
             //    .ToListAsync();
@@ -355,7 +350,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             //    _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
             //}
-            
+
 
             return task;
         }
@@ -473,14 +468,9 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<BoardColumnTask>> GetColumnTaskMembership(Guid accountId)
         {
-            var result = _context.BoardColumns
-                .Include(a => a.Members)
-                .ThenInclude(a => a.Column)
-                .SelectMany(e => e.Members);
+            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
 
-            var columns = result.Where(e => e.AccountId == accountId).Select(e => e.Column).ToList();
-
-            var columnIds = columns.Select(x => x.Id).ToList();
+            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
 
             var columnTaskMembership = await _context.BoardColumnTasks.Where(x => columnIds.Contains(x.ColumnId)).ToListAsync();
 
@@ -502,12 +492,11 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId)
         {
-            var result = _context.BoardColumns
-                .Include(a => a.Members)
-                .ThenInclude(a => a.Column)
-                .SelectMany(e => e.Members);
+            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
 
-            var columns = result.Where(e => e.AccountId == accountId).Select(e => e.Column);
+            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
+
+            var columns = await _context.BoardColumns.Where(x => columnIds.Contains(x.Id)).ToListAsync();
 
             var tasks = columns.SelectMany(e => e.Tasks);
 

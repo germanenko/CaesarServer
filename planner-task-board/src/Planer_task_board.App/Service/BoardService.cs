@@ -1,6 +1,7 @@
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
+using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using System.Net;
@@ -17,13 +18,13 @@ namespace Planer_task_board.App.Service
             _boardRepository = boardRepository;
         }
 
-        public async Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId)
+        public async Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId, AccessType accessType)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember is null)
                 return HttpStatusCode.Forbidden;
 
-            var result = await _boardRepository.AddBoardMember(newAccountId, boardId);
+            var result = await _boardRepository.AddBoardMember(newAccountId, boardId, accessType);
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 

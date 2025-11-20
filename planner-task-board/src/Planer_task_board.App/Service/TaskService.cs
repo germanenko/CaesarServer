@@ -75,20 +75,20 @@ namespace Planer_task_board.App.Service
             if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                 errors.Add("End time format is not correct");
 
-            if(taskBody.ColumnId != null)
-            {
-                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-                if (columnMember == null)
-                {
-                    errors.Add("You are not a member of this column");
-                    return new ServiceResponse<TaskBody>
-                    {
-                        StatusCode = HttpStatusCode.Forbidden,
-                        Errors = errors.ToArray(),
-                        IsSuccess = false
-                    };
-                }
-            }
+            //if(taskBody.ColumnId != null)
+            //{
+            //    var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+            //    if (columnMember == null)
+            //    {
+            //        errors.Add("You are not a member of this column");
+            //        return new ServiceResponse<TaskBody>
+            //        {
+            //            StatusCode = HttpStatusCode.Forbidden,
+            //            Errors = errors.ToArray(),
+            //            IsSuccess = false
+            //        };
+            //    }
+            //}
             
 
             var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
@@ -339,14 +339,14 @@ namespace Planer_task_board.App.Service
                     IsSuccess = false
                 };
 
-            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-            if (columnMember == null)
-                return new ServiceResponse<TaskBody>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this column" },
-                    IsSuccess = false
-                };
+            //var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+            //if (columnMember == null)
+            //    return new ServiceResponse<TaskBody>
+            //    {
+            //        StatusCode = HttpStatusCode.Forbidden,
+            //        Errors = new string[] { "You are not a member of this column" },
+            //        IsSuccess = false
+            //    };
 
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
@@ -385,14 +385,14 @@ namespace Planer_task_board.App.Service
                         IsSuccess = false
                     };
 
-                var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
-                if (columnMember == null)
-                    return new ServiceResponse<List<TaskBody>>
-                    {
-                        StatusCode = HttpStatusCode.Forbidden,
-                        Errors = new string[] { "You are not a member of this column" },
-                        IsSuccess = false
-                    };
+                //var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, taskBody.ColumnId);
+                //if (columnMember == null)
+                //    return new ServiceResponse<List<TaskBody>>
+                //    {
+                //        StatusCode = HttpStatusCode.Forbidden,
+                //        Errors = new string[] { "You are not a member of this column" },
+                //        IsSuccess = false
+                //    };
 
                 DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
                 DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
@@ -426,14 +426,14 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<BoardColumnTaskBody>> UpdateColumnTaskMembership(Guid accountId, BoardColumnTaskBody columnTaskMembership)
         {
-            var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnTaskMembership.ColumnId);
-            if (columnMember == null)
-                return new ServiceResponse<BoardColumnTaskBody>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this column" },
-                    IsSuccess = false
-                };
+            //var columnMember = await _boardRepository.GetColumnMemberAsync(accountId, columnTaskMembership.ColumnId);
+            //if (columnMember == null)
+            //    return new ServiceResponse<BoardColumnTaskBody>
+            //    {
+            //        StatusCode = HttpStatusCode.Forbidden,
+            //        Errors = new string[] { "You are not a member of this column" },
+            //        IsSuccess = false
+            //    };
 
 
             var result = await _taskRepository.UpdateColumnTaskMembership(columnTaskMembership);

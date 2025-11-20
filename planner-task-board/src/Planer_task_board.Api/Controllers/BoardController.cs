@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
+using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -135,11 +136,12 @@ namespace Planer_task_board.Api.Controllers
         public async Task<IActionResult> AddMember(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery, Required] Guid boardId,
-            [FromQuery, Required] Guid accountId
+            [FromQuery, Required] Guid accountId,
+            [FromQuery, Required] AccessType accessType
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddBoardMemberAsync(boardId, tokenPayload.AccountId, accountId);
+            var result = await _boardService.AddBoardMemberAsync(boardId, tokenPayload.AccountId, accountId, accessType);
             return StatusCode((int)result);
         }
 

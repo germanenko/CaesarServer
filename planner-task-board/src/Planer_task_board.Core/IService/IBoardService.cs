@@ -1,6 +1,7 @@
 using System.Net;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
+using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.IService
 {
@@ -12,7 +13,7 @@ namespace Planer_task_board.Core.IService
         Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId);
         Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid boardId);
         Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset);
-        Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId);
+        Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId, AccessType accessType);
         Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, CreateColumnBody column);
         Task<ServiceResponse<List<BoardColumnBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns);
     }
