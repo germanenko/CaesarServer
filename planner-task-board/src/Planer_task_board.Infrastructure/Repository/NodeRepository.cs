@@ -42,5 +42,14 @@ namespace Planer_task_board.Infrastructure.Repository
 
             return await query.Select(x => x.ChildId).ToListAsync();
         }
+
+        public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
+        {
+            var access = await _context.AccessRights.Where(x => x.AccountId == accountId).Select(x => x.ResourceId).ToListAsync();
+
+            var nodes = await _context.Nodes.Where(x => access.Contains(x.ParentId)).ToListAsync();
+
+            return nodes;
+        }
     }
 }

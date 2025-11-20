@@ -7,5 +7,6 @@ namespace Planer_task_board.Core.IRepository
     {
         Task<Node?> AddNode(Guid parentId, Guid childId, RelationType relationType);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
+        Task<IEnumerable<Node>?> GetNodes(Guid accountId);
     }
 }

@@ -90,6 +90,7 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
+    services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
     services.AddScoped<IBoardService, BoardService>();
     services.AddScoped<IDraftService, DraftService>();
