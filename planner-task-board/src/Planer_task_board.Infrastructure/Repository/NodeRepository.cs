@@ -68,12 +68,6 @@ namespace Planer_task_board.Infrastructure.Repository
             }
 
             return allTreesNodes.Distinct().ToList();
-
-            var access = await _context.AccessRights.Where(x => x.AccountId == accountId).Select(x => x.ResourceId).ToListAsync();
-
-            var nodes = await _context.Nodes.Where(x => access.Contains(x.ParentId)).ToListAsync();
-
-            return nodes;
         }
         private async Task<List<Node>> GetTreeByRootId(Guid rootId)
         {

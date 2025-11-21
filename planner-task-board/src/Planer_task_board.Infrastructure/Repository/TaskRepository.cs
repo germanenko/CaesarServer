@@ -34,7 +34,7 @@ namespace Planer_task_board.Infrastructure.Repository
             string? hexColor,
             BoardColumn? column,
             Guid creatorId,
-            List<Guid> messages,
+            Guid message,
             DateTime changeDate
         )
         {
@@ -54,15 +54,14 @@ namespace Planer_task_board.Infrastructure.Repository
                 UpdatedAt = changeDate
             };
 
-            var setMessages = messages.Distinct().ToList();
-            var taskAttachedMessages = setMessages.Select(messageId => new TaskAttachedMessage
+            var taskAttachedMessage = new TaskAttachedMessage
             {
                 Task = task,
-                MessageId = messageId
-            });
+                MessageId = message
+            };
 
 
-            return await AddTaskAsync(task, column, taskAttachedMessages);
+            return await AddTaskAsync(task, column, taskAttachedMessage);
         }
 
         public async Task<TaskModel?> AddAsync
@@ -76,7 +75,7 @@ namespace Planer_task_board.Infrastructure.Repository
             DateTime? endDate,
             BoardColumn column,
             Guid creatorId,
-            List<Guid> messages,
+            Guid message,
             TaskModel? parentTask,
             DateTime changeDate
         )
@@ -98,14 +97,13 @@ namespace Planer_task_board.Infrastructure.Repository
                 UpdatedAt = changeDate
             };
 
-            var setMessages = messages.Distinct().ToList();
-            var taskAttachedMessages = setMessages.Select(messageId => new TaskAttachedMessage
+            var taskAttachedMessage = new TaskAttachedMessage
             {
-                MessageId = messageId,
+                MessageId = message,
                 Task = task
-            });
+            };
 
-            return await AddTaskAsync(task, column, taskAttachedMessages);
+            return await AddTaskAsync(task, column, taskAttachedMessage);
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
@@ -196,7 +194,6 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
             => await _context.Tasks
-                .Include(e => e.AttachedMessages)
                 .FirstOrDefaultAsync(e => e.Id == id && e.IsDraft == isDraft);
 
         public async Task<bool> RemoveAsync(Guid id, bool isDraft)
@@ -264,7 +261,7 @@ namespace Planer_task_board.Infrastructure.Repository
                     IsDraft = false,
                     Type = oldTask.Type
                 };
-                newTask = await AddTaskAsync(newTask, column, oldTask.AttachedMessages);
+                newTask = await AddTaskAsync(newTask, column);
             }
 
             _context.Tasks.Remove(oldTask);
@@ -344,12 +341,10 @@ namespace Planer_task_board.Infrastructure.Repository
         private async Task<TaskModel?> AddTaskAsync(
             TaskModel task,
             BoardColumn? column,
-            IEnumerable<TaskAttachedMessage> taskAttachedMessages)
+            TaskAttachedMessage? taskAttachedMessage = null)
         {
             if (task == null)
                 return null;
-
-            task.AttachedMessages = taskAttachedMessages.ToList();
 
             task = (await _context.Tasks.AddAsync(task))?.Entity;
 
@@ -364,7 +359,19 @@ namespace Planer_task_board.Infrastructure.Repository
 
                 await _context.Nodes.AddAsync(node);
             }
-            
+
+
+
+            if (taskAttachedMessage != null)
+            {
+                _context.Nodes.Add(new Node()
+                {
+                    ParentId = taskAttachedMessage.MessageId,
+                    ChildId = task.Id,
+                    RelationType = RelationType.Attach
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             var createTaskChatEvent = new CreateTaskChatEvent
@@ -380,20 +387,29 @@ namespace Planer_task_board.Infrastructure.Repository
 
             _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
 
-            //if (column != null)
-            //{
-            //    var boardMembers = await _context.BoardMembers.Where(e => e.BoardId == column.BoardId)
-            //    .ToListAsync();
+            if (column != null)
+            {
+                var boardMembers = await _context.Nodes.Where(e => e.ChildId == column.Id)
+                    .Join(_context.Boards,
+                        n => n.ParentId,
+                        b => b.Id,
+                        (n, b) => b)
+                    .Join(_context.AccessRights,
+                        b => b.Id, 
+                        a => a.ResourceId,
+                        (n, a) => a)
+                    .Select(a => a.AccountId)
+                    .ToListAsync();
 
 
-            //    var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
-            //    {
-            //        AccountIds = boardMembers.Select(e => e.AccountId).ToList(),
-            //        TaskIds = new List<Guid> { task.Id },
-            //    };
+                var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
+                {
+                    AccountIds = boardMembers.ToList(),
+                    TaskIds = new List<Guid> { task.Id },
+                };
 
-            //    _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
-            //}
+                _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
+            }
 
 
             return task;
@@ -511,35 +527,6 @@ namespace Planer_task_board.Infrastructure.Repository
             task.ChatId = chatId;
             await _context.SaveChangesAsync();
             return task;
-        }
-
-
-        public async Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId)
-        {
-            var tasks = await _context.AccessRights
-                .Where(ar => ar.AccountId == accountId && ar.ResourceType == ResourceType.Board)
-                .Join(_context.Nodes,
-                    ar => ar.ResourceId,
-                    n1 => n1.ParentId,
-                    (ar, n1) => new { ColumnId = n1.ChildId })
-                .Join(_context.Nodes,
-                    x => x.ColumnId,
-                    n2 => n2.ParentId,
-                    (x, n2) => new { TaskId = n2.ChildId })
-                .Join(_context.Tasks,
-                    x => x.TaskId,
-                    t => t.Id,
-                    (x, t) => t)
-                .ToListAsync();
-
-            var taskIds = tasks.Select(e => e.Id);
-
-            var attaches = _context.Tasks
-                .Include(t => t.AttachedMessages)
-                .Where(x => taskIds.Contains(x.Id))
-                .SelectMany(t => t.AttachedMessages);
-
-            return attaches;
         }
     }
 }

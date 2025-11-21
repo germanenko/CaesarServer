@@ -22,6 +22,6 @@ namespace Planer_task_board.Core.Entities.Request
         public string? EndDate { get; set; }
 
         public Guid? ModifiedTaskId { get; set; }
-        public List<Guid> MessageIds { get; set; } = new();
+        public Guid MessageId { get; set; } = new();
     }
 }

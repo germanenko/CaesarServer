@@ -28,7 +28,7 @@ namespace Planer_task_board.Core.Entities.Models
         public DeletedTask? DeletedTask { get; set; }
 
         public Guid CreatorId { get; set; }
-        public List<TaskAttachedMessage> AttachedMessages { get; set; } = new();
+        //public List<TaskAttachedMessage> AttachedMessages { get; set; } = new();
 
 
         public TaskBody ToTaskBody()

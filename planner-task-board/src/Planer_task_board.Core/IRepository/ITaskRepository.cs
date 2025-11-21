@@ -18,7 +18,7 @@ namespace Planer_task_board.Core.IRepository
             string? hexColor,
             BoardColumn column,
             Guid creatorId,
-            List<Guid> messages,
+            Guid message,
             DateTime changeDate);
         Task<TaskModel?> AddAsync(
             Guid id,
@@ -30,7 +30,7 @@ namespace Planer_task_board.Core.IRepository
             DateTime? endDate,
             BoardColumn column,
             Guid creatorId,
-            List<Guid> messages,
+            Guid message,
             TaskModel? parentTask,
             DateTime changeDate);
         Task<TaskModel?> GetAsync(Guid id, bool isDraft);
@@ -69,6 +69,6 @@ namespace Planer_task_board.Core.IRepository
         Task AssignTaskToColumn(TaskModel task, BoardColumn column);
         Task<bool> RemoveTaskFromColumn(Guid taskId, Guid columnId);
         Task<TaskModel?> UpdateTaskChatId(Guid taskId, Guid chatId);
-        Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId);
+        //Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId);
     }
 }

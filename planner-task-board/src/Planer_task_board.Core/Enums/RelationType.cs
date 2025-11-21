@@ -2,6 +2,7 @@
 {
     public enum RelationType
     {
-        Contains
+        Contains,
+        Attach
     }
 }

@@ -118,7 +118,7 @@ namespace Planer_task_board.App.Service
                 body.EndDate != null ? DateTime.Parse(body.EndDate) : null,
                 column,
                 accountId,
-                body.MessageIds,
+                body.MessageId,
                 draftOfTask,
                 body.UpdatedAt);
 

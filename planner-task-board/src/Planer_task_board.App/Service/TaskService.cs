@@ -125,7 +125,7 @@ namespace Planer_task_board.App.Service
                 taskBody.HexColor,
                 column,
                 accountId,
-                taskBody.MessageIds,
+                taskBody.MessageId,
                 taskBody.UpdatedAt);
             if (result == null)
             {
@@ -477,17 +477,17 @@ namespace Planer_task_board.App.Service
         //    };
         //}
 
-        public async Task<ServiceResponse<IEnumerable<TaskAttachedMessageBody>>> GetTasksAttachedMessages(Guid accountId)
-        {
+        //public async Task<ServiceResponse<IEnumerable<TaskAttachedMessageBody>>> GetTasksAttachedMessages(Guid accountId)
+        //{
 
-            var tasksAttachedMessages = await _taskRepository.GetTasksAttachedMessages(accountId);
+        //    var tasksAttachedMessages = await _taskRepository.GetTasksAttachedMessages(accountId);
 
-            return new ServiceResponse<IEnumerable<TaskAttachedMessageBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = tasksAttachedMessages.Select(t => t.ToTaskAttachedMessageBody()),
-                IsSuccess = true
-            };
-        }
+        //    return new ServiceResponse<IEnumerable<TaskAttachedMessageBody>>
+        //    {
+        //        StatusCode = HttpStatusCode.OK,
+        //        Body = tasksAttachedMessages.Select(t => t.ToTaskAttachedMessageBody()),
+        //        IsSuccess = true
+        //    };
+        //}
     }
 }
