@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
@@ -110,12 +110,21 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
         {
-            var result = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
-                .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft).ToListAsync();
+            var result = await _context.Nodes
+                .Where(x => x.ParentId == columnId)
+                .Join(_context.Tasks,
+                    n => n.ChildId,
+                    t => t.Id,
+                    (n, t) => t)
+                .Where(x => x.IsDraft == isDraft)
+                .ToListAsync();
 
-            return result.Select(e => e.Task);
+            //var result = await _context.BoardColumnTasks
+            //    .Include(e => e.Task)
+            //        .ThenInclude(e => e.AttachedMessages)
+            //    .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft).ToListAsync();
+
+            return result;
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, TaskState? status, bool isDraft = false)
@@ -124,38 +133,65 @@ namespace Planer_task_board.Infrastructure.Repository
                 return await GetAll(columnId, isDraft);
 
             var statusString = status.ToString();
-            var tasks = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
-                .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft && e.Task.Status == statusString)
+
+            //var tasks = await _context.BoardColumnTasks
+            //    .Include(e => e.Task)
+            //        .ThenInclude(e => e.AttachedMessages)
+            //    .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft && e.Task.Status == statusString)
+            //    .ToListAsync();
+
+            //var result = tasks.Select(e => e.Task);
+
+            var result = await _context.Nodes
+                .Where(x => x.ParentId == columnId)
+                .Join(_context.Tasks,
+                    n => n.ChildId,
+                    t => t.Id,
+                    (n, t) => t)
+                .Where(x => x.IsDraft == isDraft && x.Status == statusString)
                 .ToListAsync();
 
-            var result = tasks.Select(e => e.Task);
 
             return result;
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId)
         {
-            var result = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
-                .Where(e => e.ColumnId == columnId).ToListAsync();
+            //var result = await _context.BoardColumnTasks
+            //    .Include(e => e.Task)
+            //        .ThenInclude(e => e.AttachedMessages)
+            //    .Where(e => e.ColumnId == columnId).ToListAsync();
 
-            return result.Select(e => e.Task);
+            var result = await _context.Nodes
+                .Where(x => x.ParentId == columnId)
+                .Join(_context.Tasks,
+                    n => n.ChildId,
+                    t => t.Id,
+                    (n, t) => t)
+                .ToListAsync();
+
+            return result;
         }
 
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
-            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
+            var tasks = await _context.AccessRights
+                .Where(ar => ar.AccountId == accountId && ar.ResourceType == ResourceType.Board)
+                .Join(_context.Nodes,
+                    ar => ar.ResourceId,  
+                    n1 => n1.ParentId,    
+                    (ar, n1) => new { ColumnId = n1.ChildId })
+                .Join(_context.Nodes,
+                    x => x.ColumnId,      
+                    n2 => n2.ParentId,    
+                    (x, n2) => new { TaskId = n2.ChildId })
+                .Join(_context.Tasks,
+                    x => x.TaskId,        
+                    t => t.Id,            
+                    (x, t) => t)          
+                .ToListAsync();
 
-            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
-
-            var columns = await _context.BoardColumns.Where(x => columnIds.Contains(x.Id)).ToListAsync();
-
-            var tasks = columns.SelectMany(e => e.Tasks);
-
-            return tasks.Select(m => m.Task);
+            return tasks;
         }
 
         public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
@@ -176,21 +212,29 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> ConvertDraftToTask(Guid id, Guid accountId, BoardColumn column)
         {
-            var boardColumnTask = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.DraftOfTask)
-                .FirstOrDefaultAsync(e =>
-                    e.TaskId == id && !e.Task.IsDraft && e.ColumnId == column.Id
-                );
+            var boardColumnTask = await _context.Nodes
+                .Where(x => x.ParentId == column.Id)
+                .Join(_context.Tasks,
+                    n => n.ChildId,
+                    t => t.Id,
+                    (x, t) => t)
+                .FirstOrDefaultAsync(t => t.Id == id && !t.IsDraft);
+
+            //var boardColumnTask = await _context.BoardColumnTasks
+            //    .Include(e => e.Task)
+            //        .ThenInclude(e => e.AttachedMessages)
+            //    .Include(e => e.Task)
+            //        .ThenInclude(e => e.DraftOfTask)
+            //    .FirstOrDefaultAsync(e =>
+            //        e.TaskId == id && !e.Task.IsDraft && e.ColumnId == column.Id
+            //    );
 
             if (boardColumnTask == null)
                 return null;
 
-            var newTask = boardColumnTask.Task.DraftOfTask;
+            var newTask = boardColumnTask.DraftOfTask;
             bool hasParentTask = newTask.DraftOfTask != null;
-            var oldTask = boardColumnTask.Task;
+            var oldTask = boardColumnTask;
 
             if (hasParentTask)
             {
@@ -255,10 +299,10 @@ namespace Planer_task_board.Infrastructure.Repository
             task.EndDate = endDate;
             task.UpdatedAt = changeDate;
 
-            var boardColumnTask = _context.BoardColumnTasks.Where(x => x.TaskId == task.Id).First();
-            if (boardColumnTask.ColumnId != columnId)
+            var boardColumnTask = _context.Nodes.Where(x => x.ChildId == task.Id).First();
+            if (boardColumnTask.ParentId != columnId)
             {
-                await RemoveTaskFromColumn(task.Id, boardColumnTask.ColumnId);
+                await RemoveTaskFromColumn(task.Id, boardColumnTask.ParentId);
                 var column = _context.BoardColumns.Where(x => x.Id == columnId).First();
                 await AssignTaskToColumn(task, column); 
             }
@@ -311,14 +355,14 @@ namespace Planer_task_board.Infrastructure.Repository
 
             if(column != null)
             {
-                var boardColumnTask = new BoardColumnTask
+                var node = new Node()
                 {
-                    Column = column,
-                    Task = task
+                    ParentId = column.Id,
+                    ChildId = task.Id,
+                    RelationType = RelationType.Contains
                 };
-                boardColumnTask = (await _context.BoardColumnTasks.AddAsync(boardColumnTask))?.Entity;
 
-                task.Columns.Add(boardColumnTask);
+                await _context.Nodes.AddAsync(node);
             }
             
             await _context.SaveChangesAsync();
@@ -357,13 +401,16 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId)
         {
-            var result = await _context.BoardColumnTasks
-                .Include(e => e.Task)
-                    .ThenInclude(e => e.AttachedMessages)
-                .Where(e => e.ColumnId == columnId && e.Task.IsDraft && e.Task.CreatorId == userId)
+            var result = await _context.Nodes
+                .Where(e => e.ParentId == columnId)
+                .Join(_context.Tasks,
+                    n1 => n1.ChildId,
+                    t => t.Id,
+                    (n1, t) => t)
+                .Where(x => x.CreatorId == userId)
                 .ToListAsync();
 
-            return result.Select(e => e.Task);
+            return result;
         }
 
         public async Task<TaskPerformer?> LinkPerformerToTaskAsync(TaskModel task, Guid accountId)
@@ -424,29 +471,29 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task AssignTaskToColumn(TaskModel task, BoardColumn column)
         {
-            var columnTask = await _context.BoardColumnTasks
-                .FirstOrDefaultAsync(e => e.ColumnId == column.Id && e.TaskId == task.Id);
+            var columnTask = await _context.Nodes.FirstOrDefaultAsync(e => e.ParentId == column.Id && e.ChildId == task.Id);
 
             if (columnTask != null)
                 return;
 
-            columnTask = new BoardColumnTask
+            columnTask = new Node
             {
-                Column = column,
-                Task = task
+                ParentId = column.Id,
+                ChildId = task.Id,
+                RelationType = RelationType.Contains
             };
-            await _context.BoardColumnTasks.AddAsync(columnTask);
+            await _context.Nodes.AddAsync(columnTask);
             await _context.SaveChangesAsync();
         }
 
         public async Task<bool> RemoveTaskFromColumn(Guid taskId, Guid columnId)
         {
-            var columnTask = await _context.BoardColumnTasks
-                .FirstOrDefaultAsync(e => e.ColumnId == columnId && e.TaskId == taskId);
+            var columnTask = await _context.Nodes
+                .FirstOrDefaultAsync(e => e.ParentId == columnId && e.ChildId == taskId);
 
             if (columnTask != null)
             {
-                _context.BoardColumnTasks.Remove(columnTask);
+                _context.Nodes.Remove(columnTask);
                 await _context.SaveChangesAsync();
             }
 
@@ -466,41 +513,26 @@ namespace Planer_task_board.Infrastructure.Repository
             return task;
         }
 
-        public async Task<IEnumerable<BoardColumnTask>> GetColumnTaskMembership(Guid accountId)
-        {
-            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
-
-            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
-
-            var columnTaskMembership = await _context.BoardColumnTasks.Where(x => columnIds.Contains(x.ColumnId)).ToListAsync();
-
-            return columnTaskMembership;
-        }
-
-        public async Task<BoardColumnTask?> UpdateColumnTaskMembership(BoardColumnTaskBody boardColumnTaskBody)
-        {
-            var columnTask = await _context.BoardColumnTasks
-                .FirstOrDefaultAsync(e => e.TaskId == boardColumnTaskBody.TaskId);
-
-            if (columnTask == null)
-                return null;
-
-            columnTask.ColumnId = boardColumnTaskBody.ColumnId;
-            await _context.SaveChangesAsync();
-            return columnTask;
-        }
 
         public async Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId)
         {
-            var boards = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
+            var tasks = await _context.AccessRights
+                .Where(ar => ar.AccountId == accountId && ar.ResourceType == ResourceType.Board)
+                .Join(_context.Nodes,
+                    ar => ar.ResourceId,
+                    n1 => n1.ParentId,
+                    (ar, n1) => new { ColumnId = n1.ChildId })
+                .Join(_context.Nodes,
+                    x => x.ColumnId,
+                    n2 => n2.ParentId,
+                    (x, n2) => new { TaskId = n2.ChildId })
+                .Join(_context.Tasks,
+                    x => x.TaskId,
+                    t => t.Id,
+                    (x, t) => t)
+                .ToListAsync();
 
-            var columnIds = await _context.Nodes.Where(x => boards.Contains(x.Id)).Select(x => x.ChildId).ToListAsync();
-
-            var columns = await _context.BoardColumns.Where(x => columnIds.Contains(x.Id)).ToListAsync();
-
-            var tasks = columns.SelectMany(e => e.Tasks);
-
-            var taskIds = tasks.Select(e => e.TaskId);
+            var taskIds = tasks.Select(e => e.Id);
 
             var attaches = _context.Tasks
                 .Include(t => t.AttachedMessages)

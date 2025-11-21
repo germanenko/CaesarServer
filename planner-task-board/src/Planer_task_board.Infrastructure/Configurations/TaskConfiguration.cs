@@ -29,10 +29,6 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.Property(e => e.Type)
                 .IsRequired();
 
-            builder.HasMany(e => e.Columns)
-                .WithOne(e => e.Task)
-                .HasForeignKey(e => e.TaskId);
-
             builder.HasOne(e => e.DeletedTask)
                 .WithOne(e => e.Task)
                 .HasForeignKey<DeletedTask>(e => e.TaskId);

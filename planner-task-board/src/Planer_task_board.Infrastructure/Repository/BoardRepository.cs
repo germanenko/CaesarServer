@@ -91,20 +91,22 @@ namespace Planer_task_board.Infrastructure.Repository
             boardMember = (await _context.AccessRights.AddAsync(boardMember))?.Entity;
             await _context.SaveChangesAsync();
 
-            var columnIds = await _context.Nodes.Where(e => e.ParentId == boardId)
-                .Select(e => e.Id)
-                .ToListAsync();
-
-            var taskIds = await _context.BoardColumnTasks
-                .Where(e => columnIds.Contains(e.ColumnId))
-                .Select(e => e.TaskId)
-                .Distinct()
+            var tasksIds = await _context.Nodes.Where(e => e.ParentId == boardId)
+                .Join(_context.Nodes,
+                    n1 => n1.ChildId,
+                    c => c.ParentId,
+                    (n1, c) => c)
+                .Join(_context.Tasks,
+                    n2 => n2.ChildId,
+                    t => t.Id,
+                    (n2, t) => t)
+                .Select(t => t.Id)
                 .ToListAsync();
 
             var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
             {
                 AccountIds = new List<Guid> { accountId },
-                TaskIds = taskIds,
+                TaskIds = tasksIds,
             };
 
             _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);

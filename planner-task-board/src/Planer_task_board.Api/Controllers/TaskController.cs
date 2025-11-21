@@ -159,24 +159,6 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpGet("columnTaskMemberships"), Authorize]
-        [SwaggerOperation("Получить отношения задач к колонкам")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<BoardColumnTaskBody>))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> GetColumnTaskMembership(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.GetColumnTaskMembership(tokenPayload.AccountId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
         [HttpGet("task/performers"), Authorize]
         [SwaggerOperation("Получить список исполнителей задачи")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]
@@ -285,46 +267,6 @@ namespace Planer_task_board.Api.Controllers
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.RemoveTaskFromColumn(tokenPayload.AccountId, boardId, taskId, columnId);
             return StatusCode((int)result);
-        }
-
-        [HttpPut("updateColumnTaskMembership"), Authorize]
-        [SwaggerOperation("Обновить отношение задачи к колонке")]
-        [SwaggerResponse(200, Type = typeof(BoardColumnTaskBody))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> UpdateColumnTaskMembership(
-            [FromBody] BoardColumnTaskBody columnTaskMembershipBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.UpdateColumnTaskMembership(tokenPayload.AccountId, columnTaskMembershipBody);
-
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
-        [HttpPut("updateColumnTaskMemberships"), Authorize]
-        [SwaggerOperation("Обновить отношения задач к колонкам")]
-        [SwaggerResponse(200, Type = typeof(List<BoardColumnTaskBody>))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> UpdateColumnTaskMemberships(
-            [FromBody] List<BoardColumnTaskBody> columnTaskMembershipsBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.UpdateColumnTaskMemberships(tokenPayload.AccountId, columnTaskMembershipsBody);
-
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [HttpGet("getTasksAttachedMessages"), Authorize]

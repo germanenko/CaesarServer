@@ -25,8 +25,6 @@ namespace Planer_task_board.Core.Entities.Models
         public Guid? DraftOfTaskId { get; set; }
         public Guid? ChatId { get; set; }
 
-        public List<BoardColumnTask> Columns { get; set; } = new();
-
         public DeletedTask? DeletedTask { get; set; }
 
         public Guid CreatorId { get; set; }

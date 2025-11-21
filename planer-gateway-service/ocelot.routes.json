@@ -809,19 +809,6 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/updateColumnTaskMembership",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/updateColumnTaskMembership",
-            "UpstreamHttpMethod": [ "PUT" ]
-        },
-
-	{
             "DownstreamPathTemplate": "/api/getTasksAttachedMessages",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -835,19 +822,6 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/updateColumnTaskMemberships",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/updateColumnTaskMemberships",
-            "UpstreamHttpMethod": [ "PUT" ]
-        },
-
-	{
             "DownstreamPathTemplate": "/api/allTasks",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -857,19 +831,6 @@
                 }
             ],
             "UpstreamPathTemplate": "/api/allTasks",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-	
-	{
-            "DownstreamPathTemplate": "/api/columnTaskMemberships",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/columnTaskMemberships",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
