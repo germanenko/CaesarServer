@@ -30,7 +30,17 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, CreateColumnBody column)
         {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
+            var board = await _boardRepository.GetBoard(column.Id);
+            if (board == null)
+            {
+                return new ServiceResponse<BoardColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
             if (boardMember == null)
             {
                 return new ServiceResponse<BoardColumnBody>
@@ -40,15 +50,7 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            var board = await _boardRepository.GetAsync(column.BoardId);
-            if (board == null)
-            {
-                return new ServiceResponse<BoardColumnBody>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
-                };
-            }
+            
 
             var result = await _boardRepository.AddBoardColumn(board, column, accountId);
 
@@ -74,7 +76,8 @@ namespace Planer_task_board.App.Service
             List<BoardColumn>? newColumns = new List<BoardColumn>();
             foreach (var column in columns)
             {
-                var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, column.BoardId);
+                var board = await _boardRepository.GetBoard(column.Id);
+                var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
                 if (boardMember == null)
                 {
                     return new ServiceResponse<List<BoardColumnBody>>
@@ -84,15 +87,15 @@ namespace Planer_task_board.App.Service
                     };
                 }
 
-                var board = await _boardRepository.GetAsync(column.BoardId);
-                if (board == null)
-                {
-                    return new ServiceResponse<List<BoardColumnBody>>
-                    {
-                        IsSuccess = false,
-                        StatusCode = HttpStatusCode.BadRequest
-                    };
-                } 
+                //var board = await _boardRepository.GetAsync(column.BoardId);
+                //if (board == null)
+                //{
+                //    return new ServiceResponse<List<BoardColumnBody>>
+                //    {
+                //        IsSuccess = false,
+                //        StatusCode = HttpStatusCode.BadRequest
+                //    };
+                //} 
             }
 
             newColumns = await _boardRepository.AddBoardColumns(columns, accountId);

@@ -19,5 +19,6 @@ namespace Planer_task_board.Core.IRepository
         Task<AccessRight?> AddBoardMember(Guid accountId, Guid boardId, AccessType accessType);
         Task<BoardColumn?> AddBoardColumn(Board board, CreateColumnBody column, Guid accountId);
         Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId);
+        Task<Board?> GetBoard(Guid columnId);
     }
 }
