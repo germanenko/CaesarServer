@@ -56,7 +56,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
 
             if (!accessibleResourceIds.Any())
-                return Enumerable.Empty<Node>();
+                return null;
 
             // —оздаем CTE запрос дл€ каждого доступного ресурса
             var allTreesNodes = new List<Node>();
@@ -69,6 +69,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             return allTreesNodes.Distinct().ToList();
         }
+
         private async Task<List<Node>> GetTreeByRootId(Guid rootId)
         {
             var query = @"

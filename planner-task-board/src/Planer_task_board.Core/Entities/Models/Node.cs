@@ -1,9 +1,4 @@
 ﻿using Planer_task_board.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Planer_task_board.Core.Entities.Models
 {
@@ -12,6 +7,7 @@ namespace Planer_task_board.Core.Entities.Models
         public Guid Id { get; set; }
         public Guid ParentId { get; set; }
         public Guid ChildId { get; set; }
+        public ResourceType ChildType { get; set; }
         public RelationType RelationType { get; set; }
     }
 }

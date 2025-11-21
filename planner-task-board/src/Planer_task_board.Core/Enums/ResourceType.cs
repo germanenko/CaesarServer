@@ -8,6 +8,8 @@ namespace Planer_task_board.Core.Enums
 {
     public enum ResourceType
     {
-        Board
+        Board,
+        Column,
+        Task
     }
 }

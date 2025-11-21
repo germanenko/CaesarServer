@@ -117,11 +117,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Where(x => x.IsDraft == isDraft)
                 .ToListAsync();
 
-            //var result = await _context.BoardColumnTasks
-            //    .Include(e => e.Task)
-            //        .ThenInclude(e => e.AttachedMessages)
-            //    .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft).ToListAsync();
-
             return result;
         }
 
@@ -131,14 +126,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 return await GetAll(columnId, isDraft);
 
             var statusString = status.ToString();
-
-            //var tasks = await _context.BoardColumnTasks
-            //    .Include(e => e.Task)
-            //        .ThenInclude(e => e.AttachedMessages)
-            //    .Where(e => e.ColumnId == columnId && e.Task.IsDraft == isDraft && e.Task.Status == statusString)
-            //    .ToListAsync();
-
-            //var result = tasks.Select(e => e.Task);
 
             var result = await _context.Nodes
                 .Where(x => x.ParentId == columnId)
@@ -155,11 +142,6 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId)
         {
-            //var result = await _context.BoardColumnTasks
-            //    .Include(e => e.Task)
-            //        .ThenInclude(e => e.AttachedMessages)
-            //    .Where(e => e.ColumnId == columnId).ToListAsync();
-
             var result = await _context.Nodes
                 .Where(x => x.ParentId == columnId)
                 .Join(_context.Tasks,
@@ -216,15 +198,6 @@ namespace Planer_task_board.Infrastructure.Repository
                     t => t.Id,
                     (x, t) => t)
                 .FirstOrDefaultAsync(t => t.Id == id && !t.IsDraft);
-
-            //var boardColumnTask = await _context.BoardColumnTasks
-            //    .Include(e => e.Task)
-            //        .ThenInclude(e => e.AttachedMessages)
-            //    .Include(e => e.Task)
-            //        .ThenInclude(e => e.DraftOfTask)
-            //    .FirstOrDefaultAsync(e =>
-            //        e.TaskId == id && !e.Task.IsDraft && e.ColumnId == column.Id
-            //    );
 
             if (boardColumnTask == null)
                 return null;
