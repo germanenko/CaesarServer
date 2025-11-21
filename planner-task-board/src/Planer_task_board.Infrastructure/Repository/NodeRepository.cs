@@ -58,27 +58,29 @@ namespace Planer_task_board.Infrastructure.Repository
             if (!accessibleResourceIds.Any())
                 return Enumerable.Empty<Node>();
 
-            var parameters = accessibleResourceIds.Select((id, index) => new NpgsqlParameter($"p{index}", id)).ToArray();
-            var placeholders = string.Join(", ", parameters.Select(p => p.ParameterName));
+            var allNodes = await _context.Nodes.ToListAsync();
+            var resultNodes = new HashSet<Node>();
+            var nodesToProcess = new Queue<Guid>(accessibleResourceIds);
 
-            var query = $@"
-                WITH RECURSIVE node_tree AS (
-                    SELECT ""Id"", ""ParentId""
-                    FROM ""Nodes""
-                    WHERE ""Id"" IN ({placeholders})
-                    UNION ALL
-                    SELECT n.""Id"", n.""ParentId""
-                    FROM ""Nodes"" n
-                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""Id""
-                )
-                SELECT n.* FROM ""Nodes"" n
-                INNER JOIN node_tree nt ON n.""Id"" = nt.""Id""";
+            while (nodesToProcess.Count > 0)
+            {
+                var currentNodeId = nodesToProcess.Dequeue();
+                var currentNode = allNodes.FirstOrDefault(x => x.Id == currentNodeId);
 
-            var nodes = await _context.Nodes
-                .FromSqlRaw(query, parameters.Cast<object>().ToArray())
-                .ToListAsync();
+                if (currentNode != null && resultNodes.Add(currentNode))
+                {
+                    var childrenIds = allNodes
+                        .Where(x => x.ParentId == currentNodeId)
+                        .Select(x => x.Id);
 
-            return nodes;
+                    foreach (var childId in childrenIds)
+                    {
+                        nodesToProcess.Enqueue(childId);
+                    }
+                }
+            }
+
+            return resultNodes.ToList();
 
             //var accessibleResourceIds = await _context.AccessRights
             //    .Where(x => x.AccountId == accountId)
