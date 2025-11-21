@@ -63,16 +63,16 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var query = $@"
                 WITH RECURSIVE node_tree AS (
-                SELECT Id, ParentId
-                FROM Nodes
-                WHERE Id IN ({placeholders})
-                UNION ALL
-                SELECT n.Id, n.ParentId
-                FROM Nodes n
-                INNER JOIN node_tree nt ON n.ParentId = nt.Id
-            )
-                SELECT n.* FROM Nodes n
-                INNER JOIN node_tree nt ON n.Id = nt.Id";
+                    SELECT ""Id"", ""ParentId""
+                    FROM ""Nodes""
+                    WHERE ""Id"" IN ({placeholders})
+                    UNION ALL
+                    SELECT n.""Id"", n.""ParentId""
+                    FROM ""Nodes"" n
+                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""Id""
+                )
+                SELECT n.* FROM ""Nodes"" n
+                INNER JOIN node_tree nt ON n.""Id"" = nt.""Id""";
 
             var nodes = await _context.Nodes
                 .FromSqlRaw(query, parameters.Cast<object>().ToArray())
