@@ -5,7 +5,7 @@ namespace Planer_task_board.Core.IRepository
 {
     public interface INodeRepository
     {
-        Task<Node?> AddNode(Guid parentId, Guid childId, RelationType relationType);
+        Task<Node> AddOrUpdateNode(Guid accountId, Node node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId);
     }

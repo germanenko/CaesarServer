@@ -31,5 +31,17 @@ namespace Planer_task_board.App.Service
                 Body = nodes
             };
         }
+
+        public async Task<ServiceResponse<Node>> AddOrUpdateNode(Guid accountId, Node node)
+        {
+            var nodes = await _nodeRepository.AddOrUpdateNode(accountId, node);
+
+            return new ServiceResponse<Node>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = nodes
+            };
+        }
     }
 }

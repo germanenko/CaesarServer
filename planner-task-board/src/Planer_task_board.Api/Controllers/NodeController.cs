@@ -3,6 +3,7 @@ using System.Net;
 using System.Net.Http.Headers;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
@@ -36,6 +37,20 @@ namespace Planer_task_board.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.GetNodes(tokenPayload.AccountId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("createOrUpdateNode"), Authorize]
+        [SwaggerOperation("Создать или обновить ноду")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> AddOrUpdateNode(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromBody] Node node
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.AddOrUpdateNode(tokenPayload.AccountId, node);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }
