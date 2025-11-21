@@ -30,29 +30,7 @@ namespace Planer_task_board.App.Service
 
         public async Task<ServiceResponse<BoardColumnBody>> AddColumn(Guid accountId, CreateColumnBody column)
         {
-            var board = await _boardRepository.GetBoard(column.Id);
-            if (board == null)
-            {
-                return new ServiceResponse<BoardColumnBody>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
-                };
-            }
-
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
-            if (boardMember == null)
-            {
-                return new ServiceResponse<BoardColumnBody>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.Forbidden
-                };
-            }
-
-            
-
-            var result = await _boardRepository.AddBoardColumn(board, column, accountId);
+            var result = await _boardRepository.AddBoardColumn(column, accountId);
 
             if(result == null)
             {

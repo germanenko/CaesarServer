@@ -211,7 +211,7 @@ namespace Planer_task_board.Infrastructure.Repository
             //    .ToListAsync();
         }
 
-        public async Task<BoardColumn?> AddBoardColumn(Board board, CreateColumnBody column, Guid accountId)
+        public async Task<BoardColumn?> AddBoardColumn(CreateColumnBody column, Guid accountId)
         {
             var boardColumn = new BoardColumn
             {
@@ -231,13 +231,6 @@ namespace Planer_task_board.Infrastructure.Repository
             //};
             //await _context.BoardColumnMembers.AddAsync(boardColumnMember);
 
-            var node = new Node()
-            {
-                ParentId = board.Id,
-                ChildId = column.Id,
-                RelationType = RelationType.Contains
-            };
-            await _context.Nodes.AddAsync(node);
 
             await _context.SaveChangesAsync();
 
