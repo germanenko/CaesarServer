@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
@@ -49,11 +50,45 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
+            var accessibleResourceIds = await _context.AccessRights
+                .Where(x => x.AccountId == accountId)
+                .Select(x => x.ResourceId)
+                .ToListAsync();
+
+            if (!accessibleResourceIds.Any())
+                return Enumerable.Empty<Node>();
+
+            // —оздаем CTE запрос дл€ каждого доступного ресурса
+            var allTreesNodes = new List<Node>();
+
+            foreach (var resourceId in accessibleResourceIds)
+            {
+                var treeNodes = await GetTreeByRootId(resourceId);
+                allTreesNodes.AddRange(treeNodes);
+            }
+
+            return allTreesNodes.Distinct().ToList();
+
             var access = await _context.AccessRights.Where(x => x.AccountId == accountId).Select(x => x.ResourceId).ToListAsync();
 
             var nodes = await _context.Nodes.Where(x => access.Contains(x.ParentId)).ToListAsync();
 
             return nodes;
+        }
+        private async Task<List<Node>> GetTreeByRootId(Guid rootId)
+        {
+            var query = @"
+                WITH RECURSIVE node_tree AS (
+                    SELECT * FROM ""Nodes"" WHERE ""ParentId"" = @rootId
+                    UNION ALL
+                    SELECT n.* FROM ""Nodes"" n
+                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
+                )
+                SELECT * FROM node_tree";
+
+            return await _context.Nodes
+                .FromSqlRaw(query, new NpgsqlParameter("@rootId", rootId))
+                .ToListAsync();
         }
     }
 }
