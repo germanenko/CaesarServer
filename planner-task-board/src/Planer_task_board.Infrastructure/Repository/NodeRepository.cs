@@ -110,9 +110,9 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var query = @"
                 WITH RECURSIVE node_tree AS (
-                    SELECT * FROM ""Nodes"" WHERE ""ParentId"" = @rootId
+                    SELECT * FROM ""NodeLinks"" WHERE ""ParentId"" = @rootId
                     UNION ALL
-                    SELECT n.* FROM ""Nodes"" n
+                    SELECT n.* FROM ""NodeLinks"" n
                     INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
                 )
                 SELECT * FROM node_tree";
