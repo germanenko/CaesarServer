@@ -13,6 +13,6 @@ namespace Planer_task_board.Core.Entities.Models
         public Guid AccountId { get; set; }
         public Guid ResourceId { get; set; }
         public AccessType AccessType { get; set; }
-        public ResourceType ResourceType { get; set; }
+        public NodeType ResourceType { get; set; }
     }
 }

@@ -28,7 +28,7 @@ namespace Planer_task_board.Infrastructure.Repository
             };
 
             task = (await _context.DeletedTasks.AddAsync(task))?.Entity;
-            deletedTask.Status = TaskState.Deleted.ToString();
+            deletedTask.Status = Status.Deleted.ToString();
             await _context.SaveChangesAsync();
 
             return task;
@@ -53,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 return true;
 
             _context.DeletedTasks.Remove(deletedTask);
-            deletedTask.Task.Status = TaskState.Undefined.ToString();
+            deletedTask.Task.Status = Status.Undefined.ToString();
             await _context.SaveChangesAsync();
             return true;
         }

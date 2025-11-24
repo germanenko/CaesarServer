@@ -81,7 +81,7 @@ namespace Planer_task_board.Api.Controllers
         }
 
         [HttpGet("board/columns"), Authorize]
-        [SwaggerOperation("Получить список колоннок")]
+        [SwaggerOperation("Получить список колонок")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<BoardColumnBody>))]
 
         public async Task<IActionResult> GetColumnsByBoard(
@@ -164,20 +164,6 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> AddColumns(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            List<CreateColumnBody> columns
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddColumns(tokenPayload.AccountId, columns);
-            return StatusCode((int)result.StatusCode, result.Body);
-        }
-
-        [HttpPost("getNodes"), Authorize]
-        [SwaggerOperation("Получить ноды")]
-        [SwaggerResponse(200)]
-
-        public async Task<IActionResult> GetNodes(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             List<CreateColumnBody> columns
         )

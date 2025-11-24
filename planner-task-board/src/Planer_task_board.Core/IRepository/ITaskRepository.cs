@@ -11,7 +11,7 @@ namespace Planer_task_board.Core.IRepository
             string title,
             string description,
             int priorityOrder,
-            TaskState taskState,
+            Status taskState,
             TaskType taskType,
             DateTime? startDate,
             DateTime? endDate,
@@ -35,7 +35,7 @@ namespace Planer_task_board.Core.IRepository
             DateTime changeDate);
         Task<TaskModel?> GetAsync(Guid id, bool isDraft);
         Task<bool> RemoveAsync(Guid id, bool isDraft);
-        Task<IEnumerable<TaskModel>> GetAll(Guid columnId, TaskState? status, bool isDraft = false);
+        Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Status? status, bool isDraft = false);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId);
@@ -46,7 +46,7 @@ namespace Planer_task_board.Core.IRepository
             string title,
             string description,
             int priorityOrder,
-            TaskState taskState,
+            Status taskState,
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,

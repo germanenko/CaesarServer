@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Planer_task_board.Core.Enums
 {
-    public enum ResourceType
+    public enum NodeType
     {
         Board,
         Column,

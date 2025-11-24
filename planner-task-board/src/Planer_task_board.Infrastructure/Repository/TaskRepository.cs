@@ -27,7 +27,7 @@ namespace Planer_task_board.Infrastructure.Repository
             string title,
             string description,
             int priorityOrder,
-            TaskState taskState,
+            Status taskState,
             TaskType taskType,
             DateTime? startDate,
             DateTime? endDate,
@@ -87,7 +87,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Description = description,
                 HexColor = hexColor,
                 PriorityOrder = 0,
-                Status = TaskState.Undefined.ToString(),
+                Status = Status.Undefined.ToString(),
                 CreatorId = creatorId,
                 IsDraft = true,
                 StartDate = startDate?.ToUniversalTime(),
@@ -108,7 +108,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
         {
-            var result = await _context.Nodes
+            var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId)
                 .Join(_context.Tasks,
                     n => n.ChildId,
@@ -120,14 +120,14 @@ namespace Planer_task_board.Infrastructure.Repository
             return result;
         }
 
-        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, TaskState? status, bool isDraft = false)
+        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Status? status, bool isDraft = false)
         {
             if (status == null)
                 return await GetAll(columnId, isDraft);
 
             var statusString = status.ToString();
 
-            var result = await _context.Nodes
+            var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId)
                 .Join(_context.Tasks,
                     n => n.ChildId,
@@ -142,7 +142,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId)
         {
-            var result = await _context.Nodes
+            var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId)
                 .Join(_context.Tasks,
                     n => n.ChildId,
@@ -156,12 +156,12 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
             var tasks = await _context.AccessRights
-                .Where(ar => ar.AccountId == accountId && ar.ResourceType == ResourceType.Board)
-                .Join(_context.Nodes,
+                .Where(ar => ar.AccountId == accountId && ar.ResourceType == NodeType.Board)
+                .Join(_context.NodeLinks,
                     ar => ar.ResourceId,  
                     n1 => n1.ParentId,    
                     (ar, n1) => new { ColumnId = n1.ChildId })
-                .Join(_context.Nodes,
+                .Join(_context.NodeLinks,
                     x => x.ColumnId,      
                     n2 => n2.ParentId,    
                     (x, n2) => new { TaskId = n2.ChildId })
@@ -191,7 +191,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> ConvertDraftToTask(Guid id, Guid accountId, BoardColumn column)
         {
-            var boardColumnTask = await _context.Nodes
+            var boardColumnTask = await _context.NodeLinks
                 .Where(x => x.ParentId == column.Id)
                 .Join(_context.Tasks,
                     n => n.ChildId,
@@ -248,7 +248,7 @@ namespace Planer_task_board.Infrastructure.Repository
             string title,
             string description,
             int priorityOrder,
-            TaskState taskState,
+            Status taskState,
             DateTime? startDate,
             DateTime? endDate,
             string? hexColor,
@@ -269,7 +269,7 @@ namespace Planer_task_board.Infrastructure.Repository
             task.EndDate = endDate;
             task.UpdatedAt = changeDate;
 
-            var boardColumnTask = _context.Nodes.Where(x => x.ChildId == task.Id).First();
+            var boardColumnTask = _context.NodeLinks.Where(x => x.ChildId == task.Id).First();
             if (boardColumnTask.ParentId != columnId)
             {
                 await RemoveTaskFromColumn(task.Id, boardColumnTask.ParentId);
@@ -323,21 +323,21 @@ namespace Planer_task_board.Infrastructure.Repository
 
             if(column != null)
             {
-                var node = new Node()
+                var node = new NodeLink()
                 {
                     ParentId = column.Id,
                     ChildId = task.Id,
                     RelationType = RelationType.Contains
                 };
 
-                await _context.Nodes.AddAsync(node);
+                await _context.NodeLinks.AddAsync(node);
             }
 
 
 
             if (taskAttachedMessage != null)
             {
-                _context.Nodes.Add(new Node()
+                _context.NodeLinks.Add(new NodeLink()
                 {
                     ParentId = taskAttachedMessage.MessageId,
                     ChildId = task.Id,
@@ -362,7 +362,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             if (column != null)
             {
-                var boardMembers = await _context.Nodes.Where(e => e.ChildId == column.Id)
+                var boardMembers = await _context.NodeLinks.Where(e => e.ChildId == column.Id)
                     .Join(_context.Boards,
                         n => n.ParentId,
                         b => b.Id,
@@ -390,7 +390,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId)
         {
-            var result = await _context.Nodes
+            var result = await _context.NodeLinks
                 .Where(e => e.ParentId == columnId)
                 .Join(_context.Tasks,
                     n1 => n1.ChildId,
@@ -460,29 +460,29 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task AssignTaskToColumn(TaskModel task, BoardColumn column)
         {
-            var columnTask = await _context.Nodes.FirstOrDefaultAsync(e => e.ParentId == column.Id && e.ChildId == task.Id);
+            var columnTask = await _context.NodeLinks.FirstOrDefaultAsync(e => e.ParentId == column.Id && e.ChildId == task.Id);
 
             if (columnTask != null)
                 return;
 
-            columnTask = new Node
+            columnTask = new NodeLink
             {
                 ParentId = column.Id,
                 ChildId = task.Id,
                 RelationType = RelationType.Contains
             };
-            await _context.Nodes.AddAsync(columnTask);
+            await _context.NodeLinks.AddAsync(columnTask);
             await _context.SaveChangesAsync();
         }
 
         public async Task<bool> RemoveTaskFromColumn(Guid taskId, Guid columnId)
         {
-            var columnTask = await _context.Nodes
+            var columnTask = await _context.NodeLinks
                 .FirstOrDefaultAsync(e => e.ParentId == columnId && e.ChildId == taskId);
 
             if (columnTask != null)
             {
-                _context.Nodes.Remove(columnTask);
+                _context.NodeLinks.Remove(columnTask);
                 await _context.SaveChangesAsync();
             }
 

@@ -23,6 +23,7 @@ namespace Planer_task_board.Infrastructure.Data
         public DbSet<Board> Boards { get; set; }
         public DbSet<TaskPerformer> TaskPerformers { get; set; }
         public DbSet<Node> Nodes { get; set; }
+        public DbSet<NodeLink> NodeLinks { get; set; }
         public DbSet<AccessRight> AccessRights { get; set; }
     }
 }

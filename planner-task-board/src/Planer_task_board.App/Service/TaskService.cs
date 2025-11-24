@@ -204,7 +204,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, TaskState? state)
+        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, Status? state)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)

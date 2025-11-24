@@ -601,6 +601,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/getNodeLinks",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getNodeLinks",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/createOrUpdateNode",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -610,6 +623,19 @@
                 }
             ],
             "UpstreamPathTemplate": "/api/createOrUpdateNode",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/createOrUpdateNodeLink",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/createOrUpdateNodeLink",
             "UpstreamHttpMethod": [ "POST" ]
         },
 

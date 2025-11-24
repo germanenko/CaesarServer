@@ -130,7 +130,7 @@ namespace Planer_task_board.Api.Controllers
             [FromQuery, Required] Guid boardId,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] TaskState? status = null
+            [FromQuery] Status? status = null
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

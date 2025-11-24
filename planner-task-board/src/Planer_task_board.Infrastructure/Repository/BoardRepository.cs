@@ -31,6 +31,15 @@ namespace Planer_task_board.Infrastructure.Repository
                 UpdatedAt = createBoardBody.UpdatedAt
             };
 
+            var boardNode = new Node
+            {
+                Id = createBoardBody.Id,
+                Name = createBoardBody.Name,
+                UpdatedAt = createBoardBody.UpdatedAt,
+                CreatedAt = createBoardBody.UpdatedAt,
+                CreatedBy = accountId
+            };
+
             await _context.AccessRights.AddAsync(new AccessRight()
             {
                 AccountId = accountId,
@@ -40,6 +49,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
 
             board = (await _context.Boards.AddAsync(board))?.Entity;
+            boardNode = (await _context.Nodes.AddAsync(boardNode))?.Entity;
             await _context.SaveChangesAsync();
 
             return board;
@@ -48,6 +58,7 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
         {
             List<Board> newBoards = new List<Board>();
+            List<Node> newBoardNodes = new List<Node>();
             foreach (var board in boards)
             {
                 var newBoard = new Board()
@@ -58,6 +69,16 @@ namespace Planer_task_board.Infrastructure.Repository
                 };
                 newBoards.Add(newBoard);
 
+                var boardNode = new Node
+                {
+                    Id = board.Id,
+                    Name = board.Name,
+                    UpdatedAt = board.UpdatedAt,
+                    CreatedAt = board.UpdatedAt,
+                    CreatedBy = accountId
+                };
+                newBoardNodes.Add(boardNode);
+
                 await _context.AccessRights.AddAsync(new AccessRight()
                 {
                     AccountId = accountId,
@@ -66,6 +87,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 });
             }
             await _context.Boards.AddRangeAsync(newBoards);
+            await _context.Nodes.AddRangeAsync(newBoardNodes);
             await _context.SaveChangesAsync();
 
             return newBoards;
@@ -91,8 +113,8 @@ namespace Planer_task_board.Infrastructure.Repository
             boardMember = (await _context.AccessRights.AddAsync(boardMember))?.Entity;
             await _context.SaveChangesAsync();
 
-            var tasksIds = await _context.Nodes.Where(e => e.ParentId == boardId)
-                .Join(_context.Nodes,
+            var tasksIds = await _context.NodeLinks.Where(e => e.ParentId == boardId)
+                .Join(_context.NodeLinks,
                     n1 => n1.ChildId,
                     c => c.ParentId,
                     (n1, c) => c)
@@ -120,7 +142,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Board>> GetAll(Guid accountId)
         {
-            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board).Select(x => x.ResourceId).ToListAsync();
+            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == NodeType.Board).Select(x => x.ResourceId).ToListAsync();
 
             var boards = await _context.Boards.Where(x => access.Contains(x.Id)).ToListAsync();
 
@@ -132,7 +154,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<BoardColumn>> GetBoardColumns(Guid boardId)
         {
-            var nodes = await _context.Nodes.Where(x => x.ParentId == boardId && x.ChildType == ResourceType.Column).Select(x => x.ChildId).ToListAsync();
+            var nodes = await _context.NodeLinks.Where(x => x.ParentId == boardId && x.ChildType == NodeType.Column).Select(x => x.ChildId).ToListAsync();
 
             return await _context.BoardColumns.Where(x => nodes.Contains(x.Id)).ToListAsync();
         }
@@ -140,11 +162,11 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<IEnumerable<BoardColumn>> GetAllBoardColumns(Guid accountId)
         {
             var access = await _context.AccessRights
-                .Where(x => x.AccountId == accountId && x.ResourceType == ResourceType.Board)
+                .Where(x => x.AccountId == accountId && x.ResourceType == NodeType.Board)
                 .Select(x => x.ResourceId)
                 .ToListAsync();
 
-            var columnIds = await _context.Nodes.Where(x => access.Contains(x.ParentId) && x.ChildType == ResourceType.Column).Select(x => x.ChildId).ToListAsync();
+            var columnIds = await _context.NodeLinks.Where(x => access.Contains(x.ParentId) && x.ChildType == NodeType.Column).Select(x => x.ChildId).ToListAsync();
 
             var columns = await _context.BoardColumns.Where(x => columnIds.Contains(x.Id)).ToListAsync();
 
@@ -159,7 +181,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Board?> GetBoard(Guid columnId)
         {
-            return await _context.Nodes
+            return await _context.NodeLinks
                 .Where(e => e.ChildId == columnId)
                 .Join(_context.Boards,
                 n => n.ParentId,
@@ -194,7 +216,17 @@ namespace Planer_task_board.Infrastructure.Repository
                 UpdatedAt = column.UpdatedAt
             };
 
+            var columnNode = new Node
+            {
+                Id = column.Id,
+                Name = column.Name,
+                UpdatedAt = column.UpdatedAt,
+                CreatedBy = accountId,
+                CreatedAt = column.UpdatedAt
+            };
+
             boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
+            columnNode = (await _context.Nodes.AddAsync(columnNode))?.Entity;
 
             await _context.SaveChangesAsync();
 
@@ -204,6 +236,7 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
         {
             var boardColumns = new List<BoardColumn>();
+            var columnNodes = new List<Node>();
 
             foreach (var column in columns)
             {
@@ -213,9 +246,20 @@ namespace Planer_task_board.Infrastructure.Repository
                     Name = column.Name,
                 };
                 boardColumns.Add(newColumn);
+
+                var columnNode = new Node
+                {
+                    Id = column.Id,
+                    Name = column.Name,
+                    UpdatedAt = column.UpdatedAt,
+                    CreatedBy = accountId,
+                    CreatedAt = column.UpdatedAt
+                };
+                columnNodes.Add(columnNode);
             }
 
             await _context.BoardColumns.AddRangeAsync(boardColumns);
+            await _context.Nodes.AddRangeAsync(columnNodes);
 
             await _context.SaveChangesAsync();
 

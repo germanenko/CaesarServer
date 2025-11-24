@@ -40,7 +40,7 @@ namespace Planer_task_board.Core.Entities.Models
                 Description = Description,
                 HexColor = HexColor,
                 PriorityOrder = PriorityOrder,
-                Status = Enum.Parse<TaskState>(Status),
+                Status = Enum.Parse<Status>(Status),
                 StartDate = StartDate?.ToString("s"),
                 EndDate = EndDate?.ToString("s"),
                 ChatId = ChatId,

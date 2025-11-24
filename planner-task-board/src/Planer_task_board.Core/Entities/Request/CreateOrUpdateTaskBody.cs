@@ -15,8 +15,8 @@ namespace Planer_task_board.Core.Entities.Request
         [Range(0, 10)]
         public int PriorityOrder { get; set; }
 
-        [EnumDataType(typeof(TaskState))]
-        public TaskState Status { get; set; }
+        [EnumDataType(typeof(Status))]
+        public Status Status { get; set; }
 
         [EnumDataType(typeof(TaskType))]
         public TaskType Type { get; set; }

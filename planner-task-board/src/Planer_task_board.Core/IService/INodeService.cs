@@ -11,6 +11,8 @@ namespace Planer_task_board.Core.IService
     public interface INodeService
     {
         public Task<ServiceResponse<IEnumerable<Node>>> GetNodes(Guid accountId);
+        public Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<Node>> AddOrUpdateNode(Guid accountId, Node node);
+        public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, NodeLink node);
     }
 }

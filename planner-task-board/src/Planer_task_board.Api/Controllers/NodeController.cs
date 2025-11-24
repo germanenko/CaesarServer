@@ -40,6 +40,19 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
+        [HttpGet("getNodeLinks"), Authorize]
+        [SwaggerOperation("Получить связи")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> GetNodeLinks(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.GetNodeLinks(tokenPayload.AccountId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpPost("createOrUpdateNode"), Authorize]
         [SwaggerOperation("Создать или обновить ноду")]
         [SwaggerResponse(200)]
@@ -51,6 +64,20 @@ namespace Planer_task_board.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.AddOrUpdateNode(tokenPayload.AccountId, node);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("createOrUpdateNodeLink"), Authorize]
+        [SwaggerOperation("Создать или обновить связь")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> AddOrUpdateNodeLink(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromBody] NodeLink node
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.AddOrUpdateNodeLink(tokenPayload.AccountId, node);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }
