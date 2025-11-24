@@ -7,6 +7,8 @@ using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using Planer_task_board.Infrastructure.Data;
+using System.Text.Json;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace Planer_task_board.Infrastructure.Repository
 {
@@ -277,6 +279,18 @@ namespace Planer_task_board.Infrastructure.Repository
                 await AssignTaskToColumn(task, column); 
             }
 
+            var node = await _context.Nodes
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            node = new Node()
+            {
+                Name = task.Title,
+                Status = Enum.Parse<Status>(task.Status),
+                UpdatedBy = task.CreatorId,
+                UpdatedAt = changeDate,
+                Props = JsonSerializer.Serialize(task)
+            };
+
             await _context.SaveChangesAsync();
 
             return task;
@@ -321,16 +335,27 @@ namespace Planer_task_board.Infrastructure.Repository
 
             task = (await _context.Tasks.AddAsync(task))?.Entity;
 
-            if(column != null)
+            var node = new Node()
             {
-                var node = new NodeLink()
+                Name = task.Title,
+                Status = Enum.Parse<Status>(task.Status),
+                CreatedAt = task.CreatedAtDate,
+                Type = NodeType.Task,
+                CreatedBy = task.CreatorId,
+                Props = JsonSerializer.Serialize(task)
+            };
+            await _context.Nodes.AddAsync(node);
+
+            if (column != null)
+            {
+                var nodeLink = new NodeLink()
                 {
                     ParentId = column.Id,
                     ChildId = task.Id,
                     RelationType = RelationType.Contains
                 };
 
-                await _context.NodeLinks.AddAsync(node);
+                await _context.NodeLinks.AddAsync(nodeLink);
             }
 
 
