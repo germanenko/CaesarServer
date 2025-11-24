@@ -35,7 +35,6 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = createBoardBody.Id,
                 Name = createBoardBody.Name,
-                Type = NodeType.Board,
                 UpdatedAt = createBoardBody.UpdatedAt,
                 CreatedAt = createBoardBody.UpdatedAt,
                 CreatedBy = accountId
@@ -74,7 +73,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 {
                     Id = board.Id,
                     Name = board.Name,
-                    Type = NodeType.Board,
                     UpdatedAt = board.UpdatedAt,
                     CreatedAt = board.UpdatedAt,
                     CreatedBy = accountId
@@ -142,12 +140,11 @@ namespace Planer_task_board.Infrastructure.Repository
             return await _context.AccessRights.FirstOrDefaultAsync(e => e.ResourceId == boardId && e.AccountId == accountId);
         }
 
-        public async Task<IEnumerable<Node>> GetAll(Guid accountId)
+        public async Task<IEnumerable<Board>> GetAll(Guid accountId)
         {
             var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == NodeType.Board).Select(x => x.ResourceId).ToListAsync();
 
-            //var boards = await _context.Boards.Where(x => access.Contains(x.Id)).ToListAsync();
-            var boards = await _context.Nodes.Where(x => access.Contains(x.Id)).ToListAsync();
+            var boards = await _context.Boards.Where(x => access.Contains(x.Id)).ToListAsync();
 
             return boards;
         }
@@ -223,7 +220,6 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = column.Id,
                 Name = column.Name,
-                Type = NodeType.Column,
                 UpdatedAt = column.UpdatedAt,
                 CreatedBy = accountId,
                 CreatedAt = column.UpdatedAt
@@ -255,7 +251,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 {
                     Id = column.Id,
                     Name = column.Name,
-                    Type = NodeType.Column,
                     UpdatedAt = column.UpdatedAt,
                     CreatedBy = accountId,
                     CreatedAt = column.UpdatedAt

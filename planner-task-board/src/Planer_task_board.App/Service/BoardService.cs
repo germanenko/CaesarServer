@@ -173,15 +173,15 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<Node>>> GetBoardsAsync(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId)
         {
             var result = await _boardRepository.GetAll(accountId);
 
-            return new ServiceResponse<IEnumerable<Node>>
+            return new ServiceResponse<IEnumerable<BoardBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.Select(b => b.ToBoardBody())
             };
         }
     }

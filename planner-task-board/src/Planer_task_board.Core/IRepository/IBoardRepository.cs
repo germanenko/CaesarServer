@@ -6,7 +6,7 @@ namespace Planer_task_board.Core.IRepository
 {
     public interface IBoardRepository
     {
-        Task<IEnumerable<Node>> GetAll(Guid accountId);
+        Task<IEnumerable<Board>> GetAll(Guid accountId);
         Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId);
         Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId);
         Task<Board?> GetAsync(Guid id);
