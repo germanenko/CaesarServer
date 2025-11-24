@@ -120,44 +120,44 @@ namespace Planer_task_board.Api.Controllers
 
 
 
-        [HttpGet("tasks"), Authorize]
-        [SwaggerOperation("Получить задачи")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
+        //[HttpGet("tasks"), Authorize]
+        //[SwaggerOperation("Получить задачи")]
+        //[SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
+        //[SwaggerResponse(400)]
+        //[SwaggerResponse(403)]
 
-        public async Task<IActionResult> GetTasks(
-            [FromQuery, Required] Guid boardId,
-            [FromQuery, Required] Guid columnId,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Status? status = null
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.GetTasks(tokenPayload.AccountId, boardId, columnId, status);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+        //public async Task<IActionResult> GetTasks(
+        //    [FromQuery, Required] Guid boardId,
+        //    [FromQuery, Required] Guid columnId,
+        //    [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+        //    [FromQuery] Status? status = null
+        //)
+        //{
+        //    var tokenPayload = _jwtService.GetTokenPayload(token);
+        //    var result = await _taskService.GetTasks(tokenPayload.AccountId, boardId, columnId, status);
+        //    if (result.IsSuccess)
+        //        return StatusCode((int)result.StatusCode, result.Body);
 
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
+        //    return StatusCode((int)result.StatusCode, result.Errors);
+        //}
 
-        [HttpGet("allTasks"), Authorize]
-        [SwaggerOperation("Получить все задачи")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
+        //[HttpGet("allTasks"), Authorize]
+        //[SwaggerOperation("Получить все задачи")]
+        //[SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
+        //[SwaggerResponse(400)]
+        //[SwaggerResponse(403)]
 
-        public async Task<IActionResult> GetAllTasks(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.GetAllTasks(tokenPayload.AccountId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+        //public async Task<IActionResult> GetAllTasks(
+        //    [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        //)
+        //{
+        //    var tokenPayload = _jwtService.GetTokenPayload(token);
+        //    var result = await _taskService.GetAllTasks(tokenPayload.AccountId);
+        //    if (result.IsSuccess)
+        //        return StatusCode((int)result.StatusCode, result.Body);
 
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
+        //    return StatusCode((int)result.StatusCode, result.Errors);
+        //}
 
         [HttpGet("task/performers"), Authorize]
         [SwaggerOperation("Получить список исполнителей задачи")]
