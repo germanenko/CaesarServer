@@ -7,8 +7,8 @@ namespace Planer_task_board.Core.IRepository
     public interface IBoardRepository
     {
         Task<IEnumerable<Board>> GetAll(Guid accountId);
-        Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId);
-        Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId);
+        Task<Node?> AddAsync(CreateBoardBody createBoardBody, Guid accountId);
+        Task<List<Node>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId);
         Task<Board?> GetAsync(Guid id);
         Task<AccessRight?> GetBoardMemberAsync(Guid accountId, Guid boardId);
         Task<IEnumerable<BoardColumn>> GetBoardColumns(Guid boardId);
@@ -17,8 +17,8 @@ namespace Planer_task_board.Core.IRepository
         Task<IEnumerable<Guid>> GetBoardMembers(Guid boardId, int count, int offset);
         Task<IEnumerable<AccessRight>> GetBoardMembers(IEnumerable<Guid> memberIds, Guid boardId);
         Task<AccessRight?> AddBoardMember(Guid accountId, Guid boardId, AccessType accessType);
-        Task<BoardColumn?> AddBoardColumn(CreateColumnBody column, Guid accountId);
-        Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId);
+        Task<Node?> AddBoardColumn(CreateColumnBody column, Guid accountId);
+        Task<List<Node>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId);
         Task<Board?> GetBoard(Guid columnId);
     }
 }

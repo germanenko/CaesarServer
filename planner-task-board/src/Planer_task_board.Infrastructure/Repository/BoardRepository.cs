@@ -22,14 +22,14 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
+        public async Task<Node?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
         {
-            var board = new Board
-            {
-                Id = createBoardBody.Id,
-                Name = createBoardBody.Name,
-                UpdatedAt = createBoardBody.UpdatedAt
-            };
+            //var board = new Board
+            //{
+            //    Id = createBoardBody.Id,
+            //    Name = createBoardBody.Name,
+            //    UpdatedAt = createBoardBody.UpdatedAt
+            //};
 
             var boardNode = new Node
             {
@@ -43,31 +43,31 @@ namespace Planer_task_board.Infrastructure.Repository
             await _context.AccessRights.AddAsync(new AccessRight()
             {
                 AccountId = accountId,
-                ResourceId = board.Id,
+                ResourceId = boardNode.Id,
                 AccessType = AccessType.Creator
             });
 
 
-            board = (await _context.Boards.AddAsync(board))?.Entity;
+            //board = (await _context.Boards.AddAsync(board))?.Entity;
             boardNode = (await _context.Nodes.AddAsync(boardNode))?.Entity;
             await _context.SaveChangesAsync();
 
-            return board;
+            return boardNode;
         }
 
-        public async Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
+        public async Task<List<Node>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
         {
-            List<Board> newBoards = new List<Board>();
+            //List<Board> newBoards = new List<Board>();
             List<Node> newBoardNodes = new List<Node>();
             foreach (var board in boards)
             {
-                var newBoard = new Board()
-                {
-                    Id = board.Id,
-                    Name = board.Name,
-                    UpdatedAt = board.UpdatedAt
-                };
-                newBoards.Add(newBoard);
+                //var newBoard = new Board()
+                //{
+                //    Id = board.Id,
+                //    Name = board.Name,
+                //    UpdatedAt = board.UpdatedAt
+                //};
+                //newBoards.Add(newBoard);
 
                 var boardNode = new Node
                 {
@@ -82,15 +82,15 @@ namespace Planer_task_board.Infrastructure.Repository
                 await _context.AccessRights.AddAsync(new AccessRight()
                 {
                     AccountId = accountId,
-                    ResourceId = newBoard.Id,
+                    ResourceId = boardNode.Id,
                     AccessType = AccessType.Creator
                 });
             }
-            await _context.Boards.AddRangeAsync(newBoards);
+            //await _context.Boards.AddRangeAsync(newBoards);
             await _context.Nodes.AddRangeAsync(newBoardNodes);
             await _context.SaveChangesAsync();
 
-            return newBoards;
+            return newBoardNodes;
         }
 
         public async Task<AccessRight?> AddBoardMember(Guid accountId, Guid boardId, AccessType accessType)
@@ -207,14 +207,14 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<BoardColumn?> AddBoardColumn(CreateColumnBody column, Guid accountId)
+        public async Task<Node?> AddBoardColumn(CreateColumnBody column, Guid accountId)
         {
-            var boardColumn = new BoardColumn
-            {
-                Id = column.Id,
-                Name = column.Name,
-                UpdatedAt = column.UpdatedAt
-            };
+            //var boardColumn = new BoardColumn
+            //{
+            //    Id = column.Id,
+            //    Name = column.Name,
+            //    UpdatedAt = column.UpdatedAt
+            //};
 
             var columnNode = new Node
             {
@@ -225,27 +225,27 @@ namespace Planer_task_board.Infrastructure.Repository
                 CreatedAt = column.UpdatedAt
             };
 
-            boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
+            //boardColumn = (await _context.BoardColumns.AddAsync(boardColumn))?.Entity;
             columnNode = (await _context.Nodes.AddAsync(columnNode))?.Entity;
 
             await _context.SaveChangesAsync();
 
-            return boardColumn;
+            return columnNode;
         }
 
-        public async Task<List<BoardColumn>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
+        public async Task<List<Node>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
         {
-            var boardColumns = new List<BoardColumn>();
+            //var boardColumns = new List<BoardColumn>();
             var columnNodes = new List<Node>();
 
             foreach (var column in columns)
             {
-                BoardColumn newColumn = new BoardColumn()
-                {
-                    Id = column.Id,
-                    Name = column.Name,
-                };
-                boardColumns.Add(newColumn);
+                //BoardColumn newColumn = new BoardColumn()
+                //{
+                //    Id = column.Id,
+                //    Name = column.Name,
+                //};
+                //boardColumns.Add(newColumn);
 
                 var columnNode = new Node
                 {
@@ -258,12 +258,12 @@ namespace Planer_task_board.Infrastructure.Repository
                 columnNodes.Add(columnNode);
             }
 
-            await _context.BoardColumns.AddRangeAsync(boardColumns);
+            //await _context.BoardColumns.AddRangeAsync(boardColumns);
             await _context.Nodes.AddRangeAsync(columnNodes);
 
             await _context.SaveChangesAsync();
 
-            return boardColumns;
+            return columnNodes;
         }
     }
 }
