@@ -6,11 +6,10 @@ using System.Threading.Tasks;
 
 namespace Planer_task_board.Core.Enums
 {
-    public enum NodeType
+    public enum PublicationStatus
     {
-        Board,
-        Column,
-        Task,
-        Message
+        Active,
+        Draft,
+        Deleted
     }
 }

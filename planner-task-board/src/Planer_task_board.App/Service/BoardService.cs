@@ -137,29 +137,29 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId)
-        {
-            var result = await _boardRepository.GetBoardColumns(boardId);
+        //public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId)
+        //{
+        //    var result = await _boardRepository.GetBoardColumns(boardId);
 
-            return new ServiceResponse<IEnumerable<BoardColumnBody>>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result.Select(b => b.ToBoardColumnBody())
-            };
-        }
+        //    return new ServiceResponse<IEnumerable<BoardColumnBody>>
+        //    {
+        //        IsSuccess = true,
+        //        StatusCode = HttpStatusCode.OK,
+        //        Body = result.Select(b => b.ToBoardColumnBody())
+        //    };
+        //}
 
-        public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid accountId)
-        {
-            var result = await _boardRepository.GetAllBoardColumns(accountId);
+        //public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid accountId)
+        //{
+        //    var result = await _boardRepository.GetAllBoardColumns(accountId);
 
-            return new ServiceResponse<IEnumerable<BoardColumnBody>>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result.Select(b => b.ToBoardColumnBody())
-            };
-        }
+        //    return new ServiceResponse<IEnumerable<BoardColumnBody>>
+        //    {
+        //        IsSuccess = true,
+        //        StatusCode = HttpStatusCode.OK,
+        //        Body = result.Select(b => b.ToBoardColumnBody())
+        //    };
+        //}
 
         public async Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset)
         {
@@ -173,16 +173,16 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId)
-        {
-            var result = await _boardRepository.GetAll(accountId);
+        //public async Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId)
+        //{
+        //    var result = await _boardRepository.GetAll(accountId);
 
-            return new ServiceResponse<IEnumerable<BoardBody>>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result.Select(b => b.ToBoardBody())
-            };
-        }
+        //    return new ServiceResponse<IEnumerable<BoardBody>>
+        //    {
+        //        IsSuccess = true,
+        //        StatusCode = HttpStatusCode.OK,
+        //        Body = result.Select(b => b.ToBoardBody())
+        //    };
+        //}
     }
 }

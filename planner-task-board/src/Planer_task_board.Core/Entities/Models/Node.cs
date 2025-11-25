@@ -2,13 +2,11 @@
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class Node
+    public class Node : ModelBase
     {
-        public Guid Id { get; set; }
         public NodeType Type { get; set; }
         public Guid RootId { get; set; }
         public string Name { get; set; }
-        public Status Status { get; set; }
         public string? Props { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }

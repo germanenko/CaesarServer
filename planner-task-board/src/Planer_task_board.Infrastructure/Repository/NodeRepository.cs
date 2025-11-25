@@ -88,7 +88,7 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var accessibleResourceIds = await _context.AccessRights
                 .Where(x => x.AccountId == accountId)
-                .Select(x => x.ResourceId)
+                .Select(x => x.NodeId)
                 .ToListAsync();
 
             if (!accessibleResourceIds.Any())

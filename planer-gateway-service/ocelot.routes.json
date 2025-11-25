@@ -861,19 +861,6 @@
         },
 
         {
-            "DownstreamPathTemplate": "/api/task/performers",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/task/performers",
-            "UpstreamHttpMethod": [ "GET", "POST" ]
-        },
-
-        {
             "DownstreamPathTemplate": "/api/task/column",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

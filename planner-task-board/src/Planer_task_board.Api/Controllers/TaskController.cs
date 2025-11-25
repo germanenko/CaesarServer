@@ -33,7 +33,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] CreateOrUpdateTaskBody taskBody,
+            [FromBody] Node taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -53,7 +53,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTasks(
-            [FromBody] List<CreateOrUpdateTaskBody> taskBodies,
+            [FromBody] List<Node> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -159,43 +159,6 @@ namespace Planer_task_board.Api.Controllers
         //    return StatusCode((int)result.StatusCode, result.Errors);
         //}
 
-        [HttpGet("task/performers"), Authorize]
-        [SwaggerOperation("Получить список исполнителей задачи")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]
-
-        public async Task<IActionResult> GetTaskPerformers(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery, Required] Guid taskId,
-            [FromQuery, Required] Guid boardId,
-            [FromQuery] int count = 1,
-            [FromQuery] int offset = 0
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.GetTaskPerformerIds(tokenPayload.AccountId, boardId, taskId, count, offset);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
-        [HttpPost("task/performers"), Authorize]
-        [SwaggerOperation("Добавить исполнителей задачи")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]
-        [SwaggerResponse(400)]
-
-        public async Task<IActionResult> AddTaskPerformers(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery, Required] Guid taskId,
-            [FromQuery, Required] Guid boardId,
-            [FromBody] IEnumerable<Guid> userIds
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.AddTaskPerformers(tokenPayload.AccountId, taskId, boardId, userIds);
-            return StatusCode((int)result);
-        }
-
 
         [HttpPut("task"), Authorize]
         [SwaggerOperation("Обновить задачу")]
@@ -204,7 +167,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> UpdateTask(
-            UpdateTaskBody taskBody,
+            Node taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -223,7 +186,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> UpdateTasks(
-            List<UpdateTaskBody> taskBodies,
+            List<Node> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {

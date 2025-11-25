@@ -21,11 +21,9 @@ namespace Planer_task_board.Core.Entities.Models
         public bool IsDraft { get; set; }
         public string Type { get; set; }
 
-        public TaskModel? DraftOfTask { get; set; }
+        public Node? DraftOfTask { get; set; }
         public Guid? DraftOfTaskId { get; set; }
         public Guid? ChatId { get; set; }
-
-        public DeletedTask? DeletedTask { get; set; }
 
         public Guid CreatorId { get; set; }
         //public List<TaskAttachedMessage> AttachedMessages { get; set; } = new();

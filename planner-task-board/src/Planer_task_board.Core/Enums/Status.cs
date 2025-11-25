@@ -6,6 +6,7 @@ namespace Planer_task_board.Core.Enums
     public enum Status
     {
         Undefined,
+        Draft,
         Deleted,
         InProgress,
         Completed

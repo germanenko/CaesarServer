@@ -2,6 +2,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,7 +31,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateDraft(
-            [FromBody] CreateDraftBody draftBody,
+            [FromBody] Node draftBody,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
@@ -92,7 +93,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> UpdateDraft(
-            UpdateDraftBody draftBody,
+            Node draftBody,
             [FromQuery, Required] Guid boardId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )

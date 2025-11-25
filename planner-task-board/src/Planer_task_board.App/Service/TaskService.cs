@@ -12,36 +12,18 @@ namespace Planer_task_board.App.Service
     {
         private readonly ITaskRepository _taskRepository;
         private readonly IBoardRepository _boardRepository;
-        private readonly IDeletedTaskRepository _deletedTaskRepository;
+        private readonly IPublicationStatusRepository _publicationStatusRepository;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
-            IDeletedTaskRepository deletedTaskRepository)
+            IPublicationStatusRepository publicationStatusRepository)
         {
             _taskRepository = taskRepository;
             _boardRepository = boardRepository;
-            _deletedTaskRepository = deletedTaskRepository;
+            _publicationStatusRepository = publicationStatusRepository;
         }
 
-        public async Task<HttpStatusCode> AddTaskPerformers(Guid accountId, Guid taskId, Guid boardId, IEnumerable<Guid> performerIds)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return HttpStatusCode.Forbidden;
-
-            var task = await _taskRepository.GetAsync(taskId, false);
-            if (task == null)
-                return HttpStatusCode.BadRequest;
-
-            var boardMembers = await _boardRepository.GetBoardMembers(performerIds, boardId);
-            var members = boardMembers.IntersectBy(performerIds, e => e.AccountId).Select(e => e.AccountId);
-            if (!members.Any())
-                return HttpStatusCode.Forbidden;
-
-            var addedPerformers = await _taskRepository.LinkPerformersToTaskAsync(task, members);
-            return HttpStatusCode.OK;
-        }
 
         public async Task<HttpStatusCode> AddTaskToColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId)
         {
@@ -62,60 +44,38 @@ namespace Planer_task_board.App.Service
             if (task == null)
                 return HttpStatusCode.BadRequest;
 
-            await _taskRepository.AssignTaskToColumn(task, column);
+            await _taskRepository.AssignTaskToColumn(task.Id, column.Id);
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
+        public async Task<ServiceResponse<Node>> CreateOrUpdateTask(Guid accountId, Node taskBody)
         {
             var errors = new List<string>();
-            if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-                errors.Add("Start time format is not correct");
+            //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+            //    errors.Add("Start time format is not correct");
 
-            if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-                errors.Add("End time format is not correct");
+            //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+            //    errors.Add("End time format is not correct");
             
 
-            var column = await _boardRepository.GetBoardColumn(taskBody.ColumnId);
+            var column = await _boardRepository.GetBoardColumnByChild(taskBody.Id);
 
-            DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-            DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+            //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+            //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
             if(await _taskRepository.GetAsync(taskBody.Id, false) != null)
             {
-                var task = await UpdateTask(accountId, new UpdateTaskBody() 
-                {
-                    Id = taskBody.Id,
-                    Title = taskBody.Title,
-                    Description = taskBody.Description,
-                    PriorityOrder = taskBody.PriorityOrder,
-                    Status = taskBody.Status,
-                    HexColor = taskBody.HexColor,
-                    ColumnId = taskBody.ColumnId,
-                    UpdatedAt = taskBody.UpdatedAt
-                });
+                var task = await UpdateTask(accountId, taskBody);
 
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(
-                taskBody.Id,
-                taskBody.Title,
-                taskBody.Description,
-                taskBody.PriorityOrder,
-                taskBody.Status,
-                taskBody.Type,
-                startDate,
-                endDate,
-                taskBody.HexColor,
-                column,
-                accountId,
-                taskBody.MessageId,
-                taskBody.UpdatedAt);
+            var result = await _taskRepository.AddAsync(taskBody);
+
             if (result == null)
             {
                 errors.Add("Task not created");
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<Node>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     Errors = errors.ToArray(),
@@ -123,18 +83,18 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            return new ServiceResponse<TaskBody>
+            return new ServiceResponse<Node>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToTaskBody(),
+                Body = result,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<Node>>> CreateOrUpdateTasks(Guid accountId, List<Node> taskBodies)
         {
             var errors = new List<string>();
-            List<TaskBody> tasks = new List<TaskBody>();
+            List<Node> tasks = new List<Node>();
             foreach (var taskBody in taskBodies)
             {
                 var result = await CreateOrUpdateTask(accountId, taskBody);
@@ -145,7 +105,7 @@ namespace Planer_task_board.App.Service
                 }
                 else
                 {
-                    return new ServiceResponse<List<TaskBody>>
+                    return new ServiceResponse<List<Node>>
                     {
                         StatusCode = HttpStatusCode.BadRequest,
                         IsSuccess = false,
@@ -154,7 +114,7 @@ namespace Planer_task_board.App.Service
                 }
             }
 
-            return new ServiceResponse<List<TaskBody>>
+            return new ServiceResponse<List<Node>>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = tasks,
@@ -162,53 +122,33 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<DeletedTaskBody>>> GetDeletedTasks(Guid accountId, Guid boardId)
+        public async Task<ServiceResponse<IEnumerable<Node>>> GetDeletedTasks(Guid accountId, Guid boardId)
         {
 
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<IEnumerable<DeletedTaskBody>>
+                return new ServiceResponse<IEnumerable<Node>>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     Errors = new string[] { "You are not a member of this board" },
                     IsSuccess = false
                 };
 
-            var deletedTasks = await _deletedTaskRepository.GetAll();
-            return new ServiceResponse<IEnumerable<DeletedTaskBody>>
+            var deletedTasks = await _publicationStatusRepository.Get(PublicationStatus.Deleted);
+            return new ServiceResponse<IEnumerable<Node>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = deletedTasks.Select(t => t.ToDeletedTaskBody()),
+                Body = deletedTasks.Select(t => t.Node),
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<Guid>>> GetTaskPerformerIds(Guid accountId, Guid boardId, Guid taskId, int count, int offset)
+
+        public async Task<ServiceResponse<IEnumerable<Node>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, WorkflowStatus? state)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<IEnumerable<Guid>>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this board" },
-                    IsSuccess = false
-                };
-
-            var taskPerformers = await _taskRepository.GetTaskPerformers(taskId, count, offset);
-            var performers = taskPerformers.Select(e => e.PerformerId);
-            return new ServiceResponse<IEnumerable<Guid>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = performers,
-                IsSuccess = true
-            };
-        }
-
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, Status? state)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return new ServiceResponse<IEnumerable<TaskBody>>
+                return new ServiceResponse<IEnumerable<Node>>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     Errors = new string[] { "You are not a member of this board" },
@@ -219,31 +159,31 @@ namespace Planer_task_board.App.Service
                 ? await _taskRepository.GetAll(columnId, false)
                 : await _taskRepository.GetAll(columnId, state.Value, false);
 
-            return new ServiceResponse<IEnumerable<TaskBody>>
+            return new ServiceResponse<IEnumerable<Node>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(e => e.ToTaskBody()),
+                Body = tasks,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<Node>>> GetAllTasks(Guid accountId)
         {
             var tasks = await _taskRepository.GetAllTasks(accountId);
 
-            return new ServiceResponse<IEnumerable<TaskBody>>
+            return new ServiceResponse<IEnumerable<Node>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(a => a.ToTaskBody()),
+                Body = tasks,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<DeletedTaskBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId)
+        public async Task<ServiceResponse<Node>> RemoveTask(Guid accountId, Guid boardId, Guid taskId)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<DeletedTaskBody>
+                return new ServiceResponse<Node>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     Errors = new string[] { "You are not a member of this board" },
@@ -252,23 +192,23 @@ namespace Planer_task_board.App.Service
 
             var task = await _taskRepository.GetAsync(taskId, true);
             if (task == null)
-                return new ServiceResponse<DeletedTaskBody>
+                return new ServiceResponse<Node>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     Errors = new string[] { "Task id isn't exist" },
                     IsSuccess = false
                 };
 
-            var deletedTask = await _deletedTaskRepository.AddAsync(task);
-            return deletedTask == null ? new ServiceResponse<DeletedTaskBody>
+            var deletedTask = await _publicationStatusRepository.ChangeStatus(task.Id, PublicationStatus.Deleted);
+            return deletedTask == null ? new ServiceResponse<Node>
             {
                 StatusCode = HttpStatusCode.Conflict,
                 Errors = new string[] { "Task deleted exist" },
                 IsSuccess = false
-            } : new ServiceResponse<DeletedTaskBody>
+            } : new ServiceResponse<Node>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = deletedTask.ToDeletedTaskBody(),
+                Body = deletedTask.Node,
                 IsSuccess = true
             };
         }
@@ -302,80 +242,80 @@ namespace Planer_task_board.App.Service
             if (boardMember == null)
                 return HttpStatusCode.Forbidden;
 
-            var result = await _deletedTaskRepository.RemoveAsync(deletedTaskId);
-            return result != false ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
+            var result = await _publicationStatusRepository.ChangeStatus(deletedTaskId, PublicationStatus.Active);
+            return result != null ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, UpdateTaskBody taskBody)
+        public async Task<ServiceResponse<Node>> UpdateTask(Guid accountId, Node taskBody)
         {
             var errors = new List<string>();
 
-            if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-                errors.Add("Start time format is not correct");
+            //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+            //    errors.Add("Start time format is not correct");
 
-            if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-                errors.Add("End time format is not correct");
+            //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+            //    errors.Add("End time format is not correct");
 
             if (errors.Any())
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<Node>
                 {
                     Errors = errors.ToArray(),
                     StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false
                 };
 
-            DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-            DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+            //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+            //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.UpdatedAt);
-            return result == null ? new ServiceResponse<TaskBody>
+            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt);
+            return result == null ? new ServiceResponse<Node>
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Errors = new string[] { "Task not updated" },
                 IsSuccess = false
-            } : new ServiceResponse<TaskBody>
+            } : new ServiceResponse<Node>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToTaskBody(),
+                Body = result,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<UpdateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<Node>>> UpdateTasks(Guid accountId, List<Node> taskBodies)
         {
             var errors = new List<string>();
-            List<TaskModel> result = new List<TaskModel>();
+            List<Node> result = new List<Node>();
             foreach (var taskBody in taskBodies)
             {
-                if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-                    errors.Add("Start time format is not correct");
+                //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                //    errors.Add("Start time format is not correct");
 
-                if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-                    errors.Add("End time format is not correct");
+                //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                //    errors.Add("End time format is not correct");
 
                 if (errors.Any())
-                    return new ServiceResponse<List<TaskBody>>
+                    return new ServiceResponse<List<Node>>
                     {
                         Errors = errors.ToArray(),
                         StatusCode = HttpStatusCode.BadRequest,
                         IsSuccess = false
                     };
 
-                DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-                DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+                //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+                //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, taskBody.Title, taskBody.Description, taskBody.PriorityOrder, taskBody.Status, startDate, endDate, taskBody.HexColor, taskBody.ColumnId, taskBody.UpdatedAt));
+                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt));
             }
             
-            return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>
+            return result.Count != taskBodies.Count ? new ServiceResponse<List<Node>>
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Errors = new string[] { "Not all tasks updated" },
                 IsSuccess = false
-            } : new ServiceResponse<List<TaskBody>>
+            } : new ServiceResponse<List<Node>>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.Select(x => x.ToTaskBody()).ToList(),
+                Body = result,
                 IsSuccess = true
             };
         }
