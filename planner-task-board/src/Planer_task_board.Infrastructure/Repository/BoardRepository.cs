@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
+using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
@@ -37,7 +38,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Node = boardNode,
                 NodeId = boardNode.Id,
-                Status = PublicationStatus.Active,
+                Status = createBoardBody.PublicationStatus,
                 UpdatedAt = boardNode.UpdatedAt
             });
 
@@ -204,6 +205,14 @@ namespace Planer_task_board.Infrastructure.Repository
                 CreatedBy = accountId,
                 CreatedAt = column.UpdatedAt
             };
+
+            await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
+            {
+                Node = columnNode,
+                NodeId = column.Id,
+                Status = column.PublicationStatus,
+                UpdatedAt = column.UpdatedAt
+            });
 
             columnNode = (await _context.Nodes.AddAsync(columnNode))?.Entity;
 

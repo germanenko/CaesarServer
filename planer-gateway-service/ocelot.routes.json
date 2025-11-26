@@ -731,45 +731,6 @@
         },
 
         {
-            "DownstreamPathTemplate": "/api/draft",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/draft",
-            "UpstreamHttpMethod": [ "POST", "PUT" ]
-        },
-
-        {
-            "DownstreamPathTemplate": "/api/draft/{draftId}",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/draft/{draftId}",
-            "UpstreamHttpMethod": [ "PUT" ]
-        },
-
-        {
-            "DownstreamPathTemplate": "/api/drafts",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/draft",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-
-        {
             "DownstreamPathTemplate": "/api/task",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

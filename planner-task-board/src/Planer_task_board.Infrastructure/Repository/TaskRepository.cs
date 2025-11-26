@@ -48,7 +48,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Task = node
             };
 
-            return await AddTaskAsync(node, task.ColumnId, taskAttachedMessage);
+            return await AddTaskAsync(node, task.ColumnId, task.PublicationStatus, taskAttachedMessage);
         }
 
         public async Task<IEnumerable<Node>> GetAll(Guid columnId, bool isDraft = false)
@@ -255,6 +255,7 @@ namespace Planer_task_board.Infrastructure.Repository
         private async Task<Node?> AddTaskAsync(
             Node task,
             Guid? columnId,
+            PublicationStatus publicationStatus,
             TaskAttachedMessage? taskAttachedMessage = null)
         {
             if (task == null)
@@ -289,6 +290,14 @@ namespace Planer_task_board.Infrastructure.Repository
                     RelationType = RelationType.Attach
                 });
             }
+
+            _context.PublicationStatuses.Add(new PublicationStatusModel()
+            {
+                Node = task,
+                NodeId = task.Id,
+                Status = publicationStatus,
+                UpdatedAt = task.UpdatedAt
+            });
 
             await _context.SaveChangesAsync();
 

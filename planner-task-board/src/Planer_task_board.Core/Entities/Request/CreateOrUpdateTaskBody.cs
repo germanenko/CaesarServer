@@ -33,5 +33,7 @@ namespace Planer_task_board.Core.Entities.Request
         public Guid MessageId { get; set; } = new();
 
         public Guid? ColumnId { get; set; }
+
+        [Required] public PublicationStatus PublicationStatus { get; set; }
     }
 }
