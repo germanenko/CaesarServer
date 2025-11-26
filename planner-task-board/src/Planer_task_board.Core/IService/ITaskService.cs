@@ -8,15 +8,15 @@ namespace Planer_task_board.Core.IService
 {
     public interface ITaskService
     {
-        Task<ServiceResponse<NodeBody>> CreateOrUpdateTask(Guid accountId, Node taskBody);
-        Task<ServiceResponse<List<NodeBody>>> CreateOrUpdateTasks(Guid accountId, List<Node> taskBodies);
+        Task<ServiceResponse<NodeBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody);
+        Task<ServiceResponse<List<NodeBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies);
         Task<ServiceResponse<NodeBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId);
         Task<HttpStatusCode> RestoreDeletedTask(Guid deletedTaskId, Guid boardId, Guid accountId);
         Task<ServiceResponse<IEnumerable<NodeBody>>> GetDeletedTasks(Guid accountId, Guid boardId);
         Task<ServiceResponse<IEnumerable<NodeBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, WorkflowStatus? state);
         Task<ServiceResponse<IEnumerable<NodeBody>>> GetAllTasks(Guid accountId);
-        Task<ServiceResponse<NodeBody>> UpdateTask(Guid accountId, Node taskBody);
-        Task<ServiceResponse<List<NodeBody>>> UpdateTasks(Guid accountId, List<Node> taskBodies);
+        Task<ServiceResponse<NodeBody>> UpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody);
+        Task<ServiceResponse<List<NodeBody>>> UpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies);
         Task<HttpStatusCode> AddTaskToColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
         Task<HttpStatusCode> RemoveTaskFromColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
         //Task<ServiceResponse<IEnumerable<BoardColumnTaskBody>>> GetColumnTaskMembership(Guid accountId);

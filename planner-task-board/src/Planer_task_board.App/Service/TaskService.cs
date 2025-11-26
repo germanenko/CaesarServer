@@ -48,29 +48,29 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<NodeBody>> CreateOrUpdateTask(Guid accountId, Node taskBody)
+        public async Task<ServiceResponse<NodeBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
         {
             var errors = new List<string>();
-            //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-            //    errors.Add("Start time format is not correct");
+            if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                errors.Add("Start time format is not correct");
 
-            //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-            //    errors.Add("End time format is not correct");
-            
+            if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                errors.Add("End time format is not correct");
+
 
             var column = await _boardRepository.GetBoardColumnByChild(taskBody.Id);
 
-            //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-            //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+            DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+            DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-            if(await _taskRepository.GetAsync(taskBody.Id, false) != null)
+            if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
             {
                 var task = await UpdateTask(accountId, taskBody);
 
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(taskBody);
+            var result = await _taskRepository.AddAsync(taskBody, accountId);
 
             if (result == null)
             {
@@ -91,7 +91,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<NodeBody>>> CreateOrUpdateTasks(Guid accountId, List<Node> taskBodies)
+        public async Task<ServiceResponse<List<NodeBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
         {
             var errors = new List<string>();
             List<NodeBody> tasks = new List<NodeBody>();
@@ -246,15 +246,15 @@ namespace Planer_task_board.App.Service
             return result != null ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<NodeBody>> UpdateTask(Guid accountId, Node taskBody)
+        public async Task<ServiceResponse<NodeBody>> UpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
         {
             var errors = new List<string>();
 
-            //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-            //    errors.Add("Start time format is not correct");
+            if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                errors.Add("Start time format is not correct");
 
-            //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-            //    errors.Add("End time format is not correct");
+            if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                errors.Add("End time format is not correct");
 
             if (errors.Any())
                 return new ServiceResponse<NodeBody>
@@ -264,8 +264,8 @@ namespace Planer_task_board.App.Service
                     IsSuccess = false
                 };
 
-            //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-            //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+            DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+            DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
             var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt);
             return result == null ? new ServiceResponse<NodeBody>
@@ -281,17 +281,17 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<NodeBody>>> UpdateTasks(Guid accountId, List<Node> taskBodies)
+        public async Task<ServiceResponse<List<NodeBody>>> UpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
         {
             var errors = new List<string>();
             List<NodeBody> result = new List<NodeBody>();
             foreach (var taskBody in taskBodies)
             {
-                //if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
-                //    errors.Add("Start time format is not correct");
+                if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
+                    errors.Add("Start time format is not correct");
 
-                //if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
-                //    errors.Add("End time format is not correct");
+                if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
+                    errors.Add("End time format is not correct");
 
                 if (errors.Any())
                     return new ServiceResponse<List<NodeBody>>
@@ -301,8 +301,8 @@ namespace Planer_task_board.App.Service
                         IsSuccess = false
                     };
 
-                //DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
-                //DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
+                DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
+                DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
                 result.Add((await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt)).ToNodeBody());
             }

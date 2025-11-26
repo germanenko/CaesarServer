@@ -31,7 +31,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateDraft(
-            [FromBody] Node draftBody,
+            [FromBody] CreateOrUpdateTaskBody draftBody,
             [FromQuery, Required] Guid columnId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
@@ -93,13 +93,13 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> UpdateDraft(
-            Node draftBody,
+            CreateOrUpdateTaskBody draftBody,
             [FromQuery, Required] Guid boardId,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _draftService.UpdateDraft(tokenPayload.AccountId, boardId, draftBody.Id, draftBody);
+            var result = await _draftService.UpdateDraft(tokenPayload.AccountId, draftBody.Id, draftBody);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

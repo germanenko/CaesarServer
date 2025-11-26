@@ -33,7 +33,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] Node taskBody,
+            [FromBody] CreateOrUpdateTaskBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -53,7 +53,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTasks(
-            [FromBody] List<Node> taskBodies,
+            [FromBody] List<CreateOrUpdateTaskBody> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -112,44 +112,6 @@ namespace Planer_task_board.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.GetDeletedTasks(tokenPayload.AccountId, boardId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
-        [HttpPut("task"), Authorize]
-        [SwaggerOperation("Обновить задачу")]
-        [SwaggerResponse(200, Type = typeof(TaskBody))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> UpdateTask(
-            Node taskBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.UpdateTask(tokenPayload.AccountId, taskBody);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
-        [HttpPut("updateTasks"), Authorize]
-        [SwaggerOperation("Обновить задачи")]
-        [SwaggerResponse(200, Type = typeof(List<TaskBody>))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> UpdateTasks(
-            List<Node> taskBodies,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.UpdateTasks(tokenPayload.AccountId, taskBodies);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

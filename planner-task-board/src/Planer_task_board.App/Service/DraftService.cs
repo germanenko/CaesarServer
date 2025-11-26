@@ -1,9 +1,11 @@
-using System.Net;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
+using System.Net;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace Planer_task_board.App.Service
 {
@@ -57,15 +59,15 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> CreateDraft(Node body, Guid accountId, Guid columnId)
+        public async Task<ServiceResponse<NodeBody>> CreateDraft(CreateOrUpdateTaskBody body, Guid accountId, Guid columnId)
         {
             var errors = new List<string>();
 
-            //if (body.StartDate != null && !DateTime.TryParse(body?.StartDate, out var _))
-            //    errors.Add("Start time format is not correct");
+            if (body.StartDate != null && !DateTime.TryParse(body?.StartDate, out var _))
+                errors.Add("Start time format is not correct");
 
-            //if (body.EndDate != null && !DateTime.TryParse(body.EndDate, out var _))
-            //    errors.Add("End time format is not correct");
+            if (body.EndDate != null && !DateTime.TryParse(body.EndDate, out var _))
+                errors.Add("End time format is not correct");
 
             if (errors.Any())
                 return new ServiceResponse<NodeBody>
@@ -94,20 +96,20 @@ namespace Planer_task_board.App.Service
             //        IsSuccess = false
             //    };
 
-            //if (body.ModifiedTaskId != null)
-            //{
-            //    draftOfTask = await _taskRepository.GetAsync((Guid)body.ModifiedTaskId, false);
-            //    if (draftOfTask == null)
-            //        return new ServiceResponse<Node>
-            //        {
-            //            Errors = new[] { "taskId is not found" },
-            //            StatusCode = HttpStatusCode.BadRequest,
-            //            IsSuccess = false
-            //        };
-            //}
+            Node task = null;
+
+            task = await _taskRepository.GetAsync(body.Id, false);
+
+            if (task == null)
+                return new ServiceResponse<NodeBody>
+                {
+                    Errors = new[] { "taskId is not found" },
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false
+                };
 
 
-            var result = await _taskRepository.AddAsync(body);
+            var result = await _taskRepository.AddAsync(JsonSerializer.Deserialize<CreateOrUpdateTaskBody>(task.Props), accountId);
 
             if (result == null)
                 return new ServiceResponse<NodeBody>
@@ -145,15 +147,15 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> UpdateDraft(Guid accountId, Guid boardId, Guid draftId, Node body)
+        public async Task<ServiceResponse<NodeBody>> UpdateDraft(Guid accountId, Guid draftId, CreateOrUpdateTaskBody body)
         {
             var errors = new List<string>();
 
-            //if (body.StartDate != null && !DateTime.TryParse(body?.StartDate, out var _))
-            //    errors.Add("Start time format is not correct");
+            if (body.StartDate != null && !DateTime.TryParse(body?.StartDate, out var _))
+                errors.Add("Start time format is not correct");
 
-            //if (body.EndDate != null && !DateTime.TryParse(body.EndDate, out var _))
-            //    errors.Add("End time format is not correct");
+            if (body.EndDate != null && !DateTime.TryParse(body.EndDate, out var _))
+                errors.Add("End time format is not correct");
 
             if (errors.Any())
                 return new ServiceResponse<NodeBody>
@@ -163,31 +165,21 @@ namespace Planer_task_board.App.Service
                     IsSuccess = false
                 };
 
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
+            Node? draftOfTask = null;
+
+            draftOfTask = await _taskRepository.GetAsync(body.Id, false);
+
+            if (draftOfTask == null)
                 return new ServiceResponse<NodeBody>
                 {
-                    Errors = new[] { "You are not a member of this board" },
-                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "taskId is not found" },
+                    StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false
                 };
 
-            Node? draftOfTask = null;
-            //if (body.ModifiedTaskId != null)
-            //{
-            //    draftOfTask = await _taskRepository.GetAsync((Guid)body.ModifiedTaskId, false);
-            //    if (draftOfTask == null)
-            //        return new ServiceResponse<Node>
-            //        {
-            //            Errors = new[] { "taskId is not found" },
-            //            StatusCode = HttpStatusCode.BadRequest,
-            //            IsSuccess = false
-            //        };
-            //}
-
-            //DateTime? startDate = body.StartDate != null ? DateTime.Parse(body.StartDate) : null;
-            //DateTime? endDate = body.EndDate != null ? DateTime.Parse(body.EndDate) : null;
-            var result = await _taskRepository.UpdateAsync(body.Id, body, body.UpdatedAt);
+            DateTime? startDate = body.StartDate != null ? DateTime.Parse(body.StartDate) : null;
+            DateTime? endDate = body.EndDate != null ? DateTime.Parse(body.EndDate) : null;
+            var result = await _taskRepository.UpdateAsync(body.Id, JsonSerializer.Deserialize<CreateOrUpdateTaskBody>(draftOfTask.Props), body.UpdatedAt);
             return result == null ? new ServiceResponse<NodeBody>
             {
                 Errors = new[] { "Failed to update draft" },

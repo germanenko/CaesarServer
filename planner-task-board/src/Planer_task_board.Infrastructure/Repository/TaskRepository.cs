@@ -26,10 +26,21 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> AddAsync
         (
-            Node node
+            CreateOrUpdateTaskBody task,
+            Guid accountId
         )
         {
-            var task = JsonSerializer.Deserialize<CreateOrUpdateTaskBody>(node.Props);
+            var props = JsonSerializer.Serialize(task);
+
+            var node = new Node()
+            {
+                Id = task.Id,
+                Name = task.Title,
+                CreatedAt = task.UpdatedAt,
+                Props = props,
+                Type = NodeType.Task,
+                CreatedBy = accountId
+            };
 
             var taskAttachedMessage = new TaskAttachedMessage
             {
@@ -186,7 +197,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> UpdateAsync(
             Guid id,
-            Node updatedNode,
+            CreateOrUpdateTaskBody updatedNode,
             Guid? columnId,
             DateTime changeDate)
         {
@@ -198,8 +209,8 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var task = status.Node;
 
-            task.Name = updatedNode.Name;
-            task.Props = updatedNode.Props;
+            task.Name = updatedNode.Title;
+            task.Props = JsonSerializer.Serialize(updatedNode);
             task.UpdatedAt = changeDate;
 
             var boardColumnTask = _context.NodeLinks.Where(x => x.ChildId == task.Id).First();
@@ -221,7 +232,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> UpdateAsync(
             Guid id,
-            Node updatedNode,
+            CreateOrUpdateTaskBody updatedNode,
             DateTime changeDate)
         {
             var draftStatus = await _context.PublicationStatuses
@@ -232,8 +243,8 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var draft = draftStatus.Node;
 
-            draft.Name = updatedNode.Name;
-            draft.Props = updatedNode.Props;
+            draft.Name = updatedNode.Title;
+            draft.Props = JsonSerializer.Serialize(updatedNode);
             draft.UpdatedAt = changeDate;
 
             await _context.SaveChangesAsync();
