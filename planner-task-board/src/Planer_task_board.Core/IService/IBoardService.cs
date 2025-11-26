@@ -8,14 +8,14 @@ namespace Planer_task_board.Core.IService
 {
     public interface IBoardService
     {
-        Task<ServiceResponse<Node>> CreateBoardAsync(CreateBoardBody body, Guid accountId);
-        Task<ServiceResponse<List<Node>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId);
+        Task<ServiceResponse<NodeBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId);
+        Task<ServiceResponse<List<NodeBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId);
         //Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId);
         //Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId);
         //Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid boardId);
         Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset);
         Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId, AccessType accessType);
-        Task<ServiceResponse<Node>> AddColumn(Guid accountId, CreateColumnBody column);
-        Task<ServiceResponse<List<Node>>> AddColumns(Guid accountId, List<CreateColumnBody> columns);
+        Task<ServiceResponse<NodeBody>> AddColumn(Guid accountId, CreateColumnBody column);
+        Task<ServiceResponse<List<NodeBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns);
     }
 }

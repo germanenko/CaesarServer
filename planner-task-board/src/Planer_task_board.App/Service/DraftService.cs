@@ -20,11 +20,11 @@ namespace Planer_task_board.App.Service
             _taskRepository = taskRepository;
         }
 
-        public async Task<ServiceResponse<Node>> ConvertDraftToTask(Guid accountId, Guid boardId, Guid draftId, Guid columnId)
+        public async Task<ServiceResponse<NodeBody>> ConvertDraftToTask(Guid accountId, Guid boardId, Guid draftId, Guid columnId)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "You are not a member of this board" },
                     StatusCode = HttpStatusCode.Forbidden,
@@ -33,7 +33,7 @@ namespace Planer_task_board.App.Service
 
             var column = await _boardRepository.GetBoardColumn(columnId);
             if (column == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "Column not found" },
                     StatusCode = HttpStatusCode.NotFound,
@@ -42,22 +42,22 @@ namespace Planer_task_board.App.Service
 
             var result = await _taskRepository.ConvertDraftToTask(draftId, accountId, column.Id);
             if (result == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "Failed to convert draft to task" },
                     StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false
                 };
 
-            return new ServiceResponse<Node>
+            return new ServiceResponse<NodeBody>
             {
-                Body = result,
+                Body = result.ToNodeBody(),
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<Node>> CreateDraft(Node body, Guid accountId, Guid columnId)
+        public async Task<ServiceResponse<NodeBody>> CreateDraft(Node body, Guid accountId, Guid columnId)
         {
             var errors = new List<string>();
 
@@ -68,7 +68,7 @@ namespace Planer_task_board.App.Service
             //    errors.Add("End time format is not correct");
 
             if (errors.Any())
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = errors.ToArray(),
                     StatusCode = HttpStatusCode.BadRequest,
@@ -77,7 +77,7 @@ namespace Planer_task_board.App.Service
 
             var column = await _boardRepository.GetBoardColumn(columnId);
             if (column == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "Column not found" },
                     StatusCode = HttpStatusCode.NotFound,
@@ -110,26 +110,26 @@ namespace Planer_task_board.App.Service
             var result = await _taskRepository.AddAsync(body);
 
             if (result == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "Failed to create draft" },
                     StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false
                 };
 
-            return new ServiceResponse<Node>
+            return new ServiceResponse<NodeBody>
             {
-                Body = result,
+                Body = result.ToNodeBody(),
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<Node>>> GetDrafts(Guid accountId, Guid boardId, Guid columnId)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetDrafts(Guid accountId, Guid boardId, Guid columnId)
         {
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<IEnumerable<Node>>
+                return new ServiceResponse<IEnumerable<NodeBody>>
                 {
                     Errors = new[] { "You are not a member of this board" },
                     StatusCode = HttpStatusCode.Forbidden,
@@ -137,15 +137,15 @@ namespace Planer_task_board.App.Service
                 };
 
             var tasks = await _taskRepository.GetAll(columnId, true);
-            return new ServiceResponse<IEnumerable<Node>>
+            return new ServiceResponse<IEnumerable<NodeBody>>
             {
-                Body = tasks,
+                Body = tasks.Select(x => x.ToNodeBody()),
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true
             };
         }
 
-        public async Task<ServiceResponse<Node>> UpdateDraft(Guid accountId, Guid boardId, Guid draftId, Node body)
+        public async Task<ServiceResponse<NodeBody>> UpdateDraft(Guid accountId, Guid boardId, Guid draftId, Node body)
         {
             var errors = new List<string>();
 
@@ -156,7 +156,7 @@ namespace Planer_task_board.App.Service
             //    errors.Add("End time format is not correct");
 
             if (errors.Any())
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = errors.ToArray(),
                     StatusCode = HttpStatusCode.BadRequest,
@@ -165,7 +165,7 @@ namespace Planer_task_board.App.Service
 
             var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
             if (boardMember == null)
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     Errors = new[] { "You are not a member of this board" },
                     StatusCode = HttpStatusCode.Forbidden,
@@ -188,14 +188,14 @@ namespace Planer_task_board.App.Service
             //DateTime? startDate = body.StartDate != null ? DateTime.Parse(body.StartDate) : null;
             //DateTime? endDate = body.EndDate != null ? DateTime.Parse(body.EndDate) : null;
             var result = await _taskRepository.UpdateAsync(body.Id, body, body.UpdatedAt);
-            return result == null ? new ServiceResponse<Node>
+            return result == null ? new ServiceResponse<NodeBody>
             {
                 Errors = new[] { "Failed to update draft" },
                 StatusCode = HttpStatusCode.BadRequest,
                 IsSuccess = false
-            } : new ServiceResponse<Node>
+            } : new ServiceResponse<NodeBody>
             {
-                Body = result,
+                Body = result.ToNodeBody(),
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true
             };

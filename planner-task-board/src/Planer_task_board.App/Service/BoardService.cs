@@ -28,66 +28,56 @@ namespace Planer_task_board.App.Service
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<Node>> AddColumn(Guid accountId, CreateColumnBody column)
+        public async Task<ServiceResponse<NodeBody>> AddColumn(Guid accountId, CreateColumnBody column)
         {
             var result = await _boardRepository.AddBoardColumn(column, accountId);
 
             if(result == null)
             {
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            return new ServiceResponse<Node>
+            return new ServiceResponse<NodeBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.ToNodeBody()
             };
         }
 
-        public async Task<ServiceResponse<List<Node>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
+        public async Task<ServiceResponse<List<NodeBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
         {
-            List<Node>? newColumns = new List<Node>();
+            List<NodeBody>? newColumns = new List<NodeBody>();
             foreach (var column in columns)
             {
                 var board = await _boardRepository.GetBoard(column.Id);
                 var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
                 if (boardMember == null)
                 {
-                    return new ServiceResponse<List<Node>>
+                    return new ServiceResponse<List<NodeBody>>
                     {
                         IsSuccess = false,
                         StatusCode = HttpStatusCode.Forbidden
                     };
                 }
-
-                //var board = await _boardRepository.GetAsync(column.BoardId);
-                //if (board == null)
-                //{
-                //    return new ServiceResponse<List<BoardColumnBody>>
-                //    {
-                //        IsSuccess = false,
-                //        StatusCode = HttpStatusCode.BadRequest
-                //    };
-                //} 
             }
 
-            newColumns = await _boardRepository.AddBoardColumns(columns, accountId);
+            newColumns = (await _boardRepository.AddBoardColumns(columns, accountId)).Select(x => x.ToNodeBody()).ToList();
 
             if (newColumns == null)
             {
-                return new ServiceResponse<List<Node>>
+                return new ServiceResponse<List<NodeBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            return new ServiceResponse<List<Node>>
+            return new ServiceResponse<List<NodeBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -95,71 +85,47 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<Node>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
+        public async Task<ServiceResponse<NodeBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
         {
             var result = await _boardRepository.AddAsync(body, accountId);
 
             if (result is null)
             {
-                return new ServiceResponse<Node>
+                return new ServiceResponse<NodeBody>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
                 };
             }
 
-            return new ServiceResponse<Node>
+            return new ServiceResponse<NodeBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.ToNodeBody()
             };
         }
 
-        public async Task<ServiceResponse<List<Node>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<List<NodeBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
         {
             var result = await _boardRepository.AddRangeAsync(bodies, accountId);
 
             if (result is null)
             {
-                return new ServiceResponse<List<Node>>
+                return new ServiceResponse<List<NodeBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
                 };
             }
 
-            return new ServiceResponse<List<Node>>
+            return new ServiceResponse<List<NodeBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.Select(x => x.ToNodeBody()).ToList()
             };
         }
-
-        //public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetBoardColumnsAsync(Guid boardId)
-        //{
-        //    var result = await _boardRepository.GetBoardColumns(boardId);
-
-        //    return new ServiceResponse<IEnumerable<BoardColumnBody>>
-        //    {
-        //        IsSuccess = true,
-        //        StatusCode = HttpStatusCode.OK,
-        //        Body = result.Select(b => b.ToBoardColumnBody())
-        //    };
-        //}
-
-        //public async Task<ServiceResponse<IEnumerable<BoardColumnBody>>> GetAllBoardColumnsAsync(Guid accountId)
-        //{
-        //    var result = await _boardRepository.GetAllBoardColumns(accountId);
-
-        //    return new ServiceResponse<IEnumerable<BoardColumnBody>>
-        //    {
-        //        IsSuccess = true,
-        //        StatusCode = HttpStatusCode.OK,
-        //        Body = result.Select(b => b.ToBoardColumnBody())
-        //    };
-        //}
 
         public async Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset)
         {
@@ -172,17 +138,5 @@ namespace Planer_task_board.App.Service
                 Body = result
             };
         }
-
-        //public async Task<ServiceResponse<IEnumerable<BoardBody>>> GetBoardsAsync(Guid accountId)
-        //{
-        //    var result = await _boardRepository.GetAll(accountId);
-
-        //    return new ServiceResponse<IEnumerable<BoardBody>>
-        //    {
-        //        IsSuccess = true,
-        //        StatusCode = HttpStatusCode.OK,
-        //        Body = result.Select(b => b.ToBoardBody())
-        //    };
-        //}
     }
 }

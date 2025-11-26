@@ -20,51 +20,51 @@ namespace Planer_task_board.App.Service
             _nodeRepository = nodeRepository;
         }
 
-        public async Task<ServiceResponse<IEnumerable<Node>>> GetNodes(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
         {
             var nodes = await _nodeRepository.GetNodes(accountId);
 
-            return new ServiceResponse<IEnumerable<Node>>()
+            return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes
+                Body = nodes.Select(x => x.ToNodeBody())
             };
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId)
         {
-            var nodes = await _nodeRepository.GetNodeLinks(accountId);
+            var nodeLinks = await _nodeRepository.GetNodeLinks(accountId);
 
             return new ServiceResponse<IEnumerable<NodeLink>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes
+                Body = nodeLinks
             };
         }
 
-        public async Task<ServiceResponse<Node>> AddOrUpdateNode(Guid accountId, Node node)
+        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, Node node)
         {
-            var nodes = await _nodeRepository.AddOrUpdateNode(accountId, node);
+            var newNode = await _nodeRepository.AddOrUpdateNode(accountId, node);
 
-            return new ServiceResponse<Node>()
+            return new ServiceResponse<NodeBody>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes
+                Body = newNode.ToNodeBody()
             };
         }
 
         public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, NodeLink node)
         {
-            var nodes = await _nodeRepository.AddOrUpdateNodeLink(accountId, node);
+            var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(accountId, node);
 
             return new ServiceResponse<NodeLink>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes
+                Body = nodeLink
             };
         }
     }
