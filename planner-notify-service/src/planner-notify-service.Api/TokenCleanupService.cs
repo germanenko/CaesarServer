@@ -17,8 +17,6 @@ namespace planner_notify_service.App.Service
         private readonly IServiceProvider _serviceProvider;
         private readonly ILogger<TokenCleanupService> _logger;
         private readonly TimeSpan _checkInterval = TimeSpan.FromDays(1);
-
-        // ИСПРАВЛЕНИЕ: Используем IServiceProvider вместо INotifyRepository
         public TokenCleanupService(IServiceProvider serviceProvider, ILogger<TokenCleanupService> logger)
         {
             _serviceProvider = serviceProvider;
@@ -48,7 +46,6 @@ namespace planner_notify_service.App.Service
 
         private async Task CleanUpInactiveDevicesAsync()
         {
-            // ИСПРАВЛЕНИЕ: Создаем scope для каждого вызова
             using var scope = _serviceProvider.CreateScope();
             var notifyRepository = scope.ServiceProvider.GetRequiredService<INotifyRepository>();
             await notifyRepository.DeleteInvalidTokens();
