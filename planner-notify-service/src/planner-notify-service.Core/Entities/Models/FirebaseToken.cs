@@ -11,5 +11,7 @@ namespace planner_notify_service.Core.Entities.Models
         public Guid DeviceId { get; set; }
         public Guid UserId { get; set; }
         public string Token { get; set; }
+        public DateTime UpdatedAt { get; set; }
+        public bool IsActive { get; set; }
     }
 }

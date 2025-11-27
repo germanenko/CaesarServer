@@ -31,6 +31,9 @@ namespace Planer_task_board.Infrastructure.Configurations
                 .HasForeignKey(e => e.ChildId)
                 .OnDelete(DeleteBehavior.Cascade);
 
+            builder.Property(e => e.RootId)
+                .IsRequired();
+
             builder.Property(e => e.ChildType)
                 .IsRequired()
                 .HasConversion<string>()
@@ -41,6 +44,7 @@ namespace Planer_task_board.Infrastructure.Configurations
                 .HasConversion<string>()
                 .HasMaxLength(30);
 
+            builder.HasIndex(e => e.RootId);
             builder.HasIndex(e => e.ParentId);
             builder.HasIndex(e => e.ChildId);
             builder.HasIndex(e => e.ChildType);

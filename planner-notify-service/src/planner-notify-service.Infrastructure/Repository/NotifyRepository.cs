@@ -32,7 +32,8 @@ namespace planner_notify_service.Infrastructure.Repository
                 {
                     UserId = accountId,
                     Token = firebaseToken,
-                    DeviceId = deviceId
+                    DeviceId = deviceId,
+                    UpdatedAt = DateTime.UtcNow
                 };
 
                 var token = _context.FirebaseTokens.Add(newToken).Entity;
@@ -49,7 +50,8 @@ namespace planner_notify_service.Infrastructure.Repository
                 {
                     UserId = accountId,
                     Token = firebaseToken,
-                    DeviceId = deviceId
+                    DeviceId = deviceId,
+                    UpdatedAt = DateTime.UtcNow
                 };
 
                 _context.FirebaseTokens.Add(newToken);
@@ -65,6 +67,22 @@ namespace planner_notify_service.Infrastructure.Repository
             var token = await _context.FirebaseTokens.Where(x => x.UserId == accountId).ToListAsync();
 
             return token;
+        }
+
+        public async Task DeleteInvalidTokens()
+        {
+            var thresholdDate = DateTime.UtcNow - TimeSpan.FromDays(30);
+
+            var devicesToDelete = await _context.FirebaseTokens
+                .Where(d => d.IsActive == false)
+                .Where(d => d.UpdatedAt < thresholdDate)
+                .ToListAsync();
+
+            if (devicesToDelete.Any())
+            {
+                _context.FirebaseTokens.RemoveRange(devicesToDelete);
+                await _context.SaveChangesAsync();
+            }
         }
     }
 }

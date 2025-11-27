@@ -26,9 +26,6 @@ namespace Planer_task_board.Infrastructure.Configurations
                 .HasConversion<string>()
                 .HasMaxLength(30);
 
-            builder.Property(e => e.RootId)
-                .IsRequired();
-
             builder.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -51,14 +48,12 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.Property(e => e.UpdatedBy)
                 .IsRequired();
 
-            builder.HasIndex(e => e.RootId);
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);
             builder.HasIndex(e => e.CreatedBy);
             builder.HasIndex(e => e.CreatedAt);
             builder.HasIndex(e => e.UpdatedAt);
 
-            builder.HasIndex(e => new { e.Type, e.RootId });
             builder.HasIndex(e => new { e.CreatedBy, e.CreatedAt });
         }
     }

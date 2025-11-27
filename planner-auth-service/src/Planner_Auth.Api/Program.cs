@@ -7,8 +7,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-//using Planer_email_service.App.Service;
-//using Planer_email_service.Core.IService;
 using Planner_Auth.App.Service;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;

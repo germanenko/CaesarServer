@@ -215,5 +215,18 @@ namespace Planner_Auth.Infrastructure.Repository
 
             return account;
         }
+
+        public async Task DeleteInvalidSessions()
+        {
+            var sessionsToDelete = await _context.AccountSessions
+                .Where(d => d.TokenValidBefore < DateTime.UtcNow)
+                .ToListAsync();
+
+            if (sessionsToDelete.Any())
+            {
+                _context.AccountSessions.RemoveRange(sessionsToDelete);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

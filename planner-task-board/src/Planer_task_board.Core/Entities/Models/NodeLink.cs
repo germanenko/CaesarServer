@@ -11,5 +11,6 @@ namespace Planer_task_board.Core.Entities.Models
         public Node ChildNode { get; set; }
         public NodeType ChildType { get; set; }
         public RelationType RelationType { get; set; }
+        public Guid RootId { get; set; }
     }
 }

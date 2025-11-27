@@ -14,6 +14,8 @@ using planner_notify_service.Infrastructure.Repository;
 using planner_notify_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 
+Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);
@@ -31,7 +33,8 @@ void ConfigureServices(IServiceCollection services)
     var firebaseClientEmail = GetEnvVar("FIREBASE_CLIENT_EMAIL");
     var firebasePrivateKey = GetEnvVar("FIREBASE_PRIVATE_KEY");
 
-    var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
+    //var notifyDbConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
+    var notifyDbConnectionString = "Server=188.225.18.18:5437;Database=planner-notify;User Id=user;Password=*Planner;";
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
@@ -83,6 +86,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(notifyDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner-notify-service.Api");
         });
     });
 
@@ -101,6 +105,8 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddScoped<INotifyService, NotifyService>();
     services.AddScoped<INotifyRepository, NotifyRepository>();
+
+    services.AddHostedService<TokenCleanupService>();
 
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),

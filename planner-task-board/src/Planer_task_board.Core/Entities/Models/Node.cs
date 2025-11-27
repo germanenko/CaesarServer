@@ -6,7 +6,6 @@ namespace Planer_task_board.Core.Entities.Models
     public class Node : ModelBase
     {
         public NodeType Type { get; set; }
-        public Guid RootId { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
         public DateTime CreatedAt { get; set; }

@@ -12,5 +12,6 @@ namespace planner_notify_service.Core.IRepository
     {
         Task<FirebaseToken?> AddFirebaseToken(Guid account, string firebaseToken, Guid deviceId);
         Task<List<FirebaseToken>?> GetTokens(Guid accountId);
+        Task DeleteInvalidTokens();
     }
 }
