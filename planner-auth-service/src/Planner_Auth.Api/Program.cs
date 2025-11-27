@@ -209,6 +209,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAuthService, AuthService>();
     services.AddScoped<IAccountRepository, AccountRepository>();
 
+    services.AddHostedService<TokenCleanupService>();
     services.AddHostedService(provider => provider.GetRequiredService<RabbitMqService>());
 }
 

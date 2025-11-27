@@ -15,15 +15,13 @@ namespace Planner_Auth.App.Service
     public class TokenCleanupService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IAccountRepository _accountRepository;
         private readonly ILogger<TokenCleanupService> _logger;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromDays(1); // Запускаем раз в день
+        private readonly TimeSpan _checkInterval = TimeSpan.FromDays(1);
 
-        public TokenCleanupService(IServiceProvider serviceProvider, ILogger<TokenCleanupService> logger, IAccountRepository accountRepository)
+        public TokenCleanupService(IServiceProvider serviceProvider, ILogger<TokenCleanupService> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
-            _accountRepository = accountRepository;
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
@@ -51,7 +49,9 @@ namespace Planner_Auth.App.Service
 
         private async Task CleanUpInactiveDevicesAsync()
         {
-            await _accountRepository.DeleteInvalidSessions();
+            using var scope = _serviceProvider.CreateScope();
+            var accountRepository = scope.ServiceProvider.GetRequiredService<IAccountRepository>();
+            await accountRepository.DeleteInvalidSessions();
         }
     }
 }
