@@ -991,6 +991,32 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/enableNotifications",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/enableNotifications",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/disableNotifications",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/disableNotifications",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/chat",
             "DownstreamScheme": "http",

@@ -300,5 +300,17 @@ namespace Planner_chat_server.App.Service
                 Body = drafts.Select(x => x.ToMessageDraftBody()).ToList()
             };
         }
+
+        public async Task<ServiceResponse<bool>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
+        {
+            var enabled = await _chatRepository.EnableNotifications(accountId, chatId, enable);
+
+            return new ServiceResponse<bool>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = enabled
+            };
+        }
     }
 }

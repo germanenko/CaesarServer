@@ -491,5 +491,33 @@ namespace Planner_chat_server.Infrastructure.Repository
         {
             return await _context.MessageDrafts.Include(d => d.ChatMembership).Where(x => x.ChatMembership.AccountId == accountId).ToListAsync();
         }
+
+        public async Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId)
+        {
+            var membership = await _context.ChatMemberships.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+
+            return membership.NotificationsEnabled;
+        }
+
+        public async Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId)
+        {
+            return await _context.ChatMemberships
+                .Where(cm => accountIds.Contains(cm.AccountId)
+                            && cm.ChatId == chatId
+                            && cm.NotificationsEnabled)
+                .Select(cm => cm.AccountId)
+                .ToListAsync();
+        }
+
+        public async Task<bool> EnableNotifications(Guid accountId, Guid chatId, bool enable)
+        {
+            var membership = await _context.ChatMemberships.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+
+            membership.NotificationsEnabled = enable;
+
+            await _context.SaveChangesAsync();
+
+            return membership.NotificationsEnabled;
+        }
     }
 }

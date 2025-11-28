@@ -237,5 +237,39 @@ namespace Planner_chat_server.Api.Controllers
 
             return StatusCode((int)result.StatusCode);
         }
+
+        [HttpPost("api/enableNotifications"), Authorize]
+        [SwaggerOperation("Включить уведомления от чата")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> EnableNotifications(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromQuery] Guid chatId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, true);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpPost("api/disableNotifications"), Authorize]
+        [SwaggerOperation("Выключить уведомления от чата")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> DisableNotifications(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromQuery] Guid chatId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, false);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
     }
 }

@@ -1,8 +1,9 @@
-using System.Net.WebSockets;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
+using System.Net;
+using System.Net.WebSockets;
 
 namespace Planner_chat_server.Core.IService
 {
@@ -20,5 +21,6 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDrafts(Guid accountId, List<MessageDraftBody> drafts);
         Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId);
         Task<ServiceResponse<List<MessageDraftBody>>> GetMessageDrafts(Guid accountId);
+        Task<ServiceResponse<bool>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
     }
 }

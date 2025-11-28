@@ -172,22 +172,31 @@ namespace Planner_chat_server.App.Service
             try
             {
                 var user = await _userService.GetUserData(message.SenderId);
-                foreach (var accountId in notConnectedAccountIds)
+
+                Dictionary<string, string> data = new Dictionary<string, string>()
                 {
-                    //await _firebaseService.SendNotificationAsync(firebaseToken.Token, senderName, message.Content);
+                    { "type", NotificationType.ChatMessage.ToString() },
+                    { "chatId", chat.Id.ToString() },
+                    { "senderName", user.Nickname },
+                    { "messageId", message.Id.ToString() },
+                    { "message", message.Content },
+                    { "iconUrl", user.UrlIcon }
+                };
 
-                    Dictionary<string, string> data = new Dictionary<string, string>()
-                    {
-                        { "type", NotificationType.ChatMessage.ToString() },
-                        { "chatId", chat.Id.ToString() },
-                        { "senderName", user.Nickname },
-                        { "messageId", message.Id.ToString() },
-                        { "message", message.Content },
-                        { "iconUrl", user.UrlIcon }
-                    };
+                var usersWithEnabledNotifications = await _chatRepository
+                    .GetUsersWithEnabledNotifications(notConnectedAccountIds, chat.Id);
 
-                    await _notificationService.SendNotification(accountId, user.Nickname, message.Content, NotificationType.ChatMessage, data);
-                }
+                var notificationTasks = usersWithEnabledNotifications.Select(accountId =>
+                    _notificationService.SendNotification(
+                        accountId,
+                        user.Nickname,
+                        message.Content,
+                        NotificationType.ChatMessage,
+                        data
+                    )
+                );
+
+                await Task.WhenAll(notificationTasks);
             }
             catch (Exception ex)
             {
