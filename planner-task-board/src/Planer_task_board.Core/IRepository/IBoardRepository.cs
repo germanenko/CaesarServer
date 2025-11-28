@@ -16,7 +16,7 @@ namespace Planer_task_board.Core.IRepository
         Task<Node?> GetBoardColumn(Guid columnId);
         Task<Node?> GetBoardColumnByChild(Guid childId);
         Task<IEnumerable<Guid>> GetBoardMembers(Guid boardId, int count, int offset);
-        Task<IEnumerable<AccessRight>> GetBoardMembers(IEnumerable<Guid> memberIds, Guid boardId);
+        Task<IEnumerable<AccessRight>> GetBoardMembers(IEnumerable<Guid?> memberIds, Guid boardId);
         Task<AccessRight?> AddBoardMember(Guid accountId, Guid boardId, AccessType accessType);
         Task<Node?> AddBoardColumn(CreateColumnBody column, Guid accountId);
         Task<List<Node>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId);

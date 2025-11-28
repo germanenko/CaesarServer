@@ -11,6 +11,8 @@ namespace Planer_task_board.Core.Enums
         Board,
         Column,
         Task,
-        Message
+        Message,
+        AccessGroup,
+        AccessGroupMember
     }
 }

@@ -326,14 +326,16 @@ namespace Planer_task_board.Infrastructure.Repository
                         a => a.NodeId,
                         (n, a) => a)
                     .Select(a => a.AccountId)
+                    .Where(id => id.HasValue) 
+                    .Select(id => id.Value)  
                     .ToListAsync();
-
 
                 var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
                 {
                     AccountIds = boardMembers.ToList(),
                     TaskIds = new List<Guid> { task.Id },
                 };
+                
 
                 _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
             }

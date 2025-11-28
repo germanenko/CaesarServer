@@ -93,6 +93,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
     services.AddScoped<IBoardService, BoardService>();
+    services.AddScoped<IAccessService, AccessService>();
 
     services.AddScoped<IBoardRepository, BoardRepository>();
     services.AddScoped<IPublicationStatusRepository, PublicationStatusRepository>();

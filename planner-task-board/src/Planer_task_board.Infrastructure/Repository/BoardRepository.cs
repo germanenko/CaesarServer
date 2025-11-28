@@ -185,10 +185,10 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Take(count)
                 .ToListAsync();
 
-            return members.Select(e => e.AccountId);
+            return members.Where(e => e.AccountId.HasValue).Select(e => e.AccountId.Value);
         }
 
-        public async Task<IEnumerable<AccessRight>> GetBoardMembers(IEnumerable<Guid> memberIds, Guid boardId)
+        public async Task<IEnumerable<AccessRight>> GetBoardMembers(IEnumerable<Guid?> memberIds, Guid boardId)
         {
             return await _context.AccessRights
                 .Where(e => e.NodeId == boardId && memberIds.Contains(e.AccountId))
