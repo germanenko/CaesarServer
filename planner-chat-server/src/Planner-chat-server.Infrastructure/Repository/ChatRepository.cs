@@ -455,7 +455,7 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             if (result != null)
             {
-                if(content == "")
+                if(string.IsNullOrEmpty(content))
                 {
                     _context.Remove(result);
                     await _context.SaveChangesAsync();

@@ -112,7 +112,7 @@ void ConfigureServices(IServiceCollection services)
         addAccountsToTaskChatsQueue
     ));
 
-    services.AddHostedService<RabbitMqService>(sp => new RabbitMqService
+    services.AddHostedService(sp => new RabbitMqService
     (
         sp.GetRequiredService<IServiceScopeFactory>(),
         hostname,

@@ -239,6 +239,16 @@ namespace Planner_chat_server.App.Service
         {
             var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
 
+            if(membership == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    StatusCode = HttpStatusCode.Forbidden,
+                    IsSuccess = false,
+                    Errors = new[] { "Вы не участник этого чата" } 
+                };
+            }
+
             var result = await _chatRepository.CreateOrUpdateMessageDraft(membership, content);
 
             return new ServiceResponse<bool>
