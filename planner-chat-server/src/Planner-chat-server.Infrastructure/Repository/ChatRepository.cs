@@ -509,15 +509,20 @@ namespace Planner_chat_server.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<bool> EnableNotifications(Guid accountId, Guid chatId, bool enable)
+        public async Task<ChatMembership?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
             var membership = await _context.ChatMemberships.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+
+            if(membership == null)
+            {
+                return null;
+            }
 
             membership.NotificationsEnabled = enable;
 
             await _context.SaveChangesAsync();
 
-            return membership.NotificationsEnabled;
+            return membership;
         }
     }
 }

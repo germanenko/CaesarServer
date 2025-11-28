@@ -303,13 +303,23 @@ namespace Planner_chat_server.App.Service
 
         public async Task<ServiceResponse<bool>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
-            var enabled = await _chatRepository.EnableNotifications(accountId, chatId, enable);
+            var membership = await _chatRepository.SetEnabledNotifications(accountId, chatId, enable);
+
+            if (membership == null)
+            {
+                return new ServiceResponse<bool>
+                {
+                    StatusCode = HttpStatusCode.Forbidden,
+                    IsSuccess = true,
+                    Errors = new[] { "Нет доступа к чату" }
+                };
+            }
 
             return new ServiceResponse<bool>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = enabled
+                Body = true
             };
         }
     }
