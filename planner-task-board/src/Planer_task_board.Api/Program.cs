@@ -1,4 +1,5 @@
 using System.Text;
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -99,6 +100,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IPublicationStatusRepository, PublicationStatusRepository>();
     services.AddScoped<ITaskRepository, TaskRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
+    services.AddScoped<IAccessRepository, AccessRepository>();
 
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService
