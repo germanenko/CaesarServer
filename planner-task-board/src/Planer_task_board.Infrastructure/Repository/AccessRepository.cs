@@ -20,173 +20,111 @@ namespace Planer_task_board.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<Node?> CreateOrUpdateGroup(Guid accountId, CreateAccessGroupBody body)
+        public async Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
         {
             var hasAccess = await CheckAccess(accountId, body.BoardId);
+            if (!hasAccess)
+                return null;
 
-            if (hasAccess)
+            var group = new AccessGroup()
             {
-                var newNodes = new List<Node>();
-                var newNodeLinks = new List<NodeLink>();
+                Id = Guid.NewGuid(),
+                Name = body.Name
+            };
 
-                var group = new AccessGroup()
-                {
-                    Id = body.Id,
-                    Name = body.Name
-                };
+            await _context.AccessGroups.AddAsync(group);
 
-                newNodes.Add(new Node()
-                {
-                    Id = body.Id,
-                    Name = body.Name,
-                    CreatedBy = accountId,
-                    CreatedAt = DateTime.UtcNow,
-                    Type = NodeType.AccessGroup,
-                    Props = JsonSerializer.Serialize(group)
-                });
+            var members = body.UserIds.Select(userId => new AccessGroupMember()
+            {
+                AccessGroupId = group.Id,
+                AccountId = userId,
+                JoinedAt = DateTime.UtcNow
+            }).ToList();
 
-                newNodeLinks.Add(new NodeLink()
-                {
-                    ParentId = body.BoardId,
-                    ChildId = body.Id,
-                    ParentType = NodeType.Board,
-                    ChildType = NodeType.AccessGroup
-                });
+            await _context.AccessGroupMembers.AddRangeAsync(members);
 
-                foreach (var userId in body.UserIds)
-                {
-                    var member = new AccessGroupMember()
-                    {
-                        AccessGroupId = group.Id,
-                        JoinedAt = DateTime.UtcNow,
-                        AccountId = userId,
-                    };
+            var accessRight = new AccessRight()
+            {
+                NodeId = body.BoardId,
+                AccessGroupId = group.Id
+            };
+            await _context.AccessRights.AddAsync(accessRight);
 
-                    newNodes.Add(new Node()
-                    {
-                        Id = member.Id,
-                        CreatedBy = accountId,
-                        CreatedAt = DateTime.UtcNow,
-                        Type = NodeType.AccessGroupMember,
-                        Props = JsonSerializer.Serialize(member)
-                    });
+            await _context.SaveChangesAsync();
 
-                    newNodeLinks.Add(new NodeLink()
-                    {
-                        ParentId = group.Id,
-                        ChildId = member.Id,
-                        ParentType = NodeType.AccessGroup,
-                        ChildType = NodeType.AccessGroupMember
-                    });
-
-                }
-
-                await _context.Nodes.AddRangeAsync(newNodes);
-                await _context.NodeLinks.AddRangeAsync(newNodeLinks);
-
-                await _context.SaveChangesAsync();
-            }
-
-            return null;
+            group.Members = members;
+            return group;
         }
 
-        public async Task<Node?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
+        public async Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
         {
-            var board = await _context.NodeLinks.Where(x => x.ChildId == groupId).FirstOrDefaultAsync();
+            var accessRight = await _context.AccessRights
+                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId);
 
-            var hasAccess = await CheckAccess(accountId, board.ParentId);
+            if (accessRight == null)
+                return null;
 
-            if (hasAccess)
-            { 
-                var groupNode = await _context.Nodes.Where(x => x.Id == groupId).FirstOrDefaultAsync();
+            var hasAccess = await CheckAccess(accountId, accessRight.NodeId);
+            if (!hasAccess)
+                return null;
 
-                var group = JsonSerializer.Deserialize<AccessGroup>(groupNode.Props);
+            var existingMember = await _context.AccessGroupMembers
+                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId && x.AccountId == userToAdd);
 
-                var member = new AccessGroupMember()
-                {
-                    AccessGroupId = group.Id,
-                    JoinedAt = DateTime.UtcNow,
-                    AccountId = userToAdd,
-                };
+            if (existingMember != null)
+                return existingMember;
 
-                group.Members.Add(member);
+            var member = new AccessGroupMember()
+            {
+                AccessGroupId = groupId,
+                AccountId = userToAdd,
+                JoinedAt = DateTime.UtcNow
+            };
 
-                groupNode.Props = JsonSerializer.Serialize(group);
+            await _context.AccessGroupMembers.AddAsync(member);
+            await _context.SaveChangesAsync();
 
-                await _context.SaveChangesAsync();
-
-                return groupNode;
-            }
-
-            return null;
+            return member;
         }
 
         public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
         {
-            var creator = await _context.Nodes.AnyAsync(x => x.CreatedBy == accountId && x.Id == nodeId);
+            var isCreator = await _context.Nodes
+                .AnyAsync(n => n.Id == nodeId && n.CreatedBy == accountId);
 
-            if (creator)
+            if (isCreator)
                 return true;
 
-            var directAccess = await _context.AccessRights.AnyAsync(x => x.NodeId == nodeId && x.AccountId == accountId);
-
-            if (directAccess)
-                return true;
-
-            var userGroupAccess = await _context.AccessRights
-                .Where(ar => ar.NodeId == nodeId && ar.IsGroupAccess)
-                .Select(ar => ar.AccessGroupId.Value)
-                .Join(_context.NodeLinks,
-                    groupId => groupId,
-                    nodeLink => nodeLink.ParentId,
-                    (groupId, nodeLink) => nodeLink)
-                .Where(nl => nl.ChildNode.Type == NodeType.AccessGroup)
-                .Select(nl => nl.ChildNode.Props)
-                .AnyAsync(props => CheckIfUserInGroup(props, accountId));
-
-            return userGroupAccess;
+            return await _context.AccessRights
+                .Where(ar => ar.NodeId == nodeId)
+                .AnyAsync(ar =>
+                    (!ar.IsGroupAccess && ar.AccountId == accountId) ||
+                    (ar.IsGroupAccess && ar.AccessGroup.Members.Any(m => m.AccountId == accountId)));
         }
 
-        private bool CheckIfUserInGroup(string? props, Guid accountId)
+
+        public async Task<AccessGroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
         {
-            if (string.IsNullOrEmpty(props))
-                return false;
+            var accessRight = await _context.AccessRights
+                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId);
 
-            try
-            {
-                var memberIds = JsonSerializer.Deserialize<List<Guid>>(props);
-                return memberIds?.Contains(accountId) == true;
-            }
-            catch
-            {
-                return false;
-            }
-        }
+            if (accessRight == null)
+                return null;
 
-        public async Task<Node?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
-        {
-            var board = await _context.NodeLinks.Where(x => x.ChildId == groupId).FirstOrDefaultAsync();
+            var hasAccess = await CheckAccess(accountId, accessRight.NodeId);
+            if (!hasAccess)
+                return null;
 
-            var hasAccess = await CheckAccess(accountId, board.ParentId);
+            var groupMember = await _context.AccessGroupMembers
+                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId && x.AccountId == userToRemove);
 
-            if (hasAccess)
-            {
-                var groupNode = await _context.Nodes.Where(x => x.Id == groupId).FirstOrDefaultAsync();
+            if (groupMember == null)
+                return null;
 
-                var group = JsonSerializer.Deserialize<AccessGroup>(groupNode.Props);
+            _context.AccessGroupMembers.Remove(groupMember);
+            await _context.SaveChangesAsync();
 
-                var member = group.Members.Where(x => x.AccountId == accountId).FirstOrDefault();
-
-                group.Members.Remove(member);
-
-                groupNode.Props = JsonSerializer.Serialize(group);
-
-                await _context.SaveChangesAsync();
-
-                return groupNode;
-            }
-
-            return null;
+            return groupMember;
         }
     }
 }

@@ -36,7 +36,7 @@ namespace Planer_task_board.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.CreateOrUpdateAccessGroup(tokenPayload.AccountId, body);
+            var result = await _accessService.CreateAccessGroup(tokenPayload.AccountId, body);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 

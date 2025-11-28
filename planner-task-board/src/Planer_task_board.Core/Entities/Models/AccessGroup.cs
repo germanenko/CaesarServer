@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Planer_task_board.Core.Entities.Response;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,5 +11,14 @@ namespace Planer_task_board.Core.Entities.Models
     {
         public string Name { get; set; } 
         public List<AccessGroupMember> Members { get; set; } = new();
+
+        public AccessGroupBody ToAccessGroupBody()
+        {
+            return new AccessGroupBody
+            {
+                Id = Id,
+                Name = Name
+            };
+        }
     }
 }

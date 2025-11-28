@@ -6,6 +6,7 @@ using Planer_task_board.Core.IService;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml.Linq;
@@ -21,13 +22,13 @@ namespace Planer_task_board.App.Service
             _accessRepository = accessRepository;
         }
 
-        public async Task<ServiceResponse<NodeBody>> CreateOrUpdateAccessGroup(Guid accountId, CreateAccessGroupBody body)
+        public async Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body)
         {
-            var group = await _accessRepository.CreateOrUpdateGroup(accountId, body);
+            var group = await _accessRepository.CreateGroup(accountId, body);
 
             if(group == null)
             {
-                return new ServiceResponse<NodeBody>()
+                return new ServiceResponse<AccessGroupBody>()
                 {
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -35,21 +36,21 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            return new ServiceResponse<NodeBody>()
+            return new ServiceResponse<AccessGroupBody>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = group.ToNodeBody()
+                Body = group.ToAccessGroupBody()
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
+        public async Task<ServiceResponse<AccessGroupMemberBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
         {
             var group = await _accessRepository.AddUserToGroup(accountId, userToAdd, groupId);
 
             if(group == null)
             {
-                return new ServiceResponse<NodeBody>()
+                return new ServiceResponse<AccessGroupMemberBody>()
                 {
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -57,21 +58,21 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            return new ServiceResponse<NodeBody>()
+            return new ServiceResponse<AccessGroupMemberBody>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = group.ToNodeBody()
+                Body = group.ToAccessGroupMemberBody()
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
+        public async Task<ServiceResponse<HttpStatusCode>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
         {
             var group = await _accessRepository.RemoveUserFromGroup(accountId, userToRemove, groupId);
 
             if (group == null)
             {
-                return new ServiceResponse<NodeBody>()
+                return new ServiceResponse<HttpStatusCode>()
                 {
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -79,11 +80,11 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            return new ServiceResponse<NodeBody>()
+            return new ServiceResponse<HttpStatusCode>()
             {
                 IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Body = group.ToNodeBody()
+                StatusCode = HttpStatusCode.OK,
+                Body = HttpStatusCode.OK
             };
         }
     }

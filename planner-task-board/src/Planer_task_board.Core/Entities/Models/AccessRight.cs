@@ -6,6 +6,7 @@ namespace Planer_task_board.Core.Entities.Models
     {
         public Guid? AccountId { get; set; }
         public Guid? AccessGroupId { get; set; }
+        public AccessGroup AccessGroup { get; set; }
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
         public AccessType AccessType { get; set; }

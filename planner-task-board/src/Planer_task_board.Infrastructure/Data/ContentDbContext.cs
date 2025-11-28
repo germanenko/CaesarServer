@@ -18,14 +18,11 @@ namespace Planer_task_board.Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
         }
 
-        //public DbSet<TaskModel> Tasks { get; set; }
-        //public DbSet<DeletedTask> DeletedTasks { get; set; }
-        //public DbSet<BoardColumn> BoardColumns { get; set; }
-        //public DbSet<Board> Boards { get; set; }
-        //public DbSet<TaskPerformer> TaskPerformers { get; set; }
         public DbSet<Node> Nodes { get; set; }
         public DbSet<NodeLink> NodeLinks { get; set; }
         public DbSet<AccessRight> AccessRights { get; set; }
+        public DbSet<AccessGroup> AccessGroups { get; set; }
+        public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
         public DbSet<PublicationStatusModel> PublicationStatuses { get; set; }
         public DbSet<WorkflowStatusModel> WorkflowStatuses { get; set; }
     }

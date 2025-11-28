@@ -49,6 +49,13 @@ namespace Planer_task_board.Infrastructure.Repository
                 AccessType = AccessType.Creator
             });
 
+            await _context.NodeLinks.AddAsync(new NodeLink()
+            {
+                ParentId = boardNode.Id,
+                ChildId = boardNode.Id,
+                UpdatedAt = boardNode.UpdatedAt
+            });
+
 
             boardNode = (await _context.Nodes.AddAsync(boardNode))?.Entity;
             await _context.SaveChangesAsync();
@@ -215,6 +222,13 @@ namespace Planer_task_board.Infrastructure.Repository
                 UpdatedAt = column.UpdatedAt
             });
 
+            await _context.NodeLinks.AddAsync(new NodeLink()
+            {
+                ParentId = columnNode.Id,
+                ChildId = columnNode.Id,
+                UpdatedAt = columnNode.UpdatedAt
+            });
+
             columnNode = (await _context.Nodes.AddAsync(columnNode))?.Entity;
 
             await _context.SaveChangesAsync();
@@ -225,21 +239,38 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<List<Node>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
         {
             var columnNodes = new List<Node>();
+            var statuses = new List<PublicationStatusModel>();
+            var links = new List<NodeLink>();
 
             foreach (var column in columns)
             {
-                var columnNode = new Node
+                columnNodes.Add(new Node
                 {
                     Id = column.Id,
                     Name = column.Name,
                     UpdatedAt = column.UpdatedAt,
                     CreatedBy = accountId,
                     CreatedAt = column.UpdatedAt
-                };
-                columnNodes.Add(columnNode);
+                });
+
+                statuses.Add(new PublicationStatusModel()
+                {
+                    NodeId = column.Id,
+                    Status = column.PublicationStatus,
+                    UpdatedAt = column.UpdatedAt
+                });
+
+                links.Add(new NodeLink()
+                {
+                    ParentId = column.Id,
+                    ChildId = column.Id,
+                    UpdatedAt = column.UpdatedAt
+                });
             }
 
             await _context.Nodes.AddRangeAsync(columnNodes);
+            await _context.PublicationStatuses.AddRangeAsync(statuses);
+            await _context.NodeLinks.AddRangeAsync(links);
 
             await _context.SaveChangesAsync();
 

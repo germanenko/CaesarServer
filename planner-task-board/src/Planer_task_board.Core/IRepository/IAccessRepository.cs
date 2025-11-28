@@ -7,9 +7,9 @@ namespace Planer_task_board.Core.IRepository
 {
     public interface IAccessRepository
     {
-        Task<Node?> CreateOrUpdateGroup(Guid accountId, CreateAccessGroupBody body);
-        Task<Node?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
-        Task<Node?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
+        Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
+        Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
+        Task<AccessGroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
         Task<bool> CheckAccess(Guid accountId, Guid nodeId);
     }
 }
