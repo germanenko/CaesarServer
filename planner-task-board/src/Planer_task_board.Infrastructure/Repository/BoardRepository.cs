@@ -25,42 +25,60 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
         {
-            var boardNode = new Node
+            var board = new Board
             {
-                Id = createBoardBody.Id,
+                Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
                 Name = createBoardBody.Name,
-                UpdatedAt = createBoardBody.UpdatedAt,
-                CreatedAt = createBoardBody.UpdatedAt,
-                CreatedBy = accountId
+                Type = NodeType.Board,
+                Props = createBoardBody.Props,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                CreatedBy = accountId,
+                UpdatedBy = accountId
             };
 
-            await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
+            await _context.Boards.AddAsync(board);
+
+            var publicationStatus = new PublicationStatusModel()
             {
-                Node = boardNode,
-                NodeId = boardNode.Id,
+                Id = Guid.NewGuid(),
+                Node = board,
+                NodeId = board.Id,
                 Status = createBoardBody.PublicationStatus,
-                UpdatedAt = boardNode.UpdatedAt
-            });
+                UpdatedAt = DateTime.UtcNow
+            };
 
-            await _context.AccessRights.AddAsync(new AccessRight()
+            await _context.PublicationStatuses.AddAsync(publicationStatus);
+
+            var accessRight = new AccessRight()
             {
+                Id = Guid.NewGuid(),
+                Type = NodeType.AccessRight,
                 AccountId = accountId,
-                NodeId = boardNode.Id,
-                AccessType = AccessType.Creator
-            });
+                NodeId = board.Id,
+                Node = board, 
+                AccessType = AccessType.Creator,
+                CreatedAt = DateTime.UtcNow,
+                UpdatedAt = DateTime.UtcNow,
+                CreatedBy = accountId,
+                UpdatedBy = accountId
+            };
 
-            await _context.NodeLinks.AddAsync(new NodeLink()
+            await _context.AccessRights.AddAsync(accessRight);
+
+            var nodeLink = new NodeLink()
             {
-                ParentId = boardNode.Id,
-                ChildId = boardNode.Id,
-                UpdatedAt = boardNode.UpdatedAt
-            });
+                Id = Guid.NewGuid(),
+                ParentId = board.Id,
+                ChildId = board.Id,
+                UpdatedAt = DateTime.UtcNow
+            };
 
+            await _context.NodeLinks.AddAsync(nodeLink);
 
-            boardNode = (await _context.Nodes.AddAsync(boardNode))?.Entity;
             await _context.SaveChangesAsync();
 
-            return boardNode;
+            return board;
         }
 
         public async Task<List<Node>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)

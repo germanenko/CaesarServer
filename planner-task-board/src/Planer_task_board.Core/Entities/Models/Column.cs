@@ -2,7 +2,7 @@ using Planer_task_board.Core.Entities.Response;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class BoardColumn : ModelBase
+    public class Column : Node
     {
         public string Name { get; set; }
 

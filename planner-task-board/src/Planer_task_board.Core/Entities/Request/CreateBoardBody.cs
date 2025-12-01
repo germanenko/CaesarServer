@@ -10,5 +10,6 @@ namespace Planer_task_board.Core.Entities.Request
         [Required] public string Name { get; set; }
         [Required] public DateTime UpdatedAt { get; set; }
         [Required] public PublicationStatus PublicationStatus { get; set; }
+        public string Props { get; set; }
     }
 }

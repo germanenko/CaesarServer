@@ -8,7 +8,6 @@ namespace Planer_task_board.Core.Entities.Response
         public string Title { get; set; }
         public string Description { get; set; }
         public int PriorityOrder { get; set; }
-        public Status Status { get; set; }
 
         public string? HexColor { get; set; }
 

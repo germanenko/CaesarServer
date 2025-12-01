@@ -2,7 +2,7 @@
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class AccessRight : ModelBase
+    public class AccessRight : Node
     {
         public Guid? AccountId { get; set; }
         public Guid? AccessGroupId { get; set; }

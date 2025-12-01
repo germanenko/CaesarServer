@@ -14,6 +14,8 @@ using Planer_task_board.Infrastructure.Repository;
 using Planer_task_board.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 
+Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
 
@@ -32,7 +34,8 @@ string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? thr
 
 void ConfigureServices(IServiceCollection services)
 {
-    var contentDbConnectionString = GetEnvVar("CONTENT_DB_CONNECTION_STRING");
+    //var contentDbConnectionString = GetEnvVar("CONTENT_DB_CONNECTION_STRING");
+    var contentDbConnectionString = "Server=188.225.18.18:5436;Database=planner-content;User Id=user;Password=*Planner;";
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
@@ -88,6 +91,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(contentDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("Planer_task_board.Api");
         });
     });
 

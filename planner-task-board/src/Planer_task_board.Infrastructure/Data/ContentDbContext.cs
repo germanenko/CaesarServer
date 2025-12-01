@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Enums;
+using System;
 
 namespace Planer_task_board.Infrastructure.Data
 {
@@ -16,10 +17,15 @@ namespace Planer_task_board.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
+
+            modelBuilder.Entity<Node>().UseTptMappingStrategy();
         }
 
         public DbSet<Node> Nodes { get; set; }
         public DbSet<NodeLink> NodeLinks { get; set; }
+        public DbSet<Board> Boards { get; set; }
+        public DbSet<Column> Columns { get; set; }
+        public DbSet<TaskModel> Tasks { get; set; }
         public DbSet<AccessRight> AccessRights { get; set; }
         public DbSet<AccessGroup> AccessGroups { get; set; }
         public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }

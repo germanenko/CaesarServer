@@ -2,10 +2,8 @@ using Planer_task_board.Core.Entities.Response;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class Board : ModelBase
+    public class Board : Node
     { 
-        public string Name { get; set; }
-
         public BoardBody ToBoardBody()
         {
             return new BoardBody

@@ -13,8 +13,6 @@ namespace Planer_task_board.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<AccessRight> builder)
         {
-            builder.HasKey(e => e.Id);
-
             builder.HasIndex(e => e.InternalId)
             .IsUnique();
 

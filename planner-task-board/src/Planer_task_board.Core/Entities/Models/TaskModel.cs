@@ -4,13 +4,12 @@ using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class TaskModel : ModelBase
+    public class TaskModel : Node
     {
         [MaxLength(128)]
-        public string Title { get; set; }
+        public string Name { get; set; }
         public string Description { get; set; }
         public int PriorityOrder { get; set; }
-        public string Status { get; set; }
 
         [MaxLength(7)]
         public string? HexColor { get; set; }
@@ -18,15 +17,8 @@ namespace Planer_task_board.Core.Entities.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
         public DateTime CreatedAtDate { get; set; } = DateTime.UtcNow;
-        public bool IsDraft { get; set; }
-        public string Type { get; set; }
-
-        public Node? DraftOfTask { get; set; }
-        public Guid? DraftOfTaskId { get; set; }
         public Guid? ChatId { get; set; }
-
         public Guid CreatorId { get; set; }
-        //public List<TaskAttachedMessage> AttachedMessages { get; set; } = new();
 
 
         public TaskBody ToTaskBody()
@@ -34,11 +26,10 @@ namespace Planer_task_board.Core.Entities.Models
             return new TaskBody
             {
                 Id = Id,
-                Title = Title,
+                Title = Name,
                 Description = Description,
                 HexColor = HexColor,
                 PriorityOrder = PriorityOrder,
-                Status = Enum.Parse<Status>(Status),
                 StartDate = StartDate?.ToString("s"),
                 EndDate = EndDate?.ToString("s"),
                 ChatId = ChatId,

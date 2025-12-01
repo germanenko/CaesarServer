@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Planer_task_board.Core.Entities.Models
 {
-    public class AccessGroupMember : ModelBase
+    public class AccessGroupMember : Node
     {
         public Guid AccessGroupId { get; set; }
         public AccessGroup AccessGroup { get; set; }
