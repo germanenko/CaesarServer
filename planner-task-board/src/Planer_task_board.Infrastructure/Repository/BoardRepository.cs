@@ -53,6 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
             var accessRight = new AccessRight()
             {
                 Id = Guid.NewGuid(),
+                Name = "Access",
                 Type = NodeType.AccessRight,
                 AccountId = accountId,
                 NodeId = board.Id,
