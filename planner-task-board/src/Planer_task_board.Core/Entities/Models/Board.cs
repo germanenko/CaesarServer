@@ -9,8 +9,7 @@ namespace Planer_task_board.Core.Entities.Models
             return new BoardBody
             {
                 Id = Id,
-                Name = Name,
-                UpdatedAt = UpdatedAt
+                Name = Name
             };
         }
     }

@@ -4,15 +4,12 @@ namespace Planer_task_board.Core.Entities.Models
 {
     public class Column : Node
     {
-        public string Name { get; set; }
-
-        public BoardColumnBody ToBoardColumnBody()
+        public ColumnBody ToColumnBody()
         {
-            return new BoardColumnBody
+            return new ColumnBody
             {
                 Id = Id,
-                Name = Name,
-                UpdatedAt = UpdatedAt
+                Name = Name
             };
         }
     }

@@ -14,8 +14,6 @@ namespace Planer_task_board.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Column> builder)
         {
             builder.ToTable("Columns");
-
-            builder.HasIndex(b => b.CreatedBy);
         }
     }
 }

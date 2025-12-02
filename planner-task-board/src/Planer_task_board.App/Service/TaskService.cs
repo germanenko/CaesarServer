@@ -267,7 +267,7 @@ namespace Planer_task_board.App.Service
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-            var result = await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt);
+            var result = await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow);
             return result == null ? new ServiceResponse<NodeBody>
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -304,7 +304,7 @@ namespace Planer_task_board.App.Service
                 DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
                 DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
 
-                result.Add((await _taskRepository.UpdateAsync(taskBody.Id, taskBody, taskBody.UpdatedAt)).ToNodeBody());
+                result.Add((await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow)).ToNodeBody());
             }
             
             return result.Count != taskBodies.Count ? new ServiceResponse<List<NodeBody>>

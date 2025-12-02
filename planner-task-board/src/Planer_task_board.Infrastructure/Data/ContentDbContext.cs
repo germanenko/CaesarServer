@@ -31,5 +31,6 @@ namespace Planer_task_board.Infrastructure.Data
         public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
         public DbSet<PublicationStatusModel> PublicationStatuses { get; set; }
         public DbSet<WorkflowStatusModel> WorkflowStatuses { get; set; }
+        public DbSet<History> History { get; set; }
     }
 }

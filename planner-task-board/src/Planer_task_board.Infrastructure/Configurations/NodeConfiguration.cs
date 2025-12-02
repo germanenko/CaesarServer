@@ -33,28 +33,9 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.Property(e => e.Props)
                 .HasColumnType("jsonb");
 
-            builder.Property(e => e.CreatedAt)
-                .IsRequired()
-                .HasDefaultValueSql("NOW()");
-
-            builder.Property(e => e.UpdatedAt)
-                .IsRequired()
-                .HasDefaultValueSql("NOW()")
-                .ValueGeneratedOnAddOrUpdate();
-
-            builder.Property(e => e.CreatedBy)
-                .IsRequired();
-
-            builder.Property(e => e.UpdatedBy)
-                .IsRequired();
-
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);
-            builder.HasIndex(e => e.CreatedBy);
-            builder.HasIndex(e => e.CreatedAt);
-            builder.HasIndex(e => e.UpdatedAt);
 
-            builder.HasIndex(e => new { e.CreatedBy, e.CreatedAt });
         }
     }
 }

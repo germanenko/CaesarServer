@@ -18,11 +18,13 @@ namespace Planer_task_board.Core.IRepository
         Task<Node?> ConvertDraftToTask(Guid id, Guid accountId, Guid? columnId);
         Task<Node?> UpdateAsync(
             Guid id,
+            Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
             Guid? columnId,
             DateTime changeDate);
         Task<Node?> UpdateAsync(
             Guid id,
+            Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
             DateTime changeDate);
         Task AssignTaskToColumn(Guid task, Guid columnId);

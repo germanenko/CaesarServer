@@ -23,8 +23,7 @@ namespace Planer_task_board.Core.Entities.Models
                 Description = Description,
                 HexColor = HexColor,
                 StartDate = StartDate?.ToString("s"),
-                EndDate = EndDate?.ToString("s"),
-                UpdatedAt = UpdatedAt
+                EndDate = EndDate?.ToString("s")
             };
         }
     }

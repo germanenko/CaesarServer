@@ -1,5 +1,4 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
@@ -30,14 +29,19 @@ namespace Planer_task_board.Infrastructure.Repository
                 Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
                 Name = createBoardBody.Name,
                 Type = NodeType.Board,
-                Props = createBoardBody.Props,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedBy = accountId,
-                UpdatedBy = accountId
+                Props = createBoardBody.Props
             };
 
             await _context.Boards.AddAsync(board);
+
+            var history = new History
+            {
+                NodeId = board.Id,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = accountId
+            };
+
+            await _context.History.AddAsync(history);
 
             var publicationStatus = new PublicationStatusModel()
             {
@@ -58,11 +62,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 AccountId = accountId,
                 NodeId = board.Id,
                 Node = board, 
-                AccessType = AccessType.Creator,
-                CreatedAt = DateTime.UtcNow,
-                UpdatedAt = DateTime.UtcNow,
-                CreatedBy = accountId,
-                UpdatedBy = accountId
+                AccessType = AccessType.Creator
             };
 
             await _context.AccessRights.AddAsync(accessRight);
@@ -71,9 +71,17 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = Guid.NewGuid(),
                 ParentId = board.Id,
-                ChildId = board.Id,
-                UpdatedAt = DateTime.UtcNow
+                ChildId = board.Id
             };
+
+            await _context.NodeLinks.AddAsync(nodeLink);
+
+            await _context.History.AddAsync(new History()
+            {
+                NodeId = board.Id,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = accountId
+            });
 
             await _context.NodeLinks.AddAsync(nodeLink);
 
@@ -224,14 +232,18 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> AddBoardColumn(CreateColumnBody column, Guid accountId)
         {
-            var columnNode = new Node
+            var columnNode = new Column
             {
                 Id = column.Id,
-                Name = column.Name,
-                UpdatedAt = column.UpdatedAt,
-                CreatedBy = accountId,
-                CreatedAt = column.UpdatedAt
+                Name = column.Name
             };
+            
+            await _context.History.AddAsync(new History
+            {
+                NodeId = column.Id,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = accountId
+            });
 
             await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
             {
@@ -244,11 +256,10 @@ namespace Planer_task_board.Infrastructure.Repository
             await _context.NodeLinks.AddAsync(new NodeLink()
             {
                 ParentId = columnNode.Id,
-                ChildId = columnNode.Id,
-                UpdatedAt = columnNode.UpdatedAt
+                ChildId = columnNode.Id
             });
 
-            columnNode = (await _context.Nodes.AddAsync(columnNode))?.Entity;
+            columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
 
             await _context.SaveChangesAsync();
 
@@ -260,16 +271,14 @@ namespace Planer_task_board.Infrastructure.Repository
             var columnNodes = new List<Node>();
             var statuses = new List<PublicationStatusModel>();
             var links = new List<NodeLink>();
+            var histories = new List<History>();
 
             foreach (var column in columns)
             {
-                columnNodes.Add(new Node
+                columnNodes.Add(new Column
                 {
                     Id = column.Id,
-                    Name = column.Name,
-                    UpdatedAt = column.UpdatedAt,
-                    CreatedBy = accountId,
-                    CreatedAt = column.UpdatedAt
+                    Name = column.Name
                 });
 
                 statuses.Add(new PublicationStatusModel()
@@ -282,14 +291,20 @@ namespace Planer_task_board.Infrastructure.Repository
                 links.Add(new NodeLink()
                 {
                     ParentId = column.Id,
-                    ChildId = column.Id,
-                    UpdatedAt = column.UpdatedAt
+                    ChildId = column.Id
+                });
+                histories.Add(new History()
+                {
+                    NodeId = column.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = accountId
                 });
             }
 
             await _context.Nodes.AddRangeAsync(columnNodes);
             await _context.PublicationStatuses.AddRangeAsync(statuses);
             await _context.NodeLinks.AddRangeAsync(links);
+            await _context.History.AddRangeAsync(histories);
 
             await _context.SaveChangesAsync();
 

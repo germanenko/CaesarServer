@@ -20,7 +20,6 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.Property(t => t.HexColor)
                 .HasMaxLength(7);
 
-            builder.HasIndex(t => t.CreatedBy);
             builder.HasIndex(t => t.StartDate);
             builder.HasIndex(t => t.EndDate);
         }

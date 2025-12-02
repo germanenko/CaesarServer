@@ -89,7 +89,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
         {
-            var isCreator = await _context.Nodes
+            var isCreator = await _context.History
                 .AnyAsync(n => n.Id == nodeId && n.CreatedBy == accountId);
 
             if (isCreator)

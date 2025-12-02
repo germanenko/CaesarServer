@@ -14,8 +14,6 @@ namespace Planer_task_board.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Board> builder)
         {
             builder.ToTable("Boards");
-
-            builder.HasIndex(b => b.CreatedBy);
         }
     }
 }

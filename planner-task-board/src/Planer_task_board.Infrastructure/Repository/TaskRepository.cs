@@ -36,11 +36,16 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Id = task.Id,
                 Name = task.Title,
-                CreatedAt = task.UpdatedAt,
                 Props = props,
-                Type = NodeType.Task,
-                CreatedBy = accountId
+                Type = NodeType.Task
             };
+
+            await _context.History.AddAsync(new History
+            {
+                NodeId = node.Id,
+                CreatedAt = DateTime.UtcNow,
+                CreatedBy = accountId
+            });
 
             var taskAttachedMessage = new TaskAttachedMessage
             {
@@ -48,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Task = node
             };
 
-            return await AddTaskAsync(node, task.ColumnId, task.PublicationStatus, taskAttachedMessage);
+            return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, taskAttachedMessage);
         }
 
         public async Task<IEnumerable<Node>> GetAll(Guid columnId, bool isDraft = false)
@@ -197,6 +202,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> UpdateAsync(
             Guid id,
+            Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
             Guid? columnId,
             DateTime changeDate)
@@ -210,8 +216,14 @@ namespace Planer_task_board.Infrastructure.Repository
             var task = status.Node;
 
             task.Name = updatedNode.Title;
-            task.Props = JsonSerializer.Serialize(updatedNode);
-            task.UpdatedAt = changeDate;
+            task.Props = JsonSerializer.Serialize(updatedNode); 
+
+            await _context.History.AddAsync(new History
+            {
+                NodeId = task.Id,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId
+            });
 
             var boardColumnTask = _context.NodeLinks.Where(x => x.ChildId == task.Id).First();
             if (boardColumnTask.ParentId != columnId)
@@ -232,6 +244,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<Node?> UpdateAsync(
             Guid id,
+            Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
             DateTime changeDate)
         {
@@ -245,7 +258,13 @@ namespace Planer_task_board.Infrastructure.Repository
 
             draft.Name = updatedNode.Title;
             draft.Props = JsonSerializer.Serialize(updatedNode);
-            draft.UpdatedAt = changeDate;
+
+            await _context.History.AddAsync(new History
+            {
+                NodeId = draft.Id,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId
+            });
 
             await _context.SaveChangesAsync();
             return draft;
@@ -254,6 +273,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         private async Task<Node?> AddTaskAsync(
             Node task,
+            Guid accountId,
             Guid? columnId,
             PublicationStatus publicationStatus,
             TaskAttachedMessage? taskAttachedMessage = null)
@@ -295,8 +315,7 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 Node = task,
                 NodeId = task.Id,
-                Status = publicationStatus,
-                UpdatedAt = task.UpdatedAt
+                Status = publicationStatus
             });
 
             await _context.SaveChangesAsync();
@@ -307,7 +326,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 CreateTaskChat = new CreateTaskChat
                 {
                     TaskId = task.Id,
-                    CreatorId = task.CreatedBy,
+                    CreatorId = accountId,
                     ChatName = $"{task.Name} chat"
                 }
             };
@@ -352,10 +371,15 @@ namespace Planer_task_board.Infrastructure.Repository
                     n1 => n1.ChildId,
                     t => t.Id,
                     (n1, t) => t)
+                .Join(_context.History,
+                    n => n.Id,
+                    h => h.NodeId,
+                    (n, h) => h)
+                .Include(n => n.Node)
                 .Where(x => x.CreatedBy == userId)
                 .ToListAsync();
 
-            return result;
+            return result.Select(x => x.Node);
         }
 
 
