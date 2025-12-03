@@ -1,12 +1,13 @@
 namespace Planner_chat_server.Core.Entities.Models
 {
-    public class ChatMembership
+    public class ChatSettings
     {
         public Guid Id { get; set; }
-        public Guid AccountId { get; set; }
-
         public Guid ChatId { get; set; }
         public Chat Chat { get; set; }
+        public Guid AccountId { get; set; }
+        public string? ChatName { get; set; }
+        public string? MessageDraft { get; set; }
         public DateTime DateLastViewing { get; set; } = DateTime.UtcNow;
         public bool NotificationsEnabled { get; set; } = true;
 

@@ -44,14 +44,14 @@ namespace Planner_chat_server.App.Service
         }
 
         public async Task Invoke(
-            Core.Entities.Models.ChatMembership chatMembership,
+            AccessRight accessRight,
             Chat chat,
             ChatLobby lobby,
             ChatSession currentSession,
             AccountChatSession accountChatSession
         )
         {
-            await Loop(lobby, currentSession, accountChatSession, chat, chatMembership);
+            await Loop(lobby, currentSession, accountChatSession, chat, accessRight);
         }
 
         private async Task Loop(
@@ -59,7 +59,7 @@ namespace Planner_chat_server.App.Service
             ChatSession currentSession,
             AccountChatSession accountChatSession,
             Chat chat,
-            Core.Entities.Models.ChatMembership chatMembership
+            AccessRight accessRight
         )
         {
             var ws = currentSession.Ws;
@@ -71,7 +71,9 @@ namespace Planner_chat_server.App.Service
             var allUserIds = lobby.AllChatUsers;
             var activeSessionIds = lobby.ActiveSessions.Select(e => e.Key);
 
-            dateLastViewingMessage = await ProcessWebSocketState(ws, sessions, allUserIds, chat, chatMembership.AccountId, CancellationToken.None);
+            dateLastViewingMessage = await ProcessWebSocketState(ws, sessions, allUserIds, chat, accessRight.AccountId.Value, CancellationToken.None);
+
+            var chatMembership = await _chatRepository.GetChatSettingsAsync(accessRight.NodeId, accessRight.AccountId.Value);
 
             await CloseWebSocket(ws, errorMessage);
             await UpdateLastViewingDate(chatMembership, accountChatSession, dateLastViewingMessage);
@@ -161,7 +163,7 @@ namespace Planner_chat_server.App.Service
             var chatMessageBody = new ChatMessageInfo
             {
                 ChatId = chat.Id,
-                ChatType = Enum.Parse<ChatType>(chat.Type),
+                ChatType = chat.ChatType,
                 Message = message
             };
 
@@ -298,7 +300,7 @@ namespace Planner_chat_server.App.Service
             return stream;
         }
 
-        private async Task UpdateLastViewingDate(Core.Entities.Models.ChatMembership chatMembership, AccountChatSession accountChatSession, DateTime? dateLastViewingMessage)
+        private async Task UpdateLastViewingDate(Core.Entities.Models.ChatSettings chatMembership, AccountChatSession accountChatSession, DateTime? dateLastViewingMessage)
         {
             if (dateLastViewingMessage != null)
             {

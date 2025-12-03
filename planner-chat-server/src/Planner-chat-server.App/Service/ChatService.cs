@@ -47,17 +47,18 @@ namespace Planner_chat_server.App.Service
                 SessionId = sessionId
             };
 
-            var chatMembership = await _chatRepository.GetChatMembershipAsync(chatId, accountId);
+            var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
+            var access = await _chatRepository.GetChatAccess(chatId, accountId);
             if (chatMembership == null)
                 return;
 
-            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
+            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, access.Id, chatMembership.DateLastViewing);
             if (accountChatSession == null)
                 return;
 
             if (!_chatConnectionService.LobbyIsExist(chatId))
             {
-                var chatMemberships = await _chatRepository.GetChatMembershipsAsync(chatId);
+                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chatId);
                 var userIds = chatMemberships.Select(e => e.AccountId).ToList();
                 _chatConnectionService.AddLobby(chatId, userIds);
             }
@@ -68,7 +69,7 @@ namespace Planner_chat_server.App.Service
 
             try
             {
-                await _chatConnector.Invoke(chatMembership, chat, lobby, session, accountChatSession);
+                await _chatConnector.Invoke(access, chat, lobby, session, accountChatSession);
             }
             finally
             {
@@ -218,7 +219,7 @@ namespace Planner_chat_server.App.Service
 
             if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
             {
-                var chatMemberships = await _chatRepository.GetChatMembershipsAsync(chat.ChatId);
+                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chat.ChatId);
                 var userIds = chatMemberships.Select(e => e.AccountId).ToList();
                 lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
             }
@@ -237,7 +238,7 @@ namespace Planner_chat_server.App.Service
 
         public async Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content)
         {
-            var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
+            var membership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
             if(membership == null)
             {
@@ -263,7 +264,7 @@ namespace Planner_chat_server.App.Service
         {
             foreach (var draft in drafts)
             {
-                var membership = await _chatRepository.GetMembershipAsync(draft.ChatId, accountId);
+                var membership = await _chatRepository.GetChatSettingsAsync(draft.ChatId, accountId);
 
                 var result = await _chatRepository.CreateOrUpdateMessageDraft(membership, draft.Content);
             }
@@ -276,28 +277,27 @@ namespace Planner_chat_server.App.Service
             };
         }
 
-        public async Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId)
+        public async Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId)
         {
-            var membership = await _chatRepository.GetMembershipAsync(chatId, accountId);
-            var draft = await _chatRepository.GetMessageDraft(membership);
+            var membership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
-            return new ServiceResponse<MessageDraftBody>
+            return new ServiceResponse<string>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = draft.ToMessageDraftBody()
+                Body = membership.MessageDraft
             };
         }
 
-        public async Task<ServiceResponse<List<MessageDraftBody>>> GetMessageDrafts(Guid accountId)
+        public async Task<ServiceResponse<List<string>>> GetMessageDrafts(Guid accountId)
         {
-            var drafts = await _chatRepository.GetMessageDrafts(accountId);
+            var drafts = await _chatRepository.GetChatSettingsByAccountIdAsync(accountId);
 
-            return new ServiceResponse<List<MessageDraftBody>>
+            return new ServiceResponse<List<string>>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = drafts.Select(x => x.ToMessageDraftBody()).ToList()
+                Body = drafts.Select(x => x.MessageDraft).ToList()
             };
         }
 

@@ -7,7 +7,7 @@ namespace Planner_chat_server.Core.IService
     public interface IChatConnector
     {
         Task Invoke(
-            ChatMembership chatMembership,
+            AccessRight accessRight,
             Chat chat,
             ChatLobby lobby,
             ChatSession currentSession,

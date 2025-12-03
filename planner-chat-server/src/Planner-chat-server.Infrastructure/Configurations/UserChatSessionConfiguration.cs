@@ -11,9 +11,9 @@ namespace Planner_chat_server.Infrastructure.Configurations
             builder.HasKey(e => e.Id);
             builder.HasIndex(e => e.SessionId);
 
-            builder.HasOne(e => e.ChatMembership)
+            builder.HasOne(e => e.ChatSetting)
                 .WithMany(e => e.UserChatSessions)
-                .HasForeignKey(e => e.ChatMembershipId);
+                .HasForeignKey(e => e.ChatSettingId);
         }
     }
 }

@@ -1,4 +1,4 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Planner_chat_server.Core;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
@@ -6,6 +6,7 @@ using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Infrastructure.Data;
+using System.Linq;
 
 namespace Planner_chat_server.Infrastructure.Repository
 {
@@ -18,18 +19,26 @@ namespace Planner_chat_server.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<ChatMembership?> AddMembershipAsync(Guid accountId, Chat chat)
+        public async Task<ChatSettings?> AddMembershipAsync(Guid accountId, Chat chat)
         {
-            var chatMembership = await GetMembershipAsync(chat.Id, accountId);
+            var chatMembership = await GetChatSettingsAsync(chat.Id, accountId);
             if (chatMembership != null)
                 return null;
 
-            chatMembership = new ChatMembership
+            chatMembership = new ChatSettings
             {
                 AccountId = accountId,
                 Chat = chat,
             };
-            chatMembership = (await _context.ChatMemberships.AddAsync(chatMembership))?.Entity;
+            chatMembership = (await _context.ChatSettings.AddAsync(chatMembership))?.Entity;
+
+            await _context.AccessRights.AddAsync(new AccessRight
+            {
+                AccountId = accountId,
+                NodeId = chat.Id,
+                NodeType = NodeType.Message
+            });
+
             await _context.SaveChangesAsync();
 
             return chatMembership;
@@ -40,11 +49,18 @@ namespace Planner_chat_server.Infrastructure.Repository
             var message = new ChatMessage
             {
                 Id = messageId,
-                Chat = chat,
-                Type = messageType.ToString(),
+                Name = "Message",
+                MessageType = messageType,
                 Content = content,
                 SenderId = senderId,
             };
+
+            await _context.NodeLinks.AddAsync(new NodeLink()
+            {
+                ParentNode = chat,
+                ChildNode = message,
+                RelationType = RelationType.Contains
+            });
 
             message = (await _context.ChatMessages.AddAsync(message))?.Entity;
             await _context.SaveChangesAsync();
@@ -57,21 +73,33 @@ namespace Planner_chat_server.Infrastructure.Repository
             if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
                 return null;
 
-            var memberships = participants
-                .Select(participantId => new ChatMembership
-                {
-                    AccountId = participantId,
-                    DateLastViewing = date
-                })
-                .ToList();
-
             var chat = new Chat
             {
                 Id = createChatBody.Id,
                 Name = createChatBody.Name,
-                Type = ChatType.Personal.ToString(),
-                ChatMemberships = memberships,
+                ChatType = ChatType.Personal
             };
+
+            var memberships = participants
+                .Select(participantId => new ChatSettings
+                {
+                    AccountId = participantId,
+                    Chat = chat,
+                    DateLastViewing = date,
+                })
+                .ToList();
+
+            chat.ChatMemberships = memberships;
+
+            var access = participants
+                .Select(participantId => new AccessRight
+                {
+                    AccountId = participantId,
+                    Node = chat
+                })
+                .ToList();
+
+            await _context.AccessRights.AddRangeAsync(access);
 
             chat = (await _context.Chats.AddAsync(chat))?.Entity;
             await _context.SaveChangesAsync();
@@ -79,26 +107,26 @@ namespace Planner_chat_server.Infrastructure.Repository
             return chat;
         }
 
-        public async Task<ChatMembership?> CreateOrGetChatMembershipAsync(Chat chat, Guid accountId)
+        public async Task<ChatSettings?> CreateOrGetChatSettingsAsync(Chat chat, Guid accountId)
         {
-            var chatMembership = await GetMembershipAsync(chat.Id, accountId);
+            var chatMembership = await GetChatSettingsAsync(chat.Id, accountId);
             if (chatMembership != null)
                 return chatMembership;
 
-            chatMembership = new ChatMembership
+            chatMembership = new ChatSettings
             {
                 Chat = chat,
                 AccountId = accountId
             };
 
-            chatMembership = (await _context.ChatMemberships.AddAsync(chatMembership))?.Entity;
+            chatMembership = (await _context.ChatSettings.AddAsync(chatMembership))?.Entity;
             await _context.SaveChangesAsync();
             return chatMembership;
         }
 
-        public async Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatMembership chatMembership, DateTime date)
+        public async Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatSettings chatMembership, DateTime date)
         {
-            var existedChatSessions = await _context.AccountChatSessions.Where(e => e.ChatMembershipId == chatMembership.Id
+            var existedChatSessions = await _context.AccountChatSessions.Where(e => e.ChatSettingId == chatMembership.Id
                                                                                  && sessions.Contains(e.SessionId))
                                                                      .ToListAsync();
 
@@ -107,7 +135,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                 .Select(sessionId => new AccountChatSession
                 {
                     SessionId = sessionId,
-                    ChatMembership = chatMembership,
+                    ChatSetting = chatMembership,
                     DateLastViewing = date
                 })
                 .ToList();
@@ -118,14 +146,14 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task CreateAccountChatSessionsAsync(Guid sessionId)
         {
-            var chatMemberships = await _context.ChatMemberships.Where(e => e.AccountId == sessionId)
+            var chatMemberships = await _context.ChatSettings.Where(e => e.AccountId == sessionId)
                 .ToListAsync();
 
             var userChatSessions = chatMemberships
                 .Select(chatMembership => new AccountChatSession
                 {
                     SessionId = sessionId,
-                    ChatMembership = chatMembership,
+                    ChatSetting = chatMembership,
                     DateLastViewing = chatMembership.DateLastViewing
                 });
 
@@ -142,9 +170,9 @@ namespace Planner_chat_server.Infrastructure.Repository
             var result = new List<ChatBody>();
             var type = chatType.ToString();
 
-            var userChatMemberships = await _context.ChatMemberships
+            var userChatMemberships = await _context.ChatSettings
                 .Include(e => e.Chat)
-                .Where(e => e.AccountId == accountId && e.Chat.Type == type)
+                .Where(e => e.AccountId == accountId && e.Chat.ChatType == Enum.Parse<ChatType>(type))
                 .ToListAsync();
 
             if (!userChatMemberships.Any())
@@ -152,7 +180,7 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             var chatIds = userChatMemberships.Select(e => e.ChatId);
 
-            var chatMemberships = await _context.ChatMemberships
+            var chatMemberships = await _context.ChatSettings
                 .Where(e => chatIds.Contains(e.ChatId))
                 .GroupBy(e => e.ChatId)
                 .ToListAsync();
@@ -160,33 +188,45 @@ namespace Planner_chat_server.Infrastructure.Repository
             foreach (var chatMembership in chatMemberships)
             {
                 var chatId = chatMembership.Key;
-                var userMembership = userChatMemberships.First(e => e.ChatId == chatId);
-                var userSession = await CreateOrGetAccountChatSessionAsync(userSessionId, userMembership.Id, userMembership.DateLastViewing);
 
-                var chat = userMembership.Chat;
-                var dateLastViewing = userSession.DateLastViewing;
+                result.Add(await GetChat(accountId, userSessionId, chatId));
 
-                var countOfUnreadMessages = await _context.ChatMessages
-                     .CountAsync(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false);
+                //var userMembership = userChatMemberships.First(e => e.ChatId == chatId);
+                //var userSession = await CreateOrGetAccountChatSessionAsync(userSessionId, userMembership.Id, userMembership.DateLastViewing);
 
-                var lastMessage = await _context.ChatMessages
-                        .Where(e => e.SentAt > dateLastViewing && e.ChatId == chatId)
-                        .OrderByDescending(e => e.SentAt)
-                        .FirstOrDefaultAsync();
+                //var chat = userMembership.Chat;
+                //var dateLastViewing = userSession.DateLastViewing;
 
-                var chatBody = new ChatBody
-                {
-                    Id = chat.Id,
-                    Name = chat.Name,
-                    ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
-                    CountOfUnreadMessages = countOfUnreadMessages,
-                    IsSyncedReadStatus = userSession.DateLastViewing == userMembership.DateLastViewing,
-                    ParticipantIds = chatMembership.Where(x => x.AccountId != accountId).Select(e => e.AccountId).ToList(),
-                    Type = Enum.Parse<ChatType>(chat.Type),
-                    LastMessage = lastMessage?.ToMessageBody()
-                };
+                //var countOfUnreadMessages = await _context.NodeLinks
+                //    .Join(_context.ChatMessages,
+                //        n => n.ChildId,
+                //        m => m.Id,
+                //        (n, m) => new { Message = m, Link = n })
+                //    .CountAsync(e => e.Link.ParentId == chatId && e.Message.SenderId != accountId && e.Message.HasBeenRead == false);
 
-                result.Add(chatBody);
+                //var lastMessage = await _context.ChatMessages
+                //    .Join(_context.NodeLinks,
+                //        m => m.Id,
+                //        n => n.ChildId,
+                //        (m, n) => new { Message = m, Link = n })
+                //    .Where(x => x.Link.ParentId == chatId && x.Message.SentAt > dateLastViewing)
+                //    .OrderByDescending(x => x.Message.SentAt)
+                //    .Select(x => x.Message)
+                //    .FirstOrDefaultAsync();
+
+                //var chatBody = new ChatBody
+                //{
+                //    Id = chat.Id,
+                //    Name = chat.Name,
+                //    ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
+                //    CountOfUnreadMessages = countOfUnreadMessages,
+                //    IsSyncedReadStatus = userSession.DateLastViewing == userMembership.DateLastViewing,
+                //    ParticipantIds = chatMembership.Where(x => x.AccountId != accountId).Select(e => e.AccountId).ToList(),
+                //    Type = chat.ChatType,
+                //    LastMessage = lastMessage?.ToMessageBody()
+                //};
+
+                //result.Add(chatBody);
             }
 
             return result;
@@ -194,7 +234,7 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<ChatBody> GetChat(Guid accountId, Guid userSessionId, Guid chatId)
         {
-            var chatMembership = await _context.ChatMemberships
+            var chatMembership = await _context.ChatSettings
                 .Include(e => e.Chat)
                 .Where(e => e.AccountId == accountId && e.ChatId == chatId)
                 .FirstOrDefaultAsync();
@@ -204,45 +244,58 @@ namespace Planner_chat_server.Infrastructure.Repository
             var chat = chatMembership.Chat;
             var dateLastViewing = userSession.DateLastViewing;
 
-            var countOfUnreadMessages = await _context.ChatMessages
-                .CountAsync(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false);
+            var countOfUnreadMessages = await _context.NodeLinks
+                .Join(_context.ChatMessages,
+                    n => n.ChildId,
+                    m => m.Id,
+                    (n, m) => new { Message = m, Link = n })
+                .CountAsync(e => e.Link.ParentId == chatId && e.Message.SenderId != accountId && e.Message.HasBeenRead == false);
 
             var lastMessage = await _context.ChatMessages
-                    .Where(e => e.SentAt > dateLastViewing && e.ChatId == chatId)
-                    .OrderByDescending(e => e.SentAt)
-                    .FirstOrDefaultAsync();
+                .Join(_context.NodeLinks,
+                    m => m.Id,
+                    n => n.ChildId,
+                    (m, n) => new { Message = m, Link = n })
+                .Where(x => x.Link.ParentId == chatId && x.Message.SentAt > dateLastViewing)
+                .OrderByDescending(x => x.Message.SentAt)
+                .Select(x => x.Message)
+                .FirstOrDefaultAsync();
 
             var chatBody = new ChatBody
             {
                 Id = chat.Id,
                 Name = chat.Name,
+                Type = chat.ChatType,
                 ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
                 CountOfUnreadMessages = countOfUnreadMessages,
                 IsSyncedReadStatus = userSession.DateLastViewing == chatMembership.DateLastViewing,
-                ParticipantIds = _context.ChatMemberships.Where(x => x.ChatId == chatId && x.AccountId != accountId).Select(e => e.AccountId).ToList(),
+                ParticipantIds = _context.ChatSettings
+                .Where(x => x.ChatId == chatId && x.AccountId != accountId)
+                .Select(e => e.AccountId)
+                .ToList(),
                 LastMessage = lastMessage?.ToMessageBody()
             };
 
             return chatBody;
         }
 
-        public async Task<List<ChatMembership>> GetChatMembershipsAsync(Guid chatId)
+        public async Task<List<ChatSettings>> GetChatSettingsAsync(Guid chatId)
         {
-            return await _context.ChatMemberships
+            return await _context.ChatSettings
                 .Where(e => e.ChatId == chatId)
                 .ToListAsync();
         }
 
-        public async Task<List<ChatMembership>> GetChatMembershipsByAccountIdAsync(Guid accountId)
+        public async Task<List<ChatSettings>> GetChatSettingsByAccountIdAsync(Guid accountId)
         {
-            return await _context.ChatMemberships
+            return await _context.ChatSettings
                 .Where(e => e.AccountId == accountId)
                 .ToListAsync();
         }
 
-        public async Task<ChatMembership?> GetMembershipAsync(Guid chatId, Guid accountId)
+        public async Task<ChatSettings?> GetChatSettingsAsync(Guid chatId, Guid accountId)
         {
-            return await _context.ChatMemberships
+            return await _context.ChatSettings
                 .FirstOrDefaultAsync(e => e.ChatId == chatId && e.AccountId == accountId);
         }
 
@@ -257,8 +310,12 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true)
         {
-            var query = _context.ChatMessages
-                .Where(e => e.ChatId == chatId);
+            var query = _context.NodeLinks
+                .Where(e => e.ParentId == chatId)
+                .Join(_context.ChatMessages,
+                n => n.ChildId,
+                m => m.Id,
+                (n, m) => m);
 
             query = isDescending
                 ? query.OrderByDescending(e => e.SentAt)
@@ -272,39 +329,39 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<List<ChatMessage>> GetAllMessagesAsync(Guid accountId)
         {
-            var query = _context.ChatMemberships.Include(c => c.Chat).ThenInclude(x => x.Messages).Where(cm => cm.AccountId == accountId).Select(c => c.Chat);
+            var query = _context.AccessRights.Include(c => c.Node).Where(cm => cm.AccountId == accountId).Select(c => c.Node as Chat);
             var messages = query.SelectMany(x => x.Messages.OrderByDescending(m => m.SentAt).Take(30));
 
             return await messages
                 .ToListAsync();
         }
 
-        public async Task<ChatMembership?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId)
+        public async Task<ChatSettings?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId)
         {
-            var query = _context.ChatMemberships
+            var query = _context.ChatSettings
                 .Include(e => e.Chat)
                 .Where(firstUser =>
                     firstUser.AccountId == firstAccountId &&
-                    _context.ChatMemberships.Any(secondUser =>
+                    _context.ChatSettings.Any(secondUser =>
                         secondUser.AccountId == secondAccountId &&
                         secondUser.ChatId == firstUser.ChatId)
                 );
 
-            var result = await query.FirstOrDefaultAsync(e => e.Chat.Type == ChatType.Personal.ToString());
+            var result = await query.FirstOrDefaultAsync(e => e.Chat.ChatType == ChatType.Personal);
             return result;
         }
 
         public async Task<AccountChatSession?> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatMembershipId, DateTime dateLastViewing)
         {
             var result = await _context.AccountChatSessions
-                .FirstOrDefaultAsync(e => e.SessionId == sessionId && e.ChatMembershipId == chatMembershipId);
+                .FirstOrDefaultAsync(e => e.SessionId == sessionId && e.ChatSettingId == chatMembershipId);
             if (result != null)
                 return result;
 
             result = new AccountChatSession
             {
                 SessionId = sessionId,
-                ChatMembershipId = chatMembershipId,
+                ChatSettingId = chatMembershipId,
                 DateLastViewing = dateLastViewing
             };
 
@@ -329,7 +386,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             return chat;
         }
 
-        public async Task<bool> UpdateLastViewingChatMembership(ChatMembership chatMembership, DateTime lastViewingDate)
+        public async Task<bool> UpdateLastViewingChatMembership(ChatSettings chatMembership, DateTime lastViewingDate)
         {
             if (chatMembership == null)
                 return false;
@@ -357,7 +414,7 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatMembershipId)
         {
-            return await _context.AccountChatSessions.Where(e => e.ChatMembershipId == chatMembershipId)
+            return await _context.AccountChatSessions.Where(e => e.ChatSettingId == chatMembershipId)
                 .ToListAsync();
         }
 
@@ -370,11 +427,11 @@ namespace Planner_chat_server.Infrastructure.Repository
             var chat = new Chat
             {
                 Name = name,
-                Type = ChatType.Task.ToString(),
+                ChatType = ChatType.Task,
                 TaskId = taskId,
-                ChatMemberships = new List<ChatMembership>
+                ChatMemberships = new List<ChatSettings>
                 {
-                    new ChatMembership { AccountId = creatorId }
+                    new ChatSettings { AccountId = creatorId }
                 }
             };
 
@@ -384,29 +441,48 @@ namespace Planner_chat_server.Infrastructure.Repository
             return chat;
         }
 
-        public Task<ChatMembership?> GetChatMembershipAsync(Guid chatId, Guid accountId)
+        public async Task CreateChatSettingsAsync(Guid taskId, List<Guid> accountIds)
         {
-            return _context.ChatMemberships.FirstOrDefaultAsync(e => e.ChatId == chatId && e.AccountId == accountId);
-        }
+            if (accountIds == null || !accountIds.Any())
+                return;
 
-        public async Task CreateChatMembershipsAsync(Guid taskId, List<Guid> accountIds)
-        {
-            var chat = await _context.Chats.FirstOrDefaultAsync(e => e.TaskId == taskId);
+            var chat = await _context.Chats
+                .FirstOrDefaultAsync(e => e.TaskId == taskId);
+
             if (chat == null)
                 return;
 
-            var chatMemberships = await _context.ChatMemberships.Where(e => e.ChatId == chat.Id && accountIds.Contains(e.AccountId))
+            var uniqueAccountIds = accountIds.Distinct().ToList();
+
+            var existingMemberships = await _context.ChatSettings
+                .Where(e => e.ChatId == chat.Id &&
+                            uniqueAccountIds.Contains(e.AccountId))
+                .Select(e => e.AccountId)
                 .ToListAsync();
 
-            var notExistedAccountIds = accountIds.Except(chatMemberships.Select(e => e.AccountId));
-            var newChatMemberships = notExistedAccountIds.Select(accountId => new ChatMembership { ChatId = chat.Id, AccountId = accountId });
-            await _context.ChatMemberships.AddRangeAsync(newChatMemberships);
+            var newAccountIds = uniqueAccountIds
+                .Except(existingMemberships)
+                .ToList();
+
+            if (!newAccountIds.Any())
+                return;
+
+            var newChatMemberships = newAccountIds.Select(accountId => new ChatSettings
+            {
+                Id = Guid.NewGuid(),
+                ChatId = chat.Id,
+                AccountId = accountId,
+                DateLastViewing = DateTime.UtcNow,
+                NotificationsEnabled = true
+            });
+
+            await _context.ChatSettings.AddRangeAsync(newChatMemberships);
             await _context.SaveChangesAsync();
         }
 
         public async Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody updatedMessage)
         {
-            var query = _context.ChatMemberships
+            var query = _context.ChatSettings
                 .Include(e => e.Chat)
                 .Where(user => user.AccountId == accountId);
 
@@ -424,7 +500,13 @@ namespace Planner_chat_server.Infrastructure.Repository
             }
 
             message.Content = updatedMessage.Content;
-            message.UpdatedAt = updatedMessage.UpdatedAt;
+
+            _context.History.Add(new History()
+            {
+                NodeId = message.Id,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId,
+            });
 
             await _context.SaveChangesAsync();
 
@@ -448,70 +530,42 @@ namespace Planner_chat_server.Infrastructure.Repository
             return message;
         }
 
-        public async Task<bool> CreateOrUpdateMessageDraft(ChatMembership membership, string content)
+        public async Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content)
         {
-            var result = await _context.MessageDrafts
-                .FirstOrDefaultAsync(e => e.MembershipId == membership.Id);
+            var membership = await _context.ChatSettings
+                .FirstOrDefaultAsync(m => m.Id == chatSettings.Id);
 
-            if (result != null)
-            {
-                if(string.IsNullOrEmpty(content))
-                {
-                    _context.Remove(result);
-                    await _context.SaveChangesAsync();
-                    return true;
-                }
+            if (membership == null)
+                return false;
 
-                result.Content = content;
-
-                await _context.SaveChangesAsync();
-
+            if (membership.MessageDraft == content)
                 return true;
-            }
 
-            result = new MessageDraft
-            {
-                Content = content,
-                MembershipId = membership.Id,
-                ChatMembership = membership
-            };
-
-            result = (await _context.MessageDrafts.AddAsync(result))?.Entity;
+            membership.MessageDraft = content;
             await _context.SaveChangesAsync();
-
-            return result != null;
-        }
-
-        public Task<MessageDraft?> GetMessageDraft(ChatMembership membership)
-        {
-            return _context.MessageDrafts.FirstOrDefaultAsync(e => e.MembershipId == membership.Id);
-        }
-
-        public async Task<List<MessageDraft>> GetMessageDrafts(Guid accountId)
-        {
-            return await _context.MessageDrafts.Include(d => d.ChatMembership).Where(x => x.ChatMembership.AccountId == accountId).ToListAsync();
+            return true;
         }
 
         public async Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId)
         {
-            var membership = await _context.ChatMemberships.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+            var membership = await _context.ChatSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
 
             return membership.NotificationsEnabled;
         }
 
         public async Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId)
         {
-            return await _context.ChatMemberships
-                .Where(cm => accountIds.Contains(cm.AccountId)
-                            && cm.ChatId == chatId
-                            && cm.NotificationsEnabled)
+            return await _context.ChatSettings
+                .Where(cm => accountIds.Contains(cm.AccountId) &&
+                            cm.ChatId == chatId &&
+                            cm.NotificationsEnabled)
                 .Select(cm => cm.AccountId)
                 .ToListAsync();
         }
 
-        public async Task<ChatMembership?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
+        public async Task<ChatSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
-            var membership = await _context.ChatMemberships.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+            var membership = await _context.ChatSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
 
             if(membership == null)
             {
@@ -523,6 +577,11 @@ namespace Planner_chat_server.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             return membership;
+        }
+
+        public async Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId)
+        {
+            return await _context.AccessRights.FirstOrDefaultAsync(cm => cm.AccountId == accountId && cm.NodeId == chatId);
         }
     }
 }

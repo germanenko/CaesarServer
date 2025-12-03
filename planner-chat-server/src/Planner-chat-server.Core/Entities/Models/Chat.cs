@@ -3,16 +3,13 @@ using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Core.Entities.Models
 {
-    public class Chat
+    public class Chat : Node
     {
-        public Guid Id { get; set; }
-
-        public string Name { get; set; }
         public string? Image { get; set; }
-        public string Type { get; set; }
+        public ChatType ChatType { get; set; }
         public Guid? TaskId { get; set; }
 
         public List<ChatMessage> Messages { get; set; } = new();
-        public List<ChatMembership> ChatMemberships { get; set; } = new();
+        public List<ChatSettings> ChatMemberships { get; set; } = new();
     }
 }

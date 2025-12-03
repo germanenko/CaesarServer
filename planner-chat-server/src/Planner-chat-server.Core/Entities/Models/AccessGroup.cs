@@ -1,11 +1,6 @@
-﻿using Planer_task_board.Core.Entities.Response;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Planner_chat_server.Core.Entities.Response;
 
-namespace Planer_task_board.Core.Entities.Models
+namespace Planner_chat_server.Core.Entities.Models
 {
     public class AccessGroup
     {

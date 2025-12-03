@@ -14,12 +14,17 @@ namespace Planner_chat_server.Infrastructure.Data
         {
             base.OnModelCreating(modelBuilder);
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ChatDbContext).Assembly);
+
+            modelBuilder.Entity<Node>().UseTptMappingStrategy();
         }
 
-        public DbSet<ChatMembership> ChatMemberships { get; set; }
+        public DbSet<ChatSettings> ChatSettings { get; set; }
         public DbSet<AccountChatSession> AccountChatSessions { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
-        public DbSet<MessageDraft> MessageDrafts { get; set; }
+        public DbSet<Node> Nodes { get; set; }
+        public DbSet<NodeLink> NodeLinks { get; set; }
+        public DbSet<History> History { get; set; }
+        public DbSet<AccessRight> AccessRights { get; set; }
     }
 }

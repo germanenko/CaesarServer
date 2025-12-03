@@ -32,7 +32,7 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var props = JsonSerializer.Serialize(task);
 
-            var node = new Node()
+            var node = new TaskModel()
             {
                 Id = task.Id,
                 Name = task.Title,
@@ -109,7 +109,7 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<IEnumerable<Node>> GetAllTasks(Guid accountId)
         {
             var tasks = await _context.AccessRights
-                .Where(ar => ar.AccountId == accountId && ar.ResourceType == NodeType.Board)
+                .Where(ar => ar.AccountId == accountId && ar.NodeType == NodeType.Board)
                 .Join(_context.NodeLinks,
                     ar => ar.NodeId,  
                     n1 => n1.ParentId,    
@@ -272,7 +272,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
 
         private async Task<Node?> AddTaskAsync(
-            Node task,
+            TaskModel task,
             Guid accountId,
             Guid? columnId,
             PublicationStatus publicationStatus,
@@ -281,16 +281,14 @@ namespace Planer_task_board.Infrastructure.Repository
             if (task == null)
                 return null;
 
-            task = (await _context.Nodes.AddAsync(task)).Entity;
+            task = (await _context.Tasks.AddAsync(task)).Entity;
 
             if (columnId != null)
             {
                 var nodeLink = new NodeLink()
                 {
                     ParentId = columnId.Value,
-                    ParentType = NodeType.Column,
                     ChildId = task.Id,
-                    ChildType = NodeType.Task,
                     RelationType = RelationType.Contains
                 };
 
@@ -304,9 +302,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 _context.NodeLinks.Add(new NodeLink()
                 {
                     ParentId = taskAttachedMessage.MessageId,
-                    ParentType = NodeType.Message,
                     ChildId = task.Id,
-                    ChildType = NodeType.Task,
                     RelationType = RelationType.Attach
                 });
             }
@@ -394,9 +390,7 @@ namespace Planer_task_board.Infrastructure.Repository
             columnTask = new NodeLink
             {
                 ParentId = columnId,
-                ParentType = NodeType.Column,
                 ChildId = taskId,
-                ChildType = NodeType.Task,
                 RelationType = RelationType.Contains
             };
             await _context.NodeLinks.AddAsync(columnTask);

@@ -1,6 +1,6 @@
-﻿using Planer_task_board.Core.Enums;
+﻿using Planner_chat_server.Core.Enums;
 
-namespace Planer_task_board.Core.Entities.Models
+namespace Planner_chat_server.Core.Entities.Models
 {
     public class AccessRight
     {

@@ -57,8 +57,6 @@ namespace Planer_task_board.Infrastructure.Repository
             var accessRight = new AccessRight()
             {
                 Id = Guid.NewGuid(),
-                Name = "Access",
-                Type = NodeType.AccessRight,
                 AccountId = accountId,
                 NodeId = board.Id,
                 Node = board, 
@@ -154,7 +152,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>> GetAll(Guid accountId)
         {
-            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.ResourceType == NodeType.Board).Select(x => x.NodeId).ToListAsync();
+            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.NodeType == NodeType.Board).Select(x => x.NodeId).ToListAsync();
 
             var boards = await _context.Nodes.Where(x => access.Contains(x.Id)).ToListAsync();
 
@@ -166,7 +164,14 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>> GetBoardColumns(Guid boardId)
         {
-            var nodes = await _context.NodeLinks.Where(x => x.ParentId == boardId && x.ChildType == NodeType.Column).Select(x => x.ChildId).ToListAsync();
+            var nodes = await _context.NodeLinks.Where(x => x.ParentId == boardId)
+                .Join(_context.Nodes,
+                    nl => nl.ChildId,
+                    n => n.Id,
+                    (nl, n) => n) 
+                .Where(x => x.Type == NodeType.Column)
+                .Select(x => x.Id)
+                .ToListAsync();
 
             return await _context.Nodes.Where(x => nodes.Contains(x.Id)).ToListAsync();
         }
@@ -174,11 +179,18 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<IEnumerable<Node>> GetAllBoardColumns(Guid accountId)
         {
             var access = await _context.AccessRights
-                .Where(x => x.AccountId == accountId && x.ResourceType == NodeType.Board)
+                .Where(x => x.AccountId == accountId && x.NodeType == NodeType.Board)
                 .Select(x => x.NodeId)
                 .ToListAsync();
 
-            var columnIds = await _context.NodeLinks.Where(x => access.Contains(x.ParentId) && x.ChildType == NodeType.Column).Select(x => x.ChildId).ToListAsync();
+            var columnIds = await _context.NodeLinks.Where(x => access.Contains(x.ParentId))
+                .Join(_context.Nodes,
+                    nl => nl.ChildId,
+                    n => n.Id,
+                    (nl, n) => n)
+                .Where(x => x.Type == NodeType.Column)
+                .Select(x => x.Id)
+                .ToListAsync();
 
             var columns = await _context.Nodes.Where(x => columnIds.Contains(x.Id)).ToListAsync();
 

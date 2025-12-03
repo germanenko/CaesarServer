@@ -19,8 +19,8 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<MessageBody>> SendMessageFromEmail(Guid senderId, Guid receiverid, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDrafts(Guid accountId, List<MessageDraftBody> drafts);
-        Task<ServiceResponse<MessageDraftBody>> GetMessageDraft(Guid accountId, Guid chatId);
-        Task<ServiceResponse<List<MessageDraftBody>>> GetMessageDrafts(Guid accountId);
+        Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId);
+        Task<ServiceResponse<List<string>>> GetMessageDrafts(Guid accountId);
         Task<ServiceResponse<bool>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
     }
 }

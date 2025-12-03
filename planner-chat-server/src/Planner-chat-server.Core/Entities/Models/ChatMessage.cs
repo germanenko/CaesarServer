@@ -4,21 +4,18 @@ using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Core.Entities.Models
 {
-    public class ChatMessage : ModelBase
+    public class ChatMessage : Node
     {
-        public string Type { get; set; }
+        public MessageType MessageType { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
         public Guid SenderId { get; set; }
-
-        public Guid ChatId { get; set; }
         public bool HasBeenRead { get; set; }
-        public Chat Chat { get; set; }
 
         public CreateMessageBody ToCreateMessageBody()
         {
-            var messageType = Enum.Parse<MessageType>(Type);
+            var messageType = MessageType;
 
             return new CreateMessageBody
             {
@@ -29,7 +26,7 @@ namespace Planner_chat_server.Core.Entities.Models
 
         public MessageBody ToMessageBody(Guid? deviceId = null)
         {
-            var messageType = Enum.Parse<MessageType>(Type);
+            var messageType = MessageType;
 
             return new MessageBody
             {
@@ -38,7 +35,6 @@ namespace Planner_chat_server.Core.Entities.Models
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
                 Date = SentAt,
                 SenderId = SenderId,
-                ChatId = ChatId,
                 SenderDeviceId = deviceId,
                 HasBeenRead = HasBeenRead
             };

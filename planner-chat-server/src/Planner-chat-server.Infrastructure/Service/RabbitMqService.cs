@@ -145,7 +145,7 @@ namespace Planner_chat_server.Infrastructure.Service
                 return;
 
             foreach (var taskId in addAccountToTaskChatBody.TaskIds)
-                await chatRepository.CreateChatMembershipsAsync(taskId, addAccountToTaskChatBody.AccountIds);
+                await chatRepository.CreateChatSettingsAsync(taskId, addAccountToTaskChatBody.AccountIds);
         }
 
 
@@ -160,7 +160,7 @@ namespace Planner_chat_server.Infrastructure.Service
 
             foreach (var participant in createChatResponseEvent.Participants)
             {
-                var chatMembership = await chatRepository.GetMembershipAsync(createChatResponseEvent.ChatId, participant.AccountId);
+                var chatMembership = await chatRepository.GetChatSettingsAsync(createChatResponseEvent.ChatId, participant.AccountId);
                 if (chatMembership == null)
                     continue;
 
@@ -197,7 +197,7 @@ namespace Planner_chat_server.Infrastructure.Service
                 chatMessage.ToMessageBody(),
                 WebSocketMessageType.Text,
                 account,
-                Enum.Parse<ChatType>(chat.Type),
+                chat.ChatType,
                 chatAttachment.ChatId);
 
         }
