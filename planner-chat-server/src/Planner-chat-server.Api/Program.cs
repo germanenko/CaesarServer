@@ -1,5 +1,4 @@
 using System.Text;
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -13,8 +12,6 @@ using Planner_chat_server.Infrastructure.Data;
 using Planner_chat_server.Infrastructure.Repository;
 using Planner_chat_server.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
-
-Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -49,10 +46,8 @@ void ConfigureServices(IServiceCollection services)
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
     var jwtAudience = GetEnvVar("JWT_AUTH_AUDIENCE");
 
-    //var chatConnectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
-    var chatConnectionString = "Server=188.225.18.18:5438;Database=planner-chat;User Id=user;Password=*Planner;";
-    //var notifyConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
-    var notifyConnectionString = "Server=188.225.18.18:5437;Database=planner-notify;User Id=user;Password=*Planner;";
+    var chatConnectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
+    var notifyConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
 
 
@@ -73,10 +68,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddDbContext<ChatDbContext>(options =>
     {
-        options.UseNpgsql(chatConnectionString, builder =>
-        {
-            builder.MigrationsAssembly("Planner-chat-server.Api");
-        });
+        options.UseNpgsql(chatConnectionString);
     });
 
     services.AddWebSockets(options =>
