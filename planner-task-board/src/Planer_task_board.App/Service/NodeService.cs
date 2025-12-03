@@ -28,7 +28,10 @@ namespace Planer_task_board.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes.Select(x => x.ToNodeBody())
+                Body = nodes?.Select(x => x.ToNodeBody())
+                  .Where(x => x != null)
+                  .ToList()!
+               ?? new List<NodeBody>()
             };
         }
 
