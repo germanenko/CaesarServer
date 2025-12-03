@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 
 namespace Planer_task_board.App.Service
 {
@@ -43,7 +44,10 @@ namespace Planer_task_board.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodeLinks
+                Body = nodeLinks?
+                  .Where(x => x != null)
+                  .ToList()!
+               ?? new List<NodeLink>()
             };
         }
 
