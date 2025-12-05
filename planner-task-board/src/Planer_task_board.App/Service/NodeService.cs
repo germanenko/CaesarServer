@@ -22,19 +22,26 @@ namespace Planer_task_board.App.Service
             _nodeRepository = nodeRepository;
         }
 
-        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<Node>>> GetNodes(Guid accountId)
         {
             var nodes = await _nodeRepository.GetNodes(accountId);
 
-            return new ServiceResponse<IEnumerable<NodeBody>>()
+            return new ServiceResponse<IEnumerable<Node>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes?.Select(x => x.ToNodeBody())
-                  .Where(x => x != null)
-                  .ToList()!
-               ?? new List<NodeBody>()
+                Body = nodes
             };
+
+            //return new ServiceResponse<IEnumerable<Node>>()
+            //{
+            //    IsSuccess = true,
+            //    StatusCode = System.Net.HttpStatusCode.OK,
+            //    Body = nodes?.Select(x => x.ToNodeBody())
+            //      .Where(x => x != null)
+            //      .ToList()!
+            //   ?? new List<NodeBody>()
+            //};
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId)

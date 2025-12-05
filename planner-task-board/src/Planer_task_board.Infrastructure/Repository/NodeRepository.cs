@@ -80,6 +80,9 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
+            return await _context.Nodes
+                .ToListAsync();
+
             var links = await GetNodeLinks(accountId);
             if (links == null || !links.Any())
                 return null;
@@ -88,9 +91,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 .SelectMany(x => new[] { x.ParentId, x.ChildId })
                 .Distinct()
                 .ToList();
-
-            return await _context.Nodes
-                .ToListAsync();
         }
 
         public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
