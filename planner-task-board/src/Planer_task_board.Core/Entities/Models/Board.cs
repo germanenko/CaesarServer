@@ -4,6 +4,7 @@ namespace Planer_task_board.Core.Entities.Models
 {
     public class Board : Node
     { 
+        public string HexColor { get; set; }
         public BoardBody ToBoardBody()
         {
             return new BoardBody
