@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Infrastructure.Data;
@@ -36,21 +37,30 @@ namespace Planer_task_board.Infrastructure.Repository
             }
         }
 
-        public async Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, NodeLink newNode)
+        public async Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink newNodeLink)
         {
             var existingNode = await _context.NodeLinks
-                .Where(x => x.Id == newNode.Id)
+                .Where(x => x.Id == newNodeLink.Id)
                 .FirstOrDefaultAsync();
 
             if (existingNode == null)
             {
-                var result = await _context.NodeLinks.AddAsync(newNode);
+                var newLink = new NodeLink
+                {
+                    Id = newNodeLink.Id,
+                    ParentId = accountId,
+                    ChildId = newNodeLink.Id,
+                    RelationType = newNodeLink.RelationType
+                };
+                var result = await _context.NodeLinks.AddAsync(newLink);
                 await _context.SaveChangesAsync();
                 return result.Entity;
             }
             else
             {
-                _context.Entry(existingNode).CurrentValues.SetValues(newNode);
+                existingNode.ParentId = newNodeLink.ParentId;
+                existingNode.ChildId = newNodeLink.ChildId;
+                existingNode.RelationType = newNodeLink.RelationType;
                 await _context.SaveChangesAsync();
                 return existingNode;
             }

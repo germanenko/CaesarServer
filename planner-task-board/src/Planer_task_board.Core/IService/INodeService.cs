@@ -1,4 +1,5 @@
 ﻿using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using System;
 using System.Collections.Generic;
@@ -13,6 +14,6 @@ namespace Planer_task_board.Core.IService
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, Node node);
-        public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, NodeLink node);
+        public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node);
     }
 }

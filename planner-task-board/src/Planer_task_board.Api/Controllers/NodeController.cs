@@ -73,7 +73,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNodeLink(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] NodeLink node
+            [FromBody] CreateOrUpdateNodeLink node
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

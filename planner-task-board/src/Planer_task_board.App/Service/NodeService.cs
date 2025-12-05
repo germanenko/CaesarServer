@@ -1,4 +1,5 @@
 ﻿using Planer_task_board.Core.Entities.Models;
+using Planer_task_board.Core.Entities.Request;
 using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
@@ -63,7 +64,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, NodeLink node)
+        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node)
         {
             var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(accountId, node);
 
