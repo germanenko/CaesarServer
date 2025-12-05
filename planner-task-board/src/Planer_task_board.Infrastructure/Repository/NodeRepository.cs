@@ -82,9 +82,9 @@ namespace Planer_task_board.Infrastructure.Repository
         {
             var result = new List<Node>();
 
-            result.AddRange(await _context.Nodes.OfType<Board>().ToListAsync());
-            result.AddRange(await _context.Nodes.OfType<Column>().ToListAsync());
-            result.AddRange(await _context.Nodes.OfType<TaskModel>().ToListAsync());
+            result.AddRange(await _context.Boards.ToListAsync());
+            result.AddRange(await _context.Columns.ToListAsync());
+            result.AddRange(await _context.Tasks.ToListAsync());
 
             return result;
 
