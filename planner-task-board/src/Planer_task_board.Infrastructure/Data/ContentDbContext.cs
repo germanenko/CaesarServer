@@ -18,12 +18,7 @@ namespace Planer_task_board.Infrastructure.Data
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ContentDbContext).Assembly);
 
-            modelBuilder.Entity<Node>().UseTpcMappingStrategy();
-
-            modelBuilder.Entity<Node>().ToTable("Nodes");
-            modelBuilder.Entity<Board>().ToTable("Boards");
-            modelBuilder.Entity<Column>().ToTable("Columns");
-            modelBuilder.Entity<TaskModel>().ToTable("Tasks");
+            modelBuilder.Entity<Node>().UseTptMappingStrategy();
         }
 
         public DbSet<Node> Nodes { get; set; }

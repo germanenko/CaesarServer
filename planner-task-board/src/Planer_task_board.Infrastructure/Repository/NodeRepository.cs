@@ -80,8 +80,13 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
-            return await _context.Nodes
-                .ToListAsync();
+            var result = new List<Node>();
+
+            result.AddRange(await _context.Nodes.OfType<Board>().ToListAsync());
+            result.AddRange(await _context.Nodes.OfType<Column>().ToListAsync());
+            result.AddRange(await _context.Nodes.OfType<TaskModel>().ToListAsync());
+
+            return result;
 
             var links = await GetNodeLinks(accountId);
             if (links == null || !links.Any())
