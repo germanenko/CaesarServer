@@ -28,37 +28,37 @@ namespace Planer_task_board.App.Service
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<NodeBody>> AddColumn(Guid accountId, CreateColumnBody column)
+        public async Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, CreateColumnBody column)
         {
             var result = await _boardRepository.AddBoardColumn(column, accountId);
 
             if(result == null)
             {
-                return new ServiceResponse<NodeBody>
+                return new ServiceResponse<ColumnBody>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            return new ServiceResponse<NodeBody>
+            return new ServiceResponse<ColumnBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToNodeBody()
+                Body = result.ToColumnBody()
             };
         }
 
-        public async Task<ServiceResponse<List<NodeBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
+        public async Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
         {
-            List<NodeBody>? newColumns = new List<NodeBody>();
+            List<ColumnBody>? newColumns = new List<ColumnBody>();
             foreach (var column in columns)
             {
                 var board = await _boardRepository.GetBoard(column.Id);
                 var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
                 if (boardMember == null)
                 {
-                    return new ServiceResponse<List<NodeBody>>
+                    return new ServiceResponse<List<ColumnBody>>
                     {
                         IsSuccess = false,
                         StatusCode = HttpStatusCode.Forbidden
@@ -66,18 +66,18 @@ namespace Planer_task_board.App.Service
                 }
             }
 
-            newColumns = (await _boardRepository.AddBoardColumns(columns, accountId)).Select(x => x.ToNodeBody()).ToList();
+            newColumns = (await _boardRepository.AddBoardColumns(columns, accountId)).Select(x => x.ToColumnBody()).ToList();
 
             if (newColumns == null)
             {
-                return new ServiceResponse<List<NodeBody>>
+                return new ServiceResponse<List<ColumnBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            return new ServiceResponse<List<NodeBody>>
+            return new ServiceResponse<List<ColumnBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -85,45 +85,45 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
+        public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
         {
             var result = await _boardRepository.AddAsync(body, accountId);
 
             if (result is null)
             {
-                return new ServiceResponse<NodeBody>
+                return new ServiceResponse<BoardBody>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
                 };
             }
 
-            return new ServiceResponse<NodeBody>
+            return new ServiceResponse<BoardBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToNodeBody()
+                Body = result.ToBoardBody()
             };
         }
 
-        public async Task<ServiceResponse<List<NodeBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
         {
             var result = await _boardRepository.AddRangeAsync(bodies, accountId);
 
             if (result is null)
             {
-                return new ServiceResponse<List<NodeBody>>
+                return new ServiceResponse<List<BoardBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
                 };
             }
 
-            return new ServiceResponse<List<NodeBody>>
+            return new ServiceResponse<List<BoardBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.Select(x => x.ToNodeBody()).ToList()
+                Body = result.Select(x => x.ToBoardBody()).ToList()
             };
         }
 

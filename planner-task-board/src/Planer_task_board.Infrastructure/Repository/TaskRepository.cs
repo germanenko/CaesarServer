@@ -24,7 +24,7 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<Node?> AddAsync
+        public async Task<TaskModel?> AddAsync
         (
             CreateOrUpdateTaskBody task,
             Guid accountId
@@ -56,11 +56,11 @@ namespace Planer_task_board.Infrastructure.Repository
             return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, taskAttachedMessage);
         }
 
-        public async Task<IEnumerable<Node>> GetAll(Guid columnId, bool isDraft = false)
+        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
         {
             var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId)
-                .Join(_context.Nodes,
+                .Join(_context.Tasks,
                     n => n.ChildId,
                     t => t.Id,
                     (n, t) => t)
@@ -69,7 +69,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return result;
         }
 
-        public async Task<IEnumerable<Node>> GetAll(Guid columnId, WorkflowStatus? status, bool isDraft = false)
+        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, WorkflowStatus? status, bool isDraft = false)
         {
             if (status == null)
                 return await GetAll(columnId, isDraft);
@@ -83,7 +83,7 @@ namespace Planer_task_board.Infrastructure.Repository
                     t => t.NodeId,
                     (n, t) => t)
                 .Where(x => x.Status == status)
-                .Join(_context.Nodes,
+                .Join(_context.Tasks,
                     w => w.NodeId,
                     n => n.Id,
                     (w, n) => n)
@@ -93,11 +93,11 @@ namespace Planer_task_board.Infrastructure.Repository
             return result;
         }
 
-        public async Task<IEnumerable<Node>> GetAll(Guid columnId)
+        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId)
         {
             var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId)
-                .Join(_context.Nodes,
+                .Join(_context.Tasks,
                     n => n.ChildId,
                     t => t.Id,
                     (n, t) => t)
@@ -106,7 +106,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return result;
         }
 
-        public async Task<IEnumerable<Node>> GetAllTasks(Guid accountId)
+        public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
             var tasks = await _context.AccessRights
                 .Where(ar => ar.AccountId == accountId && ar.NodeType == NodeType.Board)
@@ -118,7 +118,7 @@ namespace Planer_task_board.Infrastructure.Repository
                     x => x.ColumnId,      
                     n2 => n2.ParentId,    
                     (x, n2) => new { TaskId = n2.ChildId })
-                .Join(_context.Nodes,
+                .Join(_context.Tasks,
                     x => x.TaskId,        
                     t => t.Id,            
                     (x, t) => t)          
@@ -127,8 +127,8 @@ namespace Planer_task_board.Infrastructure.Repository
             return tasks;
         }
 
-        public async Task<Node?> GetAsync(Guid id, bool isDraft)
-            => await _context.Nodes
+        public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
+            => await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id);
 
         public async Task<bool> RemoveAsync(Guid id, bool isDraft)
@@ -142,7 +142,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return true;
         }
 
-        public async Task<Node?> ConvertDraftToTask(Guid id, Guid accountId, Guid? columnId)
+        public async Task<TaskModel?> ConvertDraftToTask(Guid id, Guid accountId, Guid? columnId)
         {
             var result = await _context.NodeLinks
                 .Where(x => x.ParentId == columnId && x.ChildId == id)
@@ -197,10 +197,10 @@ namespace Planer_task_board.Infrastructure.Repository
             result.PublicationStatus.Status = PublicationStatus.Active;
 
             await _context.SaveChangesAsync();
-            return result.Node;
+            return result.Node as TaskModel;
         }
 
-        public async Task<Node?> UpdateAsync(
+        public async Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
@@ -213,7 +213,7 @@ namespace Planer_task_board.Infrastructure.Repository
             if (status == null)
                 return null;
 
-            var task = status.Node;
+            var task = status.Node as TaskModel;
 
             task.Name = updatedNode.Title;
             task.Props = JsonSerializer.Serialize(updatedNode); 
@@ -232,7 +232,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 await AssignTaskToColumn(task.Id, columnId.Value); 
             }
 
-            var node = await _context.Nodes
+            var node = await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id);
 
             node = task;
@@ -242,7 +242,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return node;
         }
 
-        public async Task<Node?> UpdateAsync(
+        public async Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
             CreateOrUpdateTaskBody updatedNode,
@@ -254,7 +254,7 @@ namespace Planer_task_board.Infrastructure.Repository
             if (draftStatus == null)
                 return null;
 
-            var draft = draftStatus.Node;
+            var draft = draftStatus.Node as TaskModel;
 
             draft.Name = updatedNode.Title;
             draft.Props = JsonSerializer.Serialize(updatedNode);
@@ -271,7 +271,7 @@ namespace Planer_task_board.Infrastructure.Repository
         }
 
 
-        private async Task<Node?> AddTaskAsync(
+        private async Task<TaskModel?> AddTaskAsync(
             TaskModel task,
             Guid accountId,
             Guid? columnId,
@@ -359,11 +359,11 @@ namespace Planer_task_board.Infrastructure.Repository
             return task;
         }
 
-        public async Task<IEnumerable<Node>> GetAll(Guid columnId, Guid userId)
+        public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId)
         {
             var result = await _context.NodeLinks
                 .Where(e => e.ParentId == columnId)
-                .Join(_context.Nodes,
+                .Join(_context.Tasks,
                     n1 => n1.ChildId,
                     t => t.Id,
                     (n1, t) => t)
@@ -375,7 +375,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Where(x => x.CreatedBy == userId)
                 .ToListAsync();
 
-            return result.Select(x => x.Node);
+            return result.Select(x => x.Node as TaskModel);
         }
 
 

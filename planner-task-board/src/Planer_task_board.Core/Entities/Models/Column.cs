@@ -9,7 +9,9 @@ namespace Planer_task_board.Core.Entities.Models
             return new ColumnBody
             {
                 Id = Id,
-                Name = Name
+                Name = Name,
+                Props = Props,
+                Type = Type
             };
         }
     }

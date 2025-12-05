@@ -13,9 +13,5 @@ namespace Planer_task_board.Core.Entities.Response
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public Guid CreatedBy { get; set; }
-        public Guid UpdatedBy { get; set; }
     }
 }

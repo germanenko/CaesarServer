@@ -2,12 +2,10 @@ using Microsoft.EntityFrameworkCore;
 using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using Planer_task_board.Infrastructure.Data;
-using System.Xml.Linq;
 
 namespace Planer_task_board.Infrastructure.Repository
 {
@@ -22,7 +20,7 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<Node?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
+        public async Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
         {
             var board = new Board
             {
@@ -88,16 +86,16 @@ namespace Planer_task_board.Infrastructure.Repository
             return board;
         }
 
-        public async Task<List<Node>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
+        public async Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
         {
-            List<Node> newBoardNodes = new List<Node>();
+            List<Board> newBoardNodes = new List<Board>();
 
             foreach (var board in boards)
             {
                 newBoardNodes.Add(await AddAsync(board, accountId));
             }
 
-            await _context.Nodes.AddRangeAsync(newBoardNodes);
+            await _context.Boards.AddRangeAsync(newBoardNodes);
             await _context.SaveChangesAsync();
 
             return newBoardNodes;
@@ -242,7 +240,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<Node?> AddBoardColumn(CreateColumnBody column, Guid accountId)
+        public async Task<Column?> AddBoardColumn(CreateColumnBody column, Guid accountId)
         {
             var columnNode = new Column
             {
@@ -278,9 +276,9 @@ namespace Planer_task_board.Infrastructure.Repository
             return columnNode;
         }
 
-        public async Task<List<Node>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
+        public async Task<List<Column>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
         {
-            var columnNodes = new List<Node>();
+            var columnNodes = new List<Column>();
             var statuses = new List<PublicationStatusModel>();
             var links = new List<NodeLink>();
             var histories = new List<History>();
@@ -313,7 +311,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 });
             }
 
-            await _context.Nodes.AddRangeAsync(columnNodes);
+            await _context.Columns.AddRangeAsync(columnNodes);
             await _context.PublicationStatuses.AddRangeAsync(statuses);
             await _context.NodeLinks.AddRangeAsync(links);
             await _context.History.AddRangeAsync(histories);

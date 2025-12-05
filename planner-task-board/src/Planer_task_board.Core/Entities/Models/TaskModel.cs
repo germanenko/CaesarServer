@@ -19,11 +19,13 @@ namespace Planer_task_board.Core.Entities.Models
             return new TaskBody
             {
                 Id = Id,
-                Title = Name,
+                Name = Name,
                 Description = Description,
                 HexColor = HexColor,
                 StartDate = StartDate?.ToString("s"),
-                EndDate = EndDate?.ToString("s")
+                EndDate = EndDate?.ToString("s"),
+                Props = Props,
+                Type = Type
             };
         }
     }
