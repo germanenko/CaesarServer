@@ -90,7 +90,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToList();
 
             return await _context.Nodes
-                .Where(x => nodeIds.Contains(x.Id))
                 .ToListAsync();
         }
 
