@@ -48,8 +48,8 @@ namespace Planer_task_board.Infrastructure.Repository
                 var newLink = new NodeLink
                 {
                     Id = newNodeLink.Id,
-                    ParentId = accountId,
-                    ChildId = newNodeLink.Id,
+                    ParentId = newNodeLink.ParentId,
+                    ChildId = newNodeLink.ChildId,
                     RelationType = newNodeLink.RelationType
                 };
                 var result = await _context.NodeLinks.AddAsync(newLink);
@@ -115,28 +115,26 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var query = @"
                 WITH RECURSIVE node_tree AS (
-                    -- Первый уровень
                     SELECT 
                         nl.*, 
                         1 as level,
-                        ARRAY[nl.""ParentId""] as visited_path -- ? отслеживаем путь
+                        ARRAY[nl.""ParentId""] as visited_path 
                     FROM ""NodeLinks"" nl 
                     WHERE nl.""ParentId"" IN ({0})
-                      AND nl.""ParentId"" != nl.""ChildId"" -- исключаем самоссылки
+                      AND nl.""ParentId"" != nl.""ChildId"" 
                     
                     UNION ALL
                     
-                    -- Рекурсивная часть с защитой от циклов
                     SELECT 
                         n.*, 
                         nt.level + 1,
-                        nt.visited_path || n.""ParentId"" -- добавляем к пути
+                        nt.visited_path || n.""ParentId"" 
                     FROM ""NodeLinks"" n
                     INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
                     WHERE 
                         nt.level < 5
-                        AND n.""ParentId"" != n.""ChildId"" -- исключаем самоссылки
-                        AND n.""ParentId"" != ALL(nt.visited_path) -- ? защита от циклов
+                        AND n.""ParentId"" != n.""ChildId""
+                        AND n.""ParentId"" != ALL(nt.visited_path) 
                 )
                 SELECT ""Id"", ""ParentId"", ""ChildId"", ""RelationType"" 
                 FROM node_tree 
