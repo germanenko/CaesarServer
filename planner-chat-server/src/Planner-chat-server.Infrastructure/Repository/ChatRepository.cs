@@ -581,7 +581,8 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId)
         {
-            return await _context.AccessRights.FirstOrDefaultAsync(cm => cm.AccountId == accountId && cm.NodeId == chatId);
+            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.NodeId == chatId).FirstOrDefaultAsync();
+            return access;
         }
     }
 }
