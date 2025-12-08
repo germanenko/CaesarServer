@@ -112,16 +112,32 @@ namespace Planer_task_board.Infrastructure.Repository
             if (!accessibleResourceIds.Any())
                 return null;
 
-            // —оздаем CTE запрос дл€ каждого доступного ресурса
-            var allTreesNodes = new List<NodeLink>();
+            var query = @"
+                WITH RECURSIVE node_tree AS (
+                    SELECT nl.* FROM ""NodeLinks"" nl
+                    WHERE nl.""ParentId"" IN ({0})
+                    UNION ALL
+                    SELECT n.* FROM ""NodeLinks"" n
+                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
+                )
+                SELECT DISTINCT * FROM node_tree";
 
-            foreach (var resourceId in accessibleResourceIds)
+            var parameters = new List<NpgsqlParameter>();
+            var paramNames = new List<string>();
+
+            for (int i = 0; i < accessibleResourceIds.Count; i++)
             {
-                var treeNodes = await GetTreeByRootId(resourceId);
-                allTreesNodes.AddRange(treeNodes);
+                var paramName = $"@p{i}";
+                paramNames.Add(paramName);
+                parameters.Add(new NpgsqlParameter(paramName, accessibleResourceIds[i]));
             }
 
-            return allTreesNodes.Distinct().ToList();
+            var formattedQuery = string.Format(query, string.Join(",", paramNames));
+
+            return await _context.NodeLinks
+                .FromSqlRaw(formattedQuery, parameters.ToArray())
+                .Distinct()
+                .ToListAsync();
         }
 
         private async Task<List<NodeLink>> GetTreeByRootId(Guid rootId)
