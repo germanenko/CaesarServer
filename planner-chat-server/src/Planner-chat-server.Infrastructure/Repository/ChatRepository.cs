@@ -589,6 +589,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             {
                 _logger.LogInformation($"{ac.AccountId}-{ac.NodeId}");
             }
+            _logger.LogInformation($"{acc.Count}");
             return await _context.AccessRights.FirstOrDefaultAsync(cm => cm.AccountId == accountId && cm.NodeId == chatId);
         }
     }
