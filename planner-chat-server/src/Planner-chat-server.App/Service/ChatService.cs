@@ -49,7 +49,7 @@ namespace Planner_chat_server.App.Service
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
             var access = await _chatRepository.GetChatAccess(chatId, accountId);
-            if (chatMembership == null)
+            if (chatMembership == null || access == null)
                 return;
 
             var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, access.Id, chatMembership.DateLastViewing);
