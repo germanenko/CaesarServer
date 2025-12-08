@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core.Entities.Events;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
@@ -19,19 +20,22 @@ namespace Planner_chat_server.App.Service
         private readonly IChatConnector _chatConnector;
         private readonly INotifyService _notifyService;
         private readonly IUserService _userService;
+        private readonly ILogger<ChatService> _logger;
 
         public ChatService(
             IChatRepository chatRepository,
             IChatConnectionService chatConnectionService,
             IChatConnector chatConnector,
             INotifyService notifyService,
-            IUserService userService)
+            IUserService userService,
+            ILogger<ChatService> logger)
         {
             _chatRepository = chatRepository;
             _chatConnectionService = chatConnectionService;
             _chatConnector = chatConnector;
             _notifyService = notifyService;
             _userService = userService;
+            _logger = logger;
         }
 
         public async Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId)
@@ -49,6 +53,7 @@ namespace Planner_chat_server.App.Service
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
             var access = await _chatRepository.GetChatAccess(chatId, accountId);
+            _logger.LogInformation($"chat-{chatId} --- acc-{accountId} --- access-{access} --- member-{chatMembership}");
             if (chatMembership == null || access == null)
                 return;
 
