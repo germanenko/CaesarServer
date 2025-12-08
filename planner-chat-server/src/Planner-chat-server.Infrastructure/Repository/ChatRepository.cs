@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
@@ -13,10 +14,12 @@ namespace Planner_chat_server.Infrastructure.Repository
     public class ChatRepository : IChatRepository
     {
         private readonly ChatDbContext _context;
+        private readonly ILogger<ChatRepository> _logger;
 
-        public ChatRepository(ChatDbContext context)
+        public ChatRepository(ChatDbContext context, ILogger<ChatRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<ChatSettings?> AddMembershipAsync(Guid accountId, Chat chat)
@@ -581,8 +584,12 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId)
         {
-            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.NodeId == chatId).FirstOrDefaultAsync();
-            return access;
+            var acc = await _context.AccessRights.ToListAsync();
+            foreach (var ac in acc)
+            {
+                _logger.LogInformation($"{ac.AccountId}-{ac.NodeId}");
+            }
+            return await _context.AccessRights.FirstOrDefaultAsync(cm => cm.AccountId == accountId && cm.NodeId == chatId);
         }
     }
 }
