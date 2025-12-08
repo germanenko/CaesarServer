@@ -32,16 +32,6 @@ namespace Planer_task_board.App.Service
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = nodes
             };
-
-            //return new ServiceResponse<IEnumerable<Node>>()
-            //{
-            //    IsSuccess = true,
-            //    StatusCode = System.Net.HttpStatusCode.OK,
-            //    Body = nodes?.Select(x => x.ToNodeBody())
-            //      .Where(x => x != null)
-            //      .ToList()!
-            //   ?? new List<NodeBody>()
-            //};
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId)
