@@ -104,39 +104,53 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
         {
-            var accessibleResourceIds = await _context.AccessRights
+            var rootIds = await _context.AccessRights
                 .Where(x => x.AccountId == accountId)
                 .Select(x => x.NodeId)
+                .Take(5)
                 .ToListAsync();
 
-            if (!accessibleResourceIds.Any())
+            if (!rootIds.Any())
                 return null;
 
             var query = @"
                 WITH RECURSIVE node_tree AS (
-                    SELECT nl.* FROM ""NodeLinks"" nl
+                    -- Первый уровень
+                    SELECT 
+                        nl.*, 
+                        1 as level,
+                        ARRAY[nl.""ParentId""] as visited_path -- ? отслеживаем путь
+                    FROM ""NodeLinks"" nl 
                     WHERE nl.""ParentId"" IN ({0})
+                      AND nl.""ParentId"" != nl.""ChildId"" -- исключаем самоссылки
+                    
                     UNION ALL
-                    SELECT n.* FROM ""NodeLinks"" n
+                    
+                    -- Рекурсивная часть с защитой от циклов
+                    SELECT 
+                        n.*, 
+                        nt.level + 1,
+                        nt.visited_path || n.""ParentId"" -- добавляем к пути
+                    FROM ""NodeLinks"" n
                     INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
+                    WHERE 
+                        nt.level < 5
+                        AND n.""ParentId"" != n.""ChildId"" -- исключаем самоссылки
+                        AND n.""ParentId"" != ALL(nt.visited_path) -- ? защита от циклов
                 )
-                SELECT DISTINCT * FROM node_tree";
+                SELECT ""Id"", ""ParentId"", ""ChildId"", ""RelationType"" 
+                FROM node_tree 
+                WHERE level <= 5
+                LIMIT 500;";
 
-            var parameters = new List<NpgsqlParameter>();
-            var paramNames = new List<string>();
+            var parameters = rootIds.Select((id, i) =>
+                new NpgsqlParameter($"@p{i}", id)).ToArray();
 
-            for (int i = 0; i < accessibleResourceIds.Count; i++)
-            {
-                var paramName = $"@p{i}";
-                paramNames.Add(paramName);
-                parameters.Add(new NpgsqlParameter(paramName, accessibleResourceIds[i]));
-            }
-
-            var formattedQuery = string.Format(query, string.Join(",", paramNames));
+            var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
 
             return await _context.NodeLinks
-                .FromSqlRaw(formattedQuery, parameters.ToArray())
-                .Distinct()
+                .FromSqlRaw(string.Format(query, paramNames), parameters)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
