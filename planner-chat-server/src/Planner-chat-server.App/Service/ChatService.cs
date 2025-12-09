@@ -52,8 +52,8 @@ namespace Planner_chat_server.App.Service
             };
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
-            var access = await _chatRepository.GetChatAccess(chatId, accountId);
-            _logger.LogInformation($"chat-{chatId} --- acc-{accountId} --- access-{access} --- member-{chatMembership}");
+            var access = await _chatRepository.GetChatAccess(accountId, chatId);
+
             if (chatMembership == null || access == null)
                 return;
 
