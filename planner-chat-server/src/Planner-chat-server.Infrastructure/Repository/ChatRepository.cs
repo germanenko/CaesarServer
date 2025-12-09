@@ -56,6 +56,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                 MessageType = messageType,
                 Content = content,
                 SenderId = senderId,
+                Type = NodeType.Message
             };
 
             message = (await _context.ChatMessages.AddAsync(message))?.Entity;
@@ -81,7 +82,8 @@ namespace Planner_chat_server.Infrastructure.Repository
             {
                 Id = createChatBody.Id,
                 Name = createChatBody.Name,
-                ChatType = ChatType.Personal
+                ChatType = ChatType.Personal,
+                Type = NodeType.Chat
             };
 
             var memberships = participants
@@ -433,6 +435,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                 Name = name,
                 ChatType = ChatType.Task,
                 TaskId = taskId,
+                Type = NodeType.Chat,
                 ChatMemberships = new List<ChatSettings>
                 {
                     new ChatSettings { AccountId = creatorId }

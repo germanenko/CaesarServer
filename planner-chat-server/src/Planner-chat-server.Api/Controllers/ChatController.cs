@@ -239,33 +239,17 @@ namespace Planner_chat_server.Api.Controllers
         }
 
         [HttpPost("api/enableNotifications"), Authorize]
-        [SwaggerOperation("Включить уведомления от чата")]
+        [SwaggerOperation("Включить/отключить уведомления от чата")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> EnableNotifications(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Guid chatId
+            [FromQuery] Guid chatId,
+            [FromQuery] bool enable
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, true);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
-        }
-
-        [HttpPost("api/disableNotifications"), Authorize]
-        [SwaggerOperation("Выключить уведомления от чата")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
-        [SwaggerResponse(403)]
-        public async Task<IActionResult> DisableNotifications(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Guid chatId
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, false);
+            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, enable);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 
