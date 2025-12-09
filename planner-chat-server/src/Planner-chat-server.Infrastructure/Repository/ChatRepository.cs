@@ -58,14 +58,15 @@ namespace Planner_chat_server.Infrastructure.Repository
                 SenderId = senderId,
             };
 
+            message = (await _context.ChatMessages.AddAsync(message))?.Entity;
+
             await _context.NodeLinks.AddAsync(new NodeLink()
             {
-                ParentNode = chat,
-                ChildNode = message,
+                ParentId = chat.Id,
+                ChildId = message.Id,
                 RelationType = RelationType.Contains
             });
 
-            message = (await _context.ChatMessages.AddAsync(message))?.Entity;
             await _context.SaveChangesAsync();
 
             return message;
