@@ -294,25 +294,13 @@ namespace Planner_chat_server.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<string>>> GetMessageDrafts(Guid accountId)
-        {
-            var drafts = await _chatRepository.GetChatSettingsByAccountIdAsync(accountId);
-
-            return new ServiceResponse<List<string>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = drafts.Select(x => x.MessageDraft).ToList()
-            };
-        }
-
-        public async Task<ServiceResponse<bool>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
+        public async Task<ServiceResponse<ChatSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
             var membership = await _chatRepository.SetEnabledNotifications(accountId, chatId, enable);
 
             if (membership == null)
             {
-                return new ServiceResponse<bool>
+                return new ServiceResponse<ChatSettings?>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     IsSuccess = true,
@@ -320,11 +308,23 @@ namespace Planner_chat_server.App.Service
                 };
             }
 
-            return new ServiceResponse<bool>
+            return new ServiceResponse<ChatSettings?>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = true
+                Body = membership
+            };
+        }
+
+        public async Task<ServiceResponse<List<ChatSettings>>> GetChatsSettings(Guid accountId)
+        {
+            var settings = await _chatRepository.GetChatSettingsByAccountIdAsync(accountId);
+
+            return new ServiceResponse<List<ChatSettings>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = settings
             };
         }
     }

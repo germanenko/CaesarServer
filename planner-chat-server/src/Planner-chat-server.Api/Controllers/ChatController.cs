@@ -222,22 +222,6 @@ namespace Planner_chat_server.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpGet("api/getMessageDrafts")]
-        [SwaggerOperation("Получить все черновики сообщений")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
-        [SwaggerResponse(403)]
-        public async Task<IActionResult> GetMessageDrafts(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.GetMessageDrafts(tokenPayload.AccountId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
-        }
-
         [HttpPost("api/enableNotifications"), Authorize]
         [SwaggerOperation("Включить/отключить уведомления от чата")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
@@ -250,6 +234,22 @@ namespace Planner_chat_server.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, enable);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpGet("api/getChatsSettings"), Authorize]
+        [SwaggerOperation("Получить настройки чатов")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> GetChatsSettings(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.GetChatsSettings(tokenPayload.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

@@ -979,19 +979,6 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getMessageDrafts",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8090
-                }
-            ],
-            "UpstreamPathTemplate": "/api/getMessageDrafts",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-
-	{
             "DownstreamPathTemplate": "/api/enableNotifications",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
@@ -1002,6 +989,19 @@
             ],
             "UpstreamPathTemplate": "/api/enableNotifications",
             "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/getChatsSettings",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getChatsSettings",
+            "UpstreamHttpMethod": [ "GET" ]
         },
 
         {
