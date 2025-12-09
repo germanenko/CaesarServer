@@ -16,6 +16,13 @@ namespace Planner_chat_server.Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(ChatDbContext).Assembly);
 
             modelBuilder.Entity<Node>().UseTptMappingStrategy();
+
+            modelBuilder.Entity<Chat>().HasBaseType<Node>();
+            modelBuilder.Entity<ChatMessage>().HasBaseType<Node>();
+
+            modelBuilder.Entity<Node>().ToTable("Nodes");
+            modelBuilder.Entity<Chat>().ToTable("Chats");
+            modelBuilder.Entity<ChatMessage>().ToTable("ChatMessages");
         }
 
         public DbSet<ChatSettings> ChatSettings { get; set; }
