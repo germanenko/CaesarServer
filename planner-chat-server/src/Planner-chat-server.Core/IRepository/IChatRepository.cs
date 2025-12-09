@@ -19,7 +19,7 @@ namespace Planner_chat_server.Core.IRepository
         Task CreateAccountChatSessionsAsync(Guid session);
         Task<ChatMessage?> GetMessageAsync(Guid id);
         Task<Chat?> UpdateChatImage(Guid chatId, string filename);
-        Task<AccountChatSession?> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatAccessId, DateTime dateLastViewing);
+        Task<AccountChatSession?> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing);
         Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatAccessId);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);

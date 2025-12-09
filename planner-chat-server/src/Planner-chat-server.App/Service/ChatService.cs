@@ -57,7 +57,7 @@ namespace Planner_chat_server.App.Service
             if (chatMembership == null || access == null)
                 return;
 
-            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, access.Id, chatMembership.DateLastViewing);
+            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
             if (accountChatSession == null)
                 return;
 
