@@ -22,7 +22,9 @@ namespace Planer_task_board.Infrastructure.Data
 
             modelBuilder.Entity<Board>().HasBaseType<Node>();
             modelBuilder.Entity<Column>().HasBaseType<Node>();
-            modelBuilder.Entity<TaskModel>().HasBaseType<Node>();
+            modelBuilder.Entity<TaskModel>().HasBaseType<Node>(); 
+            modelBuilder.Entity<Chat>().HasBaseType<Node>();
+            modelBuilder.Entity<ChatMessage>().HasBaseType<Node>();
 
             modelBuilder.Entity<Node>().ToTable("Nodes");
             modelBuilder.Entity<Board>().ToTable("Boards");
