@@ -30,6 +30,8 @@ namespace Planer_task_board.Infrastructure.Data
             modelBuilder.Entity<Board>().ToTable("Boards");
             modelBuilder.Entity<Column>().ToTable("Columns");
             modelBuilder.Entity<TaskModel>().ToTable("Tasks");
+            modelBuilder.Entity<Chat>().ToTable("Chats");
+            modelBuilder.Entity<ChatMessage>().ToTable("ChatMessages");
         }
 
         public DbSet<Node> Nodes { get; set; }
