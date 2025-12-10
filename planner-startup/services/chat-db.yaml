@@ -8,6 +8,6 @@ services:
       - POSTGRES_PASSWORD=${CHAT_DB_PASSWORD}
       - POSTGRES_DB=${CHAT_DB_DATABASE}
     ports:
-      - "5436:5432"
+      - "5438:5432"
     volumes:
       - planner-chat-data:/var/lib/postgresql/data
