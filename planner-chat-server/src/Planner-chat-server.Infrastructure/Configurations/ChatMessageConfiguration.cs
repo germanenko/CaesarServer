@@ -12,8 +12,7 @@ namespace Planner_chat_server.Infrastructure.Configurations
             builder.ToTable("ChatMessages");
 
             builder.Property(cm => cm.MessageType)
-                .HasConversion<string>()
-                .HasMaxLength(20)
+                .HasConversion<int>()
                 .IsRequired();
 
             builder.Property(cm => cm.Content)
