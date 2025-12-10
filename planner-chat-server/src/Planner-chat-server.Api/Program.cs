@@ -47,7 +47,6 @@ void ConfigureServices(IServiceCollection services)
     var jwtAudience = GetEnvVar("JWT_AUTH_AUDIENCE");
 
     var chatConnectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
-    var notifyConnectionString = GetEnvVar("NOTIFY_DB_CONNECTION_STRING");
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
 
 
