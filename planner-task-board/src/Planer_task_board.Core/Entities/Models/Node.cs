@@ -7,6 +7,8 @@ namespace Planer_task_board.Core.Entities.Models
     [JsonDerivedType(typeof(Board), "board")]
     [JsonDerivedType(typeof(Column), "column")]
     [JsonDerivedType(typeof(TaskModel), "task")]
+    [JsonDerivedType(typeof(Chat), typeDiscriminator: "chat")]
+    [JsonDerivedType(typeof(ChatMessage), typeDiscriminator: "chatMessage")]
     public class Node : ModelBase
     {
         public NodeType Type { get; set; }
