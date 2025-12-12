@@ -33,7 +33,8 @@ namespace planner_notify_service.Infrastructure.Repository
                     UserId = accountId,
                     Token = firebaseToken,
                     DeviceId = deviceId,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true
                 };
 
                 var token = _context.FirebaseTokens.Add(newToken).Entity;
@@ -51,7 +52,8 @@ namespace planner_notify_service.Infrastructure.Repository
                     UserId = accountId,
                     Token = firebaseToken,
                     DeviceId = deviceId,
-                    UpdatedAt = DateTime.UtcNow
+                    UpdatedAt = DateTime.UtcNow,
+                    IsActive = true
                 };
 
                 _context.FirebaseTokens.Add(newToken);
