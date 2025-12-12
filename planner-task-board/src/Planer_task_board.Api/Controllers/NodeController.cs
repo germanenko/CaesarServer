@@ -81,7 +81,7 @@ namespace Planer_task_board.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("createOrUpdateNodeLink"), Authorize]
+        [HttpPost("createOrUpdateNodeLinks"), Authorize]
         [SwaggerOperation("Создать или обновить связи")]
         [SwaggerResponse(200)]
 
