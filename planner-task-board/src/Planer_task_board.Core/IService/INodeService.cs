@@ -15,5 +15,6 @@ namespace Planer_task_board.Core.IService
         public Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, Node node);
         public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node);
+        public Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> nodes);
     }
 }

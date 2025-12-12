@@ -66,6 +66,18 @@ namespace Planer_task_board.Infrastructure.Repository
             }
         }
 
+        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> newNodeLinks)
+        {
+            var links = new List<NodeLink>();
+
+            foreach (var link in newNodeLinks)
+            {
+                links.Add(await AddOrUpdateNodeLink(accountId, link));
+            }
+
+            return links;
+        }
+
         public async Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null)
         {
             var query = _context.NodeLinks.Where(x => x.ParentId == parentId);

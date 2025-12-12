@@ -80,5 +80,19 @@ namespace Planer_task_board.Api.Controllers
             var result = await _nodeService.AddOrUpdateNodeLink(tokenPayload.AccountId, node);
             return StatusCode((int)result.StatusCode, result.Body);
         }
+
+        [HttpPost("createOrUpdateNodeLink"), Authorize]
+        [SwaggerOperation("Создать или обновить связи")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> AddOrUpdateNodeLinks(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromBody] List<CreateOrUpdateNodeLink> nodes
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.AddOrUpdateNodeLinks(tokenPayload.AccountId, nodes);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
     }
 }

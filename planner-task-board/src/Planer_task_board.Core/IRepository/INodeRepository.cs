@@ -7,6 +7,7 @@ namespace Planer_task_board.Core.IRepository
     public interface  INodeRepository
     {
         Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node);
+        Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> nodes);
         Task<Node> AddOrUpdateNode(Guid accountId, Node node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId);

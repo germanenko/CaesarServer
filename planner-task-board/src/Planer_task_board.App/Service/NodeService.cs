@@ -72,5 +72,17 @@ namespace Planer_task_board.App.Service
                 Body = nodeLink
             };
         }
+
+        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> nodes)
+        {
+            var nodeLink = await _nodeRepository.AddOrUpdateNodeLinks(accountId, nodes);
+
+            return new ServiceResponse<List<NodeLink>>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = nodeLink
+            };
+        }
     }
 }
