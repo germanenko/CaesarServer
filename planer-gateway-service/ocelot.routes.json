@@ -782,6 +782,19 @@
             "UpstreamHttpMethod": [ "DELETE" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/getAccessGrants",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getAccessGrants",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/task",
             "DownstreamScheme": "http",

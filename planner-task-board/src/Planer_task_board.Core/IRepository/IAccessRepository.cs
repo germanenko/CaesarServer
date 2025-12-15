@@ -10,6 +10,7 @@ namespace Planer_task_board.Core.IRepository
         Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
         Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
         Task<AccessGroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
+        Task<List<AccessRight>?> GetAccessRights(Guid accountId);
         Task<bool> CheckAccess(Guid accountId, Guid nodeId);
     }
 }

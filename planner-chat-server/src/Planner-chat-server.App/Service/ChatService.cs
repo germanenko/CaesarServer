@@ -162,6 +162,9 @@ namespace Planner_chat_server.App.Service
         public async Task<ServiceResponse<ChatBody>> GetChat(Guid accountId, Guid userSessionId, Guid chatId)
         {
             var chat = await _chatRepository.GetChat(accountId, userSessionId, chatId);
+
+            chat.Profile = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
+
             return new ServiceResponse<ChatBody>
             {
                 StatusCode = HttpStatusCode.OK,

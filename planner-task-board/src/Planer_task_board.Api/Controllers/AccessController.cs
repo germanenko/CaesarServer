@@ -68,5 +68,17 @@ namespace Planer_task_board.Api.Controllers
             var result = await _accessService.RemoveUserFromGroup(tokenPayload.AccountId, userId, groupId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
+
+        [HttpGet("getAccessGrants"), Authorize]
+        [SwaggerOperation("Получить список прав доступа")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GetAccessRights(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _accessService.GetAccessRights(tokenPayload.AccountId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
     }
 }

@@ -12,5 +12,6 @@ namespace Planner_chat_server.Core.Entities.Response
         public bool IsSyncedReadStatus { get; set; }
         public ChatType Type { get; set; }
         public List<Guid> ParticipantIds { get; set; } = new();
+        public ProfileBody? Profile { get; set; }
     }
 }

@@ -126,5 +126,17 @@ namespace Planer_task_board.Infrastructure.Repository
 
             return groupMember;
         }
+        
+        public async Task<List<AccessRight>?> GetAccessRights(Guid accountId)
+        {
+            var accessRights = await _context.AccessRights
+                .Where(ar => (!ar.IsGroupAccess && ar.AccountId == accountId) ||
+                             (ar.IsGroupAccess && ar.AccessGroup.Members.Any(m => m.AccountId == accountId))).ToListAsync();
+
+            if (accessRights == null)
+                return null;
+
+            return accessRights;
+        }
     }
 }

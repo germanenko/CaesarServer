@@ -87,5 +87,27 @@ namespace Planer_task_board.App.Service
                 Body = HttpStatusCode.OK
             };
         }
+
+        public async Task<ServiceResponse<List<AccessRight>>> GetAccessRights(Guid accountId)
+        {
+            var access = await _accessRepository.GetAccessRights(accountId);
+
+            if (access == null)
+            {
+                return new ServiceResponse<List<AccessRight>>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступов" }
+                };
+            }
+
+            return new ServiceResponse<List<AccessRight>>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access
+            };
+        }
     }
 }

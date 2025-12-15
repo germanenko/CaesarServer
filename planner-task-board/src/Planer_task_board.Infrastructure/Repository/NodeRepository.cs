@@ -155,21 +155,5 @@ namespace Planer_task_board.Infrastructure.Repository
                 .AsNoTracking()
                 .ToListAsync();
         }
-
-        private async Task<List<NodeLink>> GetTreeByRootId(Guid rootId)
-        {
-            var query = @"
-                WITH RECURSIVE node_tree AS (
-                    SELECT * FROM ""NodeLinks"" WHERE ""ParentId"" = @rootId
-                    UNION ALL
-                    SELECT n.* FROM ""NodeLinks"" n
-                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
-                )
-                SELECT * FROM node_tree";
-
-            return await _context.NodeLinks
-                .FromSqlRaw(query, new NpgsqlParameter("@rootId", rootId))
-                .ToListAsync();
-        }
     }
 }
