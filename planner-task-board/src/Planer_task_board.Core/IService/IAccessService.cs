@@ -10,6 +10,6 @@ namespace Planer_task_board.Core.IService
         public Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body);
         public Task<ServiceResponse<AccessGroupMemberBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
         public Task<ServiceResponse<HttpStatusCode>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
-        public Task<ServiceResponse<List<AccessRight>>> GetAccessRights(Guid accountId);
+        public Task<ServiceResponse<AccessBody>> GetAccessRights(Guid accountId);
     }
 }

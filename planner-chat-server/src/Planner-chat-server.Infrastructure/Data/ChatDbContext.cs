@@ -33,5 +33,6 @@ namespace Planner_chat_server.Infrastructure.Data
         public DbSet<NodeLink> NodeLinks { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<AccessRight> AccessRights { get; set; }
+        public DbSet<NotificationSettings> NotificationSettings { get; set; }
     }
 }

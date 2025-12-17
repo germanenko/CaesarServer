@@ -35,7 +35,7 @@ namespace Planner_chat_server.Core.IRepository
         Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody message);
         Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
         Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content);
-        Task<ChatSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
+        Task<NotificationSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
         Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId);
         Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId);
         Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId);

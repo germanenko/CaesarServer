@@ -20,7 +20,7 @@ namespace Planner_chat_server.Core.IService
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDrafts(Guid accountId, List<MessageDraftBody> drafts);
         Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId);
-        Task<ServiceResponse<ChatSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
+        Task<ServiceResponse<NotificationSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
         Task<ServiceResponse<List<ChatSettings>>> GetChatsSettings(Guid accountId);
     }
 }

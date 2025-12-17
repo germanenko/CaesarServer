@@ -45,5 +45,6 @@ namespace Planer_task_board.Infrastructure.Data
         public DbSet<PublicationStatusModel> PublicationStatuses { get; set; }
         public DbSet<WorkflowStatusModel> WorkflowStatuses { get; set; }
         public DbSet<History> History { get; set; }
+        public DbSet<NotificationSettings> NotificationSettings { get; set; }
     }
 }

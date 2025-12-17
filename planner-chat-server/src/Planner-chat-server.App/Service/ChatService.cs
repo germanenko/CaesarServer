@@ -297,13 +297,13 @@ namespace Planner_chat_server.App.Service
             };
         }
 
-        public async Task<ServiceResponse<ChatSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
+        public async Task<ServiceResponse<NotificationSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
             var membership = await _chatRepository.SetEnabledNotifications(accountId, chatId, enable);
 
             if (membership == null)
             {
-                return new ServiceResponse<ChatSettings?>
+                return new ServiceResponse<NotificationSettings?>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     IsSuccess = true,
@@ -311,7 +311,7 @@ namespace Planner_chat_server.App.Service
                 };
             }
 
-            return new ServiceResponse<ChatSettings?>
+            return new ServiceResponse<NotificationSettings?>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,

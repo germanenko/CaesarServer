@@ -474,16 +474,24 @@ namespace Planner_chat_server.Infrastructure.Repository
             if (!newAccountIds.Any())
                 return;
 
-            var newChatMemberships = newAccountIds.Select(accountId => new ChatSettings
+            var newChatSettings = newAccountIds.Select(accountId => new ChatSettings
             {
                 Id = Guid.NewGuid(),
                 ChatId = chat.Id,
                 AccountId = accountId,
-                DateLastViewing = DateTime.UtcNow,
-                NotificationsEnabled = true
+                DateLastViewing = DateTime.UtcNow
             });
 
-            await _context.ChatSettings.AddRangeAsync(newChatMemberships);
+            var newNotificationSettings = newAccountIds.Select(accountId => new NotificationSettings
+            {
+                Id = Guid.NewGuid(),
+                NodeId = chat.Id,
+                AccountId = accountId
+            });
+
+
+            await _context.ChatSettings.AddRangeAsync(newChatSettings);
+            await _context.NotificationSettings.AddRangeAsync(newNotificationSettings);
             await _context.SaveChangesAsync();
         }
 
@@ -555,24 +563,24 @@ namespace Planner_chat_server.Infrastructure.Repository
 
         public async Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId)
         {
-            var membership = await _context.ChatSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+            var membership = await _context.NotificationSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.NodeId == chatId);
 
             return membership.NotificationsEnabled;
         }
 
         public async Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId)
         {
-            return await _context.ChatSettings
+            return await _context.NotificationSettings
                 .Where(cm => accountIds.Contains(cm.AccountId) &&
-                            cm.ChatId == chatId &&
+                            cm.NodeId == chatId &&
                             cm.NotificationsEnabled)
                 .Select(cm => cm.AccountId)
                 .ToListAsync();
         }
 
-        public async Task<ChatSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
+        public async Task<NotificationSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
         {
-            var membership = await _context.ChatSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ChatId == chatId);
+            var membership = await _context.NotificationSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.NodeId == chatId);
 
             if(membership == null)
             {

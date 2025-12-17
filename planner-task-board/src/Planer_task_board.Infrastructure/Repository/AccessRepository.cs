@@ -128,7 +128,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return groupMember;
         }
         
-        public async Task<List<AccessRight>?> GetAccessRights(Guid accountId)
+        public async Task<AccessBody> GetAccessRights(Guid accountId)
         {
             var accessRights = await _context.AccessRights
                 .Include(x => x.AccessGroup)
@@ -143,12 +143,12 @@ namespace Planer_task_board.Infrastructure.Repository
             var accessGroups = accessRights.Select(x => x?.AccessGroup).ToList();
 
             accessBody.AccessGroups = accessGroups.Select(x => x.ToAccessGroupBody()).ToList();
-            //accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members));
+            accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members.Select(x => x.ToAccessGroupMemberBody())));
 
-            if (accessRights == null)
+            if (accessBody.AccessRights == null)
                 return null;
 
-            return accessRights;
+            return accessBody;
         }
     }
 }

@@ -9,7 +9,6 @@ namespace Planner_chat_server.Core.Entities.Models
         public string? ChatName { get; set; }
         public string? MessageDraft { get; set; }
         public DateTime DateLastViewing { get; set; } = DateTime.UtcNow;
-        public bool NotificationsEnabled { get; set; } = true;
 
         public List<AccountChatSession> UserChatSessions { get; set; } = new();
     }

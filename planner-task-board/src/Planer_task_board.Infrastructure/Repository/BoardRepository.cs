@@ -32,45 +32,37 @@ namespace Planer_task_board.Infrastructure.Repository
 
             await _context.Boards.AddAsync(board);
 
-            var history = new History
+            await _context.History.AddAsync(new History
             {
                 NodeId = board.Id,
                 CreatedAt = DateTime.UtcNow,
                 CreatedBy = accountId
-            };
+            });
 
-            await _context.History.AddAsync(history);
-
-            var publicationStatus = new PublicationStatusModel()
+            await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
             {
                 Id = Guid.NewGuid(),
                 Node = board,
                 NodeId = board.Id,
                 Status = createBoardBody.PublicationStatus,
                 UpdatedAt = DateTime.UtcNow
-            };
+            });
 
-            await _context.PublicationStatuses.AddAsync(publicationStatus);
-
-            var accessRight = new AccessRight()
+            await _context.AccessRights.AddAsync(new AccessRight()
             {
                 Id = Guid.NewGuid(),
                 AccountId = accountId,
                 NodeId = board.Id,
                 Node = board, 
                 AccessType = AccessType.Creator
-            };
+            });
 
-            await _context.AccessRights.AddAsync(accessRight);
-
-            var nodeLink = new NodeLink()
+            await _context.NodeLinks.AddAsync(new NodeLink()
             {
                 Id = Guid.NewGuid(),
                 ParentId = board.Id,
                 ChildId = board.Id
-            };
-
-            await _context.NodeLinks.AddAsync(nodeLink);
+            });
 
             await _context.History.AddAsync(new History()
             {
@@ -79,7 +71,11 @@ namespace Planer_task_board.Infrastructure.Repository
                 CreatedBy = accountId
             });
 
-            await _context.NodeLinks.AddAsync(nodeLink);
+            await _context.NotificationSettings.AddAsync(new NotificationSettings()
+            {
+                NodeId = board.Id,
+                AccountId = accountId
+            });
 
             await _context.SaveChangesAsync();
 
@@ -267,6 +263,12 @@ namespace Planer_task_board.Infrastructure.Repository
             {
                 ParentId = columnNode.Id,
                 ChildId = columnNode.Id
+            });
+
+            await _context.NotificationSettings.AddAsync(new NotificationSettings()
+            {
+                NodeId = columnNode.Id,
+                AccountId = accountId
             });
 
             columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;

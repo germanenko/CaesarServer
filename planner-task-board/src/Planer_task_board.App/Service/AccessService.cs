@@ -88,13 +88,13 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<AccessRight>>> GetAccessRights(Guid accountId)
+        public async Task<ServiceResponse<AccessBody>> GetAccessRights(Guid accountId)
         {
             var access = await _accessRepository.GetAccessRights(accountId);
 
             if (access == null)
             {
-                return new ServiceResponse<List<AccessRight>>()
+                return new ServiceResponse<AccessBody>()
                 {
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -102,7 +102,7 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            return new ServiceResponse<List<AccessRight>>()
+            return new ServiceResponse<AccessBody>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
