@@ -125,7 +125,6 @@ namespace Planer_task_board.Infrastructure.Repository
                         ARRAY[nl.""ParentId""] as visited_path 
                     FROM ""NodeLinks"" nl 
                     WHERE nl.""ParentId"" IN ({0})
-                      AND nl.""ParentId"" != nl.""ChildId"" 
                     
                     UNION ALL
                     

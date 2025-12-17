@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.Entities.Request;
+using Planer_task_board.Core.Entities.Response;
 using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Infrastructure.Data;
@@ -130,8 +131,19 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<List<AccessRight>?> GetAccessRights(Guid accountId)
         {
             var accessRights = await _context.AccessRights
+                .Include(x => x.AccessGroup)
+                .ThenInclude(x => x.Members)
                 .Where(ar => (!ar.IsGroupAccess && ar.AccountId == accountId) ||
                              (ar.IsGroupAccess && ar.AccessGroup.Members.Any(m => m.AccountId == accountId))).ToListAsync();
+
+            var accessBody = new AccessBody();
+
+            accessBody.AccessRights = accessRights;
+
+            var accessGroups = accessRights.Select(x => x?.AccessGroup).ToList();
+
+            accessBody.AccessGroups = accessGroups.Select(x => x.ToAccessGroupBody()).ToList();
+            accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members));
 
             if (accessRights == null)
                 return null;
