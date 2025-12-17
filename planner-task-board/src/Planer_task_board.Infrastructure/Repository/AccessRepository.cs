@@ -143,7 +143,7 @@ namespace Planer_task_board.Infrastructure.Repository
             var accessGroups = accessRights.Select(x => x?.AccessGroup).ToList();
 
             accessBody.AccessGroups = accessGroups.Select(x => x.ToAccessGroupBody()).ToList();
-            accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members));
+            //accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members));
 
             if (accessRights == null)
                 return null;
