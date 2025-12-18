@@ -111,7 +111,6 @@ namespace Planer_task_board.Infrastructure.Repository
             var rootIds = await _context.AccessRights
                 .Where(x => x.AccountId == accountId)
                 .Select(x => x.NodeId)
-                .Take(5)
                 .ToListAsync();
 
             if (!rootIds.Any())
