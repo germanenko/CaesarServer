@@ -106,8 +106,8 @@ namespace Planer_task_board.App.Service
 
             var profiles = new List<ProfileBody>();
 
-            access.AccessRights.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId.Value)));
-            access.AccessGroupMembers.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId)));
+            access.AccessRights?.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId.Value)));
+            access.AccessGroupMembers?.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId)));
 
             access.Profiles = profiles.Distinct().ToList();
 
