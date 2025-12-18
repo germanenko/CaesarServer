@@ -16,10 +16,12 @@ namespace Planer_task_board.App.Service
     public class AccessService : IAccessService
     {
         private readonly IAccessRepository _accessRepository;
+        private readonly IUserService _userService;
 
-        public AccessService(IAccessRepository accessRepository)
+        public AccessService(IAccessRepository accessRepository, IUserService userService)
         {
             _accessRepository = accessRepository;
+            _userService = userService;
         }
 
         public async Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body)
@@ -101,6 +103,13 @@ namespace Planer_task_board.App.Service
                     Errors = new[] { "Нет доступов" }
                 };
             }
+
+            var profiles = new List<ProfileBody>();
+
+            access.AccessRights.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId.Value)));
+            access.AccessGroupMembers.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId)));
+
+            access.Profiles = profiles;
 
             return new ServiceResponse<AccessBody>()
             {
