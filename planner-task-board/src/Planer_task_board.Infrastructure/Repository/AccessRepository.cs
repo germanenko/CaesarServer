@@ -162,7 +162,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Distinct() 
                 .ToList();
 
-            accessBody.AccessGroupMembers.AddRange(members);
+            accessBody.AccessGroupMembers?.AddRange(members);
 
             return accessBody;
         }
