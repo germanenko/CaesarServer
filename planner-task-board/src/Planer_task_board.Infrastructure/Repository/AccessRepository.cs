@@ -99,8 +99,8 @@ namespace Planer_task_board.Infrastructure.Repository
             return await _context.AccessRights
                 .Where(ar => ar.NodeId == nodeId)
                 .AnyAsync(ar =>
-                    (!ar.IsGroupAccess && ar.AccountId == accountId) ||
-                    (ar.IsGroupAccess && ar.AccessGroup.Members.Any(m => m.AccountId == accountId)));
+                    (ar.AccessGroupId == null && ar.AccountId == accountId) ||
+                    (ar.AccessGroupId != null && ar.AccessGroup.Members.Any(m => m.AccountId == accountId)));
         }
 
 
@@ -127,26 +127,42 @@ namespace Planer_task_board.Infrastructure.Repository
 
             return groupMember;
         }
-        
-        public async Task<AccessBody> GetAccessRights(Guid accountId)
+
+        public async Task<AccessBody?> GetAccessRights(Guid accountId)
         {
             var accessRights = await _context.AccessRights
                 .Include(x => x.AccessGroup)
-                .ThenInclude(x => x.Members)
-                .Where(ar => (!ar.IsGroupAccess && ar.AccountId == accountId) ||
-                             (ar.IsGroupAccess && ar.AccessGroup.Members.Any(m => m.AccountId == accountId))).ToListAsync();
+                    .ThenInclude(x => x.Members)
+                .Where(ar =>
+                    (ar.AccessGroupId == null && ar.AccountId == accountId) ||
+                    (ar.AccessGroupId != null &&
+                     ar.AccessGroup != null &&
+                     ar.AccessGroup.Members.Any(m => m.AccountId == accountId))
+                )
+                .ToListAsync();
+
+            if (accessRights == null || !accessRights.Any())
+                return null;
 
             var accessBody = new AccessBody();
-
             accessBody.AccessRights = accessRights;
 
-            var accessGroups = accessRights.Select(x => x?.AccessGroup).ToList();
+            var accessGroups = accessRights
+                .Select(x => x.AccessGroup)
+                .Where(x => x != null)
+                .Distinct() 
+                .ToList();
 
-            accessBody.AccessGroups = accessGroups.Select(x => x.ToAccessGroupBody()).ToList();
-            accessBody.AccessGroupMembers.AddRange(accessGroups.SelectMany(x => x.Members.Select(x => x.ToAccessGroupMemberBody())));
+            accessBody.AccessGroups = accessGroups
+                .Select(x => x.ToAccessGroupBody())
+                .ToList();
 
-            if (accessBody.AccessRights == null)
-                return null;
+            var members = accessGroups
+                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
+                .Distinct() 
+                .ToList();
+
+            accessBody.AccessGroupMembers.AddRange(members);
 
             return accessBody;
         }

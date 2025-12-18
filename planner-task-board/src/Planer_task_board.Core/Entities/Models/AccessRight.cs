@@ -12,8 +12,5 @@ namespace Planer_task_board.Core.Entities.Models
         public Node Node { get; set; }
         public AccessType AccessType { get; set; }
         public NodeType NodeType { get; set; }
-
-        public bool IsGroupAccess => AccessGroupId.HasValue;
-        public bool IsIndividualAccess => AccountId.HasValue;
     }
 }
