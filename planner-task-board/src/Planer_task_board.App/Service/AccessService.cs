@@ -109,7 +109,7 @@ namespace Planer_task_board.App.Service
             access.AccessRights.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId.Value)));
             access.AccessGroupMembers.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId)));
 
-            access.Profiles = profiles;
+            access.Profiles = profiles.Distinct().ToList();
 
             return new ServiceResponse<AccessBody>()
             {

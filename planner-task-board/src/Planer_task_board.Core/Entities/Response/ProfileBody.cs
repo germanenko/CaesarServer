@@ -2,7 +2,7 @@ using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.Entities.Response
 {
-    public class ProfileBody
+    public record ProfileBody
     {
         public Guid Id { get; set; }
         public string Identifier { get; set; }
