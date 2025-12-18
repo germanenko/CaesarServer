@@ -271,7 +271,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             {
                 Id = chat.Id,
                 Name = chat.Name,
-                Type = chat.ChatType,
+                ChatType = chat.ChatType,
                 ImageUrl = chat.Image == null ? null : $"{Constants.WebUrlToChatIcon}/{chat.Image}",
                 CountOfUnreadMessages = countOfUnreadMessages,
                 IsSyncedReadStatus = userSession.DateLastViewing == chatMembership.DateLastViewing,

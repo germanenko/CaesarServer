@@ -144,7 +144,7 @@ namespace Planner_chat_server.App.Service
 
             foreach (var chat in chats)
             {
-                if(chat.Type == ChatType.Personal)
+                if(chat.ChatType == ChatType.Personal)
                 {
                     var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
                     chat.ImageUrl = user.UrlIcon;
