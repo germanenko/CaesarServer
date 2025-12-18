@@ -145,7 +145,12 @@ namespace Planer_task_board.Infrastructure.Repository
                 return null;
 
             var accessBody = new AccessBody();
-            accessBody.AccessRights = accessRights;
+
+            var accessNodes = accessRights.Select(x => x.NodeId);
+
+            accessRights.AddRange(await _context.AccessRights.Where(x => accessNodes.Contains(x.NodeId)).ToListAsync());
+
+            accessBody.AccessRights = accessRights.Distinct().ToList();
 
             var accessGroups = accessRights
                 .Select(x => x.AccessGroup)
