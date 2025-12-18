@@ -10,7 +10,7 @@ namespace Planner_chat_server.Core.Entities.Response
         public int CountOfUnreadMessages { get; set; }
         public MessageBody? LastMessage { get; set; }
         public bool IsSyncedReadStatus { get; set; }
-        public ChatType Type { get; set; }
+        public ChatType ChatType { get; set; }
         public List<Guid> ParticipantIds { get; set; } = new();
         public ProfileBody? Profile { get; set; }
     }
