@@ -104,12 +104,31 @@ namespace Planer_task_board.App.Service
                 };
             }
 
-            var profiles = new List<ProfileBody>();
+            var accountIds = new List<Guid>();
 
-            access.AccessRights?.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId.Value)));
-            access.AccessGroupMembers?.Select(async x => profiles.Add(await _userService.GetUserData(x.AccountId)));
+            if (access.AccessRights != null)
+            {
+                accountIds.AddRange(access.AccessRights
+                    .Where(x => x.AccountId.HasValue)
+                    .Select(x => x.AccountId.Value));
+            }
 
-            access.Profiles = profiles.Distinct().ToList();
+            if (access.AccessGroupMembers != null)
+            {
+                accountIds.AddRange(access.AccessGroupMembers
+                    .Select(x => x.AccountId));
+            }
+
+            var profileTasks = accountIds.Distinct()
+            .Select(id => _userService.GetUserData(id))
+            .ToList();
+
+            var profiles = await Task.WhenAll(profileTasks);
+
+            access.Profiles = profiles
+                .Where(profile => profile != null)
+                .Distinct()
+                .ToList();
 
             return new ServiceResponse<AccessBody>()
             {
