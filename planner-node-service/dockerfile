@@ -1,20 +1,12 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /App
 
-# Копируем ВСЁ из корня CaesarServer
-COPY . .
-
-# Переходим в папку сервиса
-WORKDIR /App/planner-node-service
-
-# Обновляем пути в solution файле
-RUN sed -i 's|..\\\\planner-task-board|../planner-task-board|g' planner-node-service.sln && \
-    sed -i 's|..\\\\planner-auth-service|../planner-auth-service|g' planner-node-service.sln
-
+COPY . ./
 RUN dotnet restore
 RUN dotnet publish -c Debug -o out
 
+
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
-COPY --from=build-env /App/planner-node-service/out .
+COPY --from=build-env /App/out .
 ENTRYPOINT ["dotnet", "planner-node-service.Api.dll"]
