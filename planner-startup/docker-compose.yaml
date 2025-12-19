@@ -66,12 +66,23 @@ services:
       file: services/task-board-db.yaml
       service: planner-content-db
 
+  planner-node-service:
+    extends:
+      file: services/node-service.yaml
+      service: planner-node
+
+  planner-node-db:
+    extends:
+      file: services/node-db.yaml
+      service: planner-node-db
+
 volumes:
   planner-auth-data:
   planner-content-data:
   planner-mail-credentials-data:
   planner-chat-data:
   planner-notify-data:
+  planner-node-data:
 
   planner-file-server-data:
   planner-rabbitmq:
