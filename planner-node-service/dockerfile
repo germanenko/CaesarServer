@@ -1,14 +1,9 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /App
 
-ENV NUGET_HTTP_TIMEOUT=300
-ENV NUGET_RETRY_COUNT=10
-ENV DOTNET_SYSTEM_NET_HTTP_USESOCKETSHTTPHANDLER=0
-
 COPY . ./
-RUN dotnet restore src/planner-node-service.Api/planner-node-service.Api.csproj
-RUN dotnet publish src/planner-node-service.Api/planner-node-service.Api.csproj \
-    -c Debug -o /App/out
+RUN dotnet restore
+RUN dotnet publish -c Debug -o out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
