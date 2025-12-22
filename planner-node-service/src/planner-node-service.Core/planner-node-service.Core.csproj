@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
@@ -9,10 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\planner-task-board\src\Planer_task_board.Core\Planer_task_board.Core.csproj" />
+	<PackageReference Include="Planner.Shared.Contracts" Version="1.0.0" />
   </ItemGroup>
 
 </Project>
