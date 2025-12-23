@@ -1,4 +1,5 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
+using NpgsqlTypes;
 using planner_node_service.Core.Entities.Response;
 using planner_node_service.Core.Enums;
 
@@ -14,7 +15,9 @@ namespace planner_node_service.Core.Entities.Models
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
-
+        public string BodyJson { get; set; }
+        public string SearchText { get; set; }
+        public NpgsqlTsVector SearchVector { get; set; }
         public NodeBody ToNodeBody()
         {
             return new NodeBody()

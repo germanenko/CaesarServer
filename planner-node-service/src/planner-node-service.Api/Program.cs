@@ -27,7 +27,7 @@ app.Run();
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
-    var notifyDbConnectionString = GetEnvVar("CONTENT_DB_CONNECTION_STRING");
+    var notifyDbConnectionString = GetEnvVar("NODE_DB_CONNECTION_STRING");
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");

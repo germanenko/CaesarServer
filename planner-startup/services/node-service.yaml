@@ -10,7 +10,7 @@ services:
       planner-rabbitmq-service:
         condition: service_healthy
     environment:
-      - CONTENT_DB_CONNECTION_STRING=Host=${CONTENT_DB_HOST};Port=5432;Database=${CONTENT_DB_DATABASE};Username=${CONTENT_DB_USERNAME};Password=${CONTENT_DB_PASSWORD}
+      - NODE_DB_CONNECTION_STRING=Host=${NODE_DB_HOST};Port=5432;Database=${NODE_DB_DATABASE};Username=${NODE_DB_USERNAME};Password=${NODE_DB_PASSWORD}
       - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
       - JWT_AUTH_SECRET=${JWT_AUTH_SECRET}
