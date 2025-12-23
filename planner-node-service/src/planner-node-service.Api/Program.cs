@@ -5,7 +5,6 @@ using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using planner_node_service.Api;
 using planner_node_service.App.Service;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
@@ -82,10 +81,10 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
-    services.AddSingleton<INodeService, NodeService>();
 
     services.AddSingleton<IJwtService, JwtService>();
 
+    services.AddScoped<INodeService, NodeService>();
     services.AddScoped<INodeRepository, NodeRepository>();
 
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
@@ -114,7 +113,7 @@ WebApplication ConfigureApplication(WebApplication app)
     app.UseAuthorization();
     app.MapControllers();
 
-    app.MapGet("/", () => "Notify service work");
+    app.MapGet("/", () => "Node service work");
 
     return app;
 }
@@ -126,7 +125,7 @@ void ConfigureSwagger(IServiceCollection services)
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
-            Title = "Planer notify service api",
+            Title = "Planer node service api",
             Description = "Api",
         });
 
