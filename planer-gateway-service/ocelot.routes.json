@@ -847,6 +847,19 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/swagger/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/node/swagger/{everything}",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/tasks",
             "DownstreamScheme": "http",
