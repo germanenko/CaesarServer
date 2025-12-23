@@ -4,9 +4,13 @@ WORKDIR /App
 COPY NuGet.config .
 COPY nuget-local ./nuget-local
 
-COPY . ./
-RUN dotnet restore
-RUN dotnet publish -c Debug -o out
+COPY planner-node-service ./planner-node-service
+
+RUN dotnet restore planner-node-service/planner-node-service.sln
+
+RUN dotnet publish \
+  planner-node-service/src/planner-node-service.Api/planner-node-service.Api.csproj \
+  -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
