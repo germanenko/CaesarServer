@@ -1,4 +1,7 @@
-namespace Planner_chat_server.Core.Entities.Events
+using System;
+using System.Collections.Generic;
+
+namespace CaesarServerLibrary.Events
 {
     public class CreateChatResponseEvent
     {

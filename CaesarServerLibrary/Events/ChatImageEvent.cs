@@ -1,4 +1,6 @@
-namespace Planner_chat_server.Core.Entities.Events
+using System;
+
+namespace CaesarServerLibrary.Events
 {
     public class ChatImageEvent
     {

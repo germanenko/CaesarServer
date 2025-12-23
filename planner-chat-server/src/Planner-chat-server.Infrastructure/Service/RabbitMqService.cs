@@ -1,11 +1,11 @@
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Planner_chat_server.Core.Entities.Events;
-using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
@@ -110,26 +110,7 @@ namespace Planner_chat_server.Infrastructure.Service
             ConsumeQueue(_chatAddAccountsToTaskChats, HandleAddAccountToTaskChatMessageAsync);
             ConsumeQueue(_chatAttachmentQueue, HandleChatAttachmentMessageAsync);
             ConsumeQueue(_chatImageQueue, HandleChatImageMessageAsync);
-            ConsumeQueue(_createTaskChatQueue, HandleCreateTaskChatMessageAsync);
             await Task.CompletedTask;
-        }
-
-        private async Task HandleCreateTaskChatMessageAsync(string message)
-        {
-            using var scope = _serviceFactory.CreateScope();
-            var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
-            var result = JsonSerializer.Deserialize<CreateTaskChatEvent>(message);
-            if (result == null || result.IsSuccess)
-                return;
-
-            var newChat = await chatRepository.CreateTaskChatAsync(result.CreateTaskChat.ChatName, result.CreateTaskChat.CreatorId, result.CreateTaskChat.TaskId);
-            if (newChat == null)
-                return;
-
-            result.IsSuccess = true;
-            result.CreateTaskChat.ChatId = newChat.Id;
-
-            _notifyService.Publish(result, NotifyPublishEvent.ResponseTaskChat);
         }
 
         private async Task HandleAddAccountToTaskChatMessageAsync(string message)

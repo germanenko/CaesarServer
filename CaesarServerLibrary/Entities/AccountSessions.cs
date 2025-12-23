@@ -1,4 +1,7 @@
-namespace Planner_chat_server.Core.Entities.Response
+using System;
+using System.Collections.Generic;
+
+namespace CaesarServerLibrary.Entities
 {
     public class AccountSessions
     {

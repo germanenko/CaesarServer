@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 
-namespace Planner_chat_server.Core.Entities.Response
+namespace CaesarServerLibrary.Entities
 {
     public class ChatLobby
     {

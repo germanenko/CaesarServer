@@ -1,8 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using planner_node_service.Core.Entities.Models;
-using planner_node_service.Core.Entities.Request;
-using planner_node_service.Core.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
 
@@ -17,7 +17,7 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<Node> AddOrUpdateNode(Guid accountId, Node newNode)
+        public async Task<Node> AddOrUpdateNode(Node newNode)
         {
             var existingNode = await _context.Nodes
                 .Where(x => x.Id == newNode.Id)
@@ -37,7 +37,7 @@ namespace planner_node_service.Infrastructure.Repository
             }
         }
 
-        public async Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink newNodeLink)
+        public async Task<NodeLink> AddOrUpdateNodeLink(CreateOrUpdateNodeLink newNodeLink)
         {
             var existingNode = await _context.NodeLinks
                 .Where(x => x.Id == newNodeLink.Id)
@@ -66,13 +66,13 @@ namespace planner_node_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> newNodeLinks)
+        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(List<CreateOrUpdateNodeLink> newNodeLinks)
         {
             var links = new List<NodeLink>();
 
             foreach (var link in newNodeLinks)
             {
-                links.Add(await AddOrUpdateNodeLink(accountId, link));
+                links.Add(await AddOrUpdateNodeLink(link));
             }
 
             return links;

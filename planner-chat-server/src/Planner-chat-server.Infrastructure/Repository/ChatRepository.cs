@@ -1,4 +1,6 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core;
 using Planner_chat_server.Core.Entities.Models;
@@ -61,12 +63,12 @@ namespace Planner_chat_server.Infrastructure.Repository
 
             message = (await _context.ChatMessages.AddAsync(message))?.Entity;
 
-            await _context.NodeLinks.AddAsync(new NodeLink()
-            {
-                ParentId = chat.Id,
-                ChildId = message.Id,
-                RelationType = RelationType.Contains
-            });
+            //await _context.NodeLinks.AddAsync(new NodeLink()
+            //{
+            //    ParentId = chat.Id,
+            //    ChildId = message.Id,
+            //    RelationType = RelationType.Contains
+            //});
 
             await _context.SaveChangesAsync();
 

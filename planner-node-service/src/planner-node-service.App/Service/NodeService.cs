@@ -1,5 +1,5 @@
-﻿using planner_node_service.Core.Entities.Models;
-using planner_node_service.Core.Entities.Request;
+﻿using CaesarServerLibrary.Entities;
+using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.Entities.Response;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
@@ -43,9 +43,9 @@ namespace planner_node_service.Infrastructure.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, Node node)
+        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Node node)
         {
-            var newNode = await _nodeRepository.AddOrUpdateNode(accountId, node);
+            var newNode = await _nodeRepository.AddOrUpdateNode(node);
 
             return new ServiceResponse<NodeBody>()
             {
@@ -55,9 +55,9 @@ namespace planner_node_service.Infrastructure.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node)
+        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(CreateOrUpdateNodeLink node)
         {
-            var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(accountId, node);
+            var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(node);
 
             return new ServiceResponse<NodeLink>()
             {
@@ -67,9 +67,9 @@ namespace planner_node_service.Infrastructure.Service
             };
         }
 
-        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> nodes)
+        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<CreateOrUpdateNodeLink> nodes)
         {
-            var nodeLink = await _nodeRepository.AddOrUpdateNodeLinks(accountId, nodes);
+            var nodeLink = await _nodeRepository.AddOrUpdateNodeLinks(nodes);
 
             return new ServiceResponse<List<NodeLink>>()
             {

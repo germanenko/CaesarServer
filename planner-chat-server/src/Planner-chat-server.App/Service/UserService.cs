@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using CaesarServerLibrary.Entities;
+using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.IService;
 using System.Text.Json;

@@ -1,3 +1,4 @@
+using CaesarServerLibrary.Entities;
 using Planner_chat_server.Core.Entities.Response;
 
 namespace Planner_chat_server.Core.IService

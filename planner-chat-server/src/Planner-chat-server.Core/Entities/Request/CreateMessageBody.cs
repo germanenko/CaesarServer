@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using CaesarServerLibrary.Enums;
 using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Core.Entities.Request

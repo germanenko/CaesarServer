@@ -11,6 +11,7 @@ namespace CaesarServerLibrary.Enums
         Board,
         Column,
         Task,
+        Chat,
         Message,
         AccessRight,
         AccessGroup,

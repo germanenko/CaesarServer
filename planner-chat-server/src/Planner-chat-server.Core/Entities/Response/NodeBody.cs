@@ -1,4 +1,5 @@
-﻿using Planner_chat_server.Core.Enums;
+﻿using CaesarServerLibrary.Enums;
+using Planner_chat_server.Core.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,8 +1,12 @@
-namespace Planner_chat_server.Core.Entities.Events
+using CaesarServerLibrary.Entities;
+using System;
+using System.Collections.Generic;
+
+namespace CaesarServerLibrary.Events
 {
-    public class CreateChatEvent
+    public class CreatePersonalChatEvent
     {
-        public Guid ChatId { get; set; }
+        public ChatBody Chat { get; set; }
         public IEnumerable<ChatMembership> Participants { get; set; } = new List<ChatMembership>();
     }
 

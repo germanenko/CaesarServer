@@ -1,3 +1,5 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.Entities.Response;

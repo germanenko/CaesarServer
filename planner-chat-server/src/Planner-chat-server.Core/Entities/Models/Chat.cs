@@ -1,3 +1,5 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 
@@ -11,5 +13,16 @@ namespace Planner_chat_server.Core.Entities.Models
 
         public List<ChatMessage> Messages { get; set; } = new();
         public List<ChatSettings> ChatMemberships { get; set; } = new();
+
+        public ChatBody ToChatBody()
+        {
+            return new ChatBody
+            {
+                Id = Id,
+                ImageUrl = Image,
+                ChatType = ChatType,
+                Name = Name
+            };
+        }
     }
 }

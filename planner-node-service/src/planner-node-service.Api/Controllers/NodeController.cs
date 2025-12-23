@@ -1,7 +1,7 @@
+using CaesarServerLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_node_service.Core.Entities.Models;
-using planner_node_service.Core.Entities.Request;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Http.Headers;
@@ -59,7 +59,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.AddOrUpdateNode(tokenPayload.AccountId, node);
+            var result = await _nodeService.AddOrUpdateNode(node);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -73,7 +73,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.AddOrUpdateNodeLink(tokenPayload.AccountId, node);
+            var result = await _nodeService.AddOrUpdateNodeLink(node);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -87,7 +87,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.AddOrUpdateNodeLinks(tokenPayload.AccountId, nodes);
+            var result = await _nodeService.AddOrUpdateNodeLinks(nodes);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

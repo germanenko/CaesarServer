@@ -1,6 +1,7 @@
-using Planner_chat_server.Core.Enums;
+using CaesarServerLibrary.Enums;
+using System;
 
-namespace Planner_chat_server.Core.Entities.Response
+namespace CaesarServerLibrary.Entities
 {
     public class ChatMessageInfo
     {

@@ -1,4 +1,4 @@
-﻿using planner_node_service.Core.Enums;
+﻿using CaesarServerLibrary.Enums;
 
 namespace planner_node_service.Core.Entities.Models
 {

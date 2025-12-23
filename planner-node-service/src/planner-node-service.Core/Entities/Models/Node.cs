@@ -1,7 +1,7 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using NpgsqlTypes;
-using planner_node_service.Core.Entities.Response;
-using planner_node_service.Core.Enums;
 
 namespace planner_node_service.Core.Entities.Models
 {

@@ -1,6 +1,8 @@
-using Planner_chat_server.Core.Entities.Response;
+using CaesarServerLibrary.Entities;
+using System;
+using System.Collections.Generic;
 
-namespace Planner_chat_server.Core.Entities.Events
+namespace CaesarServerLibrary.Events
 {
     public class MessageSentToChatEvent
     {

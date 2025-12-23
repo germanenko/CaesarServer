@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Http;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.Extensions.Logging;
-using Planner_chat_server.Core.Entities.Events;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
-using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
@@ -104,22 +104,23 @@ namespace Planner_chat_server.App.Service
                     Errors = new string[] { "chat exist" }
                 };
 
-            var chatMemberships = new List<Core.Entities.Events.ChatMembership>();
+            var chatMemberships = new List<ChatMembership>();
             foreach (var chatMembership in result.ChatMemberships)
             {
-                chatMemberships.Add(new Core.Entities.Events.ChatMembership
+                chatMemberships.Add(new ChatMembership
                 {
                     AccountId = chatMembership.AccountId,
                     ChatMembershipId = chatMembership.Id
                 });
             }
 
-            var createChatEvent = new CreateChatEvent
+            var createChatEvent = new CreatePersonalChatEvent
             {
-                ChatId = result.Id,
+                Chat = result.ToChatBody(),
                 Participants = chatMemberships
             };
 
+            _notifyService.Publish(createChatEvent, NotifyPublishEvent.CreatePersonalChat);
             _notifyService.Publish(createChatEvent, NotifyPublishEvent.AddAccountToChat);
             return new ServiceResponse<ChatBody>
             {

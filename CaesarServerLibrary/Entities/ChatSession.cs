@@ -1,6 +1,7 @@
+using System;
 using System.Net.WebSockets;
 
-namespace Planner_chat_server.Core.Entities.Response
+namespace CaesarServerLibrary.Entities
 {
     public class ChatSession
     {

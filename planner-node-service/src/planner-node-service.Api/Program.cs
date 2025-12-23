@@ -33,6 +33,7 @@ void ConfigureServices(IServiceCollection services)
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
 
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
+    var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -93,7 +94,8 @@ void ConfigureServices(IServiceCollection services)
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
-        messageSentToChatQueue
+        messageSentToChatQueue,
+        createPersonalChatQueue
     ));
 }
 
