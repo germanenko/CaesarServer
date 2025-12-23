@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  planner-node-service:
+  planner-node:
     image: planner-node-service
     restart: always
     ports:
