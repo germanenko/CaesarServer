@@ -3,7 +3,7 @@ WORKDIR /App
 
 COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
-COPY ./planner-node-service ./planner-node-service
+COPY . ./planner-node-service
 
 RUN dotnet restore planner-node-service/planner-node-service.sln
 
