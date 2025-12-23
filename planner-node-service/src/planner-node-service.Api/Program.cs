@@ -83,6 +83,7 @@ void ConfigureServices(IServiceCollection services)
 
 
     services.AddSingleton<IJwtService, JwtService>();
+    services.AddSingleton<INotificationService, NotificationService>();
 
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<INodeRepository, NodeRepository>();
