@@ -155,9 +155,6 @@ namespace planner_node_service.Infrastructure.Service
             {
                 _logger.LogInformation($"{ex.Message}");
             }
-            
-
-            _logger.LogInformation($"Result adding new chat: {node.Body?.Id}");
         }
 
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
