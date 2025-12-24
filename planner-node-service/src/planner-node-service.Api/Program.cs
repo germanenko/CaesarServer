@@ -26,7 +26,7 @@ app.Run();
 string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ?? throw new Exception($"{name} is not set");
 void ConfigureServices(IServiceCollection services)
 {
-    var notifyDbConnectionString = GetEnvVar("NODE_DB_CONNECTION_STRING");
+    var nodeDbConnectionString = GetEnvVar("NODE_DB_CONNECTION_STRING");
 
     var rabbitMqHostname = GetEnvVar("RABBITMQ_HOSTNAME");
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
@@ -76,7 +76,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddDbContext<NodeDbContext>(options =>
     {
-        options.UseNpgsql(notifyDbConnectionString, builder =>
+        options.UseNpgsql(nodeDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
         });

@@ -16,8 +16,6 @@ namespace planner_node_service.Core.Entities.Models
         public string Name { get; set; }
         public string? Props { get; set; }
         public string BodyJson { get; set; }
-        public string SearchText { get; set; }
-        public NpgsqlTsVector SearchVector { get; set; }
         public NodeBody ToNodeBody()
         {
             return new NodeBody()
