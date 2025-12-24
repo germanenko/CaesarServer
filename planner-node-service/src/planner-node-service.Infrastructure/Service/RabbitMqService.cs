@@ -139,7 +139,8 @@ namespace planner_node_service.Infrastructure.Service
 
             try
             {
-                _logger.LogInformation($"{result.Chat}");
+                _logger.LogInformation($"{result.Chat.Id}");
+                _logger.LogInformation($"{result.Chat.Name}");
 
                 await _nodeService.AddOrUpdateNode(new Node()
                 {
