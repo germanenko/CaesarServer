@@ -99,7 +99,7 @@ namespace Planer_task_board.App.Service
                 return new ServiceResponse<AccessBody>()
                 {
                     IsSuccess = true,
-                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    StatusCode = HttpStatusCode.OK,
                     Errors = new[] { "Нет доступов" }
                 };
             }
