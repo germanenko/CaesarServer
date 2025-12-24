@@ -1,7 +1,10 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /App
 
-COPY . ./
+COPY ../NuGet.config .
+COPY ../nuget-local ./nuget-local
+COPY . .
+
 RUN dotnet restore
 RUN dotnet publish -c Debug -o out
 
