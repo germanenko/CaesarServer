@@ -79,10 +79,9 @@ namespace planner_node_service.Infrastructure.Service
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)
         {
-            var channel = _connection.CreateModel();
-            channel.BasicQos(0, 1, false);
+            _channel.BasicQos(0, 1, false);
 
-            var consumer = new AsyncEventingBasicConsumer(channel);
+            var consumer = new AsyncEventingBasicConsumer(_channel);
 
             consumer.Received += async (model, ea) =>
             {
@@ -92,14 +91,14 @@ namespace planner_node_service.Infrastructure.Service
                 try
                 {
                     await handler(message);
-                    channel.BasicAck(ea.DeliveryTag, false);
+                    _channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception ex)
                 {
-                    channel.BasicNack(ea.DeliveryTag, false, true);
+                    _channel.BasicNack(ea.DeliveryTag, false, true);
                 }
             };
-            channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
+            _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
