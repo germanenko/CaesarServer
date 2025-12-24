@@ -75,7 +75,7 @@ namespace planner_notify_service.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            ConsumeQueue(_queue, HandleSendMessage);
+            //ConsumeQueue(_queue, HandleSendMessage);
 
             await Task.CompletedTask;
         }
