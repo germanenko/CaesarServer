@@ -5,8 +5,11 @@ COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
 COPY . .
 
-RUN dotnet restore
-RUN dotnet publish -c Debug -o out
+RUN dotnet restore planner-chat-server/planner-chat-server.sln
+
+RUN dotnet publish \
+  planner-chat-server/src/planner-chat-server.Api/planner-chat-server.Api.csproj \
+  -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
