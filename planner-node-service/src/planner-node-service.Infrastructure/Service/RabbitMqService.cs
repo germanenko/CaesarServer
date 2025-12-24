@@ -29,6 +29,7 @@ namespace planner_node_service.Infrastructure.Service
         public RabbitMqService(
             INotificationService notifyService,
             ILogger<RabbitMqService> logger,
+            INodeService nodeService,
             string hostname,
             string userName,
             string password,
@@ -39,6 +40,8 @@ namespace planner_node_service.Infrastructure.Service
             _userName = userName;
             _password = password;
             _logger = logger;
+
+            _nodeService = nodeService;
 
             _notifyService = notifyService;
             _queue = queue;
