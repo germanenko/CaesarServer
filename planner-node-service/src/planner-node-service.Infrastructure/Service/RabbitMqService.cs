@@ -136,7 +136,7 @@ namespace planner_node_service.Infrastructure.Service
             if (result == null)
                 return;
 
-            await _nodeService.AddOrUpdateNode(new Node()
+            var node = await _nodeService.AddOrUpdateNode(new Node()
             {
                 Id = result.Chat.Id,
                 Name = result.Chat.Name,
@@ -144,6 +144,8 @@ namespace planner_node_service.Infrastructure.Service
                 Type = NodeType.Chat,
                 BodyJson = JsonSerializer.Serialize(result.Chat)
             });
+
+            _logger.LogInformation($"Result adding new chat: {node.Body?.Id}");
         }
 
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
