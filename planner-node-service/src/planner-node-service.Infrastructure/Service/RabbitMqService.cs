@@ -1,14 +1,15 @@
-using System.Text;
-using System.Text.Json;
 using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Events;
 using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using planner_node_service.Core.Entities.Models;
-using Microsoft.Extensions.Logging;
+using System.Text;
+using System.Text.Json;
+using System.Xml.Linq;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -134,19 +135,24 @@ namespace planner_node_service.Infrastructure.Service
             _logger.LogInformation($"NodeService received new chat: {message}");
 
             if (result == null)
-            {
-                _logger.LogInformation($"Result is null: {result}");
                 return;
-            }
 
-            var node = await _nodeService.AddOrUpdateNode(new Node()
+            try
             {
-                Id = result.Chat.Id,
-                Name = result.Chat.Name,
-                Props = JsonSerializer.Serialize(result.Chat),
-                Type = NodeType.Chat,
-                BodyJson = JsonSerializer.Serialize(result.Chat)
-            });
+                var node = await _nodeService.AddOrUpdateNode(new Node()
+                {
+                    Id = result.Chat.Id,
+                    Name = result.Chat.Name,
+                    Props = JsonSerializer.Serialize(result.Chat),
+                    Type = NodeType.Chat,
+                    BodyJson = JsonSerializer.Serialize(result.Chat)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogInformation($"{ex.Message}");
+            }
+            
 
             _logger.LogInformation($"Result adding new chat: {node.Body?.Id}");
         }
