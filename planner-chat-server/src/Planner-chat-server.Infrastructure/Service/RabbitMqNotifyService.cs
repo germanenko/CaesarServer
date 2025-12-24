@@ -15,6 +15,7 @@ namespace Planner_chat_server.Infrastructure.Service
         private readonly string _createChatQueueName;
         private readonly string _createTaskChatResponseQueueName;
         private readonly string _messageSentToChatQueueName;
+        private readonly string _createPersonalChatQueueName;
 
         public RabbitMqNotifyService(
             string hostname,
@@ -22,7 +23,8 @@ namespace Planner_chat_server.Infrastructure.Service
             string password,
             string createChatQueueName,
             string createTaskChatResponseQueueName,
-            string messageSentToChatQueueName)
+            string messageSentToChatQueueName,
+            string createPersonalChatQueueName)
         {
             _hostname = hostname;
             _username = username;
@@ -30,6 +32,7 @@ namespace Planner_chat_server.Infrastructure.Service
             _createChatQueueName = createChatQueueName;
             _createTaskChatResponseQueueName = createTaskChatResponseQueueName;
             _messageSentToChatQueueName = messageSentToChatQueueName;
+            _createPersonalChatQueueName = createPersonalChatQueueName;
         }
 
         public void Publish<T>(T message, NotifyPublishEvent eventType)
@@ -68,6 +71,7 @@ namespace Planner_chat_server.Infrastructure.Service
                 NotifyPublishEvent.AddAccountToChat => _createChatQueueName,
                 NotifyPublishEvent.ResponseTaskChat => _createTaskChatResponseQueueName,
                 NotifyPublishEvent.MessageSentToChat => _messageSentToChatQueueName,
+                NotifyPublishEvent.CreatePersonalChat => _createPersonalChatQueueName,
                 _ => throw new ArgumentException("Invalid event type")
             };
         }
