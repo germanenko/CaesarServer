@@ -100,7 +100,7 @@ namespace Planer_task_board.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Errors = new[] { "Нет доступов" }
+                    Body = new AccessBody()
                 };
             }
 
