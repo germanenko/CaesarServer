@@ -143,14 +143,14 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     Id = result.Chat.Id,
                     Name = result.Chat.Name,
-                    Props = JsonSerializer.Serialize(result.Chat),
                     Type = NodeType.Chat,
                     BodyJson = JsonSerializer.Serialize(result.Chat)
                 });
             }
             catch (Exception ex)
             {
-                _logger.LogInformation($"{ex.Message}");
+                _logger.LogError(ex, "Error while adding chat node");
+                throw;
             }
         }
 
