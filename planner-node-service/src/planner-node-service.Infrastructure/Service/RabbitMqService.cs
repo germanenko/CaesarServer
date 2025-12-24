@@ -119,12 +119,6 @@ namespace planner_node_service.Infrastructure.Service
             if (result == null)
                 return;
 
-            foreach (var accountId in result.AccountIds)
-                await _notifyService.SendMessageToSessions(accountId, result.Message);
-
-            foreach (var accountSession in result.AccountSessions)
-                await NotifySessions(result.Message, accountSession);
-
             var chatMessage = JsonSerializer.Deserialize<ChatMessageInfo>(result.Message);
 
             using var scope = _scopeFactory.CreateScope();
@@ -145,6 +139,12 @@ namespace planner_node_service.Infrastructure.Service
                 ChildId = chatMessage.Message.Id,
                 RelationType = RelationType.Contains
             });
+
+            foreach (var accountId in result.AccountIds)
+                await _notifyService.SendMessageToSessions(accountId, result.Message);
+
+            foreach (var accountSession in result.AccountSessions)
+                await NotifySessions(result.Message, accountSession);
         }
 
         private async Task HandleNewChat(string message)
