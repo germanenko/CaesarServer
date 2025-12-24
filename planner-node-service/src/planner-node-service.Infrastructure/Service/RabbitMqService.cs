@@ -95,9 +95,10 @@ namespace planner_node_service.Infrastructure.Service
 
         private async Task HandleSendMessage(string message)
         {
-            _logger.LogInformation($"NodeService получил сообщение: {message}");
-
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
+
+            _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<ChatMessageInfo>(result.Message)}");
+
             if (result == null)
                 return;
 
@@ -129,6 +130,9 @@ namespace planner_node_service.Infrastructure.Service
         private async Task HandleNewChat(string message)
         {
             var result = JsonSerializer.Deserialize<CreatePersonalChatEvent>(message);
+
+            _logger.LogInformation($"NodeService received new chat: {message}");
+
             if (result == null)
                 return;
 
