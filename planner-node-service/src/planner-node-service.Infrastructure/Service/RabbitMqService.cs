@@ -84,9 +84,18 @@ namespace planner_node_service.Infrastructure.Service
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                await handler(message);
+
+                try
+                {
+                    await handler(message);
+                    _channel.BasicAck(deliveryTag: ea.DeliveryTag, multiple: false);
+                }
+                catch (Exception ex)
+                {
+                    _channel.BasicNack(deliveryTag: ea.DeliveryTag, multiple: false, requeue: true);
+                }
             };
-            _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+            _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
