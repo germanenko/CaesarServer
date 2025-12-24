@@ -91,6 +91,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,

@@ -8,6 +8,7 @@ using planner_node_service.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using planner_node_service.Core.Entities.Models;
+using Microsoft.Extensions.Logging;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -17,6 +18,7 @@ namespace planner_node_service.Infrastructure.Service
         private IModel _channel;
         private readonly INotificationService _notifyService;
         private readonly INodeService _nodeService;
+        private ILogger<RabbitMqService> _logger;
         private readonly string _hostname;
         private readonly string _userName;
         private readonly string _password;
@@ -25,6 +27,7 @@ namespace planner_node_service.Infrastructure.Service
 
         public RabbitMqService(
             INotificationService notifyService,
+            ILogger<RabbitMqService> logger,
             string hostname,
             string userName,
             string password,
@@ -34,6 +37,7 @@ namespace planner_node_service.Infrastructure.Service
             _hostname = hostname;
             _userName = userName;
             _password = password;
+            _logger = logger;
 
             _notifyService = notifyService;
             _queue = queue;
@@ -91,6 +95,8 @@ namespace planner_node_service.Infrastructure.Service
 
         private async Task HandleSendMessage(string message)
         {
+            _logger.LogInformation($"NodeService получил сообщение: {message}");
+
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
             if (result == null)
                 return;
