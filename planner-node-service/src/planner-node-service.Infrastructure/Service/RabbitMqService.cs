@@ -1,6 +1,7 @@
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
 using CaesarServerLibrary.Events;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using planner_node_service.Core.Entities.Models;
@@ -18,7 +19,7 @@ namespace planner_node_service.Infrastructure.Service
         private IConnection _connection;
         private IModel _channel;
         private readonly INotificationService _notifyService;
-        private readonly INodeService _nodeService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private ILogger<RabbitMqService> _logger;
         private readonly string _hostname;
         private readonly string _userName;
@@ -29,7 +30,7 @@ namespace planner_node_service.Infrastructure.Service
         public RabbitMqService(
             INotificationService notifyService,
             ILogger<RabbitMqService> logger,
-            INodeService nodeService,
+            IServiceScopeFactory scopeFactory,
             string hostname,
             string userName,
             string password,
@@ -41,7 +42,7 @@ namespace planner_node_service.Infrastructure.Service
             _password = password;
             _logger = logger;
 
-            _nodeService = nodeService;
+            _scopeFactory = scopeFactory;
 
             _notifyService = notifyService;
             _queue = queue;
@@ -114,7 +115,10 @@ namespace planner_node_service.Infrastructure.Service
 
             var chatMessage = JsonSerializer.Deserialize<ChatMessageInfo>(result.Message);
 
-            await _nodeService.AddOrUpdateNode(new Node()
+            using var scope = _scopeFactory.CreateScope();
+            var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+
+            await nodeService.AddOrUpdateNode(new Node()
             {
                 Id = chatMessage.Message.Id,
                 Name = "Message",
@@ -122,7 +126,7 @@ namespace planner_node_service.Infrastructure.Service
                 BodyJson = JsonSerializer.Serialize(chatMessage.Message)
             });
 
-            await _nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+            await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
             {
                 Id = chatMessage.Message.Id,
                 ParentId = chatMessage.ChatId,
@@ -144,7 +148,10 @@ namespace planner_node_service.Infrastructure.Service
             {
                 _logger.LogInformation($"{result.Chat}");
 
-                await _nodeService.AddOrUpdateNode(new Node()
+                using var scope = _scopeFactory.CreateScope();
+                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+
+                await nodeService.AddOrUpdateNode(new Node()
                 {
                     Id = result.Chat.Id,
                     Name = result.Chat.Name,
