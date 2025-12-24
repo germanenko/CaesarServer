@@ -134,7 +134,10 @@ namespace planner_node_service.Infrastructure.Service
             _logger.LogInformation($"NodeService received new chat: {message}");
 
             if (result == null)
+            {
+                _logger.LogInformation($"Result is null: {result}");
                 return;
+            }
 
             var node = await _nodeService.AddOrUpdateNode(new Node()
             {
