@@ -1,16 +1,32 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
-using NpgsqlTypes;
-using System.Text.Json;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    //[JsonDerivedType(typeof(Board), "board")]
-    //[JsonDerivedType(typeof(Column), "column")]
-    //[JsonDerivedType(typeof(TaskModel), "task")]
-    //[JsonDerivedType(typeof(Chat), "chat")]
-    //[JsonDerivedType(typeof(ChatMessage), "chatMessage")]
+    public class NodeSerializationBinder : DefaultSerializationBinder
+    {
+        private readonly Dictionary<string, Type> _typeMap = new()
+        {
+            ["board"] = typeof(BoardBody),
+            ["column"] = typeof(ColumnBody),
+            ["chat"] = typeof(ChatBody),
+            ["chatmessage"] = typeof(MessageBody)
+        };
+
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            if (_typeMap.ContainsKey(typeName.ToLowerInvariant()))
+            {
+                return _typeMap[typeName.ToLowerInvariant()];
+            }
+
+            return base.BindToType(assemblyName, typeName);
+        }
+    }
+
     public class Node : ModelBase
     {
         public NodeType Type { get; set; }
@@ -30,7 +46,13 @@ namespace planner_node_service.Core.Entities.Models
 
         public NodeBody ToNodeBodyFromJson()
         {
-            return JsonSerializer.Deserialize<NodeBody>(BodyJson);
+            var settings = new JsonSerializerSettings
+            {
+                TypeNameHandling = TypeNameHandling.Objects,
+                SerializationBinder = new NodeSerializationBinder()
+            };
+
+            return JsonConvert.DeserializeObject<NodeBody>(BodyJson, settings);
         }
     }
 }
