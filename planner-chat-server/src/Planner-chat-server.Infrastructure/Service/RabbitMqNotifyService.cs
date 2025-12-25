@@ -18,6 +18,8 @@ namespace Planner_chat_server.Infrastructure.Service
         private readonly string _messageSentToChatQueueName;
         private readonly string _createPersonalChatQueueName;
 
+        private readonly List<string> _exchanges = new List<string>();
+
         public RabbitMqNotifyService(
             string hostname,
             string username,
@@ -35,6 +37,13 @@ namespace Planner_chat_server.Infrastructure.Service
             _messageSentToChatQueueName = messageSentToChatQueueName;
             _createPersonalChatQueueName = createPersonalChatQueueName;
 
+            _exchanges.AddRange(new[] { _createChatQueueName, _createTaskChatResponseQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName });
+
+            ExchangeDeclare();
+        }
+
+        public void ExchangeDeclare()
+        {
             var factory = new ConnectionFactory()
             {
                 HostName = _hostname,
@@ -45,11 +54,14 @@ namespace Planner_chat_server.Infrastructure.Service
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            channel.ExchangeDeclare(exchange: messageSentToChatQueueName,
-                                 type: ExchangeType.Fanout,
-                                 durable: true,
-                                 autoDelete: false,
-                                 arguments: null);
+            foreach(var exchange in _exchanges)
+            {
+                channel.ExchangeDeclare(exchange: exchange,
+                                     type: ExchangeType.Fanout,
+                                     durable: true,
+                                     autoDelete: false,
+                                     arguments: null);
+            }
         }
 
         public void Publish<T>(T message, NotifyPublishEvent eventType)
