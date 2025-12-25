@@ -33,7 +33,8 @@ namespace Planner_chat_server.Core.Entities.Models
             return new MessageBody
             {
                 Id = Id,
-                Type = messageType,
+                Type = NodeType.Message,
+                MessageType = MessageType,
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
                 Date = SentAt,
                 SenderId = SenderId,
