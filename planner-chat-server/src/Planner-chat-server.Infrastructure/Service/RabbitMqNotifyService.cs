@@ -47,9 +47,10 @@ namespace Planner_chat_server.Infrastructure.Service
             using var channel = connection.CreateModel();
 
             var queue = GetQueueName(eventType);
-            channel.QueueDeclare(queue: queue,
+
+            channel.ExchangeDeclare(exchange: queue,
+                                 type: ExchangeType.Fanout,
                                  durable: true,
-                                 exclusive: false,
                                  autoDelete: false,
                                  arguments: null);
 
@@ -58,8 +59,8 @@ namespace Planner_chat_server.Infrastructure.Service
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
 
-            channel.BasicPublish(exchange: "",
-                                 routingKey: queue,
+            channel.BasicPublish(exchange: queue,
+                                 routingKey: "",
                                  basicProperties: properties,
                                  body: body);
         }

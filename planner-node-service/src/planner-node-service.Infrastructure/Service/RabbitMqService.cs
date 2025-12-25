@@ -69,12 +69,20 @@ namespace planner_node_service.Infrastructure.Service
 
         private void DeclareQueue(string queueName)
         {
+            var exchange = queueName;
+            queueName = queueName + "_notify";
+
             _channel.QueueDeclare(
                 queue: queueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+
+            _channel.QueueBind(
+                queue: queueName,
+                exchange: exchange,
+                routingKey: "");
         }
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)

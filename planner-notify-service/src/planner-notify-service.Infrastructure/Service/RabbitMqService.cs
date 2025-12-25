@@ -48,16 +48,25 @@ namespace planner_notify_service.Infrastructure.Service
             _channel = _connection.CreateModel();
 
             DeclareQueue(_queue);
+
         }
 
         private void DeclareQueue(string queueName)
         {
+            var exchange = queueName;
+            queueName = queueName + "_notify";
+
             _channel.QueueDeclare(
                 queue: queueName,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+
+            _channel.QueueBind(
+                queue: queueName,
+                exchange: exchange,
+                routingKey: "");
         }
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)
@@ -75,7 +84,7 @@ namespace planner_notify_service.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            //ConsumeQueue(_queue, HandleSendMessage);
+            ConsumeQueue(_queue, HandleSendMessage);
 
             await Task.CompletedTask;
         }
