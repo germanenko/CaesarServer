@@ -1,8 +1,9 @@
-using System.Text;
-using System.Text.Json;
 using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IService;
 using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
+using System.Threading.Channels;
 
 namespace Planner_chat_server.Infrastructure.Service
 {
@@ -33,6 +34,22 @@ namespace Planner_chat_server.Infrastructure.Service
             _createTaskChatResponseQueueName = createTaskChatResponseQueueName;
             _messageSentToChatQueueName = messageSentToChatQueueName;
             _createPersonalChatQueueName = createPersonalChatQueueName;
+
+            var factory = new ConnectionFactory()
+            {
+                HostName = _hostname,
+                UserName = _username,
+                Password = _password
+            };
+
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            channel.ExchangeDeclare(exchange: messageSentToChatQueueName,
+                                 type: ExchangeType.Fanout,
+                                 durable: true,
+                                 autoDelete: false,
+                                 arguments: null);
         }
 
         public void Publish<T>(T message, NotifyPublishEvent eventType)
