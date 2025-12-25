@@ -94,7 +94,7 @@ namespace planner_node_service.Infrastructure.Repository
         {
             var links = await GetNodeLinks(accountId);
             if (links == null || !links.Any())
-                return null;
+                return Enumerable.Empty<Node>();
 
             var nodeIds = links
                 .SelectMany(x => new[] { x.ParentId, x.ChildId })
@@ -114,7 +114,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToListAsync();
 
             if (!rootIds.Any())
-                return null;
+                return Enumerable.Empty<NodeLink>();
 
             var query = @"
                 WITH RECURSIVE node_tree AS (
