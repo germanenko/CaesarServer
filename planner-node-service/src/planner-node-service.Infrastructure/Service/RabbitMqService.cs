@@ -24,8 +24,11 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _hostname;
         private readonly string _userName;
         private readonly string _password;
-        private readonly string _queue;
+        private readonly string _messageSentToChatQueue;
         private readonly string _createPersonalChatQueue;
+
+        private readonly string _messageSentToChatExchange;
+        private readonly string _createPersonalChatExchange;
 
         public RabbitMqService(
             INotificationService notifyService,
@@ -45,8 +48,11 @@ namespace planner_node_service.Infrastructure.Service
             _scopeFactory = scopeFactory;
 
             _notifyService = notifyService;
-            _queue = queue;
-            _createPersonalChatQueue = createPersonalChatQueue;
+            _messageSentToChatExchange = queue;
+            _createPersonalChatExchange = createPersonalChatQueue;
+
+            _messageSentToChatQueue = queue + "_node";
+            _createPersonalChatExchange = createPersonalChatQueue + "_node";
 
             InitializeRabbitMQ();
         }
@@ -63,15 +69,12 @@ namespace planner_node_service.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_queue);
-            DeclareQueue(_createPersonalChatQueue);
+            DeclareQueue(_messageSentToChatQueue, _messageSentToChatExchange);
+            DeclareQueue(_createPersonalChatQueue, _createPersonalChatExchange);
         }
 
-        private void DeclareQueue(string queueName)
+        private void DeclareQueue(string queueName, string exchange)
         {
-            var exchange = queueName;
-            queueName = queueName + "_node";
-
             _channel.QueueDeclare(
                 queue: queueName,
                 durable: true,
@@ -112,7 +115,7 @@ namespace planner_node_service.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            ConsumeQueue(_queue, HandleSendMessage);
+            ConsumeQueue(_messageSentToChatQueue, HandleSendMessage);
             ConsumeQueue(_createPersonalChatQueue, HandleNewChat);
 
             await Task.CompletedTask;

@@ -17,6 +17,7 @@ namespace planner_notify_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
         private readonly string _queue;
+        private readonly string _exchange;
 
         public RabbitMqService(
             INotificationService notifyService,
@@ -30,7 +31,8 @@ namespace planner_notify_service.Infrastructure.Service
             _password = password;
 
             _notifyService = notifyService;
-            _queue = queue;
+            _queue = queue + "_notify";
+            _exchange = queue;
 
             InitializeRabbitMQ();
         }
@@ -47,15 +49,12 @@ namespace planner_notify_service.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_queue);
+            DeclareQueue(_queue, _exchange);
 
         }
 
-        private void DeclareQueue(string queueName)
+        private void DeclareQueue(string queueName, string exchange)
         {
-            var exchange = queueName;
-            queueName = queueName + "_notify";
-
             _channel.QueueDeclare(
                 queue: queueName,
                 durable: true,
