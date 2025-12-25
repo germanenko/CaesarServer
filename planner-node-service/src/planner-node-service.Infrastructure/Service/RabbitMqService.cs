@@ -90,8 +90,6 @@ namespace planner_node_service.Infrastructure.Service
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)
         {
-            _channel.BasicQos(0, 1, false);
-
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
             consumer.Received += async (model, ea) =>
@@ -106,6 +104,7 @@ namespace planner_node_service.Infrastructure.Service
                 }
                 catch (Exception ex)
                 {
+                    _logger.LogError(ex, "Error while receive message");
                     _channel.BasicNack(ea.DeliveryTag, false, true);
                 }
             };
