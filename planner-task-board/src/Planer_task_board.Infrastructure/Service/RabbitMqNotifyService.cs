@@ -1,6 +1,6 @@
 using System.Text;
 using System.Text.Json;
-using Planer_task_board.Core.Enums;
+using CaesarServerLibrary.Enums;
 using Planer_task_board.Core.IService;
 using RabbitMQ.Client;
 

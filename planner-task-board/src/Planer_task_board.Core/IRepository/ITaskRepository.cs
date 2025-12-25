@@ -1,13 +1,12 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.IRepository
 {
     public interface ITaskRepository
     {
-        Task<TaskModel?> AddAsync(CreateOrUpdateTaskBody task, Guid accountId);
+        Task<TaskModel?> AddAsync(TaskBody task, Guid accountId);
         Task<TaskModel?> GetAsync(Guid id, bool isDraft);
         Task<bool> RemoveAsync(Guid id, bool isDraft);
         Task<IEnumerable<TaskModel>> GetAll(Guid columnId, WorkflowStatus? status, bool isDraft = false);
@@ -19,13 +18,13 @@ namespace Planer_task_board.Core.IRepository
         Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
-            CreateOrUpdateTaskBody updatedNode,
+            TaskBody updatedNode,
             Guid? columnId,
             DateTime changeDate);
         Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
-            CreateOrUpdateTaskBody updatedNode,
+            TaskBody updatedNode,
             DateTime changeDate);
         Task AssignTaskToColumn(Guid task, Guid columnId);
         Task<bool> RemoveTaskFromColumn(Guid taskId, Guid columnId);

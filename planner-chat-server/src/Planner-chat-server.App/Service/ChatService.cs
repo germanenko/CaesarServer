@@ -4,10 +4,8 @@ using CaesarServerLibrary.Events;
 using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
-using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
-using System;
 using System.Net;
 using System.Net.WebSockets;
 

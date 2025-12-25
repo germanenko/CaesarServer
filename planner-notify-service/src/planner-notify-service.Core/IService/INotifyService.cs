@@ -1,4 +1,5 @@
-﻿using planner_notify_service.Core.Entities.Models;
+﻿using CaesarServerLibrary.Entities;
+using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.Entities.Response;
 using System;
 using System.Collections.Generic;

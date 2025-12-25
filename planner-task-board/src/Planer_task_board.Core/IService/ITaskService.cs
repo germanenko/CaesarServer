@@ -1,22 +1,20 @@
 using System.Net;
-using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 
 namespace Planer_task_board.Core.IService
 {
     public interface ITaskService
     {
-        Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody);
-        Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies);
+        Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, TaskBody taskBody);
+        Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<TaskBody> taskBodies);
         Task<ServiceResponse<TaskBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId);
         Task<HttpStatusCode> RestoreDeletedTask(Guid deletedTaskId, Guid boardId, Guid accountId);
         Task<ServiceResponse<IEnumerable<TaskBody>>> GetDeletedTasks(Guid accountId, Guid boardId);
         Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, WorkflowStatus? state);
         Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId);
-        Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody);
-        Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies);
+        Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, TaskBody taskBody);
+        Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<TaskBody> taskBodies);
         Task<HttpStatusCode> AddTaskToColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
         Task<HttpStatusCode> RemoveTaskFromColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId);
         //Task<ServiceResponse<IEnumerable<BoardColumnTaskBody>>> GetColumnTaskMembership(Guid accountId);

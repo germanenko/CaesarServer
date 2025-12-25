@@ -1,14 +1,8 @@
+using CaesarServerLibrary.Entities;
 using Microsoft.EntityFrameworkCore;
-using Npgsql;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Infrastructure.Data;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace Planer_task_board.Infrastructure.Repository
 {
@@ -150,7 +144,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             accessRights.AddRange(await _context.AccessRights.Where(x => accessNodes.Contains(x.NodeId)).ToListAsync());
 
-            accessBody.AccessRights = accessRights.Distinct().ToList();
+            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRightBody()).Distinct().ToList();
 
             var accessGroups = accessRights
                 .Select(x => x.AccessGroup)

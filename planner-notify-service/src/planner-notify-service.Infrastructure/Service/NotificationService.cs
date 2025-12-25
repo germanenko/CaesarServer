@@ -1,6 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.Json;
+using CaesarServerLibrary.Entities;
 using planner_notify_service.Core.Entities.Response;
 using planner_notify_service.Core.IService;
 

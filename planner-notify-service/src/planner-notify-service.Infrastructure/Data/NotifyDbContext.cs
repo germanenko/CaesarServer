@@ -1,14 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using planner_notify_service.Core.Entities.Models;
-using planner_notify_service.Core.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
-using System.Reflection.Emit;
-using System.Security.Principal;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace planner_notify_service.Infrastructure.Data
 {

@@ -1,7 +1,6 @@
 using System.Collections.Concurrent;
 using CaesarServerLibrary.Entities;
 using Microsoft.Extensions.Logging;
-using Planner_chat_server.Core.Entities.Response;
 using Planner_chat_server.Core.IService;
 
 namespace Planner_chat_server.App.Service

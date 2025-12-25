@@ -1,8 +1,8 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Infrastructure.Data;
 

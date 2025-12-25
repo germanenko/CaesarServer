@@ -1,3 +1,4 @@
+using CaesarServerLibrary.Entities;
 using planner_notify_service.Core.Entities.Response;
 
 namespace planner_notify_service.Core.IService

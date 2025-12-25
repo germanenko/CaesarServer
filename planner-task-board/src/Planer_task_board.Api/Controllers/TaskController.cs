@@ -1,11 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using CaesarServerLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -33,7 +30,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] CreateOrUpdateTaskBody taskBody,
+            [FromBody] TaskBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -53,7 +50,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTasks(
-            [FromBody] List<CreateOrUpdateTaskBody> taskBodies,
+            [FromBody] List<TaskBody> taskBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -68,7 +65,7 @@ namespace Planer_task_board.Api.Controllers
 
         [HttpDelete("task")]
         [SwaggerOperation("Удалить задачу")]
-        [SwaggerResponse(200, Type = typeof(DeletedTaskBody))]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> RemoveTask(
@@ -102,7 +99,7 @@ namespace Planer_task_board.Api.Controllers
 
         [HttpGet("deleted-tasks")]
         [SwaggerOperation("Получить все удаленные задачи")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<DeletedTaskBody>))]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> GetDrafts(

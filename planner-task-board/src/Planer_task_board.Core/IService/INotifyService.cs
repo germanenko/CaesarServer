@@ -1,4 +1,4 @@
-using Planer_task_board.Core.Enums;
+using CaesarServerLibrary.Enums;
 
 namespace Planer_task_board.Core.IService
 {

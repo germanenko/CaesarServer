@@ -1,11 +1,10 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 
@@ -32,7 +31,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> CreateBoard(
-            CreateBoardBody boardBody,
+            BoardBody boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -51,7 +50,7 @@ namespace Planer_task_board.Api.Controllers
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> CreateBoards(
-            List<CreateBoardBody> boardBodies,
+            List<BoardBody> boardBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -105,7 +104,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            CreateColumnBody column
+            ColumnBody column
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -119,7 +118,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddColumns(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            List<CreateColumnBody> columns
+            List<ColumnBody> columns
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

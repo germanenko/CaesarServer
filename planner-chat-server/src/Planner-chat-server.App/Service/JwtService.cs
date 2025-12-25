@@ -1,5 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using CaesarServerLibrary.Entities;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.IService;
 

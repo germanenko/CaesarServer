@@ -1,7 +1,6 @@
 using System.Net.WebSockets;
 using CaesarServerLibrary.Entities;
 using Planner_chat_server.Core.Entities.Models;
-using Planner_chat_server.Core.Entities.Response;
 
 namespace Planner_chat_server.Core.IService
 {

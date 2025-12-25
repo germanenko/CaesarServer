@@ -1,12 +1,8 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
 using System.Net.Http.Headers;
+using CaesarServerLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 

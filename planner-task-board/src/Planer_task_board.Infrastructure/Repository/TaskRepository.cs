@@ -1,15 +1,12 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using Planer_task_board.Core.Entities.Events;
+﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
+using Microsoft.EntityFrameworkCore;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using Planer_task_board.Infrastructure.Data;
 using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Planer_task_board.Infrastructure.Repository
 {
@@ -26,7 +23,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
         public async Task<TaskModel?> AddAsync
         (
-            CreateOrUpdateTaskBody task,
+            TaskBody task,
             Guid accountId
         )
         {
@@ -203,7 +200,7 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
-            CreateOrUpdateTaskBody updatedNode,
+            TaskBody updatedNode,
             Guid? columnId,
             DateTime changeDate)
         {
@@ -245,7 +242,7 @@ namespace Planer_task_board.Infrastructure.Repository
         public async Task<TaskModel?> UpdateAsync(
             Guid id,
             Guid accountId,
-            CreateOrUpdateTaskBody updatedNode,
+            TaskBody updatedNode,
             DateTime changeDate)
         {
             var draftStatus = await _context.PublicationStatuses

@@ -1,8 +1,8 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.EntityFrameworkCore;
-using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using Planer_task_board.Infrastructure.Data;
@@ -20,7 +20,7 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<Board?> AddAsync(CreateBoardBody createBoardBody, Guid accountId)
+        public async Task<Board?> AddAsync(BoardBody createBoardBody, Guid accountId)
         {
             var board = new Board
             {
@@ -82,7 +82,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return board;
         }
 
-        public async Task<List<Board>?> AddRangeAsync(List<CreateBoardBody> boards, Guid accountId)
+        public async Task<List<Board>?> AddRangeAsync(List<BoardBody> boards, Guid accountId)
         {
             List<Board> newBoardNodes = new List<Board>();
 
@@ -236,7 +236,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<Column?> AddBoardColumn(CreateColumnBody column, Guid accountId)
+        public async Task<Column?> AddBoardColumn(ColumnBody column, Guid accountId)
         {
             var columnNode = new Column
             {
@@ -278,7 +278,7 @@ namespace Planer_task_board.Infrastructure.Repository
             return columnNode;
         }
 
-        public async Task<List<Column>?> AddBoardColumns(List<CreateColumnBody> columns, Guid accountId)
+        public async Task<List<Column>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
         {
             var columnNodes = new List<Column>();
             var statuses = new List<PublicationStatusModel>();

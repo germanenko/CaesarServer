@@ -1,8 +1,7 @@
 using System.Net;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 
@@ -48,7 +47,7 @@ namespace Planer_task_board.App.Service
             return HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, TaskBody taskBody)
         {
             var errors = new List<string>();
             if (taskBody.StartDate != null && !DateTime.TryParse(taskBody?.StartDate, out var _))
@@ -91,7 +90,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<TaskBody> taskBodies)
         {
             var errors = new List<string>();
             List<TaskBody> tasks = new List<TaskBody>();
@@ -246,7 +245,7 @@ namespace Planer_task_board.App.Service
             return result != null ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
         }
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, CreateOrUpdateTaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, TaskBody taskBody)
         {
             var errors = new List<string>();
 
@@ -281,7 +280,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<CreateOrUpdateTaskBody> taskBodies)
+        public async Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<TaskBody> taskBodies)
         {
             var errors = new List<string>();
             List<TaskBody> result = new List<TaskBody>();

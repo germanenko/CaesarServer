@@ -5,11 +5,8 @@ using Microsoft.Extensions.Logging;
 using Planner_chat_server.Core;
 using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.Entities.Request;
-using Planner_chat_server.Core.Entities.Response;
-using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Infrastructure.Data;
-using System.Linq;
 
 namespace Planner_chat_server.Infrastructure.Repository
 {

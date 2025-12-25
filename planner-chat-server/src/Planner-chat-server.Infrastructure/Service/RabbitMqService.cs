@@ -6,8 +6,6 @@ using CaesarServerLibrary.Enums;
 using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Planner_chat_server.Core.Entities.Response;
-using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
 using RabbitMQ.Client;

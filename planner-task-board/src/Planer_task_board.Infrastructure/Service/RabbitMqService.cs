@@ -1,9 +1,8 @@
 using System.Text;
 using System.Text.Json;
+using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Planer_task_board.Core.Entities.Events;
 using Planer_task_board.Core.IRepository;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;

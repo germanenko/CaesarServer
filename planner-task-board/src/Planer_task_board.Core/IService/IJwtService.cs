@@ -1,4 +1,4 @@
-using Planer_task_board.Core.Entities.Request;
+using CaesarServerLibrary.Entities;
 
 namespace Planer_task_board.Core.IService
 {

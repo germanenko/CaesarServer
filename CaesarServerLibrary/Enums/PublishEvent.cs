@@ -1,4 +1,4 @@
-namespace Planer_task_board.Core.Enums
+namespace CaesarServerLibrary.Enums
 {
     public enum PublishEvent
     {

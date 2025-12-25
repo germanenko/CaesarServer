@@ -1,11 +1,8 @@
-using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using System.Net;
-using System.Xml.Linq;
 
 namespace Planer_task_board.App.Service
 {
@@ -28,7 +25,7 @@ namespace Planer_task_board.App.Service
             return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
         }
 
-        public async Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, CreateColumnBody column)
+        public async Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, ColumnBody column)
         {
             var result = await _boardRepository.AddBoardColumn(column, accountId);
 
@@ -49,7 +46,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<CreateColumnBody> columns)
+        public async Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<ColumnBody> columns)
         {
             List<ColumnBody>? newColumns = new List<ColumnBody>();
             foreach (var column in columns)
@@ -85,7 +82,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(CreateBoardBody body, Guid accountId)
+        public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(BoardBody body, Guid accountId)
         {
             var result = await _boardRepository.AddAsync(body, accountId);
 
@@ -106,7 +103,7 @@ namespace Planer_task_board.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<CreateBoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<BoardBody> bodies, Guid accountId)
         {
             var result = await _boardRepository.AddRangeAsync(bodies, accountId);
 

@@ -1,4 +1,4 @@
-﻿using Planner_chat_server.Core.Entities.Response;
+﻿using CaesarServerLibrary.Entities;
 
 namespace Planner_chat_server.Core.Entities.Models
 {

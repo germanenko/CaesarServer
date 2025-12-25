@@ -1,6 +1,4 @@
-﻿using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
+﻿using CaesarServerLibrary.Entities;
 using System.Net;
 
 namespace Planer_task_board.Core.IService

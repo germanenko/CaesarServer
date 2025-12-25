@@ -1,18 +1,9 @@
-﻿using FirebaseAdmin;
-using FirebaseAdmin.Messaging;
-using Google.Apis.Auth.OAuth2;
+﻿using CaesarServerLibrary.Enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using Planner_chat_server.Core.Entities.Response;
-using Planner_chat_server.Core.Enums;
 using Planner_chat_server.Core.IService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net.Mime;
 using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
 
 namespace Planner_chat_server.Infrastructure.Service
 {

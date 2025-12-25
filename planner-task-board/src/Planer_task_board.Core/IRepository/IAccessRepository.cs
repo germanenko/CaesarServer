@@ -1,7 +1,5 @@
+using CaesarServerLibrary.Entities;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
 
 namespace Planer_task_board.Core.IRepository
 {

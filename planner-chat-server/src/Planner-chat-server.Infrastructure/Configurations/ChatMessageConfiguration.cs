@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Planner_chat_server.Core.Entities.Models;
-using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Infrastructure.Configurations
 {

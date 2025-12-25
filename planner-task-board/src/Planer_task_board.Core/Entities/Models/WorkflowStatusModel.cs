@@ -1,10 +1,4 @@
-﻿using Planer_task_board.Core.Enums;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations.Schema;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using CaesarServerLibrary.Enums;
 
 namespace Planer_task_board.Core.Entities.Models
 {

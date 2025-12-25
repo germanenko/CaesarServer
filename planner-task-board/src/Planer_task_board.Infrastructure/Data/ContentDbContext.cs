@@ -1,7 +1,5 @@
 using Microsoft.EntityFrameworkCore;
 using Planer_task_board.Core.Entities.Models;
-using Planer_task_board.Core.Enums;
-using System;
 
 namespace Planer_task_board.Infrastructure.Data
 {

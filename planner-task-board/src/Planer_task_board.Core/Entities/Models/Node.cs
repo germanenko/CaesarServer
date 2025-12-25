@@ -1,5 +1,5 @@
-﻿using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
+﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using System.Text.Json.Serialization;
 
 namespace Planer_task_board.Core.Entities.Models

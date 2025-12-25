@@ -1,6 +1,4 @@
-using Planer_task_board.Core.Entities.Request;
-using Planer_task_board.Core.Entities.Response;
-using Planer_task_board.Core.Enums;
+using CaesarServerLibrary.Enums;
 
 namespace Planer_task_board.Core.Entities.Models
 {

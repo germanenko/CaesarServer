@@ -1,9 +1,8 @@
-using Planner_chat_server.Core.Enums;
+using CaesarServerLibrary.Enums;
 using Planner_chat_server.Core.IService;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
 
 namespace Planner_chat_server.Infrastructure.Service
 {

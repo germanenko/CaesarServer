@@ -1,4 +1,4 @@
-using planner_node_service.Core.Entities.Response;
+using CaesarServerLibrary.Entities;
 
 namespace planner_node_service.Core.IService
 {

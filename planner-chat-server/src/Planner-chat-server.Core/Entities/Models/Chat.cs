@@ -1,7 +1,5 @@
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
-using Planner_chat_server.Core.Entities.Response;
-using Planner_chat_server.Core.Enums;
 
 namespace Planner_chat_server.Core.Entities.Models
 {

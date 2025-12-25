@@ -4,12 +4,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Planer_task_board.Core.Enums
+namespace CaesarServerLibrary.Enums
 {
-    public enum PublicationStatus
+    public enum NotificationType
     {
-        Active,
-        Draft,
-        Deleted
+        ChatMessage
     }
 }
