@@ -52,7 +52,7 @@ namespace planner_node_service.Infrastructure.Service
             _createPersonalChatExchange = createPersonalChatQueue;
 
             _messageSentToChatQueue = queue + "_node";
-            _createPersonalChatExchange = createPersonalChatQueue + "_node";
+            _createPersonalChatQueue = createPersonalChatQueue + "_node";
 
             InitializeRabbitMQ();
         }
