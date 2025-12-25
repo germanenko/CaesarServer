@@ -139,7 +139,7 @@ namespace planner_node_service.Infrastructure.Service
                 Id = chatMessage.Message.Id,
                 Name = "Message",
                 Type = NodeType.Message,
-                BodyJson = JsonSerializer.Serialize(chatMessage.Message)
+                BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage.Message)
             });
 
             await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
@@ -179,7 +179,7 @@ namespace planner_node_service.Infrastructure.Service
                     Id = result.Chat.Id,
                     Name = result.Chat.Name,
                     Type = NodeType.Chat,
-                    BodyJson = JsonSerializer.Serialize(result.Chat)
+                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Chat)
                 });
 
                 foreach (var participant in result.Participants)
