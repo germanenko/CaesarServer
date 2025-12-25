@@ -138,7 +138,7 @@ namespace planner_node_service.Infrastructure.Service
             {
                 Id = chatMessage.Message.Id,
                 Name = "Message",
-                Type = NodeType.Chat,
+                Type = NodeType.Message,
                 BodyJson = JsonSerializer.Serialize(chatMessage.Message)
             });
 
