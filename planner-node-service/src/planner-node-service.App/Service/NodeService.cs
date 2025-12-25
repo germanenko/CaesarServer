@@ -24,7 +24,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes.Select(x => x.ToNodeBody())
+                Body = nodes.Select(x => x.ToNodeBodyFromJson())
             };
         }
 

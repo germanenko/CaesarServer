@@ -2,6 +2,7 @@
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
 using NpgsqlTypes;
+using System.Text.Json;
 
 namespace planner_node_service.Core.Entities.Models
 {
@@ -25,6 +26,11 @@ namespace planner_node_service.Core.Entities.Models
                 Props = Props,
                 Type = Type
             };
+        }
+
+        public NodeBody ToNodeBodyFromJson()
+        {
+            return JsonSerializer.Deserialize<NodeBody>(BodyJson);
         }
     }
 }
