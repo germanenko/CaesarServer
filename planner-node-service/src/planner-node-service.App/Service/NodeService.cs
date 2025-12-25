@@ -16,15 +16,15 @@ namespace planner_node_service.App.Service
             _nodeRepository = nodeRepository;
         }
 
-        public async Task<ServiceResponse<IEnumerable<Node>>> GetNodes(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
         {
             var nodes = await _nodeRepository.GetNodes(accountId);
 
-            return new ServiceResponse<IEnumerable<Node>>()
+            return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes
+                Body = nodes.Select(x => x.ToNodeBody())
             };
         }
 
