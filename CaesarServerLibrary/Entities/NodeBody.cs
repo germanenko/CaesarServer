@@ -4,11 +4,12 @@ using System.Text.Json.Serialization;
 
 namespace CaesarServerLibrary.Entities
 {
-    [JsonDerivedType(typeof(BoardBody), "board")]
-    [JsonDerivedType(typeof(ColumnBody), "column")]
-    [JsonDerivedType(typeof(TaskBody), "task")]
-    [JsonDerivedType(typeof(ChatBody), "chat")]
-    [JsonDerivedType(typeof(MessageBody), "chatMessage")]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = "Type")]
+    [JsonDerivedType(typeof(BoardBody), typeDiscriminator: 0)]
+    [JsonDerivedType(typeof(ColumnBody), typeDiscriminator: 1)]
+    [JsonDerivedType(typeof(TaskBody), typeDiscriminator: 2)]
+    [JsonDerivedType(typeof(ChatBody), typeDiscriminator: 3)]
+    [JsonDerivedType(typeof(MessageBody), typeDiscriminator: 4)]
     public class NodeBody
     {
         public Guid Id { get; set; }
