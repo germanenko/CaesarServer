@@ -87,7 +87,10 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<INotificationService, NotificationService>();
 
     services.AddScoped<INodeService, NodeService>();
+    services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<INodeRepository, NodeRepository>();
+    services.AddScoped<IAccessRepository, AccessRepository>();
 
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),

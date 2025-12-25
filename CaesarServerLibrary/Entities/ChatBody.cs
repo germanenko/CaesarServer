@@ -4,10 +4,8 @@ using System.Collections.Generic;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class ChatBody
+    public class ChatBody : NodeBody
     {
-        public Guid Id { get; set; }
-        public string Name { get; set; }
         public string ImageUrl { get; set; }
         public int CountOfUnreadMessages { get; set; }
         public MessageBody LastMessage { get; set; }

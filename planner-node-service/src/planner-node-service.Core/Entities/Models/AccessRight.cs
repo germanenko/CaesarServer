@@ -1,4 +1,5 @@
-﻿using CaesarServerLibrary.Enums;
+﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 
 namespace planner_node_service.Core.Entities.Models
 {
@@ -12,5 +13,18 @@ namespace planner_node_service.Core.Entities.Models
         public Node Node { get; set; }
         public AccessType AccessType { get; set; }
         public NodeType NodeType { get; set; }
+
+        public AccessRightBody ToAccessRightBody()
+        {
+            return new AccessRightBody
+            {
+                Id = Id,
+                AccountId = AccountId,
+                NodeId = NodeId,
+                AccessGroupId = AccessGroupId,
+                AccessType = AccessType,
+                NodeType = NodeType
+            };
+        }
     }
 }

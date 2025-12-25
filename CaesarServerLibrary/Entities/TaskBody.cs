@@ -4,9 +4,8 @@ using CaesarServerLibrary.Enums;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class CreateOrUpdateTaskBody
+    public class TaskBody : NodeBody
     {
-        public Guid Id { get; set; }
         public string Title { get; set; }
 
         public string Description { get; set; }
@@ -15,7 +14,7 @@ namespace CaesarServerLibrary.Entities
 
         public Status Status { get; set; }
 
-        public TaskType Type { get; set; }
+        public TaskType TaskType { get; set; }
 
         public string StartDate { get; set; }
 

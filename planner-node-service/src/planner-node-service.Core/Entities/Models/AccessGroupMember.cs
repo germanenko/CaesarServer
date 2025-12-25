@@ -1,4 +1,5 @@
-﻿using planner_node_service.Core.Entities.Response;
+﻿using CaesarServerLibrary.Entities;
+using planner_node_service.Core.Entities.Response;
 
 namespace planner_node_service.Core.Entities.Models
 {

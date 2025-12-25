@@ -4,7 +4,7 @@ using planner_node_service.Core.Entities.Response;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 
-namespace planner_node_service.Infrastructure.Service
+namespace planner_node_service.App.Service
 {
     public class NodeService : INodeService
     {

@@ -173,6 +173,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -181,6 +182,12 @@ namespace planner_node_service.Infrastructure.Service
                     Type = NodeType.Chat,
                     BodyJson = JsonSerializer.Serialize(result.Chat)
                 });
+
+                foreach (var participant in result.Participants)
+                {
+                    await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, AccessType.Admin);
+                }
+
             }
             catch (Exception ex)
             {

@@ -3,10 +3,10 @@ using System;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class MessageBody
+    public class MessageBody : NodeBody
     {
         public Guid Id { get; set; }
-        public MessageType Type { get; set; }
+        public MessageType MessageType { get; set; }
         public string Content { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;
         public Guid SenderId { get; set; }
