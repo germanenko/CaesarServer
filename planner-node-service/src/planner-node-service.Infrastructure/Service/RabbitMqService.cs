@@ -70,7 +70,7 @@ namespace planner_node_service.Infrastructure.Service
         private void DeclareQueue(string queueName)
         {
             var exchange = queueName;
-            queueName = queueName + "_notify";
+            queueName = queueName + "_node";
 
             _channel.QueueDeclare(
                 queue: queueName,
