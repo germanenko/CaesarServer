@@ -44,6 +44,9 @@ void ConfigureServices(IServiceCollection services)
     var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE_NAME");
     var createTaskChatResponseQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_RESPONSE_QUEUE");
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
+    var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
+    var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
+    var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
 
     services.AddControllers(e =>
     {
@@ -109,7 +112,10 @@ void ConfigureServices(IServiceCollection services)
         username,
         password,
         createTaskChatQueue,
-        addAccountsToTaskChatsQueue
+        addAccountsToTaskChatsQueue,
+        createBoardExchange,
+        createColumnExchange,
+        createTaskExchange
     ));
 
     services.AddHostedService(sp => new RabbitMqService

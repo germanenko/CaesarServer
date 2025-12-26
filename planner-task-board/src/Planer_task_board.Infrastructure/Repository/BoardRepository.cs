@@ -79,6 +79,14 @@ namespace Planer_task_board.Infrastructure.Repository
 
             await _context.SaveChangesAsync();
 
+            CreateBoardEvent boardEvent = new CreateBoardEvent()
+            {
+                Board = board.ToBoardBody(),
+                CreatorId = accountId
+            };
+
+            _notifyService.Publish(boardEvent, PublishEvent.CreateBoard);
+
             return board;
         }
 
@@ -274,6 +282,14 @@ namespace Planer_task_board.Infrastructure.Repository
             columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
 
             await _context.SaveChangesAsync();
+
+            CreateColumnEvent columnEvent = new CreateColumnEvent()
+            {
+                Column = column,
+                CreatorId = accountId
+            };
+
+            _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
 
             return columnNode;
         }

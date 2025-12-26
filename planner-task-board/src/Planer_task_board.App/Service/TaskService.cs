@@ -1,9 +1,10 @@
-using System.Net;
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
+using System.Net;
 
 namespace Planer_task_board.App.Service
 {

@@ -14,6 +14,9 @@ namespace Planer_task_board.Infrastructure.Service
 
         private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
+        private readonly string _createBoardExchange;
+        private readonly string _createColumnExchange;
+        private readonly string _createTaskExchange;
 
 
         public RabbitMqNotifyService(
@@ -21,7 +24,10 @@ namespace Planer_task_board.Infrastructure.Service
             string username,
             string password,
             string createTaskChatResponseQueue,
-            string addAccountsToTaskChatsQueue)
+            string addAccountsToTaskChatsQueue,
+            string createBoardExchange,
+            string createColumnExchange, 
+            string createTaskExchange)
         {
             _hostname = hostname;
             _username = username;
@@ -29,11 +35,14 @@ namespace Planer_task_board.Infrastructure.Service
 
             _createTaskChatResponseQueue = createTaskChatResponseQueue;
             _addAccountsToTaskChatsQueue = addAccountsToTaskChatsQueue;
+            _createBoardExchange = createBoardExchange;
+            _createColumnExchange = createColumnExchange;
+            _createTaskExchange = createTaskExchange;
         }
 
         public void Publish<T>(T message, PublishEvent publishEvent)
         {
-            var queueName = GetQueueName(publishEvent);
+            var exchangeName = GetQueueName(publishEvent);
 
             var factory = new ConnectionFactory()
             {
@@ -43,9 +52,9 @@ namespace Planer_task_board.Infrastructure.Service
             };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
-            channel.QueueDeclare(queue: queueName,
+            channel.ExchangeDeclare(exchange: exchangeName,
+                                 type: ExchangeType.Fanout,
                                  durable: true,
-                                 exclusive: false,
                                  autoDelete: false,
                                  arguments: null);
 
@@ -54,8 +63,8 @@ namespace Planer_task_board.Infrastructure.Service
             var properties = channel.CreateBasicProperties();
             properties.Persistent = true;
 
-            channel.BasicPublish(exchange: "",
-                                 routingKey: queueName,
+            channel.BasicPublish(exchange: exchangeName,
+                                 routingKey: "",
                                  basicProperties: properties,
                                  body: body);
         }
@@ -66,6 +75,9 @@ namespace Planer_task_board.Infrastructure.Service
             {
                 PublishEvent.CreateTaskChatResponse => _createTaskChatResponseQueue,
                 PublishEvent.AddAccountsToTaskChats => _addAccountsToTaskChatsQueue,
+                PublishEvent.CreateBoard => _createBoardExchange,
+                PublishEvent.CreateColumn => _createColumnExchange,
+                PublishEvent.CreateTask => _createTaskExchange,
                 _ => throw new ArgumentException("Invalid publish event")
             };
         }

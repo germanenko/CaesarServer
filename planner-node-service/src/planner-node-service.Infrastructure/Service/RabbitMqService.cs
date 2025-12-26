@@ -24,11 +24,10 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _hostname;
         private readonly string _userName;
         private readonly string _password;
-        private readonly string _messageSentToChatQueue;
-        private readonly string _createPersonalChatQueue;
 
-        private readonly string _messageSentToChatExchange;
-        private readonly string _createPersonalChatExchange;
+        //private readonly Dictionary<string, string> _queues;
+        //private readonly Dictionary<string, Func<string, Task>> _queuesFuncs;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(
             INotificationService notifyService,
@@ -38,7 +37,10 @@ namespace planner_node_service.Infrastructure.Service
             string userName,
             string password,
             string queue,
-            string createPersonalChatQueue)
+            string createPersonalChatQueue,
+            string createBoard,
+            string createColumn,
+            string createTask)
         {
             _hostname = hostname;
             _userName = userName;
@@ -48,11 +50,15 @@ namespace planner_node_service.Infrastructure.Service
             _scopeFactory = scopeFactory;
 
             _notifyService = notifyService;
-            _messageSentToChatExchange = queue;
-            _createPersonalChatExchange = createPersonalChatQueue;
 
-            _messageSentToChatQueue = queue + "_node";
-            _createPersonalChatQueue = createPersonalChatQueue + "_node";
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
+            {
+                { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
+                { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
+                { createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
+                { createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
+                { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) }
+            };
 
             InitializeRabbitMQ();
         }
@@ -69,21 +75,23 @@ namespace planner_node_service.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_messageSentToChatQueue, _messageSentToChatExchange);
-            DeclareQueue(_createPersonalChatQueue, _createPersonalChatExchange);
+            foreach (var queue in _queues)
+            {
+                DeclareQueue(queue.Key, queue.Value.QueueName);
+            }
         }
 
-        private void DeclareQueue(string queueName, string exchange)
+        private void DeclareQueue(string exchange, string queue)
         {
             _channel.QueueDeclare(
-                queue: queueName,
+                queue: queue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
 
             _channel.QueueBind(
-                queue: queueName,
+                queue: queue,
                 exchange: exchange,
                 routingKey: "");
         }
@@ -114,8 +122,14 @@ namespace planner_node_service.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            ConsumeQueue(_messageSentToChatQueue, HandleSendMessage);
-            ConsumeQueue(_createPersonalChatQueue, HandleNewChat);
+
+            foreach (var func in _queues)
+            {
+                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
+            }
+
+            //ConsumeQueue(_messageSentToChatQueue, HandleSendMessage);
+            //ConsumeQueue(_createPersonalChatQueue, HandleNewChat);
 
             await Task.CompletedTask;
         }
@@ -195,6 +209,126 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
+        private async Task HandleNewBoard(string message)
+        {
+            var result = JsonSerializer.Deserialize<CreateBoardEvent>(message);
+
+            _logger.LogInformation($"NodeService received new board: {message}");
+
+            if (result == null)
+                return;
+
+            try
+            {
+                _logger.LogInformation($"{result.Board}");
+
+                using var scope = _scopeFactory.CreateScope();
+                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+
+                await nodeService.AddOrUpdateNode(new Node()
+                {
+                    Id = result.Board.Id,
+                    Name = result.Board.Name,
+                    Type = NodeType.Chat,
+                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Board)
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while adding board node");
+                throw;
+            }
+        }
+
+        private async Task HandleNewColumn(string message)
+        {
+            var result = JsonSerializer.Deserialize<CreateColumnEvent>(message);
+
+            _logger.LogInformation($"NodeService received new column: {message}");
+
+            if (result == null)
+                return;
+
+            try
+            {
+                _logger.LogInformation($"{result.Column}");
+
+                using var scope = _scopeFactory.CreateScope();
+                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+
+                await nodeService.AddOrUpdateNode(new Node()
+                {
+                    Id = result.Column.Id,
+                    Name = result.Column.Name,
+                    Type = NodeType.Chat,
+                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
+                });
+
+                await accessService.CreateAccessRight(result.CreatorId, result.Column.Id, AccessType.Creator);
+
+                if (result.ParentId != null)
+                {
+                    await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+                    {
+                        ParentId = result.ParentId.Value,
+                        ChildId = result.Column.Id,
+                        RelationType = RelationType.Contains
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while adding column node");
+                throw;
+            }
+        }
+
+        private async Task HandleNewTask(string message)
+        {
+            var result = JsonSerializer.Deserialize<CreateTaskEvent>(message);
+
+            _logger.LogInformation($"NodeService received new task: {message}");
+
+            if (result == null)
+                return;
+
+            try
+            {
+                _logger.LogInformation($"{result.Task}");
+
+                using var scope = _scopeFactory.CreateScope();
+                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+
+                await nodeService.AddOrUpdateNode(new Node()
+                {
+                    Id = result.Task.Id,
+                    Name = result.Task.Name,
+                    Type = NodeType.Chat,
+                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
+                });
+
+                await accessService.CreateAccessRight(result.CreatorId, result.Task.Id, AccessType.Creator);
+
+                if (result.ParentId != null)
+                {
+                    await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+                    {
+                        ParentId = result.ParentId.Value,
+                        ChildId = result.Task.Id,
+                        RelationType = RelationType.Contains
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while adding column node");
+                throw;
+            }
+        }
+
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
         {
             var sessionsNotReceiveMessage = await _notifyService.SendMessageToSessions(accountSessions.AccountId, accountSessions.SessionIds.ToList(), bytes);
@@ -203,6 +337,11 @@ namespace planner_node_service.Infrastructure.Service
                 AccountId = accountSessions.AccountId,
                 SessionIds = sessionsNotReceiveMessage.ToList()
             } : null;
+        }
+
+        private string GetQueueName(string exchange)
+        {
+            return exchange + "_node";
         }
     }
 }

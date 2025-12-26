@@ -34,6 +34,9 @@ void ConfigureServices(IServiceCollection services)
 
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
+    var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
+    var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
+    var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
