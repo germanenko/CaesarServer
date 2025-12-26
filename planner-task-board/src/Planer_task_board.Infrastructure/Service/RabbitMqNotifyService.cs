@@ -1,6 +1,7 @@
 using System.Text;
 using System.Text.Json;
 using CaesarServerLibrary.Enums;
+using Microsoft.Extensions.Logging;
 using Planer_task_board.Core.IService;
 using RabbitMQ.Client;
 
@@ -17,6 +18,7 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _createBoardExchange;
         private readonly string _createColumnExchange;
         private readonly string _createTaskExchange;
+        private ILogger<RabbitMqNotifyService> _logger;
 
         private readonly List<string> _exchanges = new List<string>();
 
@@ -63,9 +65,11 @@ namespace Planer_task_board.Infrastructure.Service
                 try
                 {
                     channel.ExchangeDeclarePassive(exchange);
+                    _logger.LogInformation("Passive creating exchange");
                 }
-                catch (RabbitMQ.Client.Exceptions.OperationInterruptedException)
+                catch (Exception ex) 
                 {
+                    _logger.LogError(ex, "Error creating exchange");
                     channel.ExchangeDeclare(
                         exchange: exchange,
                         type: ExchangeType.Fanout,
