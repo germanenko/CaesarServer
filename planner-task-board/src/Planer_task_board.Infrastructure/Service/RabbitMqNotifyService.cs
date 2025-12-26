@@ -33,6 +33,9 @@ namespace Planer_task_board.Infrastructure.Service
             string createColumnExchange, 
             string createTaskExchange)
         {
+            _logger = logger;
+            _logger.LogInformation("CONSTRUCTOR CALLED! Creating exchanges...");
+
             _hostname = hostname;
             _username = username;
             _password = password;
@@ -42,10 +45,6 @@ namespace Planer_task_board.Infrastructure.Service
             _createBoardExchange = createBoardExchange;
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
-
-            _logger = logger;
-
-            _logger.LogInformation("CONSTRUCTOR CALLED! Creating exchanges...");
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
