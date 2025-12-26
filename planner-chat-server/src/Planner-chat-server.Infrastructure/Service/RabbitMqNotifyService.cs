@@ -55,19 +55,12 @@ namespace Planner_chat_server.Infrastructure.Service
 
             foreach(var exchange in _exchanges)
             {
-                try
-                {
-                    channel.ExchangeDeclarePassive(exchange);
-                }
-                catch (RabbitMQ.Client.Exceptions.OperationInterruptedException)
-                {
-                    channel.ExchangeDeclare(
-                        exchange: exchange,
-                        type: ExchangeType.Fanout,
-                        durable: true,
-                        autoDelete: false,
-                        arguments: null);
-                }
+                channel.ExchangeDeclare(
+                    exchange: exchange,
+                    type: ExchangeType.Fanout,
+                    durable: true,
+                    autoDelete: false,
+                    arguments: null);
             }
         }
 

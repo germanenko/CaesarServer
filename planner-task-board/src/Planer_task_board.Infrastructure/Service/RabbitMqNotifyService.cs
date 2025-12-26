@@ -68,21 +68,12 @@ namespace Planer_task_board.Infrastructure.Service
 
             foreach (var exchange in _exchanges)
             {
-                try
-                {
-                    channel.ExchangeDeclarePassive(exchange);
-                    Console.WriteLine("Passive creating exchange");
-                }
-                catch (Exception ex) 
-                {
-                    Console.WriteLine(ex.Message, "Error creating exchange");
-                    channel.ExchangeDeclare(
-                        exchange: exchange,
-                        type: ExchangeType.Fanout,
-                        durable: true,
-                        autoDelete: false,
-                        arguments: null);
-                }
+                channel.ExchangeDeclare(
+                    exchange: exchange,
+                    type: ExchangeType.Fanout,
+                    durable: true,
+                    autoDelete: false,
+                    arguments: null);
             }
         }
 
