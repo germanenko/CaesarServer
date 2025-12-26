@@ -24,8 +24,5 @@
     <ProjectReference Include="..\Planner-chat-server.App\Planner-chat-server.App.csproj" />
     <ProjectReference Include="..\Planner-chat-server.Infrastructure\Planner-chat-server.Infrastructure.csproj" />
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Migrations\" />
-  </ItemGroup>
 
 </Project>
