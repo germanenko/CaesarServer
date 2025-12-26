@@ -155,7 +155,15 @@ void ApplyMigrations(WebApplication app)
     try
     {
         var context = services.GetRequiredService<ContentDbContext>();
-        context.Database.Migrate();
+
+        var appliedMigrations = context.Database.GetAppliedMigrations();
+
+        var allMigrations = context.Database.GetMigrations();
+
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
     }
     catch (Exception ex)
     {
