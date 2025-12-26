@@ -50,13 +50,13 @@ namespace Planer_task_board.Infrastructure.Repository
                 ChildId = node.Id
             };
 
-            CreateTaskEvent columnEvent = new CreateTaskEvent()
+            CreateTaskEvent taskEvent = new CreateTaskEvent()
             {
                 Task = task,
                 CreatorId = accountId
             };
 
-            _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
+            _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
 
 
             return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, attach);
