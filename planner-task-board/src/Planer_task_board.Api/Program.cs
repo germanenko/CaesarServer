@@ -91,6 +91,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(contentDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("Planer_task_board.Api");
         });
     });
 
