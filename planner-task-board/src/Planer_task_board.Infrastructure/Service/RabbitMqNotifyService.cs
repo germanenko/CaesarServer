@@ -41,6 +41,8 @@ namespace Planer_task_board.Infrastructure.Service
             _createTaskExchange = createTaskExchange;
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
+
+            ExchangeDeclare();
         }
 
         public void ExchangeDeclare()
