@@ -26,6 +26,7 @@ namespace Planer_task_board.Infrastructure.Service
             string hostname,
             string username,
             string password,
+            ILogger<RabbitMqNotifyService> logger,
             string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
@@ -41,6 +42,8 @@ namespace Planer_task_board.Infrastructure.Service
             _createBoardExchange = createBoardExchange;
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
+
+            _logger = logger;
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 

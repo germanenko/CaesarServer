@@ -1,8 +1,8 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using Planer_task_board.App.Service;
@@ -12,6 +12,7 @@ using Planer_task_board.Infrastructure.Data;
 using Planer_task_board.Infrastructure.Repository;
 using Planer_task_board.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
@@ -111,6 +112,7 @@ void ConfigureServices(IServiceCollection services)
         hostname,
         username,
         password,
+        sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
         createTaskChatQueue,
         addAccountsToTaskChatsQueue,
         createBoardExchange,
