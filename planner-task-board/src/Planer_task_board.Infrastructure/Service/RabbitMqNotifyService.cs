@@ -57,13 +57,22 @@ namespace Planer_task_board.Infrastructure.Service
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
+
             foreach (var exchange in _exchanges)
             {
-                channel.ExchangeDeclare(exchange: exchange,
-                                     type: ExchangeType.Fanout,
-                                     durable: true,
-                                     autoDelete: false,
-                                     arguments: null);
+                try
+                {
+                    channel.ExchangeDeclarePassive(exchange);
+                }
+                catch (RabbitMQ.Client.Exceptions.OperationInterruptedException)
+                {
+                    channel.ExchangeDeclare(
+                        exchange: exchange,
+                        type: ExchangeType.Fanout,
+                        durable: true,
+                        autoDelete: false,
+                        arguments: null);
+                }
             }
         }
 
