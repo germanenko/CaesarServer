@@ -18,7 +18,6 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _createBoardExchange;
         private readonly string _createColumnExchange;
         private readonly string _createTaskExchange;
-        private ILogger<RabbitMqNotifyService> _logger;
 
         private readonly List<string> _exchanges = new List<string>();
 
@@ -26,15 +25,12 @@ namespace Planer_task_board.Infrastructure.Service
             string hostname,
             string username,
             string password,
-            ILogger<RabbitMqNotifyService> logger,
             string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
             string createColumnExchange, 
             string createTaskExchange)
         {
-            _logger = logger;
-
             _hostname = hostname;
             _username = username;
             _password = password;
@@ -49,7 +45,7 @@ namespace Planer_task_board.Infrastructure.Service
 
             foreach (var exchange in _exchanges)
             {
-                _logger.LogInformation(exchange);
+                Console.WriteLine(exchange);
             }
 
             ExchangeDeclare();
@@ -57,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Service
 
         public void ExchangeDeclare()
         {
-            _logger.LogInformation("Start declare");
+            Console.WriteLine("Start declare");
 
             var factory = new ConnectionFactory()
             {
@@ -75,11 +71,11 @@ namespace Planer_task_board.Infrastructure.Service
                 try
                 {
                     channel.ExchangeDeclarePassive(exchange);
-                    _logger.LogInformation("Passive creating exchange");
+                    Console.WriteLine("Passive creating exchange");
                 }
                 catch (Exception ex) 
                 {
-                    _logger.LogError(ex, "Error creating exchange");
+                    Console.WriteLine(ex.Message, "Error creating exchange");
                     channel.ExchangeDeclare(
                         exchange: exchange,
                         type: ExchangeType.Fanout,

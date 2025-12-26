@@ -108,26 +108,18 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAccessRepository, AccessRepository>();
 
     services.AddSingleton<IJwtService, JwtService>();
-    try
-    {
-        services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService
-        (
-            hostname,
-            username,
-            password,
-            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
-            createTaskChatQueue,
-            addAccountsToTaskChatsQueue,
-            createBoardExchange,
-            createColumnExchange,
-            createTaskExchange
-        ));
-        Console.WriteLine("Completed!");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine(ex.ToString());
-    }
+
+    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService
+    (
+        hostname,
+        username,
+        password,
+        createTaskChatQueue,
+        addAccountsToTaskChatsQueue,
+        createBoardExchange,
+        createColumnExchange,
+        createTaskExchange
+    ));
 
     services.AddHostedService(sp => new RabbitMqService
     (
