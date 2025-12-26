@@ -114,6 +114,7 @@ void ConfigureServices(IServiceCollection services)
         hostname,
         username,
         password,
+        sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
         createTaskChatQueue,
         addAccountsToTaskChatsQueue,
         createBoardExchange,

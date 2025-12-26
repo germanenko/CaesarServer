@@ -13,6 +13,8 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _username;
         private readonly string _password;
 
+        private ILogger<RabbitMqNotifyService> _logger;
+
         private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
         private readonly string _createBoardExchange;
@@ -25,12 +27,15 @@ namespace Planer_task_board.Infrastructure.Service
             string hostname,
             string username,
             string password,
+            ILogger<RabbitMqNotifyService> logger,
             string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
             string createColumnExchange, 
             string createTaskExchange)
         {
+            _logger = logger;
+
             _hostname = hostname;
             _username = username;
             _password = password;
@@ -41,11 +46,13 @@ namespace Planer_task_board.Infrastructure.Service
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
 
+            _logger.LogInformation(createBoardExchange);
+
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
             foreach (var exchange in _exchanges)
             {
-                Console.WriteLine(exchange);
+                _logger.LogInformation(exchange);
             }
 
             ExchangeDeclare();
