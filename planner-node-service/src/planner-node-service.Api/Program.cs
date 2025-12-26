@@ -103,7 +103,10 @@ void ConfigureServices(IServiceCollection services)
         rabbitMqUsername,
         rabbitMqPassword,
         messageSentToChatQueue,
-        createPersonalChatQueue
+        createPersonalChatQueue,
+        createBoardExchange,
+        createColumnExchange,
+        createTaskExchange
     ));
 }
 
