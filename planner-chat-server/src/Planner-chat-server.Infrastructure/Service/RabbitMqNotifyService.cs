@@ -38,7 +38,7 @@ namespace Planner_chat_server.Infrastructure.Service
 
             _exchanges.AddRange(new[] { _createChatQueueName, _createTaskChatResponseQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName });
 
-            //ExchangeDeclare();
+            ExchangeDeclare();
         }
 
         public void ExchangeDeclare()
