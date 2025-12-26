@@ -34,7 +34,6 @@ namespace Planer_task_board.Infrastructure.Service
             string createTaskExchange)
         {
             _logger = logger;
-            _logger.LogInformation("CONSTRUCTOR CALLED! Creating exchanges...");
 
             _hostname = hostname;
             _username = username;
