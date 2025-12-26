@@ -18,6 +18,7 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _createColumnExchange;
         private readonly string _createTaskExchange;
 
+        private readonly List<string> _exchanges = new List<string>();
 
         public RabbitMqNotifyService(
             string hostname,
@@ -38,6 +39,30 @@ namespace Planer_task_board.Infrastructure.Service
             _createBoardExchange = createBoardExchange;
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
+
+            _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
+        }
+
+        public void ExchangeDeclare()
+        {
+            var factory = new ConnectionFactory()
+            {
+                HostName = _hostname,
+                UserName = _username,
+                Password = _password
+            };
+
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+            foreach (var exchange in _exchanges)
+            {
+                channel.ExchangeDeclare(exchange: exchange,
+                                     type: ExchangeType.Fanout,
+                                     durable: true,
+                                     autoDelete: false,
+                                     arguments: null);
+            }
         }
 
         public void Publish<T>(T message, PublishEvent publishEvent)
