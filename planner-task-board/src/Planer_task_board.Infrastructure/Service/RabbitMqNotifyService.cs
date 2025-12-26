@@ -45,6 +45,8 @@ namespace Planer_task_board.Infrastructure.Service
 
             _logger = logger;
 
+            _logger.LogInformation("CONSTRUCTOR CALLED! Creating exchanges...");
+
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
             foreach (var exchange in _exchanges)
