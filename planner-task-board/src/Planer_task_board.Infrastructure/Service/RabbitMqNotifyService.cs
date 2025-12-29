@@ -1,10 +1,9 @@
+using System.Text;
+using System.Text.Json;
 using CaesarServerLibrary.Enums;
 using Microsoft.Extensions.Logging;
 using Planer_task_board.Core.IService;
 using RabbitMQ.Client;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Channels;
 
 namespace Planer_task_board.Infrastructure.Service
 {
@@ -13,9 +12,6 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _hostname;
         private readonly string _username;
         private readonly string _password;
-
-        private IConnection _connection;
-        private IModel _channel;
 
         private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
@@ -48,40 +44,28 @@ namespace Planer_task_board.Infrastructure.Service
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
-            InitializeConnection();
-        }
 
-        private void InitializeConnection()
-        {
-            try
-            {
-                var factory = new ConnectionFactory()
-                {
-                    HostName = _hostname,
-                    UserName = _username,
-                    Password = _password,
-                    DispatchConsumersAsync = true
-                };
-
-                _connection = factory.CreateConnection();
-                _channel = _connection.CreateModel();
-
-                ExchangeDeclare();
-
-                Console.WriteLine("RabbitMQ exchanges and queues declared successfully");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"ОШИБКА при инициализации RabbitMQ: {ex.Message}");
-                throw;
-            }
+            ExchangeDeclare();
         }
 
         public void ExchangeDeclare()
         {
+            Console.WriteLine("Start declare");
+
+            var factory = new ConnectionFactory()
+            {
+                HostName = _hostname,
+                UserName = _username,
+                Password = _password
+            };
+
+            using var connection = factory.CreateConnection();
+            using var channel = connection.CreateModel();
+
+
             foreach (var exchange in _exchanges)
             {
-                _channel.ExchangeDeclare(
+                channel.ExchangeDeclare(
                     exchange: exchange,
                     type: ExchangeType.Fanout,
                     durable: true,

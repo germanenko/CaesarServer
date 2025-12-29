@@ -4,6 +4,7 @@ using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Planer_task_board.Core.IRepository;
+using Planer_task_board.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 
@@ -14,6 +15,7 @@ namespace Planer_task_board.Infrastructure.Service
         private IConnection _connection;
         private IModel _channel;
         private readonly IServiceScopeFactory _serviceFactory;
+        private readonly INotifyService _notifyService;
         private readonly string _hostname;
         private readonly string _userName;
         private readonly string _password;
@@ -22,6 +24,7 @@ namespace Planer_task_board.Infrastructure.Service
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
+            INotifyService notifyService,
             string hostname,
             string userName,
             string password,
@@ -30,6 +33,8 @@ namespace Planer_task_board.Infrastructure.Service
             _hostname = hostname;
             _userName = userName;
             _password = password;
+
+            _notifyService = notifyService;
 
             _createTaskChatResponseQueue = createTaskChatResponseQueue;
             _serviceFactory = serviceFactory;
