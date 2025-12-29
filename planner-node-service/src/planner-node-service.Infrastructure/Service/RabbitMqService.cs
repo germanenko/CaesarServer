@@ -268,8 +268,6 @@ namespace planner_node_service.Infrastructure.Service
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
                 });
 
-                await accessService.CreateAccessRight(result.CreatorId, result.Column.Id, AccessType.Creator);
-
                 if (result.ParentId != null)
                 {
                     await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
@@ -278,6 +276,10 @@ namespace planner_node_service.Infrastructure.Service
                         ChildId = result.Column.Id,
                         RelationType = RelationType.Contains
                     });
+                }
+                else
+                {
+                    await accessService.CreateAccessRight(result.CreatorId, result.Column.Id, AccessType.Creator);
                 }
             }
             catch (Exception ex)
@@ -312,8 +314,6 @@ namespace planner_node_service.Infrastructure.Service
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
                 });
 
-                await accessService.CreateAccessRight(result.CreatorId, result.Task.Id, AccessType.Creator);
-
                 if (result.ParentId != null)
                 {
                     await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
@@ -322,6 +322,10 @@ namespace planner_node_service.Infrastructure.Service
                         ChildId = result.Task.Id,
                         RelationType = RelationType.Contains
                     });
+                }
+                else
+                {
+                    await accessService.CreateAccessRight(result.CreatorId, result.Task.Id, AccessType.Creator);
                 }
             }
             catch (Exception ex)
