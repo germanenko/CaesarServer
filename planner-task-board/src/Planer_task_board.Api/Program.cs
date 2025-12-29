@@ -92,25 +92,6 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
-
-    static INotifyService CreateNotifyService(IServiceProvider sp,
-    string hostname, string username, string password,
-    string createTaskChatQueue, string addAccountsToTaskChatsQueue,
-    string createBoardExchange, string createColumnExchange, string createTaskExchange)
-    {
-        var service = new RabbitMqNotifyService(
-            hostname, username, password,
-            createTaskChatQueue, addAccountsToTaskChatsQueue,
-            createBoardExchange, createColumnExchange, createTaskExchange);
-        return service;
-    }
-
-    services.AddSingleton(sp => CreateNotifyService(
-        sp, hostname, username, password,
-        createTaskChatQueue, addAccountsToTaskChatsQueue,
-        createBoardExchange, createColumnExchange, createTaskExchange
-    ).Initialize());
-
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
@@ -124,6 +105,24 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAccessRepository, AccessRepository>();
 
     services.AddSingleton<IJwtService, JwtService>();
+
+    static INotifyService CreateNotifyService(
+    IServiceProvider sp,  // Можно убрать, если не используется
+    string hostname, string username, string password,
+    string createTaskChatQueue, string addAccountsToTaskChatsQueue,
+    string createBoardExchange, string createColumnExchange, string createTaskExchange)
+    {
+        return new RabbitMqNotifyService(
+            hostname, username, password,
+            createTaskChatQueue, addAccountsToTaskChatsQueue,
+            createBoardExchange, createColumnExchange, createTaskExchange);
+    }
+
+    services.AddSingleton<INotifyService>(sp => CreateNotifyService(
+        sp, hostname, username, password,
+        createTaskChatQueue, addAccountsToTaskChatsQueue,
+        createBoardExchange, createColumnExchange, createTaskExchange
+    ));
 
     services.AddHostedService(sp => new RabbitMqService
     (

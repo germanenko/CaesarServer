@@ -31,6 +31,7 @@ namespace Planer_task_board.Infrastructure.Service
             string createColumnExchange, 
             string createTaskExchange)
         {
+
             _hostname = hostname;
             _username = username;
             _password = password;
@@ -42,13 +43,9 @@ namespace Planer_task_board.Infrastructure.Service
             _createTaskExchange = createTaskExchange;
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
-        }
 
-        public INotifyService Initialize()
-        {
+
             ExchangeDeclare();
-
-            return this;
         }
 
         public void ExchangeDeclare()
