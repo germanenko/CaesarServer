@@ -55,9 +55,9 @@ namespace planner_node_service.Infrastructure.Service
             {
                 { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
                 { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
-                //{ createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
-                //{ createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
-                //{ createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) }
+                { createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
+                { createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
+                { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) }
             };
 
             InitializeRabbitMQ();
