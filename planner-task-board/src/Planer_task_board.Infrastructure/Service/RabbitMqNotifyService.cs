@@ -48,10 +48,10 @@ namespace Planer_task_board.Infrastructure.Service
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
-            foreach (var exchange in _exchanges)
-            {
-                _logger.LogInformation(exchange);
-            }
+            //foreach (var exchange in _exchanges)
+            //{
+            //    _logger.LogInformation(exchange);
+            //}
 
             ExchangeDeclare();
         }
