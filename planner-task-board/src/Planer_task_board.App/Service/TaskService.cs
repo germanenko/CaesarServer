@@ -1,6 +1,5 @@
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
-using CaesarServerLibrary.Events;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
@@ -57,8 +56,6 @@ namespace Planer_task_board.App.Service
             if (taskBody.EndDate != null && !DateTime.TryParse(taskBody.EndDate, out var _))
                 errors.Add("End time format is not correct");
 
-
-            var column = await _boardRepository.GetBoardColumnByChild(taskBody.Id);
 
             DateTime? startDate = taskBody.StartDate == null ? null : DateTime.Parse(taskBody.StartDate);
             DateTime? endDate = taskBody.EndDate == null ? null : DateTime.Parse(taskBody.EndDate);
@@ -306,7 +303,7 @@ namespace Planer_task_board.App.Service
 
                 result.Add((await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow)).ToTaskBody());
             }
-            
+
             return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>
             {
                 StatusCode = HttpStatusCode.BadRequest,
