@@ -233,6 +233,8 @@ namespace planner_node_service.Infrastructure.Service
                     Type = NodeType.Chat,
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Board)
                 });
+
+                await accessService.CreateAccessRight(result.CreatorId, result.Board.Id, AccessType.Creator);
             }
             catch (Exception ex)
             {
