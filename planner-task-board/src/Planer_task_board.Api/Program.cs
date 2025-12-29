@@ -122,7 +122,7 @@ void ConfigureServices(IServiceCollection services)
         sp, hostname, username, password,
         createTaskChatQueue, addAccountsToTaskChatsQueue,
         createBoardExchange, createColumnExchange, createTaskExchange
-    ));
+    ).Initialize());
 
     services.AddHostedService(sp => new RabbitMqService
     (
