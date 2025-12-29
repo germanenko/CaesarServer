@@ -46,13 +46,6 @@ namespace Planer_task_board.Infrastructure.Service
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
 
-            _logger.LogInformation(createBoardExchange);
-
-            _logger.LogError("ERROR");
-            _logger.LogWarning("WARNING");
-            _logger.LogInformation("INFORMATION");
-            _logger.LogDebug("DEBUG");
-
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
             foreach (var exchange in _exchanges)
