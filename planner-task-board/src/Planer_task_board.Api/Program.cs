@@ -109,18 +109,18 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddSingleton<IJwtService, JwtService>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService
-    (
-        hostname,
-        username,
-        password,
-        sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
-        createTaskChatQueue,
-        addAccountsToTaskChatsQueue,
-        createBoardExchange,
-        createColumnExchange,
-        createTaskExchange
-    ));
+    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => 
+        new RabbitMqNotifyService(
+            hostname,
+            username,
+            password,
+            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
+            createTaskChatQueue,
+            addAccountsToTaskChatsQueue,
+            createBoardExchange,
+            createColumnExchange,
+            createTaskExchange
+        ));
 
     services.AddHostedService(sp => new RabbitMqService
     (
