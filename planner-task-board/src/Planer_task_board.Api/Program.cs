@@ -92,19 +92,6 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
-    services.AddScoped<IUserService, UserService>();
-    services.AddScoped<INodeService, NodeService>();
-    services.AddScoped<ITaskService, TaskService>();
-    services.AddScoped<IBoardService, BoardService>();
-    services.AddScoped<IAccessService, AccessService>();
-
-    services.AddScoped<IBoardRepository, BoardRepository>();
-    services.AddScoped<IPublicationStatusRepository, PublicationStatusRepository>();
-    services.AddScoped<ITaskRepository, TaskRepository>();
-    services.AddScoped<INodeRepository, NodeRepository>();
-    services.AddScoped<IAccessRepository, AccessRepository>();
-
-    services.AddSingleton<IJwtService, JwtService>();
 
     static INotifyService CreateNotifyService(IServiceProvider sp,
     string hostname, string username, string password,
@@ -123,6 +110,20 @@ void ConfigureServices(IServiceCollection services)
         createTaskChatQueue, addAccountsToTaskChatsQueue,
         createBoardExchange, createColumnExchange, createTaskExchange
     ).Initialize());
+
+    services.AddScoped<IUserService, UserService>();
+    services.AddScoped<INodeService, NodeService>();
+    services.AddScoped<ITaskService, TaskService>();
+    services.AddScoped<IBoardService, BoardService>();
+    services.AddScoped<IAccessService, AccessService>();
+
+    services.AddScoped<IBoardRepository, BoardRepository>();
+    services.AddScoped<IPublicationStatusRepository, PublicationStatusRepository>();
+    services.AddScoped<ITaskRepository, TaskRepository>();
+    services.AddScoped<INodeRepository, NodeRepository>();
+    services.AddScoped<IAccessRepository, AccessRepository>();
+
+    services.AddSingleton<IJwtService, JwtService>();
 
     services.AddHostedService(sp => new RabbitMqService
     (
