@@ -69,7 +69,7 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNodeLink(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] CreateOrUpdateNodeLink node
+            [FromBody] NodeLinkBody node
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -83,7 +83,7 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNodeLinks(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] List<CreateOrUpdateNodeLink> nodes
+            [FromBody] List<NodeLinkBody> nodes
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

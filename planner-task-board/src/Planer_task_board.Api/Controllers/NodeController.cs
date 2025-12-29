@@ -1,10 +1,10 @@
-using System.Net.Http.Headers;
 using CaesarServerLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Planer_task_board.Core.Entities.Models;
 using Planer_task_board.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net.Http.Headers;
 
 namespace Planer_task_board.Api.Controllers
 {
@@ -69,7 +69,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNodeLink(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] CreateOrUpdateNodeLink node
+            [FromBody] NodeLinkBody node
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -83,7 +83,7 @@ namespace Planer_task_board.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNodeLinks(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] List<CreateOrUpdateNodeLink> nodes
+            [FromBody] List<NodeLinkBody> nodes
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

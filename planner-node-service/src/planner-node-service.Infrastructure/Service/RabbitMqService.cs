@@ -10,7 +10,6 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
-using System.Xml.Linq;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -156,7 +155,7 @@ namespace planner_node_service.Infrastructure.Service
                 BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage.Message)
             });
 
-            await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+            await nodeService.AddOrUpdateNodeLink(new NodeLinkBody()
             {
                 Id = chatMessage.Message.Id,
                 ParentId = chatMessage.ChatId,
@@ -268,14 +267,9 @@ namespace planner_node_service.Infrastructure.Service
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
                 });
 
-                if (result.ParentId != null)
+                if (result.Column.Link != null)
                 {
-                    await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
-                    {
-                        ParentId = result.ParentId.Value,
-                        ChildId = result.Column.Id,
-                        RelationType = RelationType.Contains
-                    });
+                    await nodeService.AddOrUpdateNodeLink(result.Column.Link);
                 }
                 else
                 {
@@ -314,14 +308,9 @@ namespace planner_node_service.Infrastructure.Service
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
                 });
 
-                if (result.ParentId != null)
+                if (result.Task.Link != null)
                 {
-                    await nodeService.AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
-                    {
-                        ParentId = result.ParentId.Value,
-                        ChildId = result.Task.Id,
-                        RelationType = RelationType.Contains
-                    });
+                    await nodeService.AddOrUpdateNodeLink(result.Task.Link);
                 }
                 else
                 {

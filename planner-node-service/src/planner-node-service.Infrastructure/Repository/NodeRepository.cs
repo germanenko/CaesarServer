@@ -27,7 +27,7 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var result = await _context.Nodes.AddAsync(newNode);
 
-                await AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+                await AddOrUpdateNodeLink(new NodeLinkBody()
                 {
                     ParentId = newNode.Id,
                     ChildId = newNode.Id,
@@ -45,7 +45,7 @@ namespace planner_node_service.Infrastructure.Repository
             }
         }
 
-        public async Task<NodeLink> AddOrUpdateNodeLink(CreateOrUpdateNodeLink newNodeLink)
+        public async Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody newNodeLink)
         {
             var existingNode = await _context.NodeLinks
                 .Where(x => x.Id == newNodeLink.Id)
@@ -74,7 +74,7 @@ namespace planner_node_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(List<CreateOrUpdateNodeLink> newNodeLinks)
+        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> newNodeLinks)
         {
             var links = new List<NodeLink>();
 

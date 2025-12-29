@@ -53,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Id = Guid.NewGuid(),
                 AccountId = accountId,
                 NodeId = board.Id,
-                Node = board, 
+                Node = board,
                 AccessType = AccessType.Creator
             });
 
@@ -79,9 +79,11 @@ namespace Planer_task_board.Infrastructure.Repository
 
             await _context.SaveChangesAsync();
 
+
+
             CreateBoardEvent boardEvent = new CreateBoardEvent()
             {
-                Board = board.ToBoardBody(),
+                Board = createBoardBody,
                 CreatorId = accountId
             };
 
@@ -170,7 +172,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 .Join(_context.Nodes,
                     nl => nl.ChildId,
                     n => n.Id,
-                    (nl, n) => n) 
+                    (nl, n) => n)
                 .Where(x => x.Type == NodeType.Column)
                 .Select(x => x.Id)
                 .ToListAsync();
@@ -251,7 +253,7 @@ namespace Planer_task_board.Infrastructure.Repository
                 Id = column.Id,
                 Name = column.Name
             };
-            
+
             await _context.History.AddAsync(new History
             {
                 NodeId = column.Id,

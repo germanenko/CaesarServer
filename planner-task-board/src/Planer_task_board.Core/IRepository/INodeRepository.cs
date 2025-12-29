@@ -4,10 +4,10 @@ using Planer_task_board.Core.Entities.Models;
 
 namespace Planer_task_board.Core.IRepository
 {
-    public interface  INodeRepository
+    public interface INodeRepository
     {
-        Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink node);
-        Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> nodes);
+        Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, NodeLinkBody node);
+        Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<NodeLinkBody> nodes);
         Task<Node> AddOrUpdateNode(Guid accountId, Node node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId);

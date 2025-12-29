@@ -37,7 +37,7 @@ namespace Planer_task_board.Infrastructure.Repository
             }
         }
 
-        public async Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, CreateOrUpdateNodeLink newNodeLink)
+        public async Task<NodeLink> AddOrUpdateNodeLink(Guid accountId, NodeLinkBody newNodeLink)
         {
             var existingNode = await _context.NodeLinks
                 .Where(x => x.Id == newNodeLink.Id)
@@ -66,7 +66,7 @@ namespace Planer_task_board.Infrastructure.Repository
             }
         }
 
-        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<CreateOrUpdateNodeLink> newNodeLinks)
+        public async Task<List<NodeLink>> AddOrUpdateNodeLinks(Guid accountId, List<NodeLinkBody> newNodeLinks)
         {
             var links = new List<NodeLink>();
 

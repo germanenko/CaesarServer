@@ -117,17 +117,17 @@ namespace Planer_task_board.Infrastructure.Repository
             var tasks = await _context.AccessRights
                 .Where(ar => ar.AccountId == accountId && ar.NodeType == NodeType.Board)
                 .Join(_context.NodeLinks,
-                    ar => ar.NodeId,  
-                    n1 => n1.ParentId,    
+                    ar => ar.NodeId,
+                    n1 => n1.ParentId,
                     (ar, n1) => new { ColumnId = n1.ChildId })
                 .Join(_context.NodeLinks,
-                    x => x.ColumnId,      
-                    n2 => n2.ParentId,    
+                    x => x.ColumnId,
+                    n2 => n2.ParentId,
                     (x, n2) => new { TaskId = n2.ChildId })
                 .Join(_context.Tasks,
-                    x => x.TaskId,        
-                    t => t.Id,            
-                    (x, t) => t)          
+                    x => x.TaskId,
+                    t => t.Id,
+                    (x, t) => t)
                 .ToListAsync();
 
             return tasks;
@@ -222,7 +222,7 @@ namespace Planer_task_board.Infrastructure.Repository
             var task = status.Node as TaskModel;
 
             task.Name = updatedNode.Title;
-            task.Props = JsonSerializer.Serialize(updatedNode); 
+            task.Props = JsonSerializer.Serialize(updatedNode);
 
             await _context.History.AddAsync(new History
             {
@@ -235,7 +235,7 @@ namespace Planer_task_board.Infrastructure.Repository
             if (boardColumnTask.ParentId != columnId)
             {
                 await RemoveTaskFromColumn(task.Id, boardColumnTask.ParentId);
-                await AssignTaskToColumn(task.Id, columnId.Value); 
+                await AssignTaskToColumn(task.Id, columnId.Value);
             }
 
             var node = await _context.Tasks
@@ -338,12 +338,12 @@ namespace Planer_task_board.Infrastructure.Repository
                         b => b.Id,
                         (n, b) => b)
                     .Join(_context.AccessRights,
-                        b => b.Id, 
+                        b => b.Id,
                         a => a.NodeId,
                         (n, a) => a)
                     .Select(a => a.AccountId)
-                    .Where(id => id.HasValue) 
-                    .Select(id => id.Value)  
+                    .Where(id => id.HasValue)
+                    .Select(id => id.Value)
                     .ToListAsync();
 
                 var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
@@ -351,7 +351,7 @@ namespace Planer_task_board.Infrastructure.Repository
                     AccountIds = boardMembers.ToList(),
                     TaskIds = new List<Guid> { task.Id },
                 };
-                
+
 
                 _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
             }

@@ -16,5 +16,6 @@ namespace CaesarServerLibrary.Entities
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string Props { get; set; }
+        public NodeLinkBody Link { get; set; }
     }
 }

@@ -54,7 +54,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(CreateOrUpdateNodeLink node)
+        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node)
         {
             var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(node);
 
@@ -66,7 +66,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<CreateOrUpdateNodeLink> nodes)
+        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes)
         {
             var nodeLink = await _nodeRepository.AddOrUpdateNodeLinks(nodes);
 

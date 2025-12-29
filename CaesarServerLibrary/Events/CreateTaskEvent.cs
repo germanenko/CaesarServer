@@ -7,6 +7,5 @@ namespace CaesarServerLibrary.Events
     {
         public TaskBody Task { get; set; }
         public Guid CreatorId { get; set; }
-        public Guid? ParentId { get; set; }
     }
 }
