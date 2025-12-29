@@ -135,32 +135,6 @@ void ConfigureServices(IServiceCollection services)
         createBoardExchange, createColumnExchange, createTaskExchange
     ));
 
-    //services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => 
-    //    new RabbitMqNotifyService(
-    //        hostname,
-    //        username,
-    //        password,
-    //        sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
-    //        createTaskChatQueue,
-    //        addAccountsToTaskChatsQueue,
-    //        createBoardExchange,
-    //        createColumnExchange,
-    //        createTaskExchange
-    //    ));
-
-    services.AddSingleton<IServiceProvider>(sp => sp);
-
-    var serviceProvider = services.BuildServiceProvider();
-    try
-    {
-        var notifyService = serviceProvider.GetRequiredService<INotifyService>();
-        Console.WriteLine("Сервис успешно создан через DI");
-    }
-    catch (Exception ex)
-    {
-        Console.WriteLine($"ОШИБКА при создании сервиса: {ex.Message}");
-    }
-
     services.AddHostedService(sp => new RabbitMqService
     (
         sp.GetRequiredService<IServiceScopeFactory>(),
