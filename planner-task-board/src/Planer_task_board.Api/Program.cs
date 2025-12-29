@@ -109,18 +109,57 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddSingleton<IJwtService, JwtService>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => 
-        new RabbitMqNotifyService(
-            hostname,
-            username,
-            password,
-            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
-            createTaskChatQueue,
-            addAccountsToTaskChatsQueue,
-            createBoardExchange,
-            createColumnExchange,
-            createTaskExchange
-        ));
+    static INotifyService CreateNotifyService(IServiceProvider sp,
+    string hostname, string username, string password,
+    string createTaskChatQueue, string addAccountsToTaskChatsQueue,
+    string createBoardExchange, string createColumnExchange, string createTaskExchange)
+    {
+        Console.WriteLine("=== Создание RabbitMqNotifyService ===");
+        Console.WriteLine($"Параметры: Hostname={hostname}, Exchange={createBoardExchange}");
+
+        var logger = sp.GetRequiredService<ILogger<RabbitMqNotifyService>>();
+        Console.WriteLine("Логгер получен");
+
+        var service = new RabbitMqNotifyService(
+            hostname, username, password, logger,
+            createTaskChatQueue, addAccountsToTaskChatsQueue,
+            createBoardExchange, createColumnExchange, createTaskExchange);
+
+        Console.WriteLine("Сервис создан");
+        return service;
+    }
+
+    services.AddSingleton<INotifyService>(sp => CreateNotifyService(
+        sp, hostname, username, password,
+        createTaskChatQueue, addAccountsToTaskChatsQueue,
+        createBoardExchange, createColumnExchange, createTaskExchange
+    ));
+
+    //services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => 
+    //    new RabbitMqNotifyService(
+    //        hostname,
+    //        username,
+    //        password,
+    //        sp.GetRequiredService<ILogger<RabbitMqNotifyService>>(),
+    //        createTaskChatQueue,
+    //        addAccountsToTaskChatsQueue,
+    //        createBoardExchange,
+    //        createColumnExchange,
+    //        createTaskExchange
+    //    ));
+
+    services.AddSingleton<IServiceProvider>(sp => sp);
+
+    var serviceProvider = services.BuildServiceProvider();
+    try
+    {
+        var notifyService = serviceProvider.GetRequiredService<INotifyService>();
+        Console.WriteLine("Сервис успешно создан через DI");
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"ОШИБКА при создании сервиса: {ex.Message}");
+    }
 
     services.AddHostedService(sp => new RabbitMqService
     (
