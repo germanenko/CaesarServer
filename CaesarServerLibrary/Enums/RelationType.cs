@@ -3,6 +3,7 @@
     public enum RelationType
     {
         Contains,
-        Attach
+        Attach,
+        Me
     }
 }

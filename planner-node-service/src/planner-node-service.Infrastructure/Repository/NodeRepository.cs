@@ -26,6 +26,14 @@ namespace planner_node_service.Infrastructure.Repository
             if (existingNode == null)
             {
                 var result = await _context.Nodes.AddAsync(newNode);
+
+                await AddOrUpdateNodeLink(new CreateOrUpdateNodeLink()
+                {
+                    ParentId = newNode.Id,
+                    ChildId = newNode.Id,
+                    RelationType = RelationType.Me
+                });
+
                 await _context.SaveChangesAsync();
                 return result.Entity;
             }
