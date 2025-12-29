@@ -13,7 +13,7 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _username;
         private readonly string _password;
 
-        private ILogger<RabbitMqNotifyService> _logger;
+        //private ILogger<RabbitMqNotifyService> _logger;
 
         private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
@@ -27,14 +27,14 @@ namespace Planer_task_board.Infrastructure.Service
             string hostname,
             string username,
             string password,
-            ILogger<RabbitMqNotifyService> logger,
+            //ILogger<RabbitMqNotifyService> logger,
             string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
             string createColumnExchange, 
             string createTaskExchange)
         {
-            _logger = logger;
+            //_logger = logger;
 
             _hostname = hostname;
             _username = username;
