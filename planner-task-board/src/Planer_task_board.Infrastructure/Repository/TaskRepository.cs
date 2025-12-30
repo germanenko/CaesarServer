@@ -53,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
 
 
-            return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, task.Link);
+            return await AddTaskAsync(node, accountId, task.PublicationStatus, task.Link);
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
@@ -274,7 +274,6 @@ namespace Planer_task_board.Infrastructure.Repository
         private async Task<TaskModel?> AddTaskAsync(
             TaskModel task,
             Guid accountId,
-            Guid? columnId,
             PublicationStatus publicationStatus,
             NodeLinkBody? attach = null)
         {
@@ -282,20 +281,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 return null;
 
             task = (await _context.Tasks.AddAsync(task)).Entity;
-
-            if (columnId != null)
-            {
-                var nodeLink = new NodeLink()
-                {
-                    ParentId = columnId.Value,
-                    ChildId = task.Id,
-                    RelationType = RelationType.Contains
-                };
-
-                await _context.NodeLinks.AddAsync(nodeLink);
-            }
-
-
 
             if (attach != null)
             {
@@ -323,33 +308,6 @@ namespace Planer_task_board.Infrastructure.Repository
             };
 
             _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
-
-            if (columnId != null)
-            {
-                var boardMembers = await _context.NodeLinks.Where(e => e.ChildId == columnId)
-                    .Join(_context.Nodes,
-                        n => n.ParentId,
-                        b => b.Id,
-                        (n, b) => b)
-                    .Join(_context.AccessRights,
-                        b => b.Id,
-                        a => a.NodeId,
-                        (n, a) => a)
-                    .Select(a => a.AccountId)
-                    .Where(id => id.HasValue)
-                    .Select(id => id.Value)
-                    .ToListAsync();
-
-                var addAccountToTaskChatsEvent = new AddAccountsToTaskChatsEvent
-                {
-                    AccountIds = boardMembers.ToList(),
-                    TaskIds = new List<Guid> { task.Id },
-                };
-
-
-                _notifyService.Publish(addAccountToTaskChatsEvent, PublishEvent.AddAccountsToTaskChats);
-            }
-
 
             return task;
         }
