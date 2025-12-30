@@ -10,7 +10,7 @@ namespace CaesarServerLibrary.Entities
     [JsonDerivedType(typeof(TaskBody), "task")]
     [JsonDerivedType(typeof(ChatBody), "chat")]
     [JsonDerivedType(typeof(MessageBody), "chatMessage")]
-    public class NodeBody
+    public record NodeBody
     {
         public Guid Id { get; set; }
         public NodeType Type { get; set; }

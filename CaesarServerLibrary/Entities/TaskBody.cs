@@ -3,7 +3,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class TaskBody : NodeBody
+    public record TaskBody : NodeBody
     {
         public string Title { get; set; }
 

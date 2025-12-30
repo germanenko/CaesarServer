@@ -3,7 +3,7 @@ using System;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class MessageBody : NodeBody
+    public record MessageBody : NodeBody
     {
         public Guid Id { get; set; }
         public MessageType MessageType { get; set; }

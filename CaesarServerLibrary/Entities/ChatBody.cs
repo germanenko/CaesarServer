@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace CaesarServerLibrary.Entities
 {
-    public class ChatBody : NodeBody
+    public record ChatBody : NodeBody
     {
         public string ImageUrl { get; set; }
         public int CountOfUnreadMessages { get; set; }

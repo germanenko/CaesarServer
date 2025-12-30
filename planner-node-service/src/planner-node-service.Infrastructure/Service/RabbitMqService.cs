@@ -304,7 +304,7 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     Id = result.Task.Id,
                     Name = result.Task.Name,
-                    Type = NodeType.Chat,
+                    Type = NodeType.Task,
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
                 });
 
