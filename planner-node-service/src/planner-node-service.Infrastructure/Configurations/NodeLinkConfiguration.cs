@@ -13,7 +13,7 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.HasOne(e => e.ParentNode)
                 .WithMany()
                 .HasForeignKey(e => e.ParentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(e => e.ChildNode)
                 .WithMany()
