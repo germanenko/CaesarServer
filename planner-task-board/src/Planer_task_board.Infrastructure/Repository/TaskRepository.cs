@@ -32,7 +32,7 @@ namespace Planer_task_board.Infrastructure.Repository
             var node = new TaskModel()
             {
                 Id = task.Id,
-                Name = task.Title,
+                Name = task.Name,
                 Props = props,
                 Type = NodeType.Task
             };
@@ -215,7 +215,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var task = status.Node as TaskModel;
 
-            task.Name = updatedNode.Title;
+            task.Name = updatedNode.Name;
             task.Props = JsonSerializer.Serialize(updatedNode);
 
             await _context.History.AddAsync(new History
@@ -256,7 +256,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             var draft = draftStatus.Node as TaskModel;
 
-            draft.Name = updatedNode.Title;
+            draft.Name = updatedNode.Name;
             draft.Props = JsonSerializer.Serialize(updatedNode);
 
             await _context.History.AddAsync(new History

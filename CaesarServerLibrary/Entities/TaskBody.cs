@@ -5,8 +5,6 @@ namespace CaesarServerLibrary.Entities
 {
     public record TaskBody : NodeBody
     {
-        public string Title { get; set; }
-
         public string Description { get; set; }
 
         public int PriorityOrder { get; set; }
