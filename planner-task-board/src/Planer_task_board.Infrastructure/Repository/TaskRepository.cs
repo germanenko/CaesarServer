@@ -44,12 +44,6 @@ namespace Planer_task_board.Infrastructure.Repository
                 CreatedBy = accountId
             });
 
-            var attach = new NodeLink
-            {
-                ParentId = task.MessageId,
-                ChildId = node.Id
-            };
-
             CreateTaskEvent taskEvent = new CreateTaskEvent()
             {
                 Task = task,
@@ -59,7 +53,7 @@ namespace Planer_task_board.Infrastructure.Repository
             _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
 
 
-            return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, attach);
+            return await AddTaskAsync(node, accountId, task.ColumnId, task.PublicationStatus, task.Link);
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, bool isDraft = false)
@@ -282,7 +276,7 @@ namespace Planer_task_board.Infrastructure.Repository
             Guid accountId,
             Guid? columnId,
             PublicationStatus publicationStatus,
-            NodeLink? attach = null)
+            NodeLinkBody? attach = null)
         {
             if (task == null)
                 return null;
@@ -305,7 +299,7 @@ namespace Planer_task_board.Infrastructure.Repository
 
             if (attach != null)
             {
-                _context.NodeLinks.Add(attach);
+                _context.NodeLinks.Add(new NodeLink() { Id = attach.Id, ParentId = attach.ParentId, ChildId = attach.ChildId, RelationType = attach.RelationType });
             }
 
             _context.PublicationStatuses.Add(new PublicationStatusModel()

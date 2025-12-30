@@ -1,6 +1,6 @@
+using CaesarServerLibrary.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
-using CaesarServerLibrary.Enums;
 
 namespace CaesarServerLibrary.Entities
 {
@@ -22,8 +22,6 @@ namespace CaesarServerLibrary.Entities
 
         [RegularExpression("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$")]
         public string HexColor { get; set; }
-
-        public Guid MessageId { get; set; } = new();
 
         public Guid? ColumnId { get; set; }
 
