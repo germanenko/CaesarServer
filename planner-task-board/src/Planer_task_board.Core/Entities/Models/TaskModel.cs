@@ -1,11 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using CaesarServerLibrary.Entities;
+using System.ComponentModel.DataAnnotations;
 
 namespace Planer_task_board.Core.Entities.Models
 {
     public class TaskModel : Node
     {
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [MaxLength(7)]
         public string? HexColor { get; set; }
