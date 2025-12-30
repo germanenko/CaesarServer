@@ -1,11 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Planer_task_board.Core.Entities.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Planer_task_board.Infrastructure.Configurations
 {
@@ -18,7 +13,7 @@ namespace Planer_task_board.Infrastructure.Configurations
             builder.HasOne(e => e.ParentNode)
                 .WithMany()
                 .HasForeignKey(e => e.ParentId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasOne(e => e.ChildNode)
                 .WithMany()
