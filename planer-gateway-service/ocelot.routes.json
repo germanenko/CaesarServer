@@ -627,6 +627,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/sendLocalNodes",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/sendLocalNodes",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/createOrUpdateNodeLink",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

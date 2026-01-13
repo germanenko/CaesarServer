@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CaesarServerLibrary.Entities
 {
-    public record BoardBody : NodeBody
+    public class BoardBody : NodeBody
     {
         [Required] public DateTime UpdatedAt { get; set; }
         [Required] public PublicationStatus PublicationStatus { get; set; }

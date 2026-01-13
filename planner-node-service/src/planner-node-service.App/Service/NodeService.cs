@@ -1,7 +1,9 @@
 ﻿using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
+using System.Text.Json;
 
 namespace planner_node_service.App.Service
 {
@@ -75,6 +77,29 @@ namespace planner_node_service.App.Service
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = nodeLink
+            };
+        }
+
+        public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies)
+        {
+            List<Node> nodes = new List<Node>();
+            foreach (NodeBody nodeBody in nodeBodies)
+            {
+                nodes.Add(new Node()
+                {
+                    Id = nodeBody.Id,
+                    Name = nodeBody.Name,
+                    Type = nodeBody.Type,
+                    BodyJson = JsonSerializer.Serialize(nodeBody)
+                });
+            }
+            var newNodes = await _nodeRepository.AddOrUpdateNodes(nodes);
+
+            return new ServiceResponse<List<NodeBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList()
             };
         }
     }

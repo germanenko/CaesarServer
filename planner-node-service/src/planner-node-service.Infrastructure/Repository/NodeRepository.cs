@@ -17,6 +17,16 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
+        public async Task<List<Node>> AddOrUpdateNodes(List<Node> nodes)
+        {
+            List<Node> newNodes = new List<Node>();
+            foreach (var node in nodes)
+            {
+                newNodes.Add(await AddOrUpdateNode(node));
+            }
+            return newNodes;
+        }
+
         public async Task<Node> AddOrUpdateNode(Node newNode)
         {
             var existingNode = await _context.Nodes

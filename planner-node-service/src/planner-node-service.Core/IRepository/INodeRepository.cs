@@ -7,6 +7,7 @@ namespace planner_node_service.Core.IRepository
     public interface INodeRepository
     {
         Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody node);
+        Task<List<Node>> AddOrUpdateNodes(List<Node> node);
         Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);
         Task<Node> AddOrUpdateNode(Node node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);

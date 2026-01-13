@@ -33,5 +33,17 @@ namespace planner_node_service.Core.Entities.Models
 
             return JsonSerializer.Deserialize<NodeBody>(BodyJson, options) ?? new NodeBody();
         }
+
+        public static Node FromNodeBody(NodeBody nodeBody)
+        {
+            return new Node()
+            {
+                Id = nodeBody.Id,
+                Type = nodeBody.Type,
+                Name = nodeBody.Name,
+                Props = nodeBody.Props,
+                BodyJson = JsonSerializer.Serialize(nodeBody)
+            };
+        }
     }
 }
