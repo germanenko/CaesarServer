@@ -91,8 +91,8 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("sendAllLocalNodes"), Authorize]
-        [SwaggerOperation("Загрузить все локальные ноды")]
+        [HttpPost("sendLocalNodes"), Authorize]
+        [SwaggerOperation("Загрузить локальные ноды")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> SendLocalNodes(

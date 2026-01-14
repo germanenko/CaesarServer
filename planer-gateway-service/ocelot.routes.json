@@ -614,54 +614,15 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/createOrUpdateNode",
+            "DownstreamPathTemplate": "/api/sendLocalNodes",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
                     "Host": "localhost",
-                    "Port": 8889
+                    "Port": 8093
                 }
             ],
-            "UpstreamPathTemplate": "/api/createOrUpdateNode",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-
-	{
-            "DownstreamPathTemplate": "/api/sendAllLocalNodes",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/sendAllLocalNodes",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-
-	{
-            "DownstreamPathTemplate": "/api/createOrUpdateNodeLink",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/createOrUpdateNodeLink",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
-
-	{
-            "DownstreamPathTemplate": "/api/createOrUpdateNodeLinks",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/createOrUpdateNodeLinks",
+            "UpstreamPathTemplate": "/api/sendLocalNodes",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
