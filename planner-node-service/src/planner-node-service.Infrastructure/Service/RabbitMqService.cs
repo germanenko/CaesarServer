@@ -303,7 +303,7 @@ namespace planner_node_service.Infrastructure.Service
                 await nodeService.AddOrUpdateNode(new Node()
                 {
                     Id = result.Task.Id,
-                    Name = result.Task.Name,
+                    Name = result.Task.Name ?? "Task",
                     Type = NodeType.Task,
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
                 });
@@ -319,7 +319,7 @@ namespace planner_node_service.Infrastructure.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while adding column node");
+                _logger.LogError(ex, "Error while adding task node");
                 throw;
             }
         }
