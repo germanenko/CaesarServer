@@ -1,5 +1,6 @@
 ﻿using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
+using Microsoft.IdentityModel.Tokens;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
@@ -46,6 +47,16 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Node node)
         {
+            if (node.Name.IsNullOrEmpty())
+            {
+                return new ServiceResponse<NodeBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Errors = new[] { "Name field is reqiured" }
+                };
+            }
+
             var newNode = await _nodeRepository.AddOrUpdateNode(node);
 
             return new ServiceResponse<NodeBody>()
