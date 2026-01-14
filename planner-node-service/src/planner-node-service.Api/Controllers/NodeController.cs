@@ -91,18 +91,18 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("sendLocalNodes"), Authorize]
-        [SwaggerOperation("Загрузить локальные ноды")]
+        [HttpPost("sendAllLocalNodes"), Authorize]
+        [SwaggerOperation("Загрузить все локальные ноды")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> SendLocalNodes(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] List<object> nodes
+            [FromBody] List<NodeBody> nodes
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            //var result = await _nodeService.LoadNodes(nodes);
-            return StatusCode(200);
+            var result = await _nodeService.LoadNodes(nodes);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
     }
 }

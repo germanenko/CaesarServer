@@ -627,7 +627,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/sendLocalNodes",
+            "DownstreamPathTemplate": "/api/sendAllLocalNodes",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -635,7 +635,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/api/sendLocalNodes",
+            "UpstreamPathTemplate": "/api/sendAllLocalNodes",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
