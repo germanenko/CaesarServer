@@ -91,7 +91,7 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("sendLocalNodes")]
+        [HttpPost("sendLocalNodes"), Authorize]
         [SwaggerOperation("Загрузить локальные ноды")]
         [SwaggerResponse(200)]
 
