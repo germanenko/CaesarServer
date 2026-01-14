@@ -97,12 +97,12 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> SendLocalNodes(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] List<NodeBody> nodes
+            [FromBody] List<object> nodes
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.LoadNodes(nodes);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _nodeService.LoadNodes(nodes);
+            return StatusCode(200);
         }
     }
 }
