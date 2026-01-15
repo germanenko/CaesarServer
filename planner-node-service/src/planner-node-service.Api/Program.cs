@@ -108,6 +108,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddHostedService(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),
+        sp.GetRequiredService<INotifyService>(),
         sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<IServiceScopeFactory>(),
         rabbitMqHostname,

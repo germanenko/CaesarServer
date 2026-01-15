@@ -17,7 +17,8 @@ namespace planner_node_service.Infrastructure.Service
     {
         private IConnection _connection;
         private IModel _channel;
-        private readonly INotificationService _notifyService;
+        private readonly INotificationService _notificationService;
+        private readonly INotifyService _notifyService;
         private readonly IServiceScopeFactory _scopeFactory;
         private ILogger<RabbitMqService> _logger;
         private readonly string _hostname;
@@ -27,7 +28,8 @@ namespace planner_node_service.Infrastructure.Service
         private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(
-            INotificationService notifyService,
+            INotificationService notificationService,
+            INotifyService notifyService,
             ILogger<RabbitMqService> logger,
             IServiceScopeFactory scopeFactory,
             string hostname,
@@ -45,8 +47,9 @@ namespace planner_node_service.Infrastructure.Service
             _logger = logger;
 
             _scopeFactory = scopeFactory;
-
             _notifyService = notifyService;
+
+            _notificationService = notificationService;
 
             _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
             {
@@ -162,7 +165,7 @@ namespace planner_node_service.Infrastructure.Service
             });
 
             foreach (var accountId in result.AccountIds)
-                await _notifyService.SendMessageToSessions(accountId, result.Message);
+                await _notificationService.SendMessageToSessions(accountId, result.Message);
 
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
@@ -324,7 +327,7 @@ namespace planner_node_service.Infrastructure.Service
 
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
         {
-            var sessionsNotReceiveMessage = await _notifyService.SendMessageToSessions(accountSessions.AccountId, accountSessions.SessionIds.ToList(), bytes);
+            var sessionsNotReceiveMessage = await _notificationService.SendMessageToSessions(accountSessions.AccountId, accountSessions.SessionIds.ToList(), bytes);
             return sessionsNotReceiveMessage.Any() ? new AccountSessions
             {
                 AccountId = accountSessions.AccountId,
