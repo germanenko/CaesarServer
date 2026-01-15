@@ -65,7 +65,7 @@ services:
       file: services/file-service.yaml
       service: planner-file-server
 
-  planner-task-board-service:
+  planner-content-service:
     extends:
       file: services/task-board-service.yaml
       service: planner-content
