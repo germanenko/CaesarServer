@@ -1,4 +1,4 @@
-using Planner_Auth.Core.Enums;
+using CaesarServerLibrary.Enums;
 
 namespace Planner_Auth.Core.Entities.Response
 {

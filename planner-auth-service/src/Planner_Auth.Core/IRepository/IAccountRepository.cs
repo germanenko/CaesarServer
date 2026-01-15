@@ -1,6 +1,6 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planner_Auth.Core.Entities.Models;
-using Planner_Auth.Core.Entities.Request;
-using Planner_Auth.Core.Enums;
 
 namespace Planner_Auth.Core.IRepository
 {

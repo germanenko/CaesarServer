@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace Planner_Auth.Core.Entities.Request
+namespace CaesarServerLibrary.Entities
 {
     public class TokenBody
     {

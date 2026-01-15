@@ -1,14 +1,15 @@
-using System.Text;
-using System.Text.Json;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Planner_Auth.Core.Entities.Events;
-using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using static Planner_Auth.Core.Entities.Events.CreateChatEvent;
+using System.Text;
+using System.Text.Json;
+using static CaesarServerLibrary.Events.CreateChatResponseEvent;
 
 namespace Planner_Auth.Infrastructure.Service
 {
@@ -126,7 +127,7 @@ namespace Planner_Auth.Infrastructure.Service
                 result.Add(chatMembership);
             }
 
-            var createChatEvent = new CreateChatEvent
+            var createChatEvent = new CreateChatResponseEvent
             {
                 ChatId = createChatBody.ChatId,
                 Participants = result

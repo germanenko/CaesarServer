@@ -1,14 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
-using Planner_Auth.Core.IRepository;
-using Planner_Auth.Infrastructure.Data;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Planner_Auth.Core.IRepository;
 
 namespace Planner_Auth.App.Service
 {

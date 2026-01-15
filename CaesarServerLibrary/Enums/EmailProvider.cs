@@ -1,11 +1,11 @@
 using System.Text.Json.Serialization;
 
-namespace Planner_Auth.Core.Enums
+namespace CaesarServerLibrary.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum DeviceTypeId
+    public enum EmailProvider
     {
-        AndroidId,
-        UUID
+        Gmail,
+        MailRu
     }
 }

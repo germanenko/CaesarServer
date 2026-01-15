@@ -1,6 +1,7 @@
-using Planner_Auth.Core.Enums;
+using CaesarServerLibrary.Enums;
+using System;
 
-namespace Planner_Auth.Core.Entities.Events
+namespace CaesarServerLibrary.Events
 {
     public class CreateAccountMailCredentialsEvent
     {

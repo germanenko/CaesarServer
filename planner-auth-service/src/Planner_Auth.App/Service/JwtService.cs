@@ -1,8 +1,8 @@
-﻿using Microsoft.Extensions.Caching.Memory;
+﻿using CaesarServerLibrary.Entities;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IService;
-using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -85,8 +85,8 @@ namespace Planner_Auth.App.Service
             var claims = new Dictionary<string, string>
             {
                 { "accountId", userId },
-                { "purpose", "password_reset" }, 
-                { "tokenId", tokenId } 
+                { "purpose", "password_reset" },
+                { "tokenId", tokenId }
             };
 
             _cache.Set($"reset_token_{tokenId}", true, new MemoryCacheEntryOptions
@@ -117,7 +117,7 @@ namespace Planner_Auth.App.Service
                     if (expiryDate < DateTime.UtcNow)
                         return false;
                 }
-   
+
                 var tokenId = claims.FirstOrDefault(c => c.Type == "tokenId")?.Value;
                 if (string.IsNullOrEmpty(tokenId))
                     return false;

@@ -1,6 +1,5 @@
+using CaesarServerLibrary.Entities;
 using System.Net;
-using Planner_Auth.Core.Entities.Models;
-using Planner_Auth.Core.Entities.Response;
 
 namespace Planner_Auth.Core.IService
 {

@@ -1,8 +1,8 @@
-using System.Text;
-using System.Text.Json;
-using Planner_Auth.Core.Entities.Events;
+using CaesarServerLibrary.Enums;
 using Planner_Auth.Core.IService;
 using RabbitMQ.Client;
+using System.Text;
+using System.Text.Json;
 
 namespace Planner_Auth.Infrastructure.Service
 {

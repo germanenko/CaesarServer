@@ -1,7 +1,7 @@
-using System.Net;
-using Planner_Auth.Core.Entities.Request;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Planner_Auth.Core.Entities.Response;
-using Planner_Auth.Core.Enums;
+using System.Net;
 
 namespace Planner_Auth.Core.IService
 {

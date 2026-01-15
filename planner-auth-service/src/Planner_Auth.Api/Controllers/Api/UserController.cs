@@ -1,11 +1,10 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
+using CaesarServerLibrary.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Planner_Auth.Core.Entities.Models;
-using Planner_Auth.Core.Entities.Response;
 using Planner_Auth.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace Planner_Auth.Api.Controllers.Api
 {

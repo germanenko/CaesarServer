@@ -1,4 +1,7 @@
-namespace Planner_Auth.Core.Entities.Events
+using System;
+using System.Collections.Generic;
+
+namespace CaesarServerLibrary.Events
 {
     public class InitChatEvent
     {

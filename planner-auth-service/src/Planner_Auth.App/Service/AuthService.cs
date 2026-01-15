@@ -1,20 +1,15 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Google.Apis.Auth.OAuth2;
-using Google.Apis.Oauth2.v2.Data;
 using Google.Apis.Services;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
-using Org.BouncyCastle.Asn1.Ocsp;
-using Planner_Auth.Core.Entities.Events;
-using Planner_Auth.Core.Entities.Request;
 using Planner_Auth.Core.Entities.Response;
-using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Core.IService;
 using System.Net;
-using System.Net.Http.Headers;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace Planner_Auth.App.Service
 {
@@ -275,12 +270,12 @@ namespace Planner_Auth.App.Service
             var session = await _accountRepository.AddSessionAsync(deviceId, account);
             if (session != null)
             {
-                var InitChatEvent = new InitChatEvent
+                var initChatEvent = new InitChatEvent
                 {
                     AccountId = account.Id,
                     SessionIds = new List<Guid> { session.Id }
                 };
-                _notifyService.Publish(InitChatEvent, PublishEvent.InitChat);
+                _notifyService.Publish(initChatEvent, PublishEvent.InitChat);
             }
             else
                 session = await _accountRepository.GetSessionAsync(account.Id, deviceId);
@@ -440,7 +435,7 @@ namespace Planner_Auth.App.Service
 
         public async Task<bool> NotifyAboutTempPassword(string email, Guid accountId)
         {
-            var client  = new HttpClient()
+            var client = new HttpClient()
             {
                 BaseAddress = new Uri("http://planer-email-service:80/api/"),
             };
@@ -504,7 +499,7 @@ namespace Planner_Auth.App.Service
 
             var oldPasswordHash = _hashPasswordService.HashPassword(oldPassword);
 
-            if(oldPasswordHash != account.PasswordHash)
+            if (oldPasswordHash != account.PasswordHash)
             {
                 return new ServiceResponse<string>
                 {

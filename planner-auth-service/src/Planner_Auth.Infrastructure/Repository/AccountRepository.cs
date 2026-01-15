@@ -1,7 +1,7 @@
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Microsoft.EntityFrameworkCore;
 using Planner_Auth.Core.Entities.Models;
-using Planner_Auth.Core.Entities.Request;
-using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IRepository;
 using Planner_Auth.Infrastructure.Data;
 
@@ -183,7 +183,7 @@ namespace Planner_Auth.Infrastructure.Repository
                 return null;
 
             var gToken = await GetGoogleTokenAsync(accountId);
-            if(gToken != null)
+            if (gToken != null)
             {
                 gToken.AccessToken = token.AccessToken;
                 gToken.RefreshToken = token.RefreshToken;

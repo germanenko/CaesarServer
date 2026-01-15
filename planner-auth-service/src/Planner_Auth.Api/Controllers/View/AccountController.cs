@@ -1,14 +1,14 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
-using System.Security.Claims;
-using System.Text.RegularExpressions;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.Google;
 using Microsoft.AspNetCore.Mvc;
-using Planner_Auth.Core.Entities.Request;
-using Planner_Auth.Core.Enums;
 using Planner_Auth.Core.IService;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using System.Security.Claims;
+using System.Text.RegularExpressions;
 
 namespace Planner_Auth.Api.Controllers.View
 {

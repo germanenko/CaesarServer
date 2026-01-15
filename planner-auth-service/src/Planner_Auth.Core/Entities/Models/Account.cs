@@ -1,5 +1,5 @@
-using Planner_Auth.Core.Entities.Response;
-using Planner_Auth.Core.Enums;
+using CaesarServerLibrary.Entities;
+using CaesarServerLibrary.Enums;
 
 namespace Planner_Auth.Core.Entities.Models
 {

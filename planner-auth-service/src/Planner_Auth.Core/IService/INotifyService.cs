@@ -1,4 +1,4 @@
-using Planner_Auth.Core.Entities.Events;
+using CaesarServerLibrary.Enums;
 
 namespace Planner_Auth.Core.IService
 {

@@ -1,4 +1,6 @@
-namespace Planner_Auth.Core.Entities.Request
+using System;
+
+namespace CaesarServerLibrary.Entities
 {
     public class UpdateProfileBody
     {

@@ -1,7 +1,7 @@
+using CaesarServerLibrary.Enums;
 using System.ComponentModel.DataAnnotations;
-using Planner_Auth.Core.Enums;
 
-namespace Planner_Auth.Core.Entities.Request
+namespace CaesarServerLibrary.Entities
 {
     public class SignUpBody
     {

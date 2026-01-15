@@ -11,5 +11,6 @@ namespace CaesarServerLibrary.Entities
         public AccountRole Role { get; set; }
         public string UrlIcon { get; set; }
         public string UserTag { get; set; }
+        public DefaultAuthenticationMethod IdentifierType { get; set; }
     }
 }
