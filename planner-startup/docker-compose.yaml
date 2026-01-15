@@ -67,7 +67,7 @@ services:
 
   planner-content-service:
     extends:
-      file: services/planner-content-service.yaml
+      file: services/content-service.yaml
       service: planner-content
 
   planner-content-db:
