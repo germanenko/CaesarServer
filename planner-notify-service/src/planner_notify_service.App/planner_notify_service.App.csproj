@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\planner-notify-service.Core\planner-notify-service.Core.csproj" />
+    <ProjectReference Include="..\planner_notify_service.Core\planner_notify_service.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>
