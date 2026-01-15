@@ -35,7 +35,6 @@ namespace Planner_chat_server.Infrastructure.Service
             string hostname,
             string userName,
             string password,
-            string queueInitChatName,
             string chatAttachmentQueue,
             string chatImageQueue,
             string chatAddAccountsToTaskChats,
@@ -47,7 +46,6 @@ namespace Planner_chat_server.Infrastructure.Service
 
             _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
             {
-                { queueInitChatName, (QueueName: GetQueueName(queueInitChatName), Handler: HandleInitChatMessageAsync) },
                 { chatAttachmentQueue, (QueueName: GetQueueName(chatAttachmentQueue), Handler: HandleChatAttachmentMessageAsync) },
                 { chatImageQueue, (QueueName: GetQueueName(chatImageQueue), Handler: HandleChatImageMessageAsync) },
                 { chatAddAccountsToTaskChats, (QueueName: GetQueueName(chatAddAccountsToTaskChats), Handler: HandleAddAccountToTaskChatMessageAsync) },
@@ -139,26 +137,6 @@ namespace Planner_chat_server.Infrastructure.Service
                 await chatRepository.CreateChatSettingsAsync(taskId, addAccountToTaskChatBody.AccountIds);
         }
 
-
-
-        private async Task HandleInitChatMessageAsync(string message)
-        {
-            using var scope = _serviceFactory.CreateScope();
-            var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
-            var createChatResponseEvent = JsonSerializer.Deserialize<CreateChatResponseEvent>(message);
-            if (createChatResponseEvent == null)
-                return;
-
-            foreach (var participant in createChatResponseEvent.Participants)
-            {
-                var chatMembership = await chatRepository.GetChatSettingsAsync(createChatResponseEvent.ChatId, participant.AccountId);
-                if (chatMembership == null)
-                    continue;
-
-                var date = DateTime.Now;
-                await chatRepository.CreateAccountChatSessionAsync(participant.SessionIds, chatMembership, date);
-            }
-        }
 
         private async Task HandleChatAttachmentMessageAsync(string message)
         {
