@@ -1,1 +1,1 @@
-docker build -t planner-notify-service .
+docker build -f dockerfile -t planner-notify-service ..

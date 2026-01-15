@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
-    <ProjectReference Include="..\planner-node-service.Core\planner-node-service.Core.csproj" />
+    <ProjectReference Include="..\planner_node_service.Core\planner_node_service.Core.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -5,14 +5,14 @@ COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
 COPY . .
 
-RUN dotnet restore planner-node-service/planner-node-service.sln
+RUN dotnet restore planner-node-service/planner_node_service.sln
 
 RUN dotnet publish \
-  planner-node-service/src/planner-node-service.Api/planner-node-service.Api.csproj \
+  planner-node-service/src/planner_node_service.Api/planner_node_service.Api.csproj \
   -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "planner-node-service.Api.dll"]
+ENTRYPOINT ["dotnet", "planner_node_service.Api.dll"]

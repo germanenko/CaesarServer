@@ -1,8 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
-    <ProjectReference Include="..\planner-node-service.App\planner-node-service.App.csproj" />
-    <ProjectReference Include="..\planner-node-service.Core\planner-node-service.Core.csproj" />
-    <ProjectReference Include="..\planner-node-service.Infrastructure\planner-node-service.Infrastructure.csproj" />
+    <ProjectReference Include="..\planner_node_service.App\planner_node_service.App.csproj" />
+    <ProjectReference Include="..\planner_node_service.Core\planner_node_service.Core.csproj" />
+    <ProjectReference Include="..\planner_node_service.Infrastructure\planner_node_service.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="DotNetEnv" Version="3.1.1" />
