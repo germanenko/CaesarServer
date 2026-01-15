@@ -1,12 +1,17 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /App
 
-COPY . ./
-RUN dotnet restore
-RUN dotnet publish -c Debug -o out
+COPY ../NuGet.config .
+COPY ../nuget-local ./nuget-local
+COPY . .
+
+RUN dotnet restore planner-file-service/planner_file_service.sln
+RUN dotnet publish \
+  planner-file-service/src/planner_file_service.Api/planner_file_service.Api.csproj \
+  -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "Planer_file_server.Api.dll"]
+ENTRYPOINT ["dotnet", "planner_file_server.Api.dll"]

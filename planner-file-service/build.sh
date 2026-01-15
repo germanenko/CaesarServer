@@ -1,1 +1,1 @@
-docker build -t planner-file-server .
+docker build -f dockerfile -t planner-file-service ..
