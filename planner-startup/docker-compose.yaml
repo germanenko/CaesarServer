@@ -70,9 +70,9 @@ services:
       file: services/task-board-service.yaml
       service: planner-task-board
 
-  planner-task-board-db:
+  planner-content-db:
     extends:
-      file: services/task-board-db.yaml
+      file: services/content-db.yaml
       service: planner-content-db
 
   planner-node-service:
