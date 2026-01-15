@@ -1,1 +1,1 @@
-docker build -t planner-node-service .
+docker build -f dockerfile -t planner-node-service ..

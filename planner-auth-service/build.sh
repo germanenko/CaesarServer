@@ -1,1 +1,1 @@
-docker build -t planner-auth .
+docker build -f dockerfile -t planner-auth-service ..

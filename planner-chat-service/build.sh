@@ -1,1 +1,1 @@
-docker build -t planner-chat-service .
+docker build -f dockerfile -t planner-chat-service ..

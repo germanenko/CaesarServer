@@ -1,1 +1,1 @@
-docker build -t planner-task-board .
+docker build -f dockerfile -t planner-content-service ..
