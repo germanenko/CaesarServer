@@ -1,1 +1,1 @@
-docker build -t planner-mailbox-service .
+docker build -f dockerfile -t planner-mailbox-service ..
