@@ -38,7 +38,7 @@ void ConfigureServices(IServiceCollection services)
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
-    var chatTaskExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
+    var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
