@@ -13,12 +13,12 @@ services:
   planner-email-service:
     extends:
       file: services/email-service.yaml
-      service: planer-email-service
+      service: planner-email-service
 
   planner-mailbox-service:
     extends:
       file: services/mailbox-service.yaml
-      service: planer-mailbox-service
+      service: planner-mailbox-service
   
   planner-mail-credentials-db:
     extends:
@@ -68,7 +68,7 @@ services:
   planner-task-board-service:
     extends:
       file: services/task-board-service.yaml
-      service: planner-task-board
+      service: planner-content
 
   planner-content-db:
     extends:
