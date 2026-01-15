@@ -37,6 +37,8 @@ void ConfigureServices(IServiceCollection services)
     var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
+    var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
+    var chatTaskExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -94,8 +96,8 @@ void ConfigureServices(IServiceCollection services)
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
-            createColumnExchange,
-            createTaskExchange
+            contentNodesExchange,
+            chatNodesExchange
         ));
 
     services.AddScoped<INodeService, NodeService>();
