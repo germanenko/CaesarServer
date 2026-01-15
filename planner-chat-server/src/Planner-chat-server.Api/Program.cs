@@ -33,11 +33,12 @@ void ConfigureServices(IServiceCollection services)
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
 
-    var chatImageQueue = GetEnvVar("RABBITMQ_CHAT_IMAGE_QUEUE_NAME");
-    var chatAttachmentQueue = GetEnvVar("RABBITMQ_CHAT_ATTACHMENT_QUEUE_NAME");
+    //var chatImageQueue = GetEnvVar("RABBITMQ_CHAT_IMAGE_QUEUE_NAME");
+    //var chatAttachmentQueue = GetEnvVar("RABBITMQ_CHAT_ATTACHMENT_QUEUE_NAME");
     var createChatQueue = GetEnvVar("RABBITMQ_CREATE_CHAT_QUEUE_NAME");
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
-    var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE_NAME");
+    //var initChatQueue = GetEnvVar("RABBITMQ_INIT_CHAT_QUEUE_NAME");
+    //var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE_NAME");
     var createTaskChatResponseQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_RESPONSE_QUEUE");
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
@@ -114,8 +115,9 @@ void ConfigureServices(IServiceCollection services)
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
-        chatAttachmentQueue,
-        chatImageQueue,
+        //initChatQueue,
+        //chatAttachmentQueue,
+        //chatImageQueue,
         addAccountsToTaskChatsQueue,
         chatNodesExchange
     ));
