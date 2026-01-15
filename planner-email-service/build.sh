@@ -1,1 +1,1 @@
-docker build -t planer-email-service .
+docker build -f dockerfile -t planner-email-service ..
