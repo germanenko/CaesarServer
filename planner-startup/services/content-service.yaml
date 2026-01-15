@@ -1,13 +1,13 @@
 version: '3.8'
 
 services:
-  planner-task-board:
-    image: planner-task-board
+  planner-content:
+    image: planner-content-service
     restart: always
     ports:
       - "8889:80"
     depends_on:
-      planner-task-board-db:
+      planner-content-db:
         condition: service_started
       planner-rabbitmq-service:
         condition: service_healthy
