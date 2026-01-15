@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  planer-email-service:
+  planner-email-service:
     image: planer-email-service
     restart: always
     ports:

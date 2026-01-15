@@ -10,12 +10,12 @@ services:
         max-size: "10m"
         max-file: "5"
 
-  planer-email-service:
+  planner-email-service:
     extends:
       file: services/email-service.yaml
       service: planer-email-service
 
-  planer-mailbox-service:
+  planner-mailbox-service:
     extends:
       file: services/mailbox-service.yaml
       service: planer-mailbox-service
