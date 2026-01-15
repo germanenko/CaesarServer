@@ -83,7 +83,7 @@ namespace Planner_chat_server.App.Service
         public async Task<ServiceResponse<ChatBody>> CreatePersonalChat(
             Guid accountId,
             Guid sessionId,
-            CreateChatBody createChatBody,
+            ChatBody createChatBody,
             Guid addedAccountId)
         {
             var participants = new List<Guid>
@@ -143,7 +143,7 @@ namespace Planner_chat_server.App.Service
 
             foreach (var chat in chats)
             {
-                if(chat.ChatType == ChatType.Personal)
+                if (chat.ChatType == ChatType.Personal)
                 {
                     var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
                     chat.ImageUrl = user.UrlIcon;
@@ -205,12 +205,50 @@ namespace Planner_chat_server.App.Service
             };
         }
 
-        public async Task<ServiceResponse<MessageBody>> SendMessageFromEmail(
+        public async Task<ServiceResponse<MessageBody>> SendMessage(
             Guid senderId, Guid receiverId, string content)
         {
             var chat = await _chatRepository.GetPersonalChatAsync(senderId, receiverId);
 
-            if(chat == null)
+            if (chat == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Errors = new[] { "Chat not found" }
+                };
+            }
+
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid());
+
+            ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
+
+            if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
+            {
+                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chat.ChatId);
+                var userIds = chatMemberships.Select(e => e.AccountId).ToList();
+                lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
+            }
+
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+
+            _chatConnectionService.RemoveLobby(chat.ChatId);
+
+            return new ServiceResponse<MessageBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = message.ToMessageBody()
+            };
+        }
+
+        public async Task<ServiceResponse<MessageBody>> SendMessageToChat(
+            Guid senderId, Guid chatId, string content)
+        {
+            var chat = (await _chatRepository.GetChatSettingsAsync(chatId)).FirstOrDefault();
+
+            if (chat == null)
             {
                 return new ServiceResponse<MessageBody>
                 {
@@ -247,13 +285,13 @@ namespace Planner_chat_server.App.Service
         {
             var membership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
-            if(membership == null)
+            if (membership == null)
             {
                 return new ServiceResponse<bool>
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     IsSuccess = false,
-                    Errors = new[] { "Вы не участник этого чата" } 
+                    Errors = new[] { "Вы не участник этого чата" }
                 };
             }
 

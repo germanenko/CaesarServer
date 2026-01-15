@@ -101,7 +101,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.LoadNodes(nodes);
+            var result = await _nodeService.LoadNodes(nodes, tokenPayload);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

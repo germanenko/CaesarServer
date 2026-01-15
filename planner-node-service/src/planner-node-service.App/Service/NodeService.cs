@@ -1,21 +1,25 @@
 ﻿using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
+using CaesarServerLibrary.Events;
 using Microsoft.IdentityModel.Tokens;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using System.Text.Json;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace planner_node_service.App.Service
 {
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
+        private readonly INotifyService _notifyService;
 
         public NodeService(
-            INodeRepository nodeRepository)
+            INodeRepository nodeRepository, INotifyService notifyService)
         {
             _nodeRepository = nodeRepository;
+            _notifyService = notifyService;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
@@ -91,7 +95,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies)
+        public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies, TokenPayload tokenPayload)
         {
             List<Node> nodes = new List<Node>();
             foreach (NodeBody nodeBody in nodeBodies)
@@ -104,7 +108,34 @@ namespace planner_node_service.App.Service
                     BodyJson = JsonSerializer.Serialize(nodeBody)
                 });
             }
+
             var newNodes = await _nodeRepository.AddOrUpdateNodes(nodes);
+
+            var bodies = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList();
+            List<NodeBody> contentNodes = new List<NodeBody>();
+            List<NodeBody> chatNodes = new List<NodeBody>();
+
+            contentNodes.AddRange(bodies.OfType<BoardBody>().ToList());
+            contentNodes.AddRange(bodies.OfType<ColumnBody>().ToList());
+            contentNodes.AddRange(bodies.OfType<TaskBody>().ToList());
+
+            chatNodes.AddRange(bodies.OfType<ChatBody>().ToList());
+            chatNodes.AddRange(bodies.OfType<MessageBody>().ToList());
+
+            NodesEvent contentNodesEvent = new NodesEvent()
+            {
+                TokenPayload = tokenPayload,
+                Nodes = contentNodes
+            };
+
+            NodesEvent chatNodesEvent = new NodesEvent()
+            {
+                TokenPayload = tokenPayload,
+                Nodes = contentNodes
+            };
+
+            _notifyService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
+            _notifyService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
 
             return new ServiceResponse<List<NodeBody>>()
             {

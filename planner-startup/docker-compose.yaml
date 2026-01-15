@@ -1,6 +1,15 @@
 version: '3.8'
 
 services:
+  app:
+    image: node
+    container_name: my-app
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "5"
+
   planer-email-service:
     extends:
       file: services/email-service.yaml

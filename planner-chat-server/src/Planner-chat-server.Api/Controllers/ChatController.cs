@@ -1,5 +1,3 @@
-using System.ComponentModel.DataAnnotations;
-using System.Net;
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
 using Microsoft.AspNetCore.Authorization;
@@ -8,6 +6,8 @@ using Planner_chat_server.Api.CustomAttributes;
 using Planner_chat_server.Core.Entities.Request;
 using Planner_chat_server.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
+using System.Net;
 
 namespace Planner_chat_server.Api.Controllers
 {
@@ -54,7 +54,7 @@ namespace Planner_chat_server.Api.Controllers
             [FromQuery] string content
         )
         {
-            var result = await _chatService.SendMessageFromEmail(senderId, receiverId, content);
+            var result = await _chatService.SendMessage(senderId, receiverId, content);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
@@ -103,7 +103,7 @@ namespace Planner_chat_server.Api.Controllers
         [SwaggerResponse(409)]
 
         public async Task<IActionResult> CreatePersonalChat(
-            [FromBody, Required] CreateChatBody chatBody,
+            [FromBody, Required] ChatBody chatBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
             [FromHeader, Required] Guid addedAccountId
         )

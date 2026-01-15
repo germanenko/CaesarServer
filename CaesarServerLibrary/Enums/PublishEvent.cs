@@ -4,6 +4,8 @@ namespace CaesarServerLibrary.Enums
     {
         CreateTaskChatResponse,
         AddAccountsToTaskChats,
+        ContentNodes,
+        ChatNodes,
         CreateBoard,
         CreateColumn,
         CreateTask

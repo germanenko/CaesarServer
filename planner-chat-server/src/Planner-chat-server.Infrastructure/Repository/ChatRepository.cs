@@ -72,7 +72,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             return message;
         }
 
-        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date)
+        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, ChatBody createChatBody, DateTime date)
         {
             if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
                 return null;
@@ -500,7 +500,7 @@ namespace Planner_chat_server.Infrastructure.Repository
                 .Include(e => e.Chat)
                 .Where(user => user.AccountId == accountId);
 
-            if(query.Count() == 0)
+            if (query.Count() == 0)
             {
                 return null;
             }
@@ -508,7 +508,7 @@ namespace Planner_chat_server.Infrastructure.Repository
             var message = _context.ChatMessages
                 .Where(m => m.Id == updatedMessage.Id).FirstOrDefault();
 
-            if(message == null)
+            if (message == null)
             {
                 return null;
             }
@@ -581,7 +581,7 @@ namespace Planner_chat_server.Infrastructure.Repository
         {
             var membership = await _context.NotificationSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.NodeId == chatId);
 
-            if(membership == null)
+            if (membership == null)
             {
                 return null;
             }

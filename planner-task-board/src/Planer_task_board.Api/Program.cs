@@ -44,6 +44,7 @@ void ConfigureServices(IServiceCollection services)
     var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
+    var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
 
     services.AddControllers(e =>
     {
@@ -124,7 +125,8 @@ void ConfigureServices(IServiceCollection services)
         hostname,
         username,
         password,
-        createTaskChatResponseQueue
+        createTaskChatResponseQueue,
+        contentNodesExchange
     ));
 }
 

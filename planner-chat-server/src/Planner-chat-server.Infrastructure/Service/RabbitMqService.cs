@@ -1,15 +1,17 @@
-using System.Net.WebSockets;
-using System.Text;
-using System.Text.Json;
 using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Enums;
 using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Planner_chat_server.Core.Entities.Models;
 using Planner_chat_server.Core.IRepository;
 using Planner_chat_server.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Net.WebSockets;
+using System.Text;
+using System.Text.Json;
+using static Google.Apis.Requests.BatchRequest;
 
 namespace Planner_chat_server.Infrastructure.Service
 {
@@ -24,11 +26,7 @@ namespace Planner_chat_server.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly string _queueInitChatName;
-        private readonly string _chatAttachmentQueue;
-        private readonly string _chatImageQueue;
-        private readonly string _chatAddAccountsToTaskChats;
-        private readonly string _createTaskChatQueue;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
@@ -41,21 +39,25 @@ namespace Planner_chat_server.Infrastructure.Service
             string chatAttachmentQueue,
             string chatImageQueue,
             string chatAddAccountsToTaskChats,
-            string createTaskChatQueue)
+            string chatNodesExchange)
         {
             _hostname = hostname;
             _userName = userName;
             _password = password;
 
-            _queueInitChatName = queueInitChatName;
-            _chatAttachmentQueue = chatAttachmentQueue;
-            _chatImageQueue = chatImageQueue;
-            _chatAddAccountsToTaskChats = chatAddAccountsToTaskChats;
-            _createTaskChatQueue = createTaskChatQueue;
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
+            {
+                { queueInitChatName, (QueueName: GetQueueName(queueInitChatName), Handler: HandleInitChatMessageAsync) },
+                { chatAttachmentQueue, (QueueName: GetQueueName(chatAttachmentQueue), Handler: HandleChatAttachmentMessageAsync) },
+                { chatImageQueue, (QueueName: GetQueueName(chatImageQueue), Handler: HandleChatImageMessageAsync) },
+                { chatAddAccountsToTaskChats, (QueueName: GetQueueName(chatAddAccountsToTaskChats), Handler: HandleAddAccountToTaskChatMessageAsync) },
+                { chatNodesExchange, (QueueName: GetQueueName(chatNodesExchange), Handler: HandleChatNodes) },
+            };
 
             _serviceFactory = serviceFactory;
             _notifyService = notifyService;
             _chatConnectionService = chatConnectionService;
+
 
             InitializeRabbitMQ();
         }
@@ -72,21 +74,25 @@ namespace Planner_chat_server.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_queueInitChatName);
-            DeclareQueue(_chatAttachmentQueue);
-            DeclareQueue(_chatImageQueue);
-            DeclareQueue(_chatAddAccountsToTaskChats);
-            DeclareQueue(_createTaskChatQueue);
+            foreach (var queue in _queues)
+            {
+                DeclareQueue(queue.Key, queue.Value.QueueName);
+            }
         }
 
-        private void DeclareQueue(string queueName)
+        private void DeclareQueue(string exchange, string queue)
         {
             _channel.QueueDeclare(
-                queue: queueName,
+                queue: queue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+
+            _channel.QueueBind(
+                queue: queue,
+                exchange: exchange,
+                routingKey: "");
         }
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)
@@ -104,10 +110,16 @@ namespace Planner_chat_server.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            ConsumeQueue(_queueInitChatName, HandleInitChatMessageAsync);
-            ConsumeQueue(_chatAddAccountsToTaskChats, HandleAddAccountToTaskChatMessageAsync);
-            ConsumeQueue(_chatAttachmentQueue, HandleChatAttachmentMessageAsync);
-            ConsumeQueue(_chatImageQueue, HandleChatImageMessageAsync);
+
+            foreach (var func in _queues)
+            {
+                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
+            }
+
+            //ConsumeQueue(_queueInitChatName, HandleInitChatMessageAsync);
+            //ConsumeQueue(_chatAddAccountsToTaskChats, HandleAddAccountToTaskChatMessageAsync);
+            //ConsumeQueue(_chatAttachmentQueue, HandleChatAttachmentMessageAsync);
+            //ConsumeQueue(_chatImageQueue, HandleChatImageMessageAsync);
             await Task.CompletedTask;
         }
 
@@ -192,6 +204,28 @@ namespace Planner_chat_server.Infrastructure.Service
             await chatRepository.UpdateChatImage(chatImage.ChatId, chatImage.Filename);
         }
 
+        private async Task HandleChatNodes(string message)
+        {
+            using var scope = _serviceFactory.CreateScope();
+            var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
+            var nodes = JsonSerializer.Deserialize<NodesEvent>(message);
+            if (nodes == null)
+                return;
+
+            var chats = nodes.Nodes.OfType<ChatBody>().ToList();
+            var messages = nodes.Nodes.OfType<MessageBody>().ToList();
+
+            foreach (var chat in chats)
+            {
+                await chatService.CreatePersonalChat(nodes.TokenPayload.AccountId, nodes.TokenPayload.SessionId, chat, chat.ParticipantIds.FirstOrDefault(x => x != nodes.TokenPayload.AccountId));
+            }
+
+            foreach (var chatMessage in messages)
+            {
+                await chatService.SendMessageToChat(chatMessage.SenderId, chatMessage.ChatId, chatMessage.Content);
+            }
+        }
+
 
         public async Task SendMessage(
             IEnumerable<ChatSession> sessions,
@@ -263,6 +297,11 @@ namespace Planner_chat_server.Infrastructure.Service
             };
 
             _notifyService.Publish(messageSentToChatEvent, NotifyPublishEvent.MessageSentToChat);
+        }
+
+        private string GetQueueName(string exchange)
+        {
+            return exchange + "_chat";
         }
 
         public override void Dispose()

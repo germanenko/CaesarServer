@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -12,6 +11,7 @@ using planner_node_service.Infrastructure.Data;
 using planner_node_service.Infrastructure.Repository;
 using planner_node_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -89,13 +89,22 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<INotificationService, NotificationService>();
 
+    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
+        new RabbitMqNotifyService(
+            rabbitMqHostname,
+            rabbitMqUsername,
+            rabbitMqPassword,
+            createColumnExchange,
+            createTaskExchange
+        ));
+
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IAccessRepository, AccessRepository>();
 
-    services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
+    services.AddHostedService(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),
         sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<IServiceScopeFactory>(),

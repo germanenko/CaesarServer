@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -12,6 +11,7 @@ using Planner_chat_server.Infrastructure.Data;
 using Planner_chat_server.Infrastructure.Repository;
 using Planner_chat_server.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +42,7 @@ void ConfigureServices(IServiceCollection services)
     var createTaskChatResponseQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_RESPONSE_QUEUE");
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
+    var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -118,7 +119,7 @@ void ConfigureServices(IServiceCollection services)
         chatAttachmentQueue,
         chatImageQueue,
         addAccountsToTaskChatsQueue,
-        createTaskChatQueue
+        chatNodesExchange
     ));
 }
 

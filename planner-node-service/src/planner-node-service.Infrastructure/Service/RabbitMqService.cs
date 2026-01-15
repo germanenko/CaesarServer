@@ -24,8 +24,6 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        //private readonly Dictionary<string, string> _queues;
-        //private readonly Dictionary<string, Func<string, Task>> _queuesFuncs;
         private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(

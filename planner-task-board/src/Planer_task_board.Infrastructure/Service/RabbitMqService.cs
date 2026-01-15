@@ -1,5 +1,4 @@
-using System.Text;
-using System.Text.Json;
+using CaesarServerLibrary.Entities;
 using CaesarServerLibrary.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -7,6 +6,9 @@ using Planer_task_board.Core.IRepository;
 using Planer_task_board.Core.IService;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Collections.Generic;
+using System.Text;
+using System.Text.Json;
 
 namespace Planer_task_board.Infrastructure.Service
 {
@@ -20,7 +22,7 @@ namespace Planer_task_board.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly string _createTaskChatResponseQueue;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
@@ -28,7 +30,8 @@ namespace Planer_task_board.Infrastructure.Service
             string hostname,
             string userName,
             string password,
-            string createTaskChatResponseQueue)
+            string createTaskChatResponseQueue,
+            string contentNodes)
         {
             _hostname = hostname;
             _userName = userName;
@@ -36,7 +39,12 @@ namespace Planer_task_board.Infrastructure.Service
 
             _notifyService = notifyService;
 
-            _createTaskChatResponseQueue = createTaskChatResponseQueue;
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
+            {
+                { createTaskChatResponseQueue, (QueueName: GetQueueName(createTaskChatResponseQueue), Handler: HandleCreateTaskChatResponseMessageAsync) },
+                { contentNodes, (QueueName: GetQueueName(contentNodes), Handler: HandleContentNodes) }
+            };
+
             _serviceFactory = serviceFactory;
 
             InitializeRabbitMQ();
@@ -54,17 +62,25 @@ namespace Planer_task_board.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_createTaskChatResponseQueue);
+            foreach (var queue in _queues)
+            {
+                DeclareQueue(queue.Key, queue.Value.QueueName);
+            }
         }
 
-        private void DeclareQueue(string queueName)
+        private void DeclareQueue(string exchange, string queue)
         {
             _channel.QueueDeclare(
-                queue: queueName,
+                queue: queue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+
+            _channel.QueueBind(
+                queue: queue,
+                exchange: exchange,
+                routingKey: "");
         }
 
         private void ConsumeQueue(string queueName, Func<string, Task> handler)
@@ -82,8 +98,32 @@ namespace Planer_task_board.Infrastructure.Service
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
-            ConsumeQueue(_createTaskChatResponseQueue, HandleCreateTaskChatResponseMessageAsync);
+
+            foreach (var func in _queues)
+            {
+                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
+            }
+
+            //ConsumeQueue(_createTaskChatResponseQueue, HandleCreateTaskChatResponseMessageAsync);
             await Task.CompletedTask;
+        }
+
+        private async Task HandleContentNodes(string message)
+        {
+            using var scope = _serviceFactory.CreateScope();
+            var taskService = scope.ServiceProvider.GetRequiredService<ITaskService>();
+            var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
+            var response = JsonSerializer.Deserialize<NodesEvent>(message);
+            if (response == null)
+                return;
+
+            var boards = response.Nodes.OfType<BoardBody>().ToList();
+            var columns = response.Nodes.OfType<ColumnBody>().ToList();
+            var tasks = response.Nodes.OfType<TaskBody>().ToList();
+
+            await boardService.CreateBoardsAsync(boards, response.TokenPayload.AccountId);
+            await boardService.AddColumns(response.TokenPayload.AccountId, columns);
+            await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, tasks);
         }
 
         private async Task HandleCreateTaskChatResponseMessageAsync(string message)
@@ -95,6 +135,11 @@ namespace Planer_task_board.Infrastructure.Service
                 return;
 
             await taskRepository.UpdateTaskChatId(response.CreateTaskChat.TaskId, (Guid)response.CreateTaskChat.ChatId);
+        }
+
+        private string GetQueueName(string exchange)
+        {
+            return exchange + "_content";
         }
 
         public override void Dispose()
