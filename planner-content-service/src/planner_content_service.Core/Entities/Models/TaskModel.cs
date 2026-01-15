@@ -1,0 +1,31 @@
+using CaesarServerLibrary.Entities;
+using System.ComponentModel.DataAnnotations;
+
+namespace planner_content_service.Core.Entities.Models
+{
+    public class TaskModel : Node
+    {
+        public string? Description { get; set; }
+
+        [MaxLength(7)]
+        public string? HexColor { get; set; }
+
+        public DateTime? StartDate { get; set; }
+        public DateTime? EndDate { get; set; }
+
+        public TaskBody ToTaskBody()
+        {
+            return new TaskBody
+            {
+                Id = Id,
+                Name = Name,
+                Description = Description,
+                HexColor = HexColor,
+                StartDate = StartDate?.ToString("s"),
+                EndDate = EndDate?.ToString("s"),
+                Props = Props,
+                Type = Type
+            };
+        }
+    }
+}

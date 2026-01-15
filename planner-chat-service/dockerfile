@@ -5,14 +5,14 @@ COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
 COPY . .
 
-RUN dotnet restore planner-chat-server/Planner-chat-server.sln
+RUN dotnet restore planner-chat-service/Planner-chat-service.sln
 
 RUN dotnet publish \
-  planner-chat-server/src/Planner-chat-server.Api/Planner-chat-server.Api.csproj \
+  planner-chat-service/src/planner-chat-service.Api/planner-chat-service.Api.csproj \
   -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "Planner-chat-server.Api.dll"]
+ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]

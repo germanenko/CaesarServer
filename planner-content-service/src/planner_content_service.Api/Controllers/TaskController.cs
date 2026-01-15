@@ -1,0 +1,152 @@
+using System.ComponentModel.DataAnnotations;
+using System.Net;
+using CaesarServerLibrary.Entities;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using planner_content_service.Core.IService;
+using Swashbuckle.AspNetCore.Annotations;
+
+namespace planner_content_service.Api.Controllers
+{
+    [ApiController]
+    [Route("api")]
+    public class TaskController : ControllerBase
+    {
+        private readonly ITaskService _taskService;
+        private readonly IJwtService _jwtService;
+
+        public TaskController(
+            ITaskService taskService,
+            IJwtService jwtService)
+        {
+            _taskService = taskService;
+            _jwtService = jwtService;
+        }
+
+        [HttpPost("task"), Authorize]
+        [SwaggerOperation("Создать/обновить задачу")]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> CreateOrUpdateTask(
+            [FromBody] TaskBody taskBody,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [HttpPost("createOrUpdateTasks"), Authorize]
+        [SwaggerOperation("Создать/обновить задачи")]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+
+        public async Task<IActionResult> CreateOrUpdateTasks(
+            [FromBody] List<TaskBody> taskBodies,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.CreateOrUpdateTasks(tokenPayload.AccountId, taskBodies);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [HttpDelete("task")]
+        [SwaggerOperation("Удалить задачу")]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(400)]
+
+        public async Task<IActionResult> RemoveTask(
+            [FromQuery, Required] Guid taskId,
+            [FromQuery, Required] Guid boardId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.RemoveTask(tokenPayload.AccountId, boardId, taskId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [HttpPatch("task")]
+        [SwaggerOperation("Восстановить удаленную задачу")]
+        [SwaggerResponse(204)]
+        [SwaggerResponse(400)]
+
+        public async Task<IActionResult> RemoveDraft(
+            [Required] Guid deletedTaskId,
+            [FromQuery, Required] Guid boardId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token)
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.RestoreDeletedTask(deletedTaskId, boardId, tokenPayload.AccountId);
+            return StatusCode((int)result);
+        }
+
+        [HttpGet("deleted-tasks")]
+        [SwaggerOperation("Получить все удаленные задачи")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<TaskBody>))]
+        [SwaggerResponse(400)]
+
+        public async Task<IActionResult> GetDrafts(
+            [FromQuery, Required] Guid boardId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.GetDeletedTasks(tokenPayload.AccountId, boardId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [HttpPost("task/column"), Authorize]
+        [SwaggerOperation("Добавить задачу в колонку любой доски")]
+        [SwaggerResponse(200)]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> AddTaskToColumn(
+            [FromQuery, Required] Guid boardId,
+            [FromQuery, Required] Guid columnId,
+            [FromQuery, Required] Guid taskId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.AddTaskToColumn(tokenPayload.AccountId, boardId, taskId, columnId);
+            return StatusCode((int)result);
+        }
+
+        [HttpDelete("task/column"), Authorize]
+        [SwaggerOperation("Удалить задачу из колонки")]
+        [SwaggerResponse(204)]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> RemoveTaskFromColumn(
+            [FromQuery, Required] Guid boardId,
+            [FromQuery, Required] Guid columnId,
+            [FromQuery, Required] Guid taskId,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.RemoveTaskFromColumn(tokenPayload.AccountId, boardId, taskId, columnId);
+            return StatusCode((int)result);
+        }
+    }
+}
