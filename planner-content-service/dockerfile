@@ -1,9 +1,14 @@
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build-env
 WORKDIR /App
 
-COPY . ./
-RUN dotnet restore
-RUN dotnet publish -c Debug -o out
+COPY ../NuGet.config .
+COPY ../nuget-local ./nuget-local
+COPY . .
+
+RUN dotnet restore planner-content-service/planner_content_service.sln
+RUN dotnet publish \
+  planner-content-service/src/planner_content_service.Api/planner_content_service.Api.csproj \
+  -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
