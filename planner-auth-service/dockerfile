@@ -10,4 +10,4 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 COPY local.pfx /https/local.pfx
-ENTRYPOINT ["dotnet", "Planner_Auth.Api.dll"]
+ENTRYPOINT ["dotnet", "planner_auth_service.Api.dll"]
