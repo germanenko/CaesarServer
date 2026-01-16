@@ -67,8 +67,6 @@ namespace planner_auth_service.App.Service
             var account = session.Account;
             var accountCredentials = await UpdateToken(account.RoleName, account.Id, session.Id);
 
-            await NotifyAboutTempPassword(account.Identifier, account.Id);
-
             return new ServiceResponse<OutputAccountCredentialsBody>
             {
                 Body = accountCredentials,
@@ -414,7 +412,8 @@ namespace planner_auth_service.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                await NotifyAboutTempPassword(userInfo.Email, account.Id);
+                if (tokenPair.IsSuccess)
+                    await NotifyAboutTempPassword(userInfo.Email, tokenPair.Body.AccessToken);
             }
             else
             {
@@ -433,14 +432,16 @@ namespace planner_auth_service.App.Service
             return tokenPair;
         }
 
-        public async Task<bool> NotifyAboutTempPassword(string email, Guid accountId)
+        public async Task<bool> NotifyAboutTempPassword(string email, string accessToken)
         {
             var client = new HttpClient()
             {
                 BaseAddress = new Uri("http://planner-email-service:80/api/"),
             };
 
-            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(accountId)}\"}}";
+            var token = _jwtService.GetTokenPayload(accessToken);
+
+            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(token.AccountId)}\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
