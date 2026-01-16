@@ -396,7 +396,11 @@ namespace planner_auth_service.App.Service
 
             var userInfo = await oauthSerivce.Userinfo.Get().ExecuteAsync();
 
+            _logger.LogInformation(userInfo.ToString());
+
             var account = await _accountRepository.GetAsync(userInfo.Email);
+
+            _logger.LogInformation(account.ToString());
 
             ServiceResponse<OutputAccountCredentialsBody> tokenPair;
 
