@@ -158,6 +158,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(authDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_auth_service.Api");
         });
     });
 

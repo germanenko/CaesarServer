@@ -1,8 +1,9 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace planner_auth_service.Infrastructure.Migrations
+namespace planner_auth_service.Api.Migrations
 {
     /// <inheritdoc />
     public partial class init : Migration
@@ -31,6 +32,20 @@ namespace planner_auth_service.Infrastructure.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Accounts", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GoogleTokens",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    UserId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccessToken = table.Column<string>(type: "text", nullable: false),
+                    RefreshToken = table.Column<string>(type: "text", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GoogleTokens", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -65,6 +80,9 @@ namespace planner_auth_service.Infrastructure.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AccountSessions");
+
+            migrationBuilder.DropTable(
+                name: "GoogleTokens");
 
             migrationBuilder.DropTable(
                 name: "Accounts");

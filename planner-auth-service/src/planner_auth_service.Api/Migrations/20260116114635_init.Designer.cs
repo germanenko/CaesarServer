@@ -12,8 +12,8 @@ using planner_auth_service.Infrastructure.Data;
 namespace planner_auth_service.Api.Migrations
 {
     [DbContext(typeof(AuthDbContext))]
-    [Migration("20251110082629_removeFirebase")]
-    partial class removeFirebase
+    [Migration("20260116114635_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
