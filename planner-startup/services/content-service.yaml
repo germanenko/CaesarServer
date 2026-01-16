@@ -7,8 +7,7 @@ services:
     ports:
       - "8889:80"
     depends_on:
-      planner-content-db:
-        condition: service_healthy
+      - planner-content-db:
       planner-rabbitmq-service:
         condition: service_healthy
     environment:
