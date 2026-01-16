@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   planner-email-service:
-    image: planer-email-service
+    image: planner-email-service
     restart: always
     ports:
       - "5000:80"
