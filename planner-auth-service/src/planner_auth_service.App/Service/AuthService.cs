@@ -412,8 +412,16 @@ namespace planner_auth_service.App.Service
                 "User",
                 AuthenticationProvider.Google);
 
-                if (tokenPair.IsSuccess)
-                    await NotifyAboutTempPassword(userInfo.Email, tokenPair.Body.AccessToken);
+                if (!tokenPair.IsSuccess)
+                {
+                    return tokenPair;
+                }
+
+                var accountId = _jwtService.GetTokenPayload(tokenPair.Body.AccessToken).AccountId;
+
+                await AddGoogleToken(token, accountId);
+
+                await NotifyAboutTempPassword(userInfo.Email, accountId);
             }
             else
             {
