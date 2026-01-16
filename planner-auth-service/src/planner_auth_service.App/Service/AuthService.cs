@@ -440,16 +440,14 @@ namespace planner_auth_service.App.Service
             return tokenPair;
         }
 
-        public async Task<bool> NotifyAboutTempPassword(string email, string accessToken)
+        public async Task<bool> NotifyAboutTempPassword(string email, Guid accountId)
         {
             var client = new HttpClient()
             {
                 BaseAddress = new Uri("http://planner-email-service:80/api/"),
             };
 
-            var token = _jwtService.GetTokenPayload(accessToken);
-
-            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(token.AccountId)}\"}}";
+            var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(accountId)}\"}}";
             var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
             var response = await client.PostAsync("message/serviceEmail" + $"?email={email}", content);
 
