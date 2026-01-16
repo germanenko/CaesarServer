@@ -1,4 +1,4 @@
-using CaesarServerLibrary.Enums;
+using planner_server_package.Enums;
 using planner_content_service.Core.Entities.Models;
 
 namespace planner_content_service.Core.IRepository

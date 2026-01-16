@@ -1,5 +1,5 @@
-﻿using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+﻿using planner_server_package.Entities;
+using planner_server_package.Enums;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core;

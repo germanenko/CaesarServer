@@ -1,5 +1,5 @@
-﻿using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+﻿using planner_server_package.Entities;
+using planner_server_package.Enums;
 using System.Text.Json.Serialization;
 
 namespace planner_content_service.Core.Entities.Models

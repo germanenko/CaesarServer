@@ -1,4 +1,4 @@
-using CaesarServerLibrary.Entities;
+using planner_server_package.Entities;
 using Microsoft.EntityFrameworkCore;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;

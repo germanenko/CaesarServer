@@ -1,4 +1,4 @@
-﻿using CaesarServerLibrary.Enums;
+﻿using planner_server_package.Enums;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using planner_chat_service.Core.IService;

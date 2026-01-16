@@ -1,6 +1,6 @@
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
-using CaesarServerLibrary.Events;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
+using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_auth_service.Core.IRepository;
@@ -9,7 +9,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
-using static CaesarServerLibrary.Events.CreateChatResponseEvent;
+using static planner_server_package.Events.CreateChatResponseEvent;
 
 namespace planner_auth_service.Infrastructure.Service
 {

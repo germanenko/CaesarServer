@@ -1,4 +1,4 @@
-﻿using CaesarServerLibrary.Entities;
+﻿using planner_server_package.Entities;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.IdentityModel.Tokens;
 using planner_auth_service.Core.Entities.Response;

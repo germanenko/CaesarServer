@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_chat_service.Core.Entities.Request;

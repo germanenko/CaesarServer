@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
-using CaesarServerLibrary.Entities;
+using planner_server_package.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_node_service.Core.IService;

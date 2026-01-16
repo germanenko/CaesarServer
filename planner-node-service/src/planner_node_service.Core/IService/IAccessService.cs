@@ -1,5 +1,5 @@
-﻿using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+﻿using planner_server_package.Entities;
+using planner_server_package.Enums;
 using System.Net;
 
 namespace planner_node_service.Core.IService

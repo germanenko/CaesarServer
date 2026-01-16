@@ -1,4 +1,4 @@
-﻿using CaesarServerLibrary.Entities;
+﻿using planner_server_package.Entities;
 using Microsoft.Extensions.Logging;
 using planner_content_service.Core.IService;
 using System.Text.Json;

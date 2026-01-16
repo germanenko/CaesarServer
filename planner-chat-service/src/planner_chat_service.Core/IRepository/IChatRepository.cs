@@ -1,5 +1,5 @@
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
 using planner_chat_service.Core.Entities.Models;
 
 namespace planner_chat_service.Core.IRepository

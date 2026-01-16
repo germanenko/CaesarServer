@@ -1,5 +1,5 @@
 using System.Net.WebSockets;
-using CaesarServerLibrary.Entities;
+using planner_server_package.Entities;
 using planner_chat_service.Core.Entities.Models;
 
 namespace planner_chat_service.Core.IService

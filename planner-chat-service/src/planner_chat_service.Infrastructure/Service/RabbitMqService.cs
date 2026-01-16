@@ -1,6 +1,6 @@
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
-using CaesarServerLibrary.Events;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
+using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_chat_service.Core.IRepository;

@@ -1,4 +1,4 @@
-﻿using CaesarServerLibrary.Enums;
+﻿using planner_server_package.Enums;
 
 namespace planner_chat_service.Core.IService
 {

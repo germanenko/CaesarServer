@@ -1,6 +1,6 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
 using Newtonsoft.Json.Serialization;
 using System.Text.Json;
 

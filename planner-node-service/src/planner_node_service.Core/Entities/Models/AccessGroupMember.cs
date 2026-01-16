@@ -1,4 +1,4 @@
-﻿using CaesarServerLibrary.Entities;
+﻿using planner_server_package.Entities;
 
 namespace planner_node_service.Core.Entities.Models
 {

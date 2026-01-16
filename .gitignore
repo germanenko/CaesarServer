@@ -9,6 +9,7 @@
 /planner-notify-service/.vs
 /.vs
 /planner-node-service/.vs
-/CaesarServerLibrary/.vs
+/planner-server-package/.vs
 /planner-gateway-service/.vs
 /planner-mailbox-service/.vs
+/planner-client-package/.vs

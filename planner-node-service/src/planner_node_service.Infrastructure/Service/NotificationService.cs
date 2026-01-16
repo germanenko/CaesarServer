@@ -1,7 +1,7 @@
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.Json;
-using CaesarServerLibrary.Entities;
+using planner_server_package.Entities;
 using planner_node_service.Core.IService;
 
 namespace planner_node_service.Infrastructure.Service

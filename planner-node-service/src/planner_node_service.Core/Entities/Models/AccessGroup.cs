@@ -1,11 +1,11 @@
-﻿using CaesarServerLibrary.Entities;
+﻿using planner_server_package.Entities;
 
 namespace planner_node_service.Core.Entities.Models
 {
     public class AccessGroup
     {
         public Guid Id { get; set; }
-        public string Name { get; set; } 
+        public string Name { get; set; }
         public List<AccessGroupMember> Members { get; set; } = new();
 
         public AccessGroupBody ToAccessGroupBody()

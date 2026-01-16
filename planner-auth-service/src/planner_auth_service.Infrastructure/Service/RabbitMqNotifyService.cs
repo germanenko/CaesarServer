@@ -1,4 +1,4 @@
-using CaesarServerLibrary.Enums;
+using planner_server_package.Enums;
 using planner_auth_service.Core.IService;
 using RabbitMQ.Client;
 using System.Text;

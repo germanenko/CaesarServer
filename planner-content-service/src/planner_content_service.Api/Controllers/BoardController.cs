@@ -1,8 +1,8 @@
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Enums;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_content_service.Core.IService;
