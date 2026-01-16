@@ -437,7 +437,7 @@ namespace planner_auth_service.App.Service
         {
             var client = new HttpClient()
             {
-                BaseAddress = new Uri("http://planer-email-service:80/api/"),
+                BaseAddress = new Uri("http://planner-email-service:80/api/"),
             };
 
             var s = $"{{ \"subject\": \"Временный пароль\", \"content\": \"Вашему аккаунту присвоен временный пароль! Смените его по ссылке: {GenerateResetLink(accountId)}\"}}";
