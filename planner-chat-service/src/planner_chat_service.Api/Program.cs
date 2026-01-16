@@ -15,7 +15,6 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
 ConfigureServices(builder.Services);
 var app = builder.Build();
 app = ConfigureApplication(app);
@@ -69,7 +68,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddDbContext<ChatDbContext>(options =>
     {
-        options.UseNpgsql(chatConnectionString);
+        options.UseNpgsql(chatConnectionString, sp => sp.MigrationsAssembly("planner_chat_service.Api"));
     });
 
     services.AddWebSockets(options =>

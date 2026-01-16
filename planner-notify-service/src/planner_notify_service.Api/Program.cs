@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -12,6 +11,7 @@ using planner_notify_service.Infrastructure.Data;
 using planner_notify_service.Infrastructure.Repository;
 using planner_notify_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +82,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(notifyDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_notify_service.Api");
         });
     });
 

@@ -84,6 +84,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(nodeDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_node_service.Api");
         });
     });
 
