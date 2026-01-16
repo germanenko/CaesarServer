@@ -386,7 +386,6 @@ namespace planner_auth_service.App.Service
         public async Task<ServiceResponse<OutputAccountCredentialsBody>> GoogleAuth(
             GoogleTokenBody token, DeviceTypeId deviceTypeId, string deviceId)
         {
-            _logger.LogInformation("Начало Google аутентификации для устройства: {DeviceId}", deviceId);
             var userCredential = GoogleCredential.FromAccessToken(token.AccessToken);
 
             var oauthService = new Google.Apis.Oauth2.v2.Oauth2Service(
@@ -395,28 +394,9 @@ namespace planner_auth_service.App.Service
                     HttpClientInitializer = userCredential
                 });
 
-            Console.WriteLine("Получение информации о пользователе Google...");
             var userInfo = await oauthService.Userinfo.Get().ExecuteAsync();
 
-            Console.WriteLine("Google UserInfo: Email={Email}, Id={Id}, Name={Name}, VerifiedEmail ={ VerifiedEmail}",
-            userInfo.Email,
-            userInfo.Id,
-            userInfo.Name,
-            userInfo.VerifiedEmail);
-
-            Console.WriteLine("Поиск аккаунта по email: {Email}", userInfo.Email);
             var account = await _accountRepository.GetAsync(userInfo.Email);
-
-            if (account == null)
-            {
-                Console.WriteLine("Аккаунт не найден для email: {Email}", userInfo.Email);
-            }
-            else
-            {
-                Console.WriteLine("Найден аккаунт: Id={AccountId}, Email={Email}",
-                    account.Id,
-                    account.Identifier);
-            }
 
             ServiceResponse<OutputAccountCredentialsBody> tokenPair;
 
