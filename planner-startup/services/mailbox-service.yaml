@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   planner-mailbox-service:
-    image: planer-mailbox-service
+    image: planner-mailbox-service
     restart: always
     ports:
       - "5001:80"
