@@ -9,7 +9,7 @@
 
   <ItemGroup>
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
-	<PackageReference Include="Planner.Shared.Contracts" Version="1.0.0" />
+	<PackageReference Include="Planner.Shared.Server.Contracts" Version="1.0.0" />
   </ItemGroup>
 
 </Project>

@@ -1,6 +1,6 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using CaesarServerLibrary.Entities;
+using planner_server_package.Entities;
 using planner_notify_service.Core.Entities.Response;
 using planner_notify_service.Core.IService;
 

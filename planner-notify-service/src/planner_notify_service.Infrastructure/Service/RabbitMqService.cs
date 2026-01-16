@@ -1,7 +1,7 @@
 using System.Text;
 using System.Text.Json;
-using CaesarServerLibrary.Entities;
-using CaesarServerLibrary.Events;
+using planner_server_package.Entities;
+using planner_server_package.Events;
 using Microsoft.Extensions.Hosting;
 using planner_notify_service.Core.IService;
 using RabbitMQ.Client;
