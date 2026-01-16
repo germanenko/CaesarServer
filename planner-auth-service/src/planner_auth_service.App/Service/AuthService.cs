@@ -436,7 +436,6 @@ namespace planner_auth_service.App.Service
                 AuthenticationProvider.Google);
             }
 
-            await _accountRepository.AddAsync(token, account.Id);
             return tokenPair;
         }
 
