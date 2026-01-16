@@ -63,12 +63,12 @@ services:
   planner-file-service:
     extends:
       file: services/file-service.yaml
-      service: planner-file-server
+      service: planner-file-service
 
   planner-content-service:
     extends:
       file: services/content-service.yaml
-      service: planner-content
+      service: planner-content-service
 
   planner-content-db:
     extends:
@@ -78,7 +78,7 @@ services:
   planner-node-service:
     extends:
       file: services/node-service.yaml
-      service: planner-node
+      service: planner-node-service
 
   planner-node-db:
     extends:

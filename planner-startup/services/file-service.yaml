@@ -1,8 +1,8 @@
 version: '3.8'
 
 services:
-  planner-file-server:
-    image: planner-file-server
+  planner-file-service:
+    image: planner-file-service
     restart: always
     ports:
       - "8091:80"
