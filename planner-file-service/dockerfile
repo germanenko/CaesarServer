@@ -14,4 +14,4 @@ RUN dotnet publish \
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "planner_file_server.Api.dll"]
+ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
