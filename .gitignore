@@ -3,9 +3,6 @@
 .vscode
 /**/.env
 /**/publish/
-/planner-content-service/src/planner_content_service.Api/Migrations
-/planner-chat-service/src/planner_chat_service.Api/Migrations
-/planner-auth-service/src/planner_auth_service.Api/Migrations
 /planner-notify-service/.vs
 /.vs
 /planner-node-service/.vs
