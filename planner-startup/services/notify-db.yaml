@@ -10,5 +10,4 @@ services:
     ports:
       - "5437:5432"
     volumes:
-      - planner-notify-data:/var/lib/postgresql/data
-      
+      - planner-notify-data:/var/lib/postgresql      
