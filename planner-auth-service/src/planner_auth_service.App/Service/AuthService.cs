@@ -395,25 +395,25 @@ namespace planner_auth_service.App.Service
                     HttpClientInitializer = userCredential
                 });
 
-            _logger.LogInformation("Получение информации о пользователе Google...");
+            Console.WriteLine("Получение информации о пользователе Google...");
             var userInfo = await oauthService.Userinfo.Get().ExecuteAsync();
 
-            _logger.LogInformation("Google UserInfo: Email={Email}, Id={Id}, Name={Name}, VerifiedEmail ={ VerifiedEmail}",
+            Console.WriteLine("Google UserInfo: Email={Email}, Id={Id}, Name={Name}, VerifiedEmail ={ VerifiedEmail}",
             userInfo.Email,
             userInfo.Id,
             userInfo.Name,
             userInfo.VerifiedEmail);
 
-            _logger.LogInformation("Поиск аккаунта по email: {Email}", userInfo.Email);
+            Console.WriteLine("Поиск аккаунта по email: {Email}", userInfo.Email);
             var account = await _accountRepository.GetAsync(userInfo.Email);
 
             if (account == null)
             {
-                _logger.LogWarning("Аккаунт не найден для email: {Email}", userInfo.Email);
+                Console.WriteLine("Аккаунт не найден для email: {Email}", userInfo.Email);
             }
             else
             {
-                _logger.LogInformation("Найден аккаунт: Id={AccountId}, Email={Email}",
+                Console.WriteLine("Найден аккаунт: Id={AccountId}, Email={Email}",
                     account.Id,
                     account.Identifier);
             }
