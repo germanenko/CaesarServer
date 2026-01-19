@@ -1,12 +1,13 @@
 using planner_server_package.Entities;
+using planner_server_package.Interface;
 using System;
 using System.Collections.Generic;
 
 namespace planner_server_package.Events
 {
-    public class NodesEvent
+    public class SyncEntitiesEvent
     {
         public TokenPayload TokenPayload { get; set; }
-        public List<NodeBody> Nodes { get; set; }
+        public List<ISyncable> Bodies { get; set; }
     }
 }

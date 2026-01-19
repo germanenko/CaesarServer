@@ -1,10 +1,10 @@
-using planner_server_package.Entities;
-using planner_server_package.Enums;
-using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
+using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Net.WebSockets;
@@ -205,12 +205,12 @@ namespace planner_chat_service.Infrastructure.Service
         {
             using var scope = _serviceFactory.CreateScope();
             var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
-            var nodes = JsonSerializer.Deserialize<NodesEvent>(message);
+            var nodes = JsonSerializer.Deserialize<SyncEntitiesEvent>(message);
             if (nodes == null)
                 return;
 
-            var chats = nodes.Nodes.OfType<ChatBody>().ToList();
-            var messages = nodes.Nodes.OfType<MessageBody>().ToList();
+            var chats = nodes.Bodies.OfType<ChatBody>().ToList();
+            var messages = nodes.Bodies.OfType<MessageBody>().ToList();
 
             foreach (var chat in chats)
             {

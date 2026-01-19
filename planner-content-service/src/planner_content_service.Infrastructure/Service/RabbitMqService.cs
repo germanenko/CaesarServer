@@ -1,9 +1,9 @@
-using planner_server_package.Entities;
-using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
+using planner_server_package.Entities;
+using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Collections.Generic;
@@ -113,13 +113,13 @@ namespace planner_content_service.Infrastructure.Service
             using var scope = _serviceFactory.CreateScope();
             var taskService = scope.ServiceProvider.GetRequiredService<ITaskService>();
             var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
-            var response = JsonSerializer.Deserialize<NodesEvent>(message);
+            var response = JsonSerializer.Deserialize<SyncEntitiesEvent>(message);
             if (response == null)
                 return;
 
-            var boards = response.Nodes.OfType<BoardBody>().ToList();
-            var columns = response.Nodes.OfType<ColumnBody>().ToList();
-            var tasks = response.Nodes.OfType<TaskBody>().ToList();
+            var boards = response.Bodies.OfType<BoardBody>().ToList();
+            var columns = response.Bodies.OfType<ColumnBody>().ToList();
+            var tasks = response.Bodies.OfType<TaskBody>().ToList();
 
             await boardService.CreateBoardsAsync(boards, response.TokenPayload.AccountId);
             await boardService.AddColumns(response.TokenPayload.AccountId, columns);

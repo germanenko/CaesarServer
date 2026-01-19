@@ -1,9 +1,10 @@
 using planner_server_package.Enums;
+using planner_server_package.Interface;
 using System;
 
 namespace planner_server_package.Entities
 {
-    public class ProfileBody
+    public class ProfileBody : ISyncable
     {
         public Guid Id { get; set; }
         public string Identifier { get; set; }

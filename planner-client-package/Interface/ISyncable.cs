@@ -1,9 +1,12 @@
-﻿using planner_client_package.Enums;
-using planner_client_package.Interface;
+﻿using planner_client_package.Entities;
 using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Text.Json.Serialization;
+using System.Threading.Tasks;
 
-namespace planner_client_package.Entities
+namespace planner_client_package.Interface
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
     [JsonDerivedType(typeof(BoardBody), "board")]
@@ -11,12 +14,9 @@ namespace planner_client_package.Entities
     [JsonDerivedType(typeof(TaskBody), "task")]
     [JsonDerivedType(typeof(ChatBody), "chat")]
     [JsonDerivedType(typeof(MessageBody), "chatMessage")]
-    public class NodeBody : ISyncable
+    [JsonDerivedType(typeof(NotificationSettingsBody), "notificationSettings")]
+    [JsonDerivedType(typeof(ProfileBody), "profile")]
+    public interface ISyncable
     {
-        public Guid Id { get; set; }
-        public NodeType Type { get; set; }
-        public string Name { get; set; }
-        public string Props { get; set; }
-        public NodeLinkBody Link { get; set; }
     }
 }

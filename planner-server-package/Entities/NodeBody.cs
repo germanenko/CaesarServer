@@ -1,4 +1,5 @@
 ﻿using planner_server_package.Enums;
+using planner_server_package.Interface;
 using System;
 using System.Text.Json.Serialization;
 
@@ -10,7 +11,7 @@ namespace planner_server_package.Entities
     [JsonDerivedType(typeof(TaskBody), "task")]
     [JsonDerivedType(typeof(ChatBody), "chat")]
     [JsonDerivedType(typeof(MessageBody), "chatMessage")]
-    public class NodeBody
+    public class NodeBody : ISyncable
     {
         public Guid Id { get; set; }
         public NodeType Type { get; set; }

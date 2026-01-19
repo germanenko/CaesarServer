@@ -1,12 +1,12 @@
-﻿using planner_server_package.Entities;
-using planner_server_package.Enums;
-using planner_server_package.Events;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
+using planner_server_package.Events;
+using planner_server_package.Interface;
 using System.Text.Json;
-using static Google.Apis.Requests.BatchRequest;
 
 namespace planner_node_service.App.Service
 {
@@ -112,26 +112,27 @@ namespace planner_node_service.App.Service
             var newNodes = await _nodeRepository.AddOrUpdateNodes(nodes);
 
             var bodies = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList();
-            List<NodeBody> contentNodes = new List<NodeBody>();
-            List<NodeBody> chatNodes = new List<NodeBody>();
+            List<ISyncable> contentBodies = new List<ISyncable>();
+            List<ISyncable> chatBodies = new List<ISyncable>();
 
-            contentNodes.AddRange(bodies.OfType<BoardBody>().ToList());
-            contentNodes.AddRange(bodies.OfType<ColumnBody>().ToList());
-            contentNodes.AddRange(bodies.OfType<TaskBody>().ToList());
+            contentBodies.AddRange(bodies.OfType<BoardBody>().ToList());
+            contentBodies.AddRange(bodies.OfType<ColumnBody>().ToList());
+            contentBodies.AddRange(bodies.OfType<TaskBody>().ToList());
 
-            chatNodes.AddRange(bodies.OfType<ChatBody>().ToList());
-            chatNodes.AddRange(bodies.OfType<MessageBody>().ToList());
+            chatBodies.AddRange(bodies.OfType<ChatBody>().ToList());
+            chatBodies.AddRange(bodies.OfType<MessageBody>().ToList());
+            chatBodies.AddRange(bodies.OfType<ChatSettingsBody>().ToList());
 
-            NodesEvent contentNodesEvent = new NodesEvent()
+            SyncEntitiesEvent contentNodesEvent = new SyncEntitiesEvent()
             {
                 TokenPayload = tokenPayload,
-                Nodes = contentNodes
+                Bodies = contentBodies
             };
 
-            NodesEvent chatNodesEvent = new NodesEvent()
+            SyncEntitiesEvent chatNodesEvent = new SyncEntitiesEvent()
             {
                 TokenPayload = tokenPayload,
-                Nodes = contentNodes
+                Bodies = contentBodies
             };
 
             _notifyService.Publish(contentNodesEvent, PublishEvent.ContentNodes);

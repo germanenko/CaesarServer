@@ -17,10 +17,6 @@
     <PackageReference Include="RabbitMq.Client" Version="6.8.1" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Configurations\" />
-  </ItemGroup>
-
   <PropertyGroup>
     <TargetFramework>net7.0</TargetFramework>
     <RootNamespace>planner_node_service.Infrastructure</RootNamespace>
