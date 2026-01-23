@@ -267,7 +267,7 @@ namespace planner_content_service.Infrastructure.Repository
                 Node = columnNode,
                 NodeId = column.Id,
                 Status = column.PublicationStatus,
-                UpdatedAt = column.UpdatedAt.Value
+                UpdatedAt = column.UpdatedAt
             });
 
             await _context.NodeLinks.AddAsync(new NodeLink()
