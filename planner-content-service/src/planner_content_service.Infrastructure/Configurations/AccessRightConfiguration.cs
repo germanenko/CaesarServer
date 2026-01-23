@@ -14,7 +14,7 @@ namespace planner_content_service.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<AccessRight> builder)
         {
             builder.HasOne(e => e.Node)
-                .WithMany() 
+                .WithMany()
                 .HasForeignKey(e => e.NodeId)
                 .OnDelete(DeleteBehavior.Cascade);
 
@@ -22,10 +22,6 @@ namespace planner_content_service.Infrastructure.Configurations
             builder.HasIndex(e => e.AccountId);
 
             builder.Property(e => e.AccessType)
-                .IsRequired()
-                .HasConversion<int>();
-
-            builder.Property(e => e.NodeType)
                 .IsRequired()
                 .HasConversion<int>();
 

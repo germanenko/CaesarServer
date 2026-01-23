@@ -14,6 +14,5 @@ namespace planner_server_package.Entities
         public Guid NodeId { get; set; }
         public NodeBody Node { get; set; }
         public AccessType AccessType { get; set; }
-        public NodeType NodeType { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-using planner_server_package.Entities;
 using Microsoft.EntityFrameworkCore;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Infrastructure.Data;
+using planner_server_package.Entities;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -32,8 +32,7 @@ namespace planner_content_service.Infrastructure.Repository
             var members = body.UserIds.Select(userId => new AccessGroupMember()
             {
                 AccessGroupId = group.Id,
-                AccountId = userId,
-                JoinedAt = DateTime.UtcNow
+                AccountId = userId
             }).ToList();
 
             await _context.AccessGroupMembers.AddRangeAsync(members);
@@ -72,8 +71,7 @@ namespace planner_content_service.Infrastructure.Repository
             var member = new AccessGroupMember()
             {
                 AccessGroupId = groupId,
-                AccountId = userToAdd,
-                JoinedAt = DateTime.UtcNow
+                AccountId = userToAdd
             };
 
             await _context.AccessGroupMembers.AddAsync(member);
@@ -149,7 +147,7 @@ namespace planner_content_service.Infrastructure.Repository
             var accessGroups = accessRights
                 .Select(x => x.AccessGroup)
                 .Where(x => x != null)
-                .Distinct() 
+                .Distinct()
                 .ToList();
 
             accessBody.AccessGroups = accessGroups
@@ -158,7 +156,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             var members = accessGroups
                 .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
-                .Distinct() 
+                .Distinct()
                 .ToList();
 
             accessBody.AccessGroupMembers?.AddRange(members);

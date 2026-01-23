@@ -8,7 +8,6 @@ namespace planner_node_service.Core.Entities.Models
         public Guid AccessGroupId { get; set; }
         public AccessGroup AccessGroup { get; set; }
         public Guid AccountId { get; set; }
-        public DateTime JoinedAt { get; set; } = DateTime.UtcNow;
 
         public AccessGroupMemberBody ToAccessGroupMemberBody()
         {
@@ -16,8 +15,7 @@ namespace planner_node_service.Core.Entities.Models
             {
                 Id = Id,
                 AccountId = AccountId,
-                GroupId = AccessGroupId,
-                JoinedAt = JoinedAt
+                GroupId = AccessGroupId
             };
         }
     }

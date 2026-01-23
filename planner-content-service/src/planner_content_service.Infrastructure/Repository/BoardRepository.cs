@@ -156,7 +156,7 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>> GetAll(Guid accountId)
         {
-            var access = await _context.AccessRights.Where(x => x.AccountId == accountId && x.NodeType == NodeType.Board).Select(x => x.NodeId).ToListAsync();
+            var access = await _context.AccessRights.Include(x => x.Node).Where(x => x.AccountId == accountId && x.Node is Board).Select(x => x.NodeId).ToListAsync();
 
             var boards = await _context.Nodes.Where(x => access.Contains(x.Id)).ToListAsync();
 
@@ -183,7 +183,8 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<IEnumerable<Node>> GetAllBoardColumns(Guid accountId)
         {
             var access = await _context.AccessRights
-                .Where(x => x.AccountId == accountId && x.NodeType == NodeType.Board)
+                .Include(x => x.Node)
+                .Where(x => x.AccountId == accountId && x.Node is Board)
                 .Select(x => x.NodeId)
                 .ToListAsync();
 
@@ -266,7 +267,7 @@ namespace planner_content_service.Infrastructure.Repository
                 Node = columnNode,
                 NodeId = column.Id,
                 Status = column.PublicationStatus,
-                UpdatedAt = column.UpdatedAt
+                UpdatedAt = column.UpdatedAt.Value
             });
 
             await _context.NodeLinks.AddAsync(new NodeLink()

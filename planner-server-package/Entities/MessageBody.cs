@@ -5,7 +5,6 @@ namespace planner_server_package.Entities
 {
     public class MessageBody : NodeBody
     {
-        public Guid Id { get; set; }
         public MessageType MessageType { get; set; }
         public string Content { get; set; }
         public DateTime Date { get; set; } = DateTime.UtcNow;

@@ -1,11 +1,11 @@
-﻿using planner_server_package.Entities;
-using planner_server_package.Enums;
-using planner_server_package.Events;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
+using planner_server_package.Events;
 using System.Text.Json;
 
 namespace planner_content_service.Infrastructure.Repository
@@ -109,7 +109,8 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<IEnumerable<TaskModel>> GetAllTasks(Guid accountId)
         {
             var tasks = await _context.AccessRights
-                .Where(ar => ar.AccountId == accountId && ar.NodeType == NodeType.Board)
+                .Include(x => x.Node)
+                .Where(ar => ar.AccountId == accountId && ar.Node is Board)
                 .Join(_context.NodeLinks,
                     ar => ar.NodeId,
                     n1 => n1.ParentId,

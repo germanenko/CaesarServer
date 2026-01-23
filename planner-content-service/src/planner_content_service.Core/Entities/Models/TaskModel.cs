@@ -21,8 +21,8 @@ namespace planner_content_service.Core.Entities.Models
                 Name = Name,
                 Description = Description,
                 HexColor = HexColor,
-                StartDate = StartDate?.ToString("s"),
-                EndDate = EndDate?.ToString("s"),
+                StartDate = StartDate,
+                EndDate = EndDate,
                 Props = Props,
                 Type = Type
             };

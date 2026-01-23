@@ -1,10 +1,10 @@
-using planner_server_package.Entities;
-using planner_server_package.Enums;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using planner_server_package.Entities;
+using planner_server_package.Enums;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using static NpgsqlTypes.NpgsqlTsQuery;
@@ -51,8 +51,7 @@ namespace planner_node_service.Infrastructure.Repository
             var members = body.UserIds.Select(userId => new AccessGroupMember()
             {
                 AccessGroupId = group.Id,
-                AccountId = userId,
-                JoinedAt = DateTime.UtcNow
+                AccountId = userId
             }).ToList();
 
             await _context.AccessGroupMembers.AddRangeAsync(members);
@@ -91,8 +90,7 @@ namespace planner_node_service.Infrastructure.Repository
             var member = new AccessGroupMember()
             {
                 AccessGroupId = groupId,
-                AccountId = userToAdd,
-                JoinedAt = DateTime.UtcNow
+                AccountId = userToAdd
             };
 
             await _context.AccessGroupMembers.AddAsync(member);
@@ -168,7 +166,7 @@ namespace planner_node_service.Infrastructure.Repository
             var accessGroups = accessRights
                 .Select(x => x.AccessGroup)
                 .Where(x => x != null)
-                .Distinct() 
+                .Distinct()
                 .ToList();
 
             accessBody.AccessGroups = accessGroups
@@ -177,7 +175,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var members = accessGroups
                 .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
-                .Distinct() 
+                .Distinct()
                 .ToList();
 
             accessBody.AccessGroupMembers?.AddRange(members);

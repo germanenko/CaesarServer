@@ -12,7 +12,6 @@ namespace planner_content_service.Core.Entities.Models
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
         public AccessType AccessType { get; set; }
-        public NodeType NodeType { get; set; }
 
         public AccessRightBody ToAccessRightBody()
         {
@@ -22,8 +21,7 @@ namespace planner_content_service.Core.Entities.Models
                 AccountId = AccountId,
                 NodeId = NodeId,
                 AccessGroupId = AccessGroupId,
-                AccessType = AccessType,
-                NodeType = NodeType
+                AccessType = AccessType
             };
         }
     }
