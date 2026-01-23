@@ -1,9 +1,10 @@
 ﻿using planner_client_package.Enums;
+using planner_client_package.Interface;
 using System;
 
 namespace planner_client_package.Entities
 {
-    public class AccessRightBody
+    public class AccessRightBody : ISyncable, IBody
     {
         public Guid Id { get; set; }
         public Guid? AccountId { get; set; }

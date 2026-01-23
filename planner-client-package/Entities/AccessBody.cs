@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace planner_client_package.Entities
 {
-    public class AccessBody : ISyncable
+    public class AccessBody : ISyncable, IBody
     {
         public List<AccessRightBody> AccessRights { get; set; }
         public List<AccessGroupBody> AccessGroups { get; set; }

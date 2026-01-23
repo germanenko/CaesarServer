@@ -3,7 +3,7 @@ using System;
 
 namespace planner_client_package.Entities
 {
-    public class ChatSettingsBody : ISyncable
+    public class ChatSettingsBody : ISyncable, IBody
     {
         public Guid Id { get; set; }
         public Guid ChatId { get; set; }

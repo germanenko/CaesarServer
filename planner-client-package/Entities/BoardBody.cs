@@ -6,7 +6,6 @@ namespace planner_client_package.Entities
 {
     public class BoardBody : NodeBody
     {
-        [Required] public DateTime UpdatedAt { get; set; }
         [Required] public PublicationStatus PublicationStatus { get; set; }
     }
 }
