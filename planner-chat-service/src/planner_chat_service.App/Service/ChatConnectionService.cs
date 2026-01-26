@@ -1,6 +1,6 @@
-using planner_server_package.Entities;
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.IService;
+using planner_client_package.Entities;
 using System.Collections.Concurrent;
 
 namespace planner_chat_service.App.Service

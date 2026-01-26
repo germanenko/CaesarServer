@@ -1,10 +1,10 @@
-using planner_server_package.Entities;
-using planner_server_package.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_chat_service.Api.CustomAttributes;
 using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IService;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;

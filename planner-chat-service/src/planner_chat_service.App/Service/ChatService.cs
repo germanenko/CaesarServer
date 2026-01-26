@@ -3,9 +3,10 @@ using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
-using planner_server_package.Entities;
-using planner_server_package.Enums;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 using System.Net;
 using System.Net.WebSockets;
 
@@ -112,9 +113,17 @@ namespace planner_chat_service.App.Service
                 });
             }
 
+            var chatBody = result.ToChatBody();
+
             var createChatEvent = new CreatePersonalChatEvent
             {
-                Chat = result.ToChatBody(),
+                Chat = new planner_server_package.Entities.ChatBody()
+                {
+                    Id = chatBody.Id,
+                    ImageUrl = chatBody.ImageUrl,
+                    ChatType = chatBody.ChatType,
+                    Name = chatBody.Name
+                },
                 Participants = chatMemberships
             };
 
@@ -260,7 +269,17 @@ namespace planner_chat_service.App.Service
 
             var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid());
 
-            ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
+            ChatLobby? lobby = _chatConnectionService.GetConnections(chat.ChatId);
+
+            if (lobby == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    Errors = new[] { "Lobby not found" }
+                };
+            }
 
             if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
             {
@@ -324,13 +343,23 @@ namespace planner_chat_service.App.Service
 
         public async Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId)
         {
-            var membership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
+            var chatSettings = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
+
+            if (chatSettings == null)
+            {
+                return new ServiceResponse<string>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = true,
+                    Errors = new[] { "Настройки чата не найдены" }
+                };
+            }
 
             return new ServiceResponse<string>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = membership.MessageDraft
+                Body = chatSettings.MessageDraft
             };
         }
 

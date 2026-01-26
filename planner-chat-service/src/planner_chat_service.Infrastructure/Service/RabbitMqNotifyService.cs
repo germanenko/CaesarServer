@@ -1,5 +1,5 @@
-using planner_server_package.Enums;
 using planner_chat_service.Core.IService;
+using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
@@ -53,7 +53,7 @@ namespace planner_chat_service.Infrastructure.Service
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            foreach(var exchange in _exchanges)
+            foreach (var exchange in _exchanges)
             {
                 channel.ExchangeDeclare(
                     exchange: exchange,

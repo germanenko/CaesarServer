@@ -1,4 +1,4 @@
-﻿using planner_server_package.Enums;
+﻿using planner_common_package.Enums;
 using System;
 using System.ComponentModel.DataAnnotations;
 

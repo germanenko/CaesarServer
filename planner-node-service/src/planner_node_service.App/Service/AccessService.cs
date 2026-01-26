@@ -1,5 +1,5 @@
 ﻿using planner_server_package.Entities;
-using planner_server_package.Enums;
+using planner_common_package.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using System;

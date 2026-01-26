@@ -2,9 +2,10 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
+using planner_common_package.Enums;
 using planner_server_package.Entities;
-using planner_server_package.Enums;
 using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Net.WebSockets;
@@ -214,7 +215,7 @@ namespace planner_chat_service.Infrastructure.Service
 
             foreach (var chat in chats)
             {
-                await chatService.CreatePersonalChat(nodes.TokenPayload.AccountId, nodes.TokenPayload.SessionId, chat, chat.ParticipantIds.FirstOrDefault(x => x != nodes.TokenPayload.AccountId));
+                await chatService.CreatePersonalChat(nodes.TokenPayload.AccountId, nodes.TokenPayload.SessionId, new planner_client_package.Entities.ChatBody() { Id = chat.Id, ChatType = chat.ChatType, CreatedAt = chat.CreatedAt, CreatedBy = chat.CreatedBy, ImageUrl = chat.ImageUrl, Name = chat.Name, ParticipantIds = chat.ParticipantIds, Type = NodeType.Chat, UpdatedAt = chat.UpdatedAt, UpdatedBy = chat.UpdatedBy, Props = chat.Props, CountOfUnreadMessages = chat.CountOfUnreadMessages }, chat.ParticipantIds.FirstOrDefault(x => x != nodes.TokenPayload.AccountId));
             }
 
             foreach (var chatMessage in messages)

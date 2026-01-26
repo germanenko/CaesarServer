@@ -1,6 +1,6 @@
-using System.Net.WebSockets;
-using planner_server_package.Entities;
 using planner_chat_service.Core.Entities.Models;
+using planner_client_package.Entities;
+using System.Net.WebSockets;
 
 namespace planner_chat_service.Core.IService
 {

@@ -1,5 +1,5 @@
+using planner_common_package.Enums;
 using System.ComponentModel.DataAnnotations;
-using planner_server_package.Enums;
 
 namespace planner_chat_service.Core.Entities.Request
 {

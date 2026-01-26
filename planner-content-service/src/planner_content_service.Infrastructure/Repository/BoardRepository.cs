@@ -1,11 +1,12 @@
 using Microsoft.EntityFrameworkCore;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
-using planner_server_package.Entities;
-using planner_server_package.Enums;
 using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -83,7 +84,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             CreateBoardEvent boardEvent = new CreateBoardEvent()
             {
-                Board = createBoardBody,
+                Board = new planner_server_package.Entities.BoardBody() { Id = createBoardBody.Id, Name = createBoardBody.Name, CreatedAt = createBoardBody.CreatedAt, CreatedBy = createBoardBody.CreatedBy, Props = createBoardBody.Props, PublicationStatus = createBoardBody.PublicationStatus, Type = NodeType.Column, UpdatedAt = createBoardBody.UpdatedAt, UpdatedBy = createBoardBody.UpdatedBy },
                 CreatorId = accountId
             };
 
@@ -288,7 +289,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             CreateColumnEvent columnEvent = new CreateColumnEvent()
             {
-                Column = column,
+                Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
                 CreatorId = accountId
             };
 

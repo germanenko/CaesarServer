@@ -1,4 +1,4 @@
-namespace planner_server_package.Enums
+namespace planner_server_package.Events.Enums
 {
     public enum PublishEvent
     {

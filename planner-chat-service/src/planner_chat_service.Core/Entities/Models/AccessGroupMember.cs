@@ -16,8 +16,7 @@ namespace planner_chat_service.Core.Entities.Models
             {
                 Id = Id,
                 AccountId = AccountId,
-                GroupId = AccessGroupId,
-                JoinedAt = JoinedAt
+                GroupId = AccessGroupId
             };
         }
     }

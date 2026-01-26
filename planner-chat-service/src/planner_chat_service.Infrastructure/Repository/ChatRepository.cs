@@ -1,11 +1,11 @@
-﻿using planner_server_package.Entities;
-using planner_server_package.Enums;
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core;
 using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Infrastructure.Data;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 
 namespace planner_chat_service.Infrastructure.Repository
 {
@@ -243,6 +243,11 @@ namespace planner_chat_service.Infrastructure.Repository
                 .Where(e => e.AccountId == accountId && e.ChatId == chatId)
                 .FirstOrDefaultAsync();
 
+            if (chatMembership == null)
+            {
+                return null;
+            }
+
             var userSession = await CreateOrGetAccountChatSessionAsync(userSessionId, chatMembership.Id, chatMembership.DateLastViewing);
 
             var chat = chatMembership.Chat;
@@ -355,21 +360,21 @@ namespace planner_chat_service.Infrastructure.Repository
             return result;
         }
 
-        public async Task<AccountChatSession?> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatMembershipId, DateTime dateLastViewing)
+        public async Task<AccountChatSession> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing)
         {
             var result = await _context.AccountChatSessions
-                .FirstOrDefaultAsync(e => e.SessionId == sessionId && e.ChatSettingId == chatMembershipId);
+                .FirstOrDefaultAsync(e => e.SessionId == sessionId && e.ChatSettingId == chatSettingsId);
             if (result != null)
                 return result;
 
             result = new AccountChatSession
             {
                 SessionId = sessionId,
-                ChatSettingId = chatMembershipId,
+                ChatSettingId = chatSettingsId,
                 DateLastViewing = dateLastViewing
             };
 
-            result = (await _context.AccountChatSessions.AddAsync(result))?.Entity;
+            result = (await _context.AccountChatSessions.AddAsync(result)).Entity;
             await _context.SaveChangesAsync();
 
             return result;

@@ -1,4 +1,4 @@
-using planner_client_package.Enums;
+using planner_common_package.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace planner_client_package.Entities

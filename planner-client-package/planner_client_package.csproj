@@ -9,4 +9,8 @@
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="Planner.Shared.Common.Contracts" Version="1.0.0" />
+  </ItemGroup>
+
 </Project>

@@ -1,12 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using planner_common_package.Enums;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package.Entities;
 using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
-using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
@@ -121,9 +121,55 @@ namespace planner_content_service.Infrastructure.Service
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
             var tasks = response.Bodies.OfType<TaskBody>().ToList();
 
-            await boardService.CreateBoardsAsync(boards, response.TokenPayload.AccountId);
-            await boardService.AddColumns(response.TokenPayload.AccountId, columns);
-            await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, tasks);
+            var boardBodies = boards.Select(x => new planner_client_package.Entities.BoardBody()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedAt = x.CreatedAt,
+                CreatedBy = x.CreatedBy,
+                Props = x.Props,
+                PublicationStatus = x.PublicationStatus,
+                Type = NodeType.Board,
+                UpdatedAt = x.UpdatedAt,
+                UpdatedBy = x.UpdatedBy
+            }).ToList();
+
+            var columnBodies = columns.Select(x => new planner_client_package.Entities.ColumnBody()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedAt = x.CreatedAt,
+                CreatedBy = x.CreatedBy,
+                Props = x.Props,
+                PublicationStatus = x.PublicationStatus,
+                Type = NodeType.Column,
+                UpdatedAt = x.UpdatedAt,
+                UpdatedBy = x.UpdatedBy
+            }).ToList();
+
+            var taskBodies = tasks.Select(x => new planner_client_package.Entities.TaskBody()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                CreatedAt = x.CreatedAt,
+                CreatedBy = x.CreatedBy,
+                Props = x.Props,
+                PublicationStatus = x.PublicationStatus,
+                Type = NodeType.Column,
+                UpdatedAt = x.UpdatedAt,
+                UpdatedBy = x.UpdatedBy,
+                StartDate = x.StartDate,
+                EndDate = x.EndDate,
+                Description = x.Description,
+                HexColor = x.HexColor,
+                PriorityOrder = x.PriorityOrder,
+                Status = x.Status,
+                TaskType = x.TaskType
+            }).ToList();
+
+            await boardService.CreateBoardsAsync(boardBodies, response.TokenPayload.AccountId);
+            await boardService.AddColumns(response.TokenPayload.AccountId, columnBodies);
+            await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
         }
 
         private async Task HandleCreateTaskChatResponseMessageAsync(string message)

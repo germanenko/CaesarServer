@@ -1,11 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
-using planner_server_package.Entities;
-using planner_server_package.Enums;
 using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 using System.Text.Json;
 
 namespace planner_content_service.Infrastructure.Repository
@@ -46,7 +47,25 @@ namespace planner_content_service.Infrastructure.Repository
 
             CreateTaskEvent taskEvent = new CreateTaskEvent()
             {
-                Task = task,
+                Task = new planner_server_package.Entities.TaskBody()
+                {
+                    Id = task.Id,
+                    Name = task.Name,
+                    CreatedAt = task.CreatedAt,
+                    CreatedBy = task.CreatedBy,
+                    Props = task.Props,
+                    PublicationStatus = task.PublicationStatus,
+                    Type = NodeType.Column,
+                    UpdatedAt = task.UpdatedAt,
+                    UpdatedBy = task.UpdatedBy,
+                    StartDate = task.StartDate,
+                    EndDate = task.EndDate,
+                    Description = task.Description,
+                    HexColor = task.HexColor,
+                    PriorityOrder = task.PriorityOrder,
+                    Status = task.Status,
+                    TaskType = task.TaskType
+                },
                 CreatorId = accountId
             };
 

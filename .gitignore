@@ -10,3 +10,5 @@
 /planner-gateway-service/.vs
 /planner-mailbox-service/.vs
 /planner-client-package/.vs
+/planner-common-package/.vs
+/planner-common-package/packages

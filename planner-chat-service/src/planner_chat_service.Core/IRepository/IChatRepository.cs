@@ -1,6 +1,6 @@
-using planner_server_package.Entities;
-using planner_server_package.Enums;
 using planner_chat_service.Core.Entities.Models;
+using planner_client_package.Entities;
+using planner_common_package.Enums;
 
 namespace planner_chat_service.Core.IRepository
 {
@@ -18,7 +18,7 @@ namespace planner_chat_service.Core.IRepository
         Task CreateAccountChatSessionsAsync(Guid session);
         Task<ChatMessage?> GetMessageAsync(Guid id);
         Task<Chat?> UpdateChatImage(Guid chatId, string filename);
-        Task<AccountChatSession?> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing);
+        Task<AccountChatSession> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing);
         Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatAccessId);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);

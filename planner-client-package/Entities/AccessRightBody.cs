@@ -1,5 +1,5 @@
-﻿using planner_client_package.Enums;
-using planner_client_package.Interface;
+﻿using planner_client_package.Interface;
+using planner_common_package.Enums;
 using System;
 
 namespace planner_client_package.Entities

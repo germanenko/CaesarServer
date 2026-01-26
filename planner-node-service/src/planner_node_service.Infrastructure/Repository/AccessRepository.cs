@@ -1,13 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
 using planner_server_package.Entities;
-using planner_server_package.Enums;
-using System.Text.Json;
-using System.Text.RegularExpressions;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
 {

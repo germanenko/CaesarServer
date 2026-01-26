@@ -1,9 +1,10 @@
+using Microsoft.Extensions.Logging;
+using planner_common_package.Enums;
+using planner_content_service.Core.IService;
+using planner_server_package.Events.Enums;
+using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
-using planner_server_package.Enums;
-using Microsoft.Extensions.Logging;
-using planner_content_service.Core.IService;
-using RabbitMQ.Client;
 
 namespace planner_content_service.Infrastructure.Service
 {
@@ -28,7 +29,7 @@ namespace planner_content_service.Infrastructure.Service
             string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
-            string createColumnExchange, 
+            string createColumnExchange,
             string createTaskExchange)
         {
 
