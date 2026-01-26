@@ -7,6 +7,7 @@ using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using System.Diagnostics;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -23,74 +24,91 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<Board?> AddAsync(BoardBody createBoardBody, Guid accountId)
         {
-            var board = new Board
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
-                Name = createBoardBody.Name,
-                Type = NodeType.Board,
-                Props = createBoardBody.Props
-            };
+                var board = new Board
+                {
+                    Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
+                    Name = createBoardBody.Name,
+                    Type = NodeType.Board,
+                    Props = createBoardBody.Props
+                };
 
-            await _context.Boards.AddAsync(board);
+                await _context.Boards.AddAsync(board);
 
-            await _context.History.AddAsync(new History
+                await _context.History.AddAsync(new History
+                {
+                    NodeId = board.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = accountId
+                });
+
+                await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
+                {
+                    Id = Guid.NewGuid(),
+                    Node = board,
+                    NodeId = board.Id,
+                    Status = createBoardBody.PublicationStatus,
+                    UpdatedAt = DateTime.UtcNow
+                });
+
+                await _context.AccessRights.AddAsync(new AccessRight()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = accountId,
+                    NodeId = board.Id,
+                    Node = board,
+                    AccessType = AccessType.Creator
+                });
+
+                await _context.NodeLinks.AddAsync(new NodeLink()
+                {
+                    Id = Guid.NewGuid(),
+                    ParentId = board.Id,
+                    ChildId = board.Id
+                });
+
+                await _context.NotificationSettings.AddAsync(new NotificationSettings()
+                {
+                    NodeId = board.Id,
+                    AccountId = accountId
+                });
+
+                await _context.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                var boardEvent = new CreateBoardEvent()
+                {
+                    Board = new planner_server_package.Entities.BoardBody()
+                    {
+                        Id = createBoardBody.Id,
+                        Name = createBoardBody.Name,
+                        CreatedAt = createBoardBody.CreatedAt,
+                        CreatedBy = createBoardBody.CreatedBy,
+                        Props = createBoardBody.Props,
+                        PublicationStatus = createBoardBody.PublicationStatus,
+                        Type = NodeType.Board,
+                        UpdatedAt = createBoardBody.UpdatedAt,
+                        UpdatedBy = createBoardBody.UpdatedBy
+                    },
+                    CreatorId = accountId
+                };
+
+                _ = Task.Run(() => _notifyService.Publish(boardEvent, PublishEvent.CreateBoard));
+
+                return board;
+            }
+            catch (Exception ex)
             {
-                NodeId = board.Id,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = accountId
-            });
+                await transaction.RollbackAsync();
 
-            await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
-            {
-                Id = Guid.NewGuid(),
-                Node = board,
-                NodeId = board.Id,
-                Status = createBoardBody.PublicationStatus,
-                UpdatedAt = DateTime.UtcNow
-            });
+                Console.WriteLine($"Ошибка при создании доски {createBoardBody.Name}: {ex.Message}");
 
-            await _context.AccessRights.AddAsync(new AccessRight()
-            {
-                Id = Guid.NewGuid(),
-                AccountId = accountId,
-                NodeId = board.Id,
-                Node = board,
-                AccessType = AccessType.Creator
-            });
-
-            await _context.NodeLinks.AddAsync(new NodeLink()
-            {
-                Id = Guid.NewGuid(),
-                ParentId = board.Id,
-                ChildId = board.Id
-            });
-
-            await _context.History.AddAsync(new History()
-            {
-                NodeId = board.Id,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = accountId
-            });
-
-            await _context.NotificationSettings.AddAsync(new NotificationSettings()
-            {
-                NodeId = board.Id,
-                AccountId = accountId
-            });
-
-            await _context.SaveChangesAsync();
-
-
-
-            CreateBoardEvent boardEvent = new CreateBoardEvent()
-            {
-                Board = new planner_server_package.Entities.BoardBody() { Id = createBoardBody.Id, Name = createBoardBody.Name, CreatedAt = createBoardBody.CreatedAt, CreatedBy = createBoardBody.CreatedBy, Props = createBoardBody.Props, PublicationStatus = createBoardBody.PublicationStatus, Type = NodeType.Column, UpdatedAt = createBoardBody.UpdatedAt, UpdatedBy = createBoardBody.UpdatedBy },
-                CreatorId = accountId
-            };
-
-            _notifyService.Publish(boardEvent, PublishEvent.CreateBoard);
-
-            return board;
+                throw;
+            }
         }
 
         public async Task<List<Board>?> AddRangeAsync(List<BoardBody> boards, Guid accountId)
@@ -102,7 +120,7 @@ namespace planner_content_service.Infrastructure.Repository
                 newBoardNodes.Add(await AddAsync(board, accountId));
             }
 
-            await _context.Boards.AddRangeAsync(newBoardNodes);
+            //await _context.Boards.AddRangeAsync(newBoardNodes);
             await _context.SaveChangesAsync();
 
             return newBoardNodes;
@@ -256,46 +274,61 @@ namespace planner_content_service.Infrastructure.Repository
                 Name = column.Name
             };
 
-            await _context.History.AddAsync(new History
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
-                NodeId = column.Id,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = accountId
-            });
+                await _context.History.AddAsync(new History
+                {
+                    NodeId = column.Id,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = accountId
+                });
 
-            await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
+                await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
+                {
+                    Node = columnNode,
+                    NodeId = column.Id,
+                    Status = column.PublicationStatus,
+                    UpdatedAt = column.UpdatedAt
+                });
+
+                await _context.NodeLinks.AddAsync(new NodeLink()
+                {
+                    ParentId = columnNode.Id,
+                    ChildId = columnNode.Id
+                });
+
+                await _context.NotificationSettings.AddAsync(new NotificationSettings()
+                {
+                    NodeId = columnNode.Id,
+                    AccountId = accountId
+                });
+
+                columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
+
+                await _context.SaveChangesAsync();
+
+                transaction.Commit();
+
+                CreateColumnEvent columnEvent = new CreateColumnEvent()
+                {
+                    Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
+                    CreatorId = accountId
+                };
+
+                _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
+
+                return columnNode;
+            }
+            catch (Exception ex)
             {
-                Node = columnNode,
-                NodeId = column.Id,
-                Status = column.PublicationStatus,
-                UpdatedAt = column.UpdatedAt
-            });
+                transaction.Rollback();
 
-            await _context.NodeLinks.AddAsync(new NodeLink()
-            {
-                ParentId = columnNode.Id,
-                ChildId = columnNode.Id
-            });
+                Console.WriteLine($"Ошибка при создании колонки {column.Name}: {ex.Message}");
 
-            await _context.NotificationSettings.AddAsync(new NotificationSettings()
-            {
-                NodeId = columnNode.Id,
-                AccountId = accountId
-            });
-
-            columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
-
-            await _context.SaveChangesAsync();
-
-            CreateColumnEvent columnEvent = new CreateColumnEvent()
-            {
-                Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
-                CreatorId = accountId
-            };
-
-            _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
-
-            return columnNode;
+                throw;
+            }
         }
 
         public async Task<List<Column>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
@@ -333,14 +366,40 @@ namespace planner_content_service.Infrastructure.Repository
                 });
             }
 
-            await _context.Columns.AddRangeAsync(columnNodes);
-            await _context.PublicationStatuses.AddRangeAsync(statuses);
-            await _context.NodeLinks.AddRangeAsync(links);
-            await _context.History.AddRangeAsync(histories);
+            await using var transaction = await _context.Database.BeginTransactionAsync();
 
-            await _context.SaveChangesAsync();
+            try
+            {
+                await _context.Columns.AddRangeAsync(columnNodes);
+                await _context.PublicationStatuses.AddRangeAsync(statuses);
+                await _context.NodeLinks.AddRangeAsync(links);
+                await _context.History.AddRangeAsync(histories);
 
-            return columnNodes;
+                await _context.SaveChangesAsync();
+
+                transaction.Commit();
+
+                foreach (var column in columns)
+                {
+                    CreateColumnEvent columnEvent = new CreateColumnEvent()
+                    {
+                        Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
+                        CreatorId = accountId
+                    };
+
+                    _ = Task.Run(() => _notifyService.Publish(columnEvent, PublishEvent.CreateColumn));
+                }
+
+                return columnNodes;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+
+                Console.WriteLine($"Ошибка при создании колонок: {ex.Message}");
+
+                throw;
+            }
         }
     }
 }
