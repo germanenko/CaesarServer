@@ -5,6 +5,7 @@ using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
+using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using System.Diagnostics;
@@ -86,18 +87,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                     var boardEvent = new CreateBoardEvent()
                     {
-                        Board = new planner_server_package.Entities.BoardBody()
-                        {
-                            Id = createBoardBody.Id,
-                            Name = createBoardBody.Name,
-                            CreatedAt = createBoardBody.CreatedAt,
-                            CreatedBy = createBoardBody.CreatedBy,
-                            Props = createBoardBody.Props,
-                            PublicationStatus = createBoardBody.PublicationStatus,
-                            Type = NodeType.Board,
-                            UpdatedAt = createBoardBody.UpdatedAt,
-                            UpdatedBy = createBoardBody.UpdatedBy
-                        },
+                        Board = BodyConverter.ClientToServerBody(createBoardBody),
                         CreatorId = accountId
                     };
 
@@ -322,7 +312,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                     CreateColumnEvent columnEvent = new CreateColumnEvent()
                     {
-                        Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy, Link = new planner_server_package.Entities.NodeLinkBody() { Id = column.Link.Id, ChildId = column.Link.ChildId, ParentId = column.Link.ParentId, RelationType = column.Link.RelationType } },
+                        Column = BodyConverter.ClientToServerBody(column),
                         CreatorId = accountId
                     };
 
@@ -397,7 +387,7 @@ namespace planner_content_service.Infrastructure.Repository
                     {
                         CreateColumnEvent columnEvent = new CreateColumnEvent()
                         {
-                            Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy, Link = new planner_server_package.Entities.NodeLinkBody() { Id = column.Link.Id, ChildId = column.Link.ChildId, ParentId = column.Link.ParentId, RelationType = column.Link.RelationType } },
+                            Column = BodyConverter.ClientToServerBody(column),
                             CreatorId = accountId
                         };
 

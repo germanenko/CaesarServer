@@ -5,6 +5,7 @@ using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
+using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using System.Net;
@@ -117,13 +118,7 @@ namespace planner_chat_service.App.Service
 
             var createChatEvent = new CreatePersonalChatEvent
             {
-                Chat = new planner_server_package.Entities.ChatBody()
-                {
-                    Id = chatBody.Id,
-                    ImageUrl = chatBody.ImageUrl,
-                    ChatType = chatBody.ChatType,
-                    Name = chatBody.Name
-                },
+                Chat = BodyConverter.ClientToServerBody(chatBody),
                 Participants = chatMemberships
             };
 

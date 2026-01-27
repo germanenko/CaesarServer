@@ -5,6 +5,7 @@ using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
+using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using System.Net.WebSockets;
@@ -213,7 +214,7 @@ namespace planner_chat_service.App.Service
             var messageSentToChatEvent = new MessageSentToChatEvent
             {
                 AccountIds = accountIds,
-                AccountSessions = accountSessions.Select(x => new planner_server_package.Entities.AccountSessions() { AccountId = x.AccountId, SessionIds = x.SessionIds }),
+                AccountSessions = accountSessions.Select(x => BodyConverter.ClientToServerBody(x)),
                 Message = bytes
             };
 
