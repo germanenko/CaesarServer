@@ -116,7 +116,8 @@ void ConfigureServices(IServiceCollection services)
             addAccountsToTaskChatsQueue,
             createBoardExchange,
             createColumnExchange,
-            createTaskExchange
+            createTaskExchange,
+            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
 
     services.AddHostedService(sp => new RabbitMqService

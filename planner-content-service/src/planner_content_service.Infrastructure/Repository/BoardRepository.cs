@@ -322,7 +322,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                     CreateColumnEvent columnEvent = new CreateColumnEvent()
                     {
-                        Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
+                        Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy, Link = new planner_server_package.Entities.NodeLinkBody() { Id = column.Link.Id, ChildId = column.Link.ChildId, ParentId = column.Link.ParentId, RelationType = column.Link.RelationType } },
                         CreatorId = accountId
                     };
 
@@ -397,7 +397,7 @@ namespace planner_content_service.Infrastructure.Repository
                     {
                         CreateColumnEvent columnEvent = new CreateColumnEvent()
                         {
-                            Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy },
+                            Column = new planner_server_package.Entities.ColumnBody() { Id = column.Id, Name = column.Name, CreatedAt = column.CreatedAt, CreatedBy = column.CreatedBy, Props = column.Props, PublicationStatus = column.PublicationStatus, Type = NodeType.Column, UpdatedAt = column.UpdatedAt, UpdatedBy = column.UpdatedBy, Link = new planner_server_package.Entities.NodeLinkBody() { Id = column.Link.Id, ChildId = column.Link.ChildId, ParentId = column.Link.ParentId, RelationType = column.Link.RelationType } },
                             CreatorId = accountId
                         };
 

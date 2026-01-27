@@ -14,6 +14,8 @@ namespace planner_content_service.Infrastructure.Service
         private readonly string _username;
         private readonly string _password;
 
+        private readonly ILogger<RabbitMqNotifyService> _logger;
+
         private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
         private readonly string _createBoardExchange;
@@ -30,7 +32,8 @@ namespace planner_content_service.Infrastructure.Service
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
             string createColumnExchange,
-            string createTaskExchange)
+            string createTaskExchange,
+            ILogger<RabbitMqNotifyService> logger)
         {
 
             _hostname = hostname;
@@ -45,6 +48,7 @@ namespace planner_content_service.Infrastructure.Service
 
             _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
+            _logger = logger;
 
             ExchangeDeclare();
         }
@@ -92,6 +96,8 @@ namespace planner_content_service.Infrastructure.Service
                                  durable: true,
                                  autoDelete: false,
                                  arguments: null);
+
+            _logger.LogInformation(JsonSerializer.Serialize(message));
 
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
