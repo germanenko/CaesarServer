@@ -1,4 +1,5 @@
 ﻿using planner_client_package.Entities;
+using planner_common_package;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,14 +9,14 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Interface
 {
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-    [JsonDerivedType(typeof(BoardBody), "board")]
-    [JsonDerivedType(typeof(ColumnBody), "column")]
-    [JsonDerivedType(typeof(TaskBody), "task")]
-    [JsonDerivedType(typeof(ChatBody), "chat")]
-    [JsonDerivedType(typeof(MessageBody), "chatMessage")]
-    [JsonDerivedType(typeof(NotificationSettingsBody), "notificationSettings")]
-    [JsonDerivedType(typeof(ProfileBody), "profile")]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
+    [JsonDerivedType(typeof(BoardBody), Discriminator.Board)]
+    [JsonDerivedType(typeof(ColumnBody), Discriminator.Column)]
+    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
+    [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
+    [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
+    [JsonDerivedType(typeof(NotificationSettingsBody), Discriminator.NotificationSettings)]
+    [JsonDerivedType(typeof(ProfileBody), Discriminator.Profile)]
     public interface ISyncable
     {
     }

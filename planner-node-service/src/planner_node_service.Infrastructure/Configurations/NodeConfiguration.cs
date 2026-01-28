@@ -8,7 +8,7 @@ namespace planner_node_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Node> builder)
         {
-            builder.HasKey(e => e.Id);
+            builder.ToTable("Nodes");
 
             builder.Property(e => e.Type)
                 .IsRequired()

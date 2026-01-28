@@ -1,16 +1,17 @@
-﻿using planner_common_package.Enums;
+﻿using planner_common_package;
+using planner_common_package.Enums;
 using planner_server_package.Interface;
 using System;
 using System.Text.Json.Serialization;
 
 namespace planner_server_package.Entities
 {
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "$type")]
-    [JsonDerivedType(typeof(BoardBody), "board")]
-    [JsonDerivedType(typeof(ColumnBody), "column")]
-    [JsonDerivedType(typeof(TaskBody), "task")]
-    [JsonDerivedType(typeof(ChatBody), "chat")]
-    [JsonDerivedType(typeof(MessageBody), "chatMessage")]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
+    [JsonDerivedType(typeof(BoardBody), Discriminator.Board)]
+    [JsonDerivedType(typeof(ColumnBody), Discriminator.Column)]
+    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
+    [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
+    [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
     public class NodeBody : ISyncable
     {
         public Guid Id { get; set; }

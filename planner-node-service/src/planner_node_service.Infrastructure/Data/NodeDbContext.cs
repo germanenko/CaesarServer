@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using planner_node_service.Core.Entities.Models;
+using System;
 using System.Reflection;
 
 namespace planner_node_service.Infrastructure.Data
@@ -15,8 +16,11 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<AccessRight> AccessRights { get; set; }
         public DbSet<AccessGroup> AccessGroups { get; set; }
         public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
+        public DbSet<StatusBase> Statuses { get; set; }
         public DbSet<PublicationStatusModel> PublicationStatuses { get; set; }
         public DbSet<WorkflowStatusModel> WorkflowStatuses { get; set; }
+        public DbSet<StatusHistory> StatusHistory { get; set; }
+        public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
 
@@ -25,6 +29,16 @@ namespace planner_node_service.Infrastructure.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
+
+            modelBuilder.Entity<TrackableEntity>().UseTptMappingStrategy();
+
+            modelBuilder.Entity<Node>().HasBaseType<TrackableEntity>();
+            modelBuilder.Entity<AccessRight>().HasBaseType<TrackableEntity>();
+            modelBuilder.Entity<AccessGroup>().HasBaseType<TrackableEntity>();
+            modelBuilder.Entity<NodeLink>().HasBaseType<TrackableEntity>();
+
+            modelBuilder.Entity<PublicationStatusModel>().HasBaseType<StatusBase>();
+            modelBuilder.Entity<WorkflowStatusModel>().HasBaseType<StatusBase>();
         }
     }
 }

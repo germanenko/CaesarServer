@@ -8,8 +8,6 @@ namespace planner_node_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<NodeLink> builder)
         {
-            builder.HasKey(e => e.Id);
-
             builder.HasOne(e => e.ParentNode)
                 .WithMany()
                 .HasForeignKey(e => e.ParentId)

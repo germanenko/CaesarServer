@@ -2,7 +2,7 @@
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class NodeLink : ModelBase
+    public class NodeLink : TrackableEntity
     {
         public Guid ParentId { get; set; }
         public Node ParentNode { get; set; }

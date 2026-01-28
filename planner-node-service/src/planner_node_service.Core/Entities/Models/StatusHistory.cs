@@ -6,10 +6,12 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class History : ModelBase
+    public class StatusHistory : ModelBase
     {
-        public Guid TrackableId { get; set; }
-        public TrackableEntity Trackable { get; set; }
+        public StatusBase Status { get; set; }
+        public Guid StatusId { get; set; }
+        public Guid NodeId { get; set; }
+        public Node Node { get; set; }
         public DateTime CreatedAt { get; set; }
         public DateTime UpdatedAt { get; set; }
         public Guid CreatedBy { get; set; }

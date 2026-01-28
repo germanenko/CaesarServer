@@ -2,9 +2,8 @@
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class AccessGroup
+    public class AccessGroup : TrackableEntity
     {
-        public Guid Id { get; set; }
         public string Name { get; set; }
         public List<AccessGroupMember> Members { get; set; } = new();
 

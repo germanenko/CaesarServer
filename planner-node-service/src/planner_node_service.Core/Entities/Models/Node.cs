@@ -6,7 +6,7 @@ using System.Text.Json;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class Node : ModelBase
+    public class Node : TrackableEntity
     {
         public NodeType Type { get; set; }
         public string Name { get; set; }

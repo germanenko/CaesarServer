@@ -8,17 +8,7 @@ namespace planner_node_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<WorkflowStatusModel> builder)
         {
-            builder.HasKey(e => e.Id);
-
-            builder.HasOne(e => e.Node)
-                .WithMany()
-                .HasForeignKey(e => e.NodeId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasIndex(e => e.NodeId);
-
-            builder.HasIndex(e => new { e.NodeId, e.UpdatedAt })
-                .IsUnique(false);
+            builder.ToTable("WorkflowStatuses");
         }
     }
 }
