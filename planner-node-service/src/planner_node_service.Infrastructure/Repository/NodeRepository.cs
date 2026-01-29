@@ -186,11 +186,6 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public class NodeLinkIdDto
-        {
-            public Guid Id { get; set; }
-        }
-
         //public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
         //{
         //    var rootIds = await _context.AccessRights
@@ -240,4 +235,9 @@ namespace planner_node_service.Infrastructure.Repository
         //        .ToListAsync();
         //}
     }
+}
+
+public class NodeLinkIdDto
+{
+    public Guid Id { get; set; }
 }
