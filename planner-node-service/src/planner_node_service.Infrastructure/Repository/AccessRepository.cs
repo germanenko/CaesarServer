@@ -158,7 +158,9 @@ namespace planner_node_service.Infrastructure.Repository
 
             accessRights.AddRange(await _context.AccessRights.Where(x => accessNodes.Contains(x.NodeId)).ToListAsync());
 
-            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRightBody()).Distinct().ToList();
+            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+
+            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRightBody()).ToList();
 
             var accessGroups = accessRights
                 .Select(x => x.AccessGroup)
