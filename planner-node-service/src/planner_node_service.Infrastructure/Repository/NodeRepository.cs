@@ -142,6 +142,13 @@ namespace planner_node_service.Infrastructure.Repository
             var currentLevelIds = new HashSet<Guid>(rootIds);
             var allNodes = new List<Node>();
 
+            var rootNodes = await _context.Nodes
+                .Where(x => rootIds.Contains(x.Id))
+                .AsNoTracking()
+                .ToListAsync();
+
+            allNodes.AddRange(rootNodes);
+
             for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
             {
                 var links = await _context.NodeLinks
