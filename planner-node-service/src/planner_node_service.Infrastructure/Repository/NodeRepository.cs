@@ -1,7 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using planner_common_package.Enums;
-using planner_node_service.Core.Entities.Dto;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
@@ -111,125 +110,66 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
-            IEnumerable<NodeLink>? links = await GetNodeLinkRows(accountId);
-            if (links == null || !links.Any())
+            IEnumerable<Node>? links = await GetNodesTree(accountId);
+
+            return links;
+
+            //if (links == null || !links.Any())
+            //    return Enumerable.Empty<Node>();
+
+            //var nodeIds = links
+            //    .SelectMany(x => new[] { x.ParentId, x.ChildId })
+            //    .Distinct()
+            //    .ToList();
+
+            //return await _context.Nodes
+            //    .Where(x => nodeIds.Contains(x.Id))
+            //    .ToListAsync();
+        }
+
+
+        public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId)
+        {
+            var rootIds = await _context.AccessRights
+                .Where(x => x.AccountId == accountId)
+                .Select(x => x.NodeId)
+                .ToListAsync();
+
+            if (!rootIds.Any())
                 return Enumerable.Empty<Node>();
 
-            var nodeIds = links
-                .SelectMany(x => new[] { x.ParentId, x.ChildId })
-                .Distinct()
-                .ToList();
+            var allNodeIds = new HashSet<Guid>(rootIds);
+            var currentLevelIds = new HashSet<Guid>(rootIds);
+            var allNodes = new List<Node>();
 
-            return await _context.Nodes
-                .Where(x => nodeIds.Contains(x.Id))
-                .ToListAsync();
-        }
+            for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
+            {
+                var links = await _context.NodeLinks
+                    .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
+                    .Include(x => x.ParentNode)
+                    .Include(x => x.ChildNode)
+                    .AsNoTracking()
+                    .ToListAsync();
 
+                foreach (var link in links)
+                {
+                    allNodes.Add(link.ParentNode);
+                    allNodes.Add(link.ChildNode);
+                }
 
-        public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
-        {
-            var rootIds = await _context.AccessRights
-                .Where(x => x.AccountId == accountId)
-                .Select(x => x.NodeId)
-                .ToListAsync();
+                var nextLevelIds = new HashSet<Guid>();
+                foreach (var link in links)
+                {
+                    if (allNodeIds.Add(link.ChildId))
+                    {
+                        nextLevelIds.Add(link.ChildId);
+                    }
+                }
 
-            if (!rootIds.Any())
-                return Enumerable.Empty<NodeLink>();
+                currentLevelIds = nextLevelIds;
+            }
 
-            var query = @"
-                WITH RECURSIVE node_tree AS (
-                    SELECT 
-                        nl.*, 
-                        1 as level,
-                        ARRAY[nl.""ParentId""] as visited_path 
-                    FROM ""NodeLinks"" nl 
-                    WHERE nl.""ParentId"" IN ({0})
-
-                    UNION ALL
-
-                    SELECT 
-                        n.*, 
-                        nt.level + 1,
-                        nt.visited_path || n.""ParentId"" 
-                    FROM ""NodeLinks"" n
-                    INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
-                    WHERE 
-                        nt.level < 5
-                        AND n.""ParentId"" != n.""ChildId""
-                        AND n.""ParentId"" != ALL(nt.visited_path) 
-                )
-                SELECT ""Id"", ""ParentId"", ""ChildId"", ""RelationType"" 
-                FROM node_tree 
-                WHERE level <= 5
-                LIMIT 500;";
-
-            var parameters = rootIds.Select((id, i) =>
-                new NpgsqlParameter($"@p{i}", id)).ToArray();
-
-            var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
-
-
-            return await _context.NodeLinks
-                .FromSqlRaw(string.Format(query, paramNames), parameters)
-                .AsNoTracking()
-                .ToListAsync();
-        }
-
-        public async Task<List<NodeLink>> GetNodeLinkRows(Guid accountId)
-        {
-            var rootIds = await _context.AccessRights
-                .Where(x => x.AccountId == accountId)
-                .Select(x => x.NodeId)
-                .ToListAsync();
-
-            if (!rootIds.Any())
-                return new();
-
-            var sql = """
-                WITH RECURSIVE node_tree AS (
-                    SELECT 
-                        nl."Id",
-                        nl."ParentId",
-                        nl."ChildId",
-                        nl."RelationType",
-                        1 AS level,
-                        ARRAY[nl."ParentId"] AS visited_path
-                    FROM "NodeLinks" nl
-                    WHERE nl."ParentId" = ANY(@rootIds)
-
-                    UNION ALL
-
-                    SELECT 
-                        n."Id",
-                        n."ParentId",
-                        n."ChildId",
-                        n."RelationType",
-                        nt.level + 1,
-                        nt.visited_path || n."ParentId"
-                    FROM "NodeLinks" n
-                    JOIN node_tree nt ON n."ParentId" = nt."ChildId"
-                    WHERE 
-                        nt.level < 5
-                        AND n."ParentId" <> n."ChildId"
-                        AND NOT (n."ParentId" = ANY(nt.visited_path))
-                )
-                SELECT 
-                    "Id", "ParentId", "ChildId", "RelationType"
-                FROM node_tree
-                WHERE level <= 5
-                LIMIT 500;
-                """;
-
-            var param = new NpgsqlParameter("rootIds", rootIds.ToArray());
-
-            var rows = await _context.NodeLinkRows
-                .FromSqlRaw(sql, param)
-                .AsNoTracking()
-                .ToListAsync();
-
-            var result = rows.Select(x => new NodeLink() { Id = x.Id, ChildId = x.ChildId, ParentId = x.ParentId, RelationType = x.RelationType }).ToList();
-
-            return result;
+            return allNodes.DistinctBy(x => x.Id).ToList();
         }
     }
 }

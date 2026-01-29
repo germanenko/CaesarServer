@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using planner_node_service.Core.Entities.Dto;
 using planner_node_service.Core.Entities.Models;
 using System;
 using System.Reflection;
@@ -24,7 +23,6 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
-        public DbSet<NodeLinkRow> NodeLinkRows { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -41,10 +39,6 @@ namespace planner_node_service.Infrastructure.Data
 
             modelBuilder.Entity<PublicationStatusModel>().HasBaseType<StatusBase>();
             modelBuilder.Entity<WorkflowStatusModel>().HasBaseType<StatusBase>();
-
-            modelBuilder.Entity<NodeLinkRow>()
-                .HasNoKey()
-                .ToView(null);
         }
     }
 }
