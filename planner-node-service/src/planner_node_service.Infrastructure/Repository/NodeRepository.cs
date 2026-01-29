@@ -131,6 +131,14 @@ namespace planner_node_service.Infrastructure.Repository
                 .Select(x => x.NodeId)
                 .ToListAsync();
 
+            return await _context.NodeLinks
+                .FromSqlRaw(@"SELECT * FROM recursive_node_links_view WHERE ""ParentId"" IN ({0})",
+                            string.Join(",", rootIds.Select((_, i) => $"@p{i}")))
+                .AsNoTracking()
+                .Take(500)
+                .ToListAsync();
+
+
             if (!rootIds.Any())
                 return Enumerable.Empty<NodeLink>();
 
@@ -165,6 +173,7 @@ namespace planner_node_service.Infrastructure.Repository
                 new NpgsqlParameter($"@p{i}", id)).ToArray();
 
             var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
+
 
             return await _context.NodeLinks
                 .FromSqlRaw(string.Format(query, paramNames), parameters)

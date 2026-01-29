@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using planner_node_service.Core.Entities.Models;
+using System.Reflection.Emit;
 
 namespace planner_node_service.Infrastructure.Configurations
 {
@@ -8,6 +9,8 @@ namespace planner_node_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<NodeLink> builder)
         {
+            builder.ToTable("NodeLinks");
+
             builder.HasOne(e => e.ParentNode)
                 .WithMany()
                 .HasForeignKey(e => e.ParentId)

@@ -38,7 +38,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("AccessGroupId");
 
-                    b.ToTable("AccessGroupMembers");
+                    b.ToTable("AccessGroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
@@ -109,7 +109,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.ToTable("NotificationSettings");
+                    b.ToTable("NotificationSettings", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusBase", b =>
@@ -125,7 +125,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Statuses", (string)null);
 
                     b.UseTptMappingStrategy();
                 });
@@ -160,7 +160,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("StatusId");
 
-                    b.ToTable("StatusHistory");
+                    b.ToTable("StatusHistory", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
@@ -171,7 +171,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Trackables");
+                    b.ToTable("Trackables", (string)null);
 
                     b.UseTptMappingStrategy();
                 });
@@ -204,7 +204,7 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.ToTable("AccessGroups");
+                    b.ToTable("AccessGroups", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRight", b =>
@@ -232,7 +232,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("AccountId", "NodeId", "AccessType")
                         .IsUnique();
 
-                    b.ToTable("AccessRights");
+                    b.ToTable("AccessRights", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
@@ -283,7 +283,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("ParentId", "ChildId", "RelationType")
                         .IsUnique();
 
-                    b.ToTable("NodeLinks");
+                    b.ToTable("NodeLinks", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroupMember", b =>
