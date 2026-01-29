@@ -248,59 +248,59 @@ namespace planner_content_service.Infrastructure.Repository
             if (task == null)
                 return null;
 
-            var strategy = _context.Database.CreateExecutionStrategy();
+            //var strategy = _context.Database.CreateExecutionStrategy();
 
-            return await strategy.ExecuteAsync(async () =>
+            //return await strategy.ExecuteAsync(async () =>
+            //{
+
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+            try
             {
 
-                await using var transaction = await _context.Database.BeginTransactionAsync();
+                task = (await _context.Tasks.AddAsync(task)).Entity;
 
-                try
+                if (attach != null)
                 {
+                    _context.NodeLinks.Add(new NodeLink() { Id = attach.Id, ParentId = attach.ParentId, ChildId = attach.ChildId, RelationType = attach.RelationType });
+                }
 
-                    task = (await _context.Tasks.AddAsync(task)).Entity;
+                _context.PublicationStatuses.Add(new PublicationStatusModel()
+                {
+                    Node = task,
+                    NodeId = task.Id,
+                    Status = publicationStatus
+                });
 
-                    if (attach != null)
+                await _context.SaveChangesAsync();
+
+                transaction.Commit();
+
+                var createTaskChatEvent = new CreateTaskChatEvent
+                {
+                    IsSuccess = false,
+                    CreateTaskChat = new CreateTaskChat
                     {
-                        _context.NodeLinks.Add(new NodeLink() { Id = attach.Id, ParentId = attach.ParentId, ChildId = attach.ChildId, RelationType = attach.RelationType });
+                        TaskId = task.Id,
+                        CreatorId = accountId,
+                        ChatName = $"{task.Name} chat"
                     }
+                };
 
-                    _context.PublicationStatuses.Add(new PublicationStatusModel()
-                    {
-                        Node = task,
-                        NodeId = task.Id,
-                        Status = publicationStatus
-                    });
-
-                    await _context.SaveChangesAsync();
-
-                    transaction.Commit();
-
-                    var createTaskChatEvent = new CreateTaskChatEvent
-                    {
-                        IsSuccess = false,
-                        CreateTaskChat = new CreateTaskChat
-                        {
-                            TaskId = task.Id,
-                            CreatorId = accountId,
-                            ChatName = $"{task.Name} chat"
-                        }
-                    };
-
-                    _ = Task.Run(() => _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse));
+                _ = Task.Run(() => _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse));
 
 
-                    return task;
-                }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
+                return task;
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
 
-                    Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
+                Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
 
-                    throw;
-                }
-            });
+                throw;
+            }
+            //});
         }
 
         public async Task<IEnumerable<TaskModel>> GetAll(Guid columnId, Guid userId)
