@@ -1,5 +1,5 @@
 using planner_server_package.Entities;
-using planner_server_package.Enums;
+using planner_common_package.Enums;
 
 namespace planner_auth_service.Core.Entities.Models
 {

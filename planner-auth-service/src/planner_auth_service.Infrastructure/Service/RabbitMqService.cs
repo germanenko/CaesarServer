@@ -1,10 +1,11 @@
-using planner_server_package.Entities;
-using planner_server_package.Enums;
-using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using planner_auth_service.Core.IRepository;
 using planner_auth_service.Core.IService;
+using planner_common_package.Enums;
+using planner_server_package.Entities;
+using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;

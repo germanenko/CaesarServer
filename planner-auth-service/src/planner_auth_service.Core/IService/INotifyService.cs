@@ -1,4 +1,4 @@
-using planner_server_package.Enums;
+using planner_server_package.Events.Enums;
 
 namespace planner_auth_service.Core.IService
 {

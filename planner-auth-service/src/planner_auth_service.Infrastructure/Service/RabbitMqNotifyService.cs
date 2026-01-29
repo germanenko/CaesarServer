@@ -1,5 +1,5 @@
-using planner_server_package.Enums;
 using planner_auth_service.Core.IService;
+using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using System.Text;
 using System.Text.Json;
