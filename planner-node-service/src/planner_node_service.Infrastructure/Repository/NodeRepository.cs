@@ -171,5 +171,46 @@ namespace planner_node_service.Infrastructure.Repository
 
             return allNodes.DistinctBy(x => x.Id).ToList();
         }
+
+        public async Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId)
+        {
+            var rootIds = await _context.AccessRights
+                .Where(x => x.AccountId == accountId)
+                .Select(x => x.NodeId)
+                .ToListAsync();
+
+            if (!rootIds.Any())
+                return Enumerable.Empty<NodeLink>();
+
+            var allLinks = new List<NodeLink>();
+            var visitedNodeIds = new HashSet<Guid>(rootIds);
+            var currentLevelIds = new HashSet<Guid>(rootIds);
+
+            for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
+            {
+                var links = await _context.NodeLinks
+                    .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                allLinks.AddRange(links);
+
+                var nextLevelIds = new HashSet<Guid>();
+                foreach (var link in links)
+                {
+                    if (visitedNodeIds.Add(link.ChildId))
+                    {
+                        nextLevelIds.Add(link.ChildId);
+                    }
+                }
+
+                currentLevelIds = nextLevelIds;
+            }
+
+            return allLinks
+                .GroupBy(x => x.Id)
+                .Select(g => g.First())
+                .ToList();
+        }
     }
 }

@@ -12,6 +12,7 @@ namespace planner_node_service.Core.IRepository
         Task<Node> AddOrUpdateNode(Node node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<Node>?> GetNodesTree(Guid accountId);
+        Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId);
     }
 }

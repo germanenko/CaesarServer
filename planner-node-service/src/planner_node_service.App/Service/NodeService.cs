@@ -37,7 +37,7 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId)
         {
-            var nodeLinks = await _nodeRepository.GetNodesTree(accountId);
+            var nodeLinks = await _nodeRepository.GetNodesLinks(accountId);
 
             return new ServiceResponse<IEnumerable<NodeLink>>()
             {
