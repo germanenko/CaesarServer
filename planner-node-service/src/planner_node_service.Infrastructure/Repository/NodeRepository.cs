@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using planner_common_package.Enums;
+using planner_node_service.Core.Entities.Dto;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
@@ -110,7 +111,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
-            var links = await GetNodeLinks(accountId);
+            IEnumerable<NodeLink>? links = await GetNodeLinkRows(accountId);
             if (links == null || !links.Any())
                 return Enumerable.Empty<Node>();
 
@@ -124,6 +125,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToListAsync();
         }
 
+
         public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
         {
             var rootIds = await _context.AccessRights
@@ -134,19 +136,19 @@ namespace planner_node_service.Infrastructure.Repository
             if (!rootIds.Any())
                 return Enumerable.Empty<NodeLink>();
 
-            var idQuery = @"
+            var query = @"
                 WITH RECURSIVE node_tree AS (
                     SELECT 
-                        nl.""Id"",
+                        nl.*, 
                         1 as level,
                         ARRAY[nl.""ParentId""] as visited_path 
                     FROM ""NodeLinks"" nl 
                     WHERE nl.""ParentId"" IN ({0})
-                    
+
                     UNION ALL
-                    
+
                     SELECT 
-                        n.""Id"",
+                        n.*, 
                         nt.level + 1,
                         nt.visited_path || n.""ParentId"" 
                     FROM ""NodeLinks"" n
@@ -156,7 +158,7 @@ namespace planner_node_service.Infrastructure.Repository
                         AND n.""ParentId"" != n.""ChildId""
                         AND n.""ParentId"" != ALL(nt.visited_path) 
                 )
-                SELECT DISTINCT ""Id""
+                SELECT ""Id"", ""ParentId"", ""ChildId"", ""RelationType"" 
                 FROM node_tree 
                 WHERE level <= 5
                 LIMIT 500;";
@@ -166,78 +168,68 @@ namespace planner_node_service.Infrastructure.Repository
 
             var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
 
-            var idDtos = await _context.Database
-                .SqlQueryRaw<NodeLinkIdDto>(
-                    string.Format(idQuery, paramNames),
-                    parameters.Cast<object>().ToArray())
-                .ToListAsync();
 
-            var ids = idDtos.Select(d => d.Id).Distinct().ToList();
-
-            if (!ids.Any())
-                return Enumerable.Empty<NodeLink>();
-
-            // 2. Получаем полные сущности через LINQ
             return await _context.NodeLinks
-                .Where(nl => ids.Contains(nl.Id))
-                .Include(nl => nl.ParentNode)
-                .Include(nl => nl.ChildNode)
+                .FromSqlRaw(string.Format(query, paramNames), parameters)
                 .AsNoTracking()
                 .ToListAsync();
         }
 
-        //public async Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId)
-        //{
-        //    var rootIds = await _context.AccessRights
-        //        .Where(x => x.AccountId == accountId)
-        //        .Select(x => x.NodeId)
-        //        .ToListAsync();
+        public async Task<List<NodeLink>> GetNodeLinkRows(Guid accountId)
+        {
+            var rootIds = await _context.AccessRights
+                .Where(x => x.AccountId == accountId)
+                .Select(x => x.NodeId)
+                .ToListAsync();
 
-        //    if (!rootIds.Any())
-        //        return Enumerable.Empty<NodeLink>();
+            if (!rootIds.Any())
+                return new();
 
-        //    var query = @"
-        //        WITH RECURSIVE node_tree AS (
-        //            SELECT 
-        //                nl.*, 
-        //                1 as level,
-        //                ARRAY[nl.""ParentId""] as visited_path 
-        //            FROM ""NodeLinks"" nl 
-        //            WHERE nl.""ParentId"" IN ({0})
+            var sql = """
+                WITH RECURSIVE node_tree AS (
+                    SELECT 
+                        nl."Id",
+                        nl."ParentId",
+                        nl."ChildId",
+                        nl."RelationType",
+                        1 AS level,
+                        ARRAY[nl."ParentId"] AS visited_path
+                    FROM "NodeLinks" nl
+                    WHERE nl."ParentId" = ANY(@rootIds)
 
-        //            UNION ALL
+                    UNION ALL
 
-        //            SELECT 
-        //                n.*, 
-        //                nt.level + 1,
-        //                nt.visited_path || n.""ParentId"" 
-        //            FROM ""NodeLinks"" n
-        //            INNER JOIN node_tree nt ON n.""ParentId"" = nt.""ChildId""
-        //            WHERE 
-        //                nt.level < 5
-        //                AND n.""ParentId"" != n.""ChildId""
-        //                AND n.""ParentId"" != ALL(nt.visited_path) 
-        //        )
-        //        SELECT ""Id"", ""ParentId"", ""ChildId"", ""RelationType"" 
-        //        FROM node_tree 
-        //        WHERE level <= 5
-        //        LIMIT 500;";
+                    SELECT 
+                        n."Id",
+                        n."ParentId",
+                        n."ChildId",
+                        n."RelationType",
+                        nt.level + 1,
+                        nt.visited_path || n."ParentId"
+                    FROM "NodeLinks" n
+                    JOIN node_tree nt ON n."ParentId" = nt."ChildId"
+                    WHERE 
+                        nt.level < 5
+                        AND n."ParentId" <> n."ChildId"
+                        AND NOT (n."ParentId" = ANY(nt.visited_path))
+                )
+                SELECT 
+                    "Id", "ParentId", "ChildId", "RelationType"
+                FROM node_tree
+                WHERE level <= 5
+                LIMIT 500;
+                """;
 
-        //    var parameters = rootIds.Select((id, i) =>
-        //        new NpgsqlParameter($"@p{i}", id)).ToArray();
+            var param = new NpgsqlParameter("rootIds", rootIds.ToArray());
 
-        //    var paramNames = string.Join(",", parameters.Select(p => p.ParameterName));
+            var rows = await _context.NodeLinkRows
+                .FromSqlRaw(sql, param)
+                .AsNoTracking()
+                .ToListAsync();
 
+            var result = rows.Select(x => new NodeLink() { Id = x.Id, ChildId = x.ChildId, ParentId = x.ParentId, RelationType = x.RelationType }).ToList();
 
-        //    return await _context.NodeLinks
-        //        .FromSqlRaw(string.Format(query, paramNames), parameters)
-        //        .AsNoTracking()
-        //        .ToListAsync();
-        //}
+            return result;
+        }
     }
-}
-
-public class NodeLinkIdDto
-{
-    public Guid Id { get; set; }
 }
