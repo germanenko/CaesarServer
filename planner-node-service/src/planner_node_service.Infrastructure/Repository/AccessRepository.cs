@@ -142,21 +142,16 @@ namespace planner_node_service.Infrastructure.Repository
                 .Include(x => x.AccessGroup)
                     .ThenInclude(x => x.Members)
                 .Where(ar =>
-                    ar.AccessGroupId == null && ar.AccountId == accountId ||
+                    (ar.AccessGroupId == null && ar.AccountId == accountId) ||
                     ar.AccessGroupId != null &&
-                     ar.AccessGroup != null &&
                      ar.AccessGroup.Members.Any(m => m.AccountId == accountId)
                 )
                 .ToListAsync();
 
-            if (accessRights == null || !accessRights.Any())
+            if (!accessRights.Any())
                 return null;
 
             var accessBody = new AccessBody();
-
-            var accessNodes = accessRights.Select(x => x.NodeId);
-
-            accessRights.AddRange(await _context.AccessRights.Where(x => accessNodes.Contains(x.NodeId)).ToListAsync());
 
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
 
