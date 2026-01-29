@@ -58,7 +58,7 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody newNodeLink)
         {
             var existingNode = await _context.NodeLinks
-                .Where(x => x.Id == newNodeLink.Id)
+                .Where(x => x.ChildId == newNodeLink.ChildId && x.ParentId == newNodeLink.ParentId)
                 .FirstOrDefaultAsync();
 
             if (existingNode == null)
