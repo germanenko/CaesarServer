@@ -82,12 +82,6 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
         {
-            var isCreator = await _context.History
-                .AnyAsync(n => n.Id == nodeId && n.CreatedBy == accountId);
-
-            if (isCreator)
-                return true;
-
             return await _context.AccessRights
                 .Where(ar => ar.NodeId == nodeId)
                 .AnyAsync(ar =>

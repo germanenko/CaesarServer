@@ -20,7 +20,7 @@ namespace planner_content_service.Infrastructure.Data
 
             modelBuilder.Entity<Board>().HasBaseType<Node>();
             modelBuilder.Entity<Column>().HasBaseType<Node>();
-            modelBuilder.Entity<TaskModel>().HasBaseType<Node>(); 
+            modelBuilder.Entity<TaskModel>().HasBaseType<Node>();
             modelBuilder.Entity<Chat>().HasBaseType<Node>();
             modelBuilder.Entity<ChatMessage>().HasBaseType<Node>();
 
@@ -42,7 +42,6 @@ namespace planner_content_service.Infrastructure.Data
         public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
         public DbSet<PublicationStatusModel> PublicationStatuses { get; set; }
         public DbSet<WorkflowStatusModel> WorkflowStatuses { get; set; }
-        public DbSet<History> History { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
     }
 }

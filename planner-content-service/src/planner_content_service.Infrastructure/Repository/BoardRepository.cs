@@ -37,13 +37,6 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.Boards.AddAsync(board);
 
-                await _context.History.AddAsync(new History
-                {
-                    NodeId = board.Id,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = accountId
-                });
-
                 await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
                 {
                     Id = Guid.NewGuid(),
@@ -260,12 +253,6 @@ namespace planner_content_service.Infrastructure.Repository
 
             try
             {
-                await _context.History.AddAsync(new History
-                {
-                    NodeId = column.Id,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = accountId
-                });
 
                 await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
                 {
@@ -315,7 +302,6 @@ namespace planner_content_service.Infrastructure.Repository
             var columnNodes = new List<Column>();
             var statuses = new List<PublicationStatusModel>();
             var links = new List<NodeLink>();
-            var histories = new List<History>();
 
             foreach (var column in columns)
             {
@@ -337,12 +323,6 @@ namespace planner_content_service.Infrastructure.Repository
                     ParentId = column.Id,
                     ChildId = column.Id
                 });
-                histories.Add(new History()
-                {
-                    NodeId = column.Id,
-                    CreatedAt = DateTime.UtcNow,
-                    CreatedBy = accountId
-                });
             }
 
             try
@@ -350,7 +330,6 @@ namespace planner_content_service.Infrastructure.Repository
                 await _context.Columns.AddRangeAsync(columnNodes);
                 await _context.PublicationStatuses.AddRangeAsync(statuses);
                 await _context.NodeLinks.AddRangeAsync(links);
-                await _context.History.AddRangeAsync(histories);
 
                 await _context.SaveChangesAsync();
 

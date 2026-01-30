@@ -39,13 +39,6 @@ namespace planner_content_service.Infrastructure.Repository
                 Type = NodeType.Task
             };
 
-            await _context.History.AddAsync(new History
-            {
-                NodeId = node.Id,
-                CreatedAt = DateTime.UtcNow,
-                CreatedBy = accountId
-            });
-
             _context.SaveChanges();
 
             CreateTaskEvent taskEvent = new CreateTaskEvent()
@@ -186,13 +179,6 @@ namespace planner_content_service.Infrastructure.Repository
             task.Name = updatedNode.Name;
             task.Props = JsonSerializer.Serialize(updatedNode);
 
-            await _context.History.AddAsync(new History
-            {
-                NodeId = task.Id,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = accountId
-            });
-
             var boardColumnTask = _context.NodeLinks.Where(x => x.ChildId == task.Id).First();
             if (boardColumnTask.ParentId != columnId)
             {
@@ -226,13 +212,6 @@ namespace planner_content_service.Infrastructure.Repository
 
             draft.Name = updatedNode.Name;
             draft.Props = JsonSerializer.Serialize(updatedNode);
-
-            await _context.History.AddAsync(new History
-            {
-                NodeId = draft.Id,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = accountId
-            });
 
             await _context.SaveChangesAsync();
             return draft;
@@ -300,15 +279,9 @@ namespace planner_content_service.Infrastructure.Repository
                     n1 => n1.ChildId,
                     t => t.Id,
                     (n1, t) => t)
-                .Join(_context.History,
-                    n => n.Id,
-                    h => h.NodeId,
-                    (n, h) => h)
-                .Include(n => n.Node)
-                .Where(x => x.CreatedBy == userId)
                 .ToListAsync();
 
-            return result.Select(x => x.Node as TaskModel);
+            return result;
         }
 
 
