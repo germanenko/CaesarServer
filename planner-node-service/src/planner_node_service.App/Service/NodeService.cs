@@ -15,24 +15,35 @@ namespace planner_node_service.App.Service
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
+        private readonly IHistoryRepository _historyRepository;
         private readonly INotifyService _notifyService;
 
         public NodeService(
-            INodeRepository nodeRepository, INotifyService notifyService)
+            INodeRepository nodeRepository, INotifyService notifyService, IHistoryRepository historyRepository)
         {
             _nodeRepository = nodeRepository;
             _notifyService = notifyService;
+            _historyRepository = historyRepository;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
         {
             var nodes = await _nodeRepository.GetNodes(accountId);
 
+            var bodies = nodes.Select(x => x.ToNodeBody());
+
+            foreach (var body in bodies)
+            {
+                var history = await _historyRepository.GetCreateHistory(body.Id);
+                body.CreatedBy = history.ActorId;
+                body.CreatedAt = history.Date;
+            }
+
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes.Select(x => x.ToNodeBody())
+                Body = bodies
             };
         }
 

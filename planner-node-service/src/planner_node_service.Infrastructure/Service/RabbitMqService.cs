@@ -220,6 +220,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -230,6 +231,8 @@ namespace planner_node_service.Infrastructure.Service
                 });
 
                 await accessService.CreateAccessRight(result.CreatorId, result.Board.Id, AccessType.Creator);
+
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, Date = result.Board.UpdatedAt.Value });
             }
             catch (Exception ex)
             {
@@ -254,6 +257,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -271,6 +275,8 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await accessService.CreateAccessRight(result.CreatorId, result.Column.Id, AccessType.Creator);
                 }
+
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, Date = result.Column.UpdatedAt.Value });
             }
             catch (Exception ex)
             {
@@ -295,6 +301,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -312,6 +319,8 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await accessService.CreateAccessRight(result.CreatorId, result.Task.Id, AccessType.Creator);
                 }
+
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, Date = result.Task.UpdatedAt.Value });
             }
             catch (Exception ex)
             {

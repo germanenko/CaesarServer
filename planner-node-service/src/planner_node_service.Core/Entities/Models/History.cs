@@ -1,4 +1,5 @@
-﻿using System;
+﻿using planner_common_package.Enums;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -10,9 +11,8 @@ namespace planner_node_service.Core.Entities.Models
     {
         public Guid TrackableId { get; set; }
         public TrackableEntity Trackable { get; set; }
-        public DateTime CreatedAt { get; set; }
-        public DateTime UpdatedAt { get; set; }
-        public Guid CreatedBy { get; set; }
-        public Guid UpdatedBy { get; set; }
+        public DateTime Date { get; set; }
+        public Guid ActorId { get; set; }
+        public ActionType Action { get; set; }
     }
 }
