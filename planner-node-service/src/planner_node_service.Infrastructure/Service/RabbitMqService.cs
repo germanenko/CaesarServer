@@ -1,11 +1,11 @@
-using planner_server_package.Entities;
-using planner_common_package.Enums;
-using planner_server_package.Events;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IService;
+using planner_server_package.Entities;
+using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -230,7 +230,7 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     Id = result.Board.Id,
                     Name = result.Board.Name,
-                    Type = NodeType.Chat,
+                    Type = NodeType.Board,
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Board)
                 });
 
@@ -264,7 +264,7 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     Id = result.Column.Id,
                     Name = result.Column.Name,
-                    Type = NodeType.Chat,
+                    Type = NodeType.Column,
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
                 });
 
