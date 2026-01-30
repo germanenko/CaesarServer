@@ -29,13 +29,10 @@ namespace planner_content_service.Infrastructure.Repository
             Guid accountId
         )
         {
-            var props = JsonSerializer.Serialize(task);
-
             var node = new TaskModel()
             {
                 Id = task.Id,
                 Name = task.Name,
-                Props = props,
                 Type = NodeType.Task
             };
 

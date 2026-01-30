@@ -1,7 +1,7 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
 using Newtonsoft.Json.Serialization;
+using planner_client_package.Entities;
 using planner_common_package.Enums;
-using planner_server_package.Entities;
 using System.Text.Json;
 
 namespace planner_node_service.Core.Entities.Models

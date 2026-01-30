@@ -1,6 +1,6 @@
 using System;
 
-namespace planner_client_package.Entities
+namespace planner_common_package.Entities
 {
     public class TokenPayload
     {

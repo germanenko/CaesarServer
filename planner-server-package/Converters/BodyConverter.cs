@@ -4,6 +4,8 @@ using BoardClient = planner_client_package.Entities.BoardBody;
 using BoardServer = planner_server_package.Entities.BoardBody;
 using ChatClient = planner_client_package.Entities.ChatBody;
 using ChatServer = planner_server_package.Entities.ChatBody;
+using ChatSettingsClient = planner_client_package.Entities.ChatSettingsBody;
+using ChatSettingsServer = planner_server_package.Entities.ChatSettingsBody;
 using ColumnClient = planner_client_package.Entities.ColumnBody;
 using ColumnServer = planner_server_package.Entities.ColumnBody;
 using MessageClient = planner_client_package.Entities.MessageBody;
@@ -12,6 +14,7 @@ using NodeLinkClient = planner_client_package.Entities.NodeLinkBody;
 using NodeLinkServer = planner_server_package.Entities.NodeLinkBody;
 using TaskClient = planner_client_package.Entities.TaskBody;
 using TaskServer = planner_server_package.Entities.TaskBody;
+
 
 namespace planner_server_package.Converters
 {
@@ -232,6 +235,35 @@ namespace planner_server_package.Converters
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null
+            };
+        }
+
+
+        public static ChatSettingsClient ServerToClientBody(ChatSettingsServer body)
+        {
+            return new ChatSettingsClient()
+            {
+                Id = body.Id,
+                AccountId = body.AccountId,
+                ChatId = body.ChatId,
+                ChatName = body.ChatName,
+                DateLastViewing = body.DateLastViewing,
+                MessageDraft = body.MessageDraft
+            };
+        }
+
+
+
+        public static ChatSettingsServer ClientToServerBody(ChatSettingsClient body)
+        {
+            return new ChatSettingsServer()
+            {
+                Id = body.Id,
+                AccountId = body.AccountId,
+                ChatId = body.ChatId,
+                ChatName = body.ChatName,
+                DateLastViewing = body.DateLastViewing,
+                MessageDraft = body.MessageDraft
             };
         }
 

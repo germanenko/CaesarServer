@@ -1,9 +1,10 @@
 ﻿using Microsoft.IdentityModel.Tokens;
-using planner_common_package.Enums;
+using planner_client_package.Entities;
+using planner_common_package.Entities;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
-using planner_server_package.Entities;
+using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.Interface;
@@ -31,22 +32,23 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodes.Select(x => x.ToNodeBodyFromJson())
+                Body = nodes.Select(x => x.ToNodeBody())
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId)
         {
             var nodeLinks = await _nodeRepository.GetNodesLinks(accountId);
 
-            return new ServiceResponse<IEnumerable<NodeLink>>()
+            return new ServiceResponse<IEnumerable<NodeLinkBody>>()
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = nodeLinks?
                   .Where(x => x != null)
+                  .Select(x => x.ToBody())
                   .ToList()!
-               ?? new List<NodeLink>()
+               ?? new List<NodeLinkBody>()
             };
         }
 
@@ -116,13 +118,13 @@ namespace planner_node_service.App.Service
             List<ISyncable> contentBodies = new List<ISyncable>();
             List<ISyncable> chatBodies = new List<ISyncable>();
 
-            contentBodies.AddRange(bodies.OfType<BoardBody>().ToList());
-            contentBodies.AddRange(bodies.OfType<ColumnBody>().ToList());
-            contentBodies.AddRange(bodies.OfType<TaskBody>().ToList());
+            contentBodies.AddRange(bodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(bodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(bodies.OfType<TaskBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
-            chatBodies.AddRange(bodies.OfType<ChatBody>().ToList());
-            chatBodies.AddRange(bodies.OfType<MessageBody>().ToList());
-            chatBodies.AddRange(bodies.OfType<ChatSettingsBody>().ToList());
+            chatBodies.AddRange(bodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(bodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(bodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
             SyncEntitiesEvent contentNodesEvent = new SyncEntitiesEvent()
             {

@@ -1,4 +1,4 @@
-using planner_server_package.Entities;
+using planner_common_package.Entities;
 
 namespace planner_node_service.Core.IService
 {

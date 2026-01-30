@@ -1,4 +1,5 @@
-﻿using planner_server_package.Entities;
+﻿using planner_client_package.Entities;
+using planner_common_package.Entities;
 using planner_node_service.Core.Entities.Models;
 
 namespace planner_node_service.Core.IService
@@ -6,7 +7,7 @@ namespace planner_node_service.Core.IService
     public interface INodeService
     {
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId);
-        public Task<ServiceResponse<IEnumerable<NodeLink>>> GetNodeLinks(Guid accountId);
+        public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Node node);
         public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node);
         public Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);

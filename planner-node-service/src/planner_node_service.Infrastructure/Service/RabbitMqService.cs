@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IService;
+using planner_server_package.Converters;
 using planner_server_package.Entities;
 using planner_server_package.Events;
 using RabbitMQ.Client;
@@ -156,13 +157,7 @@ namespace planner_node_service.Infrastructure.Service
                 BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage.Message)
             });
 
-            await nodeService.AddOrUpdateNodeLink(new NodeLinkBody()
-            {
-                Id = chatMessage.Message.Id,
-                ParentId = chatMessage.ChatId,
-                ChildId = chatMessage.Message.Id,
-                RelationType = RelationType.Contains
-            });
+            await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(chatMessage.Message.Link));
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
@@ -270,7 +265,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Column.Link != null)
                 {
-                    await nodeService.AddOrUpdateNodeLink(result.Column.Link);
+                    await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
                 else
                 {
@@ -311,7 +306,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Task.Link != null)
                 {
-                    await nodeService.AddOrUpdateNodeLink(result.Task.Link);
+                    await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
                 }
                 else
                 {
