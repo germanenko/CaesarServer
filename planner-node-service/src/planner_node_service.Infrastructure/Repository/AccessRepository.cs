@@ -19,16 +19,29 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, AccessType accessType)
         {
-            var access = (await _context.AccessRights.AddAsync(new AccessRight()
+            var existing = await _context.AccessRights
+                .FirstOrDefaultAsync(x =>
+                    x.AccountId == accountId &&
+                    x.NodeId == nodeId &&
+                    x.AccessType == accessType);
+
+            if (existing != null)
             {
+                return existing;
+            }
+
+            var accessRight = new AccessRight
+            {
+                Id = Guid.NewGuid(),
                 AccountId = accountId,
                 NodeId = nodeId,
                 AccessType = accessType
-            })).Entity;
+            };
 
+            _context.AccessRights.Add(accessRight);
             await _context.SaveChangesAsync();
 
-            return access;
+            return accessRight;
         }
 
         public async Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
