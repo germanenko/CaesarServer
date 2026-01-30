@@ -248,7 +248,8 @@ namespace planner_content_service.Infrastructure.Repository
             var columnNode = new Column
             {
                 Id = column.Id,
-                Name = column.Name
+                Name = column.Name,
+                Type = NodeType.Column
             };
 
             try
