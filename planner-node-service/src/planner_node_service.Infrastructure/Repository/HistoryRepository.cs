@@ -24,6 +24,8 @@ namespace planner_node_service.Infrastructure.Repository
 
             var result = (await _context.History.AddAsync(history)).Entity;
 
+            await _context.SaveChangesAsync();
+
             return result;
         }
 
