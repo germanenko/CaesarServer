@@ -119,7 +119,7 @@ namespace planner_node_service.Infrastructure.Service
                 catch (Exception ex)
                 {
                     _logger.LogError(ex, "Error while receive message");
-                    _channel.BasicNack(ea.DeliveryTag, false, true);
+                    _channel.BasicNack(ea.DeliveryTag, false, false);
                 }
             };
             _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
