@@ -84,12 +84,17 @@ namespace planner_node_service.Infrastructure.Service
 
         private void DeclareQueue(string exchange, string queue)
         {
+            var args = new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", "dlx-exchange" }
+            };
+
             _channel.QueueDeclare(
                 queue: queue,
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
-                arguments: null);
+                arguments: args);
 
             _channel.QueueBind(
                 queue: queue,
