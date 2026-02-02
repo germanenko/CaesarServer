@@ -76,6 +76,25 @@ namespace planner_node_service.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
+            _channel.ExchangeDeclare(
+                exchange: "dlx-exchange",
+                type: ExchangeType.Direct,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
+
+            _channel.QueueDeclare(
+                queue: "dead-letter-queue",
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: null);
+
+            _channel.QueueBind(
+                queue: "dead-letter-queue",
+                exchange: "dlx-exchange",
+                routingKey: "");
+
             foreach (var queue in _queues)
             {
                 DeclareQueue(queue.Key, queue.Value.QueueName);
@@ -86,7 +105,8 @@ namespace planner_node_service.Infrastructure.Service
         {
             var args = new Dictionary<string, object>
             {
-                { "x-dead-letter-exchange", "dlx-exchange" }
+                { "x-dead-letter-exchange", "dlx-exchange" },
+                { "x-dead-letter-routing-key", "" }
             };
 
             _channel.QueueDeclare(
