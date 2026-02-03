@@ -28,7 +28,7 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetNodesByIds(
-            [FromHeader] List<Guid> nodeIds
+            [FromQuery] List<Guid> nodeIds
         )
         {
             var result = await _nodeService.GetNodesByIds(nodeIds);
