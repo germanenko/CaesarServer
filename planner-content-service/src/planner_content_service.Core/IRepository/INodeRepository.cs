@@ -1,4 +1,4 @@
-using planner_server_package.Entities;
+using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 
@@ -12,5 +12,6 @@ namespace planner_content_service.Core.IRepository
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<NodeLink>?> GetNodeLinks(Guid accountId);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId);
+        Task<IEnumerable<Node>?> GetNodesByIds(List<Guid> nodeIds);
     }
 }

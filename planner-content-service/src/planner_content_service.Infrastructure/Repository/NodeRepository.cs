@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Infrastructure.Data;
-using planner_server_package.Entities;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -88,6 +88,13 @@ namespace planner_content_service.Infrastructure.Repository
             }
 
             return await query.Select(x => x.ChildId).ToListAsync();
+        }
+
+        public async Task<IEnumerable<Node>?> GetNodesByIds(List<Guid> nodeIds)
+        {
+            return await _context.Nodes
+                .Where(x => nodeIds.Contains(x.Id))
+                .ToListAsync();
         }
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)

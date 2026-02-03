@@ -34,7 +34,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AccessGroups");
+                    b.ToTable("AccessGroups", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.AccessGroupMember", b =>
@@ -53,7 +53,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("AccessGroupId");
 
-                    b.ToTable("AccessGroupMembers");
+                    b.ToTable("AccessGroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.AccessRight", b =>
@@ -85,7 +85,7 @@ namespace planner_content_service.Api.Migrations
                     b.HasIndex("AccountId", "NodeId", "AccessType")
                         .IsUnique();
 
-                    b.ToTable("AccessRights");
+                    b.ToTable("AccessRights", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.AccountChatSession", b =>
@@ -107,7 +107,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("ChatSettingId");
 
-                    b.ToTable("AccountChatSession");
+                    b.ToTable("AccountChatSession", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.ChatSettings", b =>
@@ -135,7 +135,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.ToTable("ChatSettings");
+                    b.ToTable("ChatSettings", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.History", b =>
@@ -241,7 +241,7 @@ namespace planner_content_service.Api.Migrations
                     b.HasIndex("ParentId", "ChildId", "RelationType")
                         .IsUnique();
 
-                    b.ToTable("NodeLinks");
+                    b.ToTable("NodeLinks", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.NotificationSettings", b =>
@@ -263,7 +263,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.ToTable("NotificationSettings");
+                    b.ToTable("NotificationSettings", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.PublicationStatusModel", b =>
@@ -287,7 +287,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("NodeId", "UpdatedAt");
 
-                    b.ToTable("PublicationStatuses");
+                    b.ToTable("PublicationStatuses", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.WorkflowStatusModel", b =>
@@ -311,7 +311,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("NodeId", "UpdatedAt");
 
-                    b.ToTable("WorkflowStatuses");
+                    b.ToTable("WorkflowStatuses", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Board", b =>

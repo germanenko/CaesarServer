@@ -1,6 +1,6 @@
-using planner_server_package.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using planner_client_package.Entities;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
@@ -21,6 +21,18 @@ namespace planner_content_service.Api.Controllers
         {
             _nodeService = nodeService;
             _jwtService = jwtService;
+        }
+
+        [HttpGet("getNodesByIds")]
+        [SwaggerOperation("Получить ноды по ID")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> GetNodesByIds(
+            [FromBody] List<Guid> nodeIds
+        )
+        {
+            var result = await _nodeService.GetNodesByIds(nodeIds);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
 
         [HttpGet("getNodes"), Authorize]

@@ -1,29 +1,21 @@
-﻿using planner_common_package.Enums;
-using planner_server_package.Entities;
+﻿using planner_client_package.Entities;
+using planner_common_package;
+using planner_common_package.Enums;
 using System.Text.Json.Serialization;
 
 namespace planner_content_service.Core.Entities.Models
 {
-    [JsonDerivedType(typeof(Board), "board")]
-    [JsonDerivedType(typeof(Column), "column")]
-    [JsonDerivedType(typeof(TaskModel), "task")]
-    [JsonDerivedType(typeof(Chat), "chat")]
-    [JsonDerivedType(typeof(ChatMessage), "chatMessage")]
-    public class Node : ModelBase
+    [JsonDerivedType(typeof(Board), Discriminator.Board)]
+    [JsonDerivedType(typeof(Column), Discriminator.Column)]
+    [JsonDerivedType(typeof(TaskModel), Discriminator.Task)]
+    [JsonDerivedType(typeof(Chat), Discriminator.Chat)]
+    [JsonDerivedType(typeof(ChatMessage), Discriminator.ChatMessage)]
+    public abstract class Node : ModelBase
     {
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
 
-        public NodeBody ToNodeBody()
-        {
-            return new NodeBody()
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type
-            };
-        }
+        public abstract NodeBody ToNodeBody();
     }
 }

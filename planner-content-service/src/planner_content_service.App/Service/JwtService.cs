@@ -1,7 +1,8 @@
+using planner_common_package.Entities;
+using planner_content_service.Core.IService;
+using planner_server_package.Entities;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using planner_server_package.Entities;
-using planner_content_service.Core.IService;
 
 namespace planner_content_service.App.Service
 {

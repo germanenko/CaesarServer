@@ -125,8 +125,6 @@ namespace planner_content_service.Infrastructure.Service
             {
                 Id = x.Id,
                 Name = x.Name,
-                CreatedAt = x.CreatedAt,
-                CreatedBy = x.CreatedBy,
                 Props = x.Props,
                 PublicationStatus = x.PublicationStatus,
                 Type = NodeType.Board,
@@ -138,8 +136,6 @@ namespace planner_content_service.Infrastructure.Service
             {
                 Id = x.Id,
                 Name = x.Name,
-                CreatedAt = x.CreatedAt,
-                CreatedBy = x.CreatedBy,
                 Props = x.Props,
                 PublicationStatus = x.PublicationStatus,
                 Type = NodeType.Column,
@@ -151,8 +147,6 @@ namespace planner_content_service.Infrastructure.Service
             {
                 Id = x.Id,
                 Name = x.Name,
-                CreatedAt = x.CreatedAt,
-                CreatedBy = x.CreatedBy,
                 Props = x.Props,
                 PublicationStatus = x.PublicationStatus,
                 Type = NodeType.Column,

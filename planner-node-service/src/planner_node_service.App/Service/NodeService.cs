@@ -8,6 +8,8 @@ using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.Interface;
+using System.Net;
+using System.Net.Mime;
 using System.Text.Json;
 
 namespace planner_node_service.App.Service
@@ -35,8 +37,8 @@ namespace planner_node_service.App.Service
             foreach (var body in bodies)
             {
                 var history = await _historyRepository.GetCreateHistory(body.Id);
-                body.CreatedBy = history.ActorId;
-                body.CreatedAt = history.Date;
+                body.UpdatedBy = history.ActorId;
+                body.UpdatedAt = history.Date;
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
@@ -158,6 +160,31 @@ namespace planner_node_service.App.Service
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList()
             };
+        }
+
+        public async Task<List<NodeBody>> GetNodesByIdAsync(List<NodeBody> nodes)
+        {
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://planner-content-service:80/api/"),
+            };
+
+            var s = JsonSerializer.Serialize(nodes.Select(x => x.Id));
+            var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
+            var response = await client.PostAsync("getNodesByIds", content);
+
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var resultString = await response.Content.ReadAsStringAsync();
+                var result = JsonSerializer.Deserialize<List<NodeBody>>(resultString);
+
+                return result;
+            }
+            else
+            {
+                return nodes;
+            }
         }
     }
 }

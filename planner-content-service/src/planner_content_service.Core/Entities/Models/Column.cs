@@ -14,5 +14,16 @@ namespace planner_content_service.Core.Entities.Models
                 Type = Type
             };
         }
+
+        public override NodeBody ToNodeBody()
+        {
+            return new ColumnBody
+            {
+                Id = Id,
+                Name = Name,
+                Props = Props,
+                Type = Type
+            };
+        }
     }
 }
