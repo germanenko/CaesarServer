@@ -32,11 +32,13 @@ namespace planner_node_service.App.Service
         {
             var nodes = await _nodeRepository.GetNodes(accountId);
 
-            var bodies = nodes.Select(x => x.ToNodeBody());
+            var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
+
+            bodies = await GetNodesByIdAsync(bodies);
 
             foreach (var body in bodies)
             {
-                var history = await _historyRepository.GetCreateHistory(body.Id);
+                var history = await _historyRepository.GetLastHistory(body.Id);
                 body.UpdatedBy = history.ActorId;
                 body.UpdatedAt = history.Date;
             }
@@ -44,7 +46,7 @@ namespace planner_node_service.App.Service
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
+                StatusCode = HttpStatusCode.OK,
                 Body = bodies
             };
         }

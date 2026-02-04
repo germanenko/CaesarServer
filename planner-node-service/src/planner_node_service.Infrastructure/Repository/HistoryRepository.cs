@@ -35,5 +35,12 @@ namespace planner_node_service.Infrastructure.Repository
 
             return history;
         }
+
+        public async Task<History?> GetLastHistory(Guid nodeId)
+        {
+            var history = await _context.History.Where(x => x.TrackableId == nodeId && x.Action == ActionType.Update).OrderByDescending(x => x.Date).FirstOrDefaultAsync();
+
+            return history;
+        }
     }
 }

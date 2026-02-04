@@ -1,4 +1,8 @@
-﻿using AccountSessionsClient = planner_client_package.Entities.AccountSessions;
+﻿using AccessGroupClient = planner_client_package.Entities.AccessGroupBody;
+using AccessGroupServer = planner_server_package.Entities.AccessGroupBody;
+using AccessRightClient = planner_client_package.Entities.AccessRightBody;
+using AccessRightServer = planner_server_package.Entities.AccessRightBody;
+using AccountSessionsClient = planner_client_package.Entities.AccountSessions;
 using AccountSessionsServer = planner_server_package.Entities.AccountSessions;
 using BoardClient = planner_client_package.Entities.BoardBody;
 using BoardServer = planner_server_package.Entities.BoardBody;
@@ -32,6 +36,7 @@ namespace planner_server_package.Converters
                 UpdatedAt = body.UpdatedAt,
                 UpdatedBy = body.UpdatedBy,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
             };
         }
 
@@ -289,7 +294,57 @@ namespace planner_server_package.Converters
                 Id = body.Id,
                 ChildId = body.ChildId,
                 ParentId = body.ParentId,
-                RelationType = body.RelationType
+                RelationType = body.RelationType,
+            };
+        }
+
+
+        public static AccessRightClient ServerToClientBody(AccessRightServer body)
+        {
+            return new AccessRightClient()
+            {
+                Id = body.Id,
+                AccessGroupId = body.AccessGroupId,
+                AccessType = body.AccessType,
+                AccountId = body.AccountId,
+                NodeId = body.NodeId,
+                AccessGroup = ServerToClientBody(body.AccessGroup)
+            };
+        }
+
+
+
+        public static AccessRightServer ClientToServerBody(AccessRightClient body)
+        {
+            return new AccessRightServer()
+            {
+                Id = body.Id,
+                AccessGroupId = body.AccessGroupId,
+                AccessType = body.AccessType,
+                AccountId = body.AccountId,
+                NodeId = body.NodeId,
+                AccessGroup = ClientToServerBody(body.AccessGroup)
+            };
+        }
+
+
+        public static AccessGroupClient ServerToClientBody(AccessGroupServer body)
+        {
+            return new AccessGroupClient()
+            {
+                Id = body.Id,
+                Name = body.Name
+            };
+        }
+
+
+
+        public static AccessGroupServer ClientToServerBody(AccessGroupClient body)
+        {
+            return new AccessGroupServer()
+            {
+                Id = body.Id,
+                Name = body.Name
             };
         }
     }

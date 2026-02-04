@@ -11,6 +11,7 @@ namespace planner_node_service.Core.IRepository
     public interface IHistoryRepository
     {
         Task<History?> GetCreateHistory(Guid nodeId);
+        Task<History?> GetLastHistory(Guid nodeId);
         Task<History?> AddHistory(History history);
     }
 }
