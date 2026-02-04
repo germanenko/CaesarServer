@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_node_service.App.Service;
@@ -47,6 +48,19 @@ void ConfigureServices(IServiceCollection services)
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
     var jwtAudience = GetEnvVar("JWT_AUTH_AUDIENCE");
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
+
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+
+    builder.Logging.AddSimpleConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.SingleLine = false;
+        options.TimestampFormat = "HH:mm:ss ";
+        options.ColorBehavior = LoggerColorBehavior.Enabled;
+    });
+
+    builder.Logging.SetMinimumLevel(LogLevel.Information);
 
     services.AddControllers(e =>
     {

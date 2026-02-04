@@ -23,6 +23,7 @@ namespace planner_node_service.App.Service
         private readonly INodeRepository _nodeRepository;
         private readonly IHistoryRepository _historyRepository;
         private readonly INotifyService _notifyService;
+        private readonly ILogger<NodeService> _logger;
 
         public NodeService(
             INodeRepository nodeRepository, INotifyService notifyService, IHistoryRepository historyRepository, ILogger<NodeService> logger)
@@ -30,6 +31,7 @@ namespace planner_node_service.App.Service
             _nodeRepository = nodeRepository;
             _notifyService = notifyService;
             _historyRepository = historyRepository;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
@@ -184,7 +186,7 @@ namespace planner_node_service.App.Service
             {
                 var resultString = await response.Content.ReadAsStringAsync();
 
-                Console.WriteLine(resultString);
+                _logger.LogInformation(resultString);
 
                 var options = new JsonSerializerOptions
                 {
