@@ -177,10 +177,11 @@ namespace planner_node_service.App.Service
                 BaseAddress = new Uri("http://planner-content-service:80/api/"),
             };
 
-            var s = JsonSerializer.Serialize(nodes.Select(x => x.Id));
-            var content = new StringContent(s, System.Text.Encoding.UTF8, MediaTypeNames.Application.Json);
-            var response = await client.PostAsync("getNodesByIds", content);
+            var nodeIds = nodes.Select(x => x.Id);
 
+            var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}"));
+
+            var response = await client.GetAsync($"getNodesByIds?{queryString}");
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
