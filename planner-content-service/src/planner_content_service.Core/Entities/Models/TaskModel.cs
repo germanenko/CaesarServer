@@ -37,6 +37,7 @@ namespace planner_content_service.Core.Entities.Models
                 Props = Props,
                 Type = Type,
                 Description = Description,
+                HexColor = HexColor,
                 StartDate = StartDate,
                 EndDate = EndDate,
             };
