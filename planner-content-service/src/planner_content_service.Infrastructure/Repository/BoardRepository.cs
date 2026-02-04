@@ -49,9 +49,10 @@ namespace planner_content_service.Infrastructure.Repository
                 await _context.AccessRights.AddAsync(new AccessRight()
                 {
                     Id = Guid.NewGuid(),
-                    AccountId = createBoardBody.AccessRight.AccountId,
-                    NodeId = createBoardBody.AccessRight.NodeId,
-                    AccessType = createBoardBody.AccessRight.AccessType
+                    AccountId = accountId,
+                    NodeId = board.Id,
+                    Node = board,
+                    AccessType = AccessType.Creator
                 });
 
                 await _context.NodeLinks.AddAsync(new NodeLink()
