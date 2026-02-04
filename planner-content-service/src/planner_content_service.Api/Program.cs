@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_content_service.App.Service;
@@ -45,6 +46,17 @@ void ConfigureServices(IServiceCollection services)
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
+
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+
+    builder.Logging.AddSimpleConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.SingleLine = false;
+        options.TimestampFormat = "HH:mm:ss ";
+        options.ColorBehavior = LoggerColorBehavior.Enabled;
+    });
 
     services.AddControllers(e =>
     {

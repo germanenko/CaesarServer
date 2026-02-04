@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
@@ -16,11 +17,13 @@ namespace planner_content_service.Infrastructure.Repository
     {
         private readonly ContentDbContext _context;
         private readonly INotifyService _notifyService;
+        private readonly ILogger<BoardRepository> _logger;
 
-        public BoardRepository(ContentDbContext context, INotifyService notifyService)
+        public BoardRepository(ContentDbContext context, INotifyService notifyService, ILogger<BoardRepository> logger)
         {
             _context = context;
             _notifyService = notifyService;
+            _logger = logger;
         }
 
         public async Task<Board?> AddAsync(BoardBody createBoardBody, Guid accountId)
@@ -257,7 +260,6 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
                 {
-                    Node = columnNode,
                     NodeId = column.Id,
                     Status = column.PublicationStatus,
                     UpdatedAt = column.UpdatedAt
@@ -291,7 +293,7 @@ namespace planner_content_service.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при создании колонки {column.Name}: {ex.Message}");
+                _logger.LogError($"Ошибка при создании колонки {column.Name}: {ex.Message}");
 
                 throw;
             }
