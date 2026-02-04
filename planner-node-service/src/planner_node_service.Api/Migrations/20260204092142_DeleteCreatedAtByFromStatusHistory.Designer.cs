@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260204092142_DeleteCreatedAtByFromStatusHistory")]
+    partial class DeleteCreatedAtByFromStatusHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -118,28 +121,23 @@ namespace planner_node_service.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("Actor")
-                        .HasColumnType("uuid");
-
-                    b.Property<DateTime>("Date")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<Guid>("NewStatusId")
-                        .HasColumnType("uuid");
-
                     b.Property<Guid>("NodeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("OldStatusId")
+                    b.Property<Guid>("StatusId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("UpdatedBy")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NewStatusId");
-
                     b.HasIndex("NodeId");
 
-                    b.HasIndex("OldStatusId");
+                    b.HasIndex("StatusId");
 
                     b.ToTable("StatusHistory");
                 });
@@ -313,29 +311,21 @@ namespace planner_node_service.Api.Migrations
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusHistory", b =>
                 {
-                    b.HasOne("planner_node_service.Core.Entities.Models.StatusBase", "NewStatus")
-                        .WithMany()
-                        .HasForeignKey("NewStatusId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
                     b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
                         .WithMany()
                         .HasForeignKey("NodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("planner_node_service.Core.Entities.Models.StatusBase", "OldStatus")
+                    b.HasOne("planner_node_service.Core.Entities.Models.StatusBase", "Status")
                         .WithMany()
-                        .HasForeignKey("OldStatusId")
+                        .HasForeignKey("StatusId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("NewStatus");
-
                     b.Navigation("Node");
 
-                    b.Navigation("OldStatus");
+                    b.Navigation("Status");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.PublicationStatusModel", b =>

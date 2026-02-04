@@ -17,12 +17,19 @@ namespace planner_node_service.Infrastructure.Configurations
 
             builder.HasIndex(e => e.NodeId);
 
-            builder.HasOne(e => e.Status)
+            builder.HasOne(e => e.NewStatus)
                 .WithMany()
-                .HasForeignKey(e => e.StatusId)
+                .HasForeignKey(e => e.NewStatusId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasIndex(e => e.StatusId);
+            builder.HasIndex(e => e.NewStatusId);
+
+            builder.HasOne(e => e.OldStatus)
+                .WithMany()
+                .HasForeignKey(e => e.OldStatusId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasIndex(e => e.OldStatusId);
         }
     }
 }
