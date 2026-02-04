@@ -248,19 +248,18 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<Column?> AddBoardColumn(ColumnBody column, Guid accountId)
         {
-            var columnNode = new Column
-            {
-                Id = column.Id,
-                Name = column.Name,
-                Type = NodeType.Column
-            };
-
             try
             {
+                var columnNode = new Column
+                {
+                    Id = column.Id != Guid.Empty ? column.Id : Guid.NewGuid(),
+                    Name = column.Name,
+                    Type = NodeType.Column
+                };
 
                 await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
                 {
-                    NodeId = column.Id,
+                    NodeId = columnNode.Id,
                     Status = column.PublicationStatus,
                     UpdatedAt = column.UpdatedAt
                 });
