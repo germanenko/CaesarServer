@@ -293,7 +293,7 @@ namespace planner_content_service.Infrastructure.Repository
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Ошибка при создании колонки {column.Name}: {ex.Message}");
+                _logger.LogError($"Ошибка при создании колонки {column.Id}: {ex.Message}");
 
                 throw;
             }
