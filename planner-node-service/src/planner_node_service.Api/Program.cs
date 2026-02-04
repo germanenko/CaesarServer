@@ -15,8 +15,6 @@ using planner_node_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
-Env.Load();
-
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);

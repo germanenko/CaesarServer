@@ -40,11 +40,7 @@ namespace planner_node_service.App.Service
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
-            _logger.LogInformation(bodies.ToString());
-
             bodies = await GetNodesByIdAsync(bodies);
-
-            _logger.LogInformation(bodies.ToString());
 
             foreach (var body in bodies)
             {
@@ -205,6 +201,7 @@ namespace planner_node_service.App.Service
             }
             else
             {
+                _logger.LogInformation($"Error: {response.StatusCode}");
                 return nodes;
             }
         }
