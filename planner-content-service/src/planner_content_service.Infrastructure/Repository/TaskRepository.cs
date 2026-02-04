@@ -33,7 +33,12 @@ namespace planner_content_service.Infrastructure.Repository
             {
                 Id = task.Id,
                 Name = task.Name,
-                Type = NodeType.Task
+                Type = NodeType.Task,
+                Description = task.Description,
+                EndDate = task.EndDate,
+                HexColor = task.HexColor,
+                Props = task.Props,
+                StartDate = task.StartDate
             };
 
             _context.SaveChanges();
