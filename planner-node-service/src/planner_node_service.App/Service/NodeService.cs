@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
 using planner_common_package.Entities;
 using planner_node_service.Core.Entities.Models;
@@ -22,13 +23,15 @@ namespace planner_node_service.App.Service
         private readonly INodeRepository _nodeRepository;
         private readonly IHistoryRepository _historyRepository;
         private readonly INotifyService _notifyService;
+        private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, INotifyService notifyService, IHistoryRepository historyRepository)
+            INodeRepository nodeRepository, INotifyService notifyService, IHistoryRepository historyRepository, ILogger<NodeService> logger)
         {
             _nodeRepository = nodeRepository;
             _notifyService = notifyService;
             _historyRepository = historyRepository;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
@@ -183,9 +186,11 @@ namespace planner_node_service.App.Service
             {
                 var resultString = await response.Content.ReadAsStringAsync();
 
+                _logger.LogInformation(resultString);
+
                 var options = new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true,
+                    PropertyNameCaseInsensitive = false,
                     PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
