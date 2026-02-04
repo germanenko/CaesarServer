@@ -11,7 +11,9 @@ using planner_server_package.Interface;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
 
 namespace planner_node_service.App.Service
 {
@@ -183,7 +185,9 @@ namespace planner_node_service.App.Service
 
                 var options = new JsonSerializerOptions
                 {
-                    PropertyNameCaseInsensitive = true
+                    PropertyNameCaseInsensitive = true,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
 
                 var result = JsonSerializer.Deserialize<List<NodeBody>>(resultString, options);
