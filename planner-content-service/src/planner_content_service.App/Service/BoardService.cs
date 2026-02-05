@@ -99,7 +99,7 @@ namespace planner_content_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToBoardBody()
+                Body = result
             };
         }
 
@@ -120,7 +120,7 @@ namespace planner_content_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.Select(x => x.ToBoardBody()).ToList()
+                Body = result
             };
         }
 

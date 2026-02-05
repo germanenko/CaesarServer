@@ -7,8 +7,8 @@ namespace planner_content_service.Core.IRepository
     public interface IBoardRepository
     {
         Task<IEnumerable<Node>> GetAll(Guid accountId);
-        Task<Board?> AddAsync(BoardBody createBoardBody, Guid accountId);
-        Task<List<Board>?> AddRangeAsync(List<BoardBody> boards, Guid accountId);
+        Task<BoardBody?> AddAsync(BoardBody createBoardBody, Guid accountId);
+        Task<List<BoardBody>?> AddRangeAsync(List<BoardBody> boards, Guid accountId);
         //Task<Board?> GetAsync(Guid id);
         Task<AccessRight?> GetBoardMemberAsync(Guid accountId, Guid boardId);
         Task<IEnumerable<Node>> GetBoardColumns(Guid boardId);

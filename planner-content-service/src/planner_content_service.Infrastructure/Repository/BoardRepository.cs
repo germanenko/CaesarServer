@@ -26,7 +26,7 @@ namespace planner_content_service.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<Board?> AddAsync(BoardBody createBoardBody, Guid accountId)
+        public async Task<BoardBody?> AddAsync(BoardBody createBoardBody, Guid accountId)
         {
             try
             {
@@ -80,7 +80,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 _ = Task.Run(() => _notifyService.Publish(boardEvent, PublishEvent.CreateBoard));
 
-                return board;
+                return createBoardBody;
             }
             catch (Exception ex)
             {
@@ -90,16 +90,15 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<Board>?> AddRangeAsync(List<BoardBody> boards, Guid accountId)
+        public async Task<List<BoardBody>?> AddRangeAsync(List<BoardBody> boards, Guid accountId)
         {
-            List<Board> newBoardNodes = new List<Board>();
+            List<BoardBody> newBoardNodes = new List<BoardBody>();
 
             foreach (var board in boards)
             {
                 newBoardNodes.Add(await AddAsync(board, accountId));
             }
 
-            //await _context.Boards.AddRangeAsync(newBoardNodes);
             await _context.SaveChangesAsync();
 
             return newBoardNodes;
