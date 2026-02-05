@@ -308,7 +308,7 @@ namespace planner_server_package.Converters
                 AccessType = body.AccessType,
                 AccountId = body.AccountId,
                 NodeId = body.NodeId,
-                AccessGroup = ServerToClientBody(body.AccessGroup)
+                AccessGroup = body.AccessGroup != null ? ServerToClientBody(body.AccessGroup) : null
             };
         }
 
@@ -323,7 +323,7 @@ namespace planner_server_package.Converters
                 AccessType = body.AccessType,
                 AccountId = body.AccountId,
                 NodeId = body.NodeId,
-                AccessGroup = ClientToServerBody(body.AccessGroup)
+                AccessGroup = body.AccessGroup != null ? ClientToServerBody(body.AccessGroup) : null
             };
         }
 
