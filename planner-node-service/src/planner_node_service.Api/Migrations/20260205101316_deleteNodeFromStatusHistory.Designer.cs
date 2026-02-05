@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205101316_deleteNodeFromStatusHistory")]
+    partial class deleteNodeFromStatusHistory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -112,9 +115,6 @@ namespace planner_node_service.Api.Migrations
                     b.Property<int>("StatusCode")
                         .HasColumnType("integer");
 
-                    b.Property<Guid?>("StatusDetailsId")
-                        .HasColumnType("uuid");
-
                     b.Property<int>("Type")
                         .HasColumnType("integer");
 
@@ -122,22 +122,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.HasIndex("StatusDetailsId");
-
                     b.ToTable("Statuses");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusDetails", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StatusDetails");
-
-                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusHistory", b =>
@@ -178,16 +163,6 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("Trackables");
 
                     b.UseTptMappingStrategy();
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.WorkflowStatusDetails", b =>
-                {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.StatusDetails");
-
-                    b.Property<string>("Comment")
-                        .HasColumnType("text");
-
-                    b.ToTable("WorkflowStatusDetails");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroup", b =>
@@ -321,13 +296,7 @@ namespace planner_node_service.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("planner_node_service.Core.Entities.Models.StatusDetails", "StatusDetails")
-                        .WithMany()
-                        .HasForeignKey("StatusDetailsId");
-
                     b.Navigation("Node");
-
-                    b.Navigation("StatusDetails");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusHistory", b =>
@@ -347,15 +316,6 @@ namespace planner_node_service.Api.Migrations
                     b.Navigation("NewStatus");
 
                     b.Navigation("OldStatus");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.WorkflowStatusDetails", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.StatusDetails", null)
-                        .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.WorkflowStatusDetails", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroup", b =>

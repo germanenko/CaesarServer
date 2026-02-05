@@ -22,12 +22,12 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.TrackableId)
                 .IsRequired();
 
-            builder.Property(e => e.Date)
+            builder.Property(e => e.UpdatedAt)
                 .IsRequired()
                 .HasDefaultValueSql("NOW()")
                 .ValueGeneratedOnAddOrUpdate();
 
-            builder.Property(e => e.ActorId)
+            builder.Property(e => e.UpdatedById)
                 .IsRequired();
 
             builder.HasOne(e => e.Trackable)
@@ -38,8 +38,8 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.HasIndex(e => e.TrackableId)
                 .HasDatabaseName("IX_Histories_TrackableId");
 
-            builder.HasIndex(e => e.ActorId)
-                .HasDatabaseName("IX_Histories_ActorId");
+            builder.HasIndex(e => e.UpdatedById)
+                .HasDatabaseName("IX_Histories_UpdatedById");
         }
     }
 }

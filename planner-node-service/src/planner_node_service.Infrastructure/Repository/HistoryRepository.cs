@@ -38,7 +38,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<History?> GetLastHistory(Guid nodeId)
         {
-            var history = await _context.History.Where(x => x.TrackableId == nodeId).OrderByDescending(x => x.Date).FirstOrDefaultAsync();
+            var history = await _context.History.Where(x => x.TrackableId == nodeId).OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
 
             return history;
         }

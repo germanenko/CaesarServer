@@ -257,7 +257,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
 
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, Date = result.Board.UpdatedAt.Value });
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
             }
             catch (Exception ex)
             {
@@ -301,7 +301,7 @@ namespace planner_node_service.Infrastructure.Service
                     await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Column.AccessRight));
                 }
 
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, Date = result.Column.UpdatedAt.Value });
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, UpdatedAt = result.Column.UpdatedAt.Value });
             }
             catch (Exception ex)
             {
@@ -345,7 +345,7 @@ namespace planner_node_service.Infrastructure.Service
                     await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Task.AccessRight));
                 }
 
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, Date = result.Task.UpdatedAt.Value });
+                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, UpdatedAt = result.Task.UpdatedAt.Value });
             }
             catch (Exception ex)
             {

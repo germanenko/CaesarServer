@@ -10,13 +10,6 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.HasKey(e => e.Id);
 
-            builder.HasOne(e => e.Node)
-                .WithMany()
-                .HasForeignKey(e => e.NodeId)
-                .OnDelete(DeleteBehavior.Cascade);
-
-            builder.HasIndex(e => e.NodeId);
-
             builder.HasOne(e => e.NewStatus)
                 .WithMany()
                 .HasForeignKey(e => e.NewStatusId)

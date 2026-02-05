@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class StatusBase : ModelBase
+    public class WorkflowStatusDetails : StatusDetails
     {
-        public Guid NodeId { get; set; }
-        public Node Node { get; set; }
+        public string? Comment { get; set; }
     }
 }

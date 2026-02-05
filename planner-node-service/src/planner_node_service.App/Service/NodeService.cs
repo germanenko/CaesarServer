@@ -45,8 +45,8 @@ namespace planner_node_service.App.Service
             foreach (var body in bodies)
             {
                 var history = await _historyRepository.GetLastHistory(body.Id);
-                body.UpdatedBy = history?.ActorId;
-                body.UpdatedAt = history?.Date;
+                body.UpdatedBy = history?.UpdatedById;
+                body.UpdatedAt = history?.UpdatedAt;
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
