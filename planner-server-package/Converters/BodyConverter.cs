@@ -53,7 +53,8 @@ namespace planner_server_package.Converters
                 Type = body.Type,
                 UpdatedAt = body.UpdatedAt,
                 UpdatedBy = body.UpdatedBy,
-                Link = body.Link != null ? ClientToServerBody(body.Link) : null
+                Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null
             };
         }
 
@@ -70,6 +71,7 @@ namespace planner_server_package.Converters
                 UpdatedAt = body.UpdatedAt,
                 UpdatedBy = body.UpdatedBy,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null
             };
         }
 
@@ -87,6 +89,7 @@ namespace planner_server_package.Converters
                 UpdatedAt = body.UpdatedAt,
                 UpdatedBy = body.UpdatedBy,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null
             };
         }
 
@@ -110,6 +113,7 @@ namespace planner_server_package.Converters
                 PriorityOrder = body.PriorityOrder,
                 TaskType = body.TaskType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null
             };
         }
 
@@ -127,6 +131,7 @@ namespace planner_server_package.Converters
                 UpdatedAt = body.UpdatedAt,
                 UpdatedBy = body.UpdatedBy,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
                 Status = body.Status,
                 StartDate = body.StartDate,
                 Description = body.Description,
@@ -154,6 +159,7 @@ namespace planner_server_package.Converters
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 IsSyncedReadStatus = body.IsSyncedReadStatus,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null
             };
         }
 
@@ -174,7 +180,8 @@ namespace planner_server_package.Converters
                 ImageUrl = body.ImageUrl,
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 ParticipantIds = body.ParticipantIds,
-                Link = body.Link != null ? ClientToServerBody(body.Link) : null
+                Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null
             };
         }
 
@@ -196,7 +203,8 @@ namespace planner_server_package.Converters
                 Date = body.Date,
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
-                Link = body.Link != null ? ServerToClientBody(body.Link) : null
+                Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null
             };
         }
 
@@ -219,7 +227,8 @@ namespace planner_server_package.Converters
                 Date = body.Date,
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
-                Link = body.Link != null ? ClientToServerBody(body.Link) : null
+                Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null
             };
         }
 
