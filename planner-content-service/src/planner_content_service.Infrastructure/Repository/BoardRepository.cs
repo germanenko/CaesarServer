@@ -51,11 +51,10 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.AccessRights.AddAsync(new AccessRight()
                 {
-                    Id = Guid.NewGuid(),
-                    AccountId = accountId,
-                    NodeId = board.Id,
-                    Node = board,
-                    AccessType = AccessType.Creator
+                    Id = createBoardBody.AccessRight.Id,
+                    AccountId = createBoardBody.AccessRight.AccountId,
+                    NodeId = createBoardBody.AccessRight.NodeId,
+                    AccessType = createBoardBody.AccessRight.AccessType
                 });
 
                 await _context.NodeLinks.AddAsync(new NodeLink()
@@ -257,6 +256,8 @@ namespace planner_content_service.Infrastructure.Repository
                     Type = NodeType.Column
                 };
 
+                columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
+
                 await _context.PublicationStatuses.AddAsync(new PublicationStatusModel()
                 {
                     NodeId = columnNode.Id,
@@ -275,8 +276,6 @@ namespace planner_content_service.Infrastructure.Repository
                     NodeId = columnNode.Id,
                     AccountId = accountId
                 });
-
-                columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
 
                 await _context.SaveChangesAsync();
 

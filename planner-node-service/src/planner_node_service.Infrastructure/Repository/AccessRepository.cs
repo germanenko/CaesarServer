@@ -1,10 +1,10 @@
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
-using planner_server_package.Entities;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -15,6 +15,33 @@ namespace planner_node_service.Infrastructure.Repository
         public AccessRepository(NodeDbContext context)
         {
             _context = context;
+        }
+
+        public async Task<AccessRight?> CreateAccessRight(AccessRightBody accessRightBody)
+        {
+            var existing = await _context.AccessRights
+                .FirstOrDefaultAsync(x =>
+                    x.AccountId == accessRightBody.AccountId &&
+                    x.NodeId == accessRightBody.NodeId &&
+                    x.AccessType == accessRightBody.AccessType);
+
+            if (existing != null)
+            {
+                return existing;
+            }
+
+            var accessRight = new AccessRight
+            {
+                Id = accessRightBody.Id,
+                AccountId = accessRightBody.AccountId,
+                NodeId = accessRightBody.NodeId,
+                AccessType = accessRightBody.AccessType
+            };
+
+            _context.AccessRights.Add(accessRight);
+            await _context.SaveChangesAsync();
+
+            return accessRight;
         }
 
         public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, AccessType accessType)

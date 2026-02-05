@@ -1,14 +1,8 @@
-﻿using planner_server_package.Entities;
+﻿using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
 
 namespace planner_node_service.App.Service
 {
@@ -21,6 +15,28 @@ namespace planner_node_service.App.Service
         {
             _accessRepository = accessRepository;
             _userService = userService;
+        }
+
+        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(AccessRightBody accessRightBody)
+        {
+            var access = await _accessRepository.CreateAccessRight(accessRightBody);
+
+            if (access == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступа к доске" }
+                };
+            }
+
+            return new ServiceResponse<AccessRightBody>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access.ToAccessRightBody()
+            };
         }
 
         public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(Guid accountId, Guid nodeId, AccessType accessType)
@@ -49,13 +65,13 @@ namespace planner_node_service.App.Service
         {
             var group = await _accessRepository.CreateGroup(accountId, body);
 
-            if(group == null)
+            if (group == null)
             {
                 return new ServiceResponse<AccessGroupBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new [] { "Нет доступа к доске" } 
+                    Errors = new[] { "Нет доступа к доске" }
                 };
             }
 
@@ -71,7 +87,7 @@ namespace planner_node_service.App.Service
         {
             var group = await _accessRepository.AddUserToGroup(accountId, userToAdd, groupId);
 
-            if(group == null)
+            if (group == null)
             {
                 return new ServiceResponse<AccessGroupMemberBody>()
                 {

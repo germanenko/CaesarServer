@@ -255,7 +255,7 @@ namespace planner_node_service.Infrastructure.Service
                     BodyJson = JsonSerializer.Serialize<NodeBody>(result.Board)
                 });
 
-                await accessService.CreateAccessRight(result.CreatorId, result.Board.Id, AccessType.Creator);
+                await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, Date = result.Board.UpdatedAt.Value });
             }
@@ -296,9 +296,9 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
-                else
+                if (result.Column.AccessRight != null)
                 {
-                    await accessService.CreateAccessRight(result.CreatorId, result.Column.Id, AccessType.Creator);
+                    await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Column.AccessRight));
                 }
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, Date = result.Column.UpdatedAt.Value });
@@ -340,9 +340,9 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
                 }
-                else
+                if (result.Task.AccessRight != null)
                 {
-                    await accessService.CreateAccessRight(result.CreatorId, result.Task.Id, AccessType.Creator);
+                    await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Task.AccessRight));
                 }
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), ActorId = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, Date = result.Task.UpdatedAt.Value });
