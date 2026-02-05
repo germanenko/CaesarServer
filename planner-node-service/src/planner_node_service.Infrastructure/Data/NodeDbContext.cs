@@ -18,8 +18,6 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<StatusHistory> StatusHistory { get; set; }
-        public DbSet<StatusDetails> StatusDetails { get; set; }
-        public DbSet<WorkflowStatusDetails> WorkflowStatusDetails { get; set; }
         public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
@@ -31,14 +29,10 @@ namespace planner_node_service.Infrastructure.Data
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             modelBuilder.Entity<TrackableEntity>().UseTptMappingStrategy();
-            modelBuilder.Entity<StatusDetails>().UseTptMappingStrategy();
-
             modelBuilder.Entity<Node>().HasBaseType<TrackableEntity>();
             modelBuilder.Entity<AccessRight>().HasBaseType<TrackableEntity>();
             modelBuilder.Entity<AccessGroup>().HasBaseType<TrackableEntity>();
             modelBuilder.Entity<NodeLink>().HasBaseType<TrackableEntity>();
-
-            modelBuilder.Entity<WorkflowStatusDetails>().HasBaseType<StatusDetails>();
         }
     }
 }

@@ -11,8 +11,7 @@ namespace planner_node_service.Core.Entities.Models
     {
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
-        public StatusDetails? StatusDetails { get; set; }
-        public StatusType Type { get; set; }
+        public StatusKind Kind { get; set; }
         public int StatusCode { get; set; }
     }
 }

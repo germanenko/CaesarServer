@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_common_package.Enums
 {
-    public enum StatusType
+    public enum StatusKind
     {
         Workflow,
         Publication

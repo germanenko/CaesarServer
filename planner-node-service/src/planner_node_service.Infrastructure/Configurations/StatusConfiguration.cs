@@ -10,9 +10,13 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.HasKey(e => e.Id);
 
-            builder.Property(e => e.Type)
+            builder.Property(e => e.Kind)
                 .IsRequired()
                 .HasConversion<int>();
+
+            builder.HasIndex(e => new { e.NodeId, e.Kind })
+                .IsUnique()
+                .HasDatabaseName("IX_Status_NodeId_Kind");
         }
     }
 }

@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260205112437_removeStatusDetailsAndRename")]
+    partial class removeStatusDetailsAndRename
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -117,9 +120,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("NodeId", "Kind")
-                        .IsUnique()
-                        .HasDatabaseName("IX_Status_NodeId_Kind");
+                    b.HasIndex("NodeId");
 
                     b.ToTable("Statuses");
                 });
