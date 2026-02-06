@@ -11,6 +11,7 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Channels;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -26,7 +27,7 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task<bool>> Handler)> _queues;
 
         public RabbitMqService(
             INotificationService notificationService,
@@ -52,7 +53,7 @@ namespace planner_node_service.Infrastructure.Service
 
             _notificationService = notificationService;
 
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task<bool>> Handler)>
             {
                 { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
                 { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
@@ -122,7 +123,7 @@ namespace planner_node_service.Infrastructure.Service
                 routingKey: "");
         }
 
-        private void ConsumeQueue(string queueName, Func<string, Task> handler)
+        private void ConsumeQueue(string queueName, Func<string, Task<bool>> handler)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -133,7 +134,27 @@ namespace planner_node_service.Infrastructure.Service
 
                 try
                 {
-                    await handler(message);
+                    var result = await handler(message);
+
+                    if (ea.BasicProperties.ReplyTo != null || ea.BasicProperties.ReplyTo != "")
+                    {
+
+                        var responseBody = Encoding.UTF8.GetBytes(
+                            JsonSerializer.Serialize(result)
+                        );
+
+                        var replyProps = _channel.CreateBasicProperties();
+                        replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                        _channel.BasicPublish(
+                            exchange: "",
+                            routingKey: ea.BasicProperties.ReplyTo,
+                            basicProperties: replyProps,
+                            body: responseBody
+                        );
+                    }
+
+
                     _channel.BasicAck(ea.DeliveryTag, false);
                 }
                 catch (Exception ex)
@@ -160,19 +181,26 @@ namespace planner_node_service.Infrastructure.Service
             await Task.CompletedTask;
         }
 
-        private async Task HandleSendMessage(string message)
+        private async Task<bool> HandleSendMessage(string message)
         {
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
 
             _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<ChatMessageInfo>(result.Message)}");
 
             if (result == null)
-                return;
+                return false;
 
             var chatMessage = JsonSerializer.Deserialize<ChatMessageInfo>(result.Message);
 
             using var scope = _scopeFactory.CreateScope();
             var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+            var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+
+            bool can = true;
+
+            can = (await accessService.CheckAccess(chatMessage.Message.SenderId, chatMessage.ChatId)).Body;
+
+            if (!can) return can;
 
             await nodeService.AddOrUpdateNode(new Node()
             {
@@ -189,16 +217,18 @@ namespace planner_node_service.Infrastructure.Service
 
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
+
+            return can;
         }
 
-        private async Task HandleNewChat(string message)
+        private async Task<bool> HandleNewChat(string message)
         {
             var result = JsonSerializer.Deserialize<CreatePersonalChatEvent>(message);
 
             _logger.LogInformation($"NodeService received new chat: {message}");
 
             if (result == null)
-                return;
+                return false;
 
             try
             {
@@ -221,6 +251,7 @@ namespace planner_node_service.Infrastructure.Service
                     await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, AccessType.Admin);
                 }
 
+                return true;
             }
             catch (Exception ex)
             {
@@ -229,14 +260,14 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task HandleNewBoard(string message)
+        private async Task<bool> HandleNewBoard(string message)
         {
             var result = JsonSerializer.Deserialize<CreateBoardEvent>(message);
 
             _logger.LogInformation($"NodeService received new board: {message}");
 
             if (result == null)
-                return;
+                return false;
 
             try
             {
@@ -258,6 +289,8 @@ namespace planner_node_service.Infrastructure.Service
                 await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
+
+                return true;
             }
             catch (Exception ex)
             {
@@ -266,14 +299,14 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task HandleNewColumn(string message)
+        private async Task<bool> HandleNewColumn(string message)
         {
             var result = JsonSerializer.Deserialize<CreateColumnEvent>(message);
 
             _logger.LogInformation($"NodeService received new column: {message}");
 
             if (result == null)
-                return;
+                return false;
 
             try
             {
@@ -284,16 +317,22 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
 
-                await nodeService.AddOrUpdateNode(new Node()
-                {
-                    Id = result.Column.Id,
-                    Name = result.Column.Name,
-                    Type = NodeType.Column,
-                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
-                });
+                bool success = true;
 
                 if (result.Column.Link != null)
                 {
+                    success = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
+
+                    if (!success) return success;
+
+                    await nodeService.AddOrUpdateNode(new Node()
+                    {
+                        Id = result.Column.Id,
+                        Name = result.Column.Name,
+                        Type = NodeType.Column,
+                        BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
+                    });
+
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
                 if (result.Column.AccessRight != null)
@@ -302,6 +341,8 @@ namespace planner_node_service.Infrastructure.Service
                 }
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, UpdatedAt = result.Column.UpdatedAt.Value });
+
+                return success;
             }
             catch (Exception ex)
             {
@@ -310,14 +351,14 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task HandleNewTask(string message)
+        private async Task<bool> HandleNewTask(string message)
         {
             var result = JsonSerializer.Deserialize<CreateTaskEvent>(message);
 
             _logger.LogInformation($"NodeService received new task: {message}");
 
             if (result == null)
-                return;
+                return false;
 
             try
             {
@@ -327,6 +368,9 @@ namespace planner_node_service.Infrastructure.Service
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
+
+                bool can = true;
+
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -338,6 +382,10 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Task.Link != null)
                 {
+                    can = (await accessService.CheckAccess(result.CreatorId, result.Task.Id)).Body;
+
+                    if (!can) return can;
+
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
                 }
                 if (result.Task.AccessRight != null)
@@ -346,6 +394,8 @@ namespace planner_node_service.Infrastructure.Service
                 }
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, UpdatedAt = result.Task.UpdatedAt.Value });
+
+                return can;
             }
             catch (Exception ex)
             {

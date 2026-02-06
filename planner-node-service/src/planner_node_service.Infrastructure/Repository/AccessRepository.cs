@@ -138,14 +138,16 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
         {
-            var isCreator = await _context.AccessRights
-                .AnyAsync(n => n.Id == nodeId && n.AccessType == AccessType.Creator);
+            //var canEdit = await _context.AccessRights
+            //    .AnyAsync(n => n.Id == nodeId && (n.AccessType == AccessType.Creator || n.AccessType == AccessType.Admin || n.AccessType == AccessType.Editor));
 
-            if (isCreator)
-                return true;
+            //if (canEdit)
+            //    return true;
 
             return await _context.AccessRights
                 .Where(ar => ar.NodeId == nodeId)
+                .Include(x => x.AccessGroup)
+                    .ThenInclude(x => x.Members)
                 .AnyAsync(ar =>
                     ar.AccessGroupId == null && ar.AccountId == accountId ||
                     ar.AccessGroupId != null && ar.AccessGroup.Members.Any(m => m.AccountId == accountId));

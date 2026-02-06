@@ -3,6 +3,7 @@ using planner_common_package.Enums;
 using planner_content_service.Core.IService;
 using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
+using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
 
@@ -79,7 +80,7 @@ namespace planner_content_service.Infrastructure.Service
             }
         }
 
-        public void Publish<T>(T message, PublishEvent publishEvent)
+        public async Task<string> Publish<T>(T message, PublishEvent publishEvent)
         {
             var exchangeName = GetQueueName(publishEvent);
 
@@ -91,23 +92,69 @@ namespace planner_content_service.Infrastructure.Service
             };
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
-            channel.ExchangeDeclare(exchange: exchangeName,
-                                 type: ExchangeType.Fanout,
-                                 durable: true,
-                                 autoDelete: false,
-                                 arguments: null);
+
+            channel.ExchangeDeclare(
+                exchange: exchangeName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                arguments: null
+            );
 
             _logger.LogInformation(JsonSerializer.Serialize(message));
+
+            var replyQueueName = channel.QueueDeclare(queue: "", exclusive: true, autoDelete: true).QueueName;
+
+            var consumer = new EventingBasicConsumer(channel);
+
+            var tcs = new TaskCompletionSource<string>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
+
+            var correlationId = Guid.NewGuid().ToString();
+
+            var consumerTag = channel.BasicConsume(
+                consumer: consumer,
+                queue: replyQueueName,
+                autoAck: true
+            );
+
+            consumer.Received += (model, ea) =>
+            {
+                if (ea.BasicProperties.CorrelationId == correlationId)
+                {
+                    var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    _logger.LogInformation($"Received response: {response}");
+                    tcs.TrySetResult(response);
+                    channel.BasicCancel(consumerTag);
+                }
+            };
 
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
             var properties = channel.CreateBasicProperties();
+            properties.CorrelationId = correlationId;
+            properties.ReplyTo = replyQueueName;
             properties.Persistent = true;
 
             channel.BasicPublish(exchange: exchangeName,
                                  routingKey: "",
                                  basicProperties: properties,
                                  body: body);
+
+            var timeout = Task.Delay(TimeSpan.FromSeconds(10));
+            var completedTask = await Task.WhenAny(tcs.Task, timeout);
+
+            if (completedTask == timeout)
+            {
+                _logger.LogInformation("Timeout! No response received.");
+                return "Timeout";
+            }
+
+            var response = await tcs.Task;
+
+            _logger.LogInformation($"RabbitMQ Response : {response}");
+
+            return response;
         }
 
         public string GetQueueName(PublishEvent publishEvent)

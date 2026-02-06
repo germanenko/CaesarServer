@@ -174,5 +174,17 @@ namespace planner_node_service.App.Service
                 Body = access
             };
         }
+
+        public async Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId)
+        {
+            var access = await _accessRepository.CheckAccess(accountId, nodeId);
+
+            return new ServiceResponse<bool>()
+            {
+                IsSuccess = true,
+                Body = access,
+                StatusCode = HttpStatusCode.OK
+            };
+        }
     }
 }
