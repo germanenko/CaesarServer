@@ -72,14 +72,6 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                var boardEvent = new CreateBoardEvent()
-                {
-                    Board = BodyConverter.ClientToServerBody(createBoardBody),
-                    CreatorId = accountId
-                };
-
-                _ = Task.Run(() => _notifyService.Publish(boardEvent, PublishEvent.CreateBoard));
-
                 return createBoardBody;
             }
             catch (Exception ex)
@@ -278,14 +270,6 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                CreateColumnEvent columnEvent = new CreateColumnEvent()
-                {
-                    Column = BodyConverter.ClientToServerBody(column),
-                    CreatorId = accountId
-                };
-
-                _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
-
                 return columnNode;
             }
             catch (Exception ex)
@@ -300,58 +284,62 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<List<Column>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
         {
             var columnNodes = new List<Column>();
-            var statuses = new List<PublicationStatusModel>();
-            var links = new List<NodeLink>();
+            //var statuses = new List<PublicationStatusModel>();
+            //var links = new List<NodeLink>();
 
             foreach (var column in columns)
             {
-                columnNodes.Add(new Column
-                {
-                    Id = column.Id,
-                    Name = column.Name
-                });
+                var addedColumn = await AddBoardColumn(column, accountId);
+                if (addedColumn != null)
+                    columnNodes.Add(addedColumn);
 
-                statuses.Add(new PublicationStatusModel()
-                {
-                    NodeId = column.Id,
-                    Status = column.PublicationStatus,
-                    UpdatedAt = column.UpdatedAt
-                });
+                //columnNodes.Add(new Column
+                //{
+                //    Id = column.Id,
+                //    Name = column.Name
+                //});
 
-                links.Add(new NodeLink()
-                {
-                    ParentId = column.Id,
-                    ChildId = column.Id
-                });
+                //statuses.Add(new PublicationStatusModel()
+                //{
+                //    NodeId = column.Id,
+                //    Status = column.PublicationStatus,
+                //    UpdatedAt = column.UpdatedAt
+                //});
+
+                //links.Add(new NodeLink()
+                //{
+                //    ParentId = column.Id,
+                //    ChildId = column.Id
+                //});
             }
+            return columnNodes;
 
-            try
-            {
-                await _context.Columns.AddRangeAsync(columnNodes);
-                await _context.PublicationStatuses.AddRangeAsync(statuses);
-                await _context.NodeLinks.AddRangeAsync(links);
+            //try
+            //{
+            //    await _context.Columns.AddRangeAsync(columnNodes);
+            //    await _context.PublicationStatuses.AddRangeAsync(statuses);
+            //    await _context.NodeLinks.AddRangeAsync(links);
 
-                await _context.SaveChangesAsync();
+            //    await _context.SaveChangesAsync();
 
-                foreach (var column in columns)
-                {
-                    CreateColumnEvent columnEvent = new CreateColumnEvent()
-                    {
-                        Column = BodyConverter.ClientToServerBody(column),
-                        CreatorId = accountId
-                    };
+            //    foreach (var column in columns)
+            //    {
+            //        CreateColumnEvent columnEvent = new CreateColumnEvent()
+            //        {
+            //            Column = BodyConverter.ClientToServerBody(column),
+            //            CreatorId = accountId
+            //        };
 
-                    _ = Task.Run(() => _notifyService.Publish(columnEvent, PublishEvent.CreateColumn));
-                }
+            //        _ = Task.Run(() => _notifyService.Publish(columnEvent, PublishEvent.CreateColumn));
+            //    }
 
-                return columnNodes;
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Ошибка при создании колонок: {ex.Message}");
+            //}
+            //catch (Exception ex)
+            //{
+            //    Console.WriteLine($"Ошибка при создании колонок: {ex.Message}");
 
-                throw;
-            }
+            //    throw;
+            //}
 
         }
     }

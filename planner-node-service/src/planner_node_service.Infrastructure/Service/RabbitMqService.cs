@@ -11,7 +11,6 @@ using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
-using System.Threading.Channels;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -27,7 +26,7 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly Dictionary<string, (string QueueName, Func<string, Task<bool>> Handler)> _queues;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<bool>>> Handler)> _queues;
 
         public RabbitMqService(
             INotificationService notificationService,
@@ -53,7 +52,7 @@ namespace planner_node_service.Infrastructure.Service
 
             _notificationService = notificationService;
 
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task<bool>> Handler)>
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<bool>>> Handler)>
             {
                 { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
                 { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
@@ -123,7 +122,7 @@ namespace planner_node_service.Infrastructure.Service
                 routingKey: "");
         }
 
-        private void ConsumeQueue(string queueName, Func<string, Task<bool>> handler)
+        private void ConsumeQueue(string queueName, Func<string, Task<ServiceResponse<bool>>> handler)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -181,14 +180,21 @@ namespace planner_node_service.Infrastructure.Service
             await Task.CompletedTask;
         }
 
-        private async Task<bool> HandleSendMessage(string message)
+        private async Task<ServiceResponse<bool>> HandleSendMessage(string message)
         {
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
 
             _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<ChatMessageInfo>(result.Message)}");
 
             if (result == null)
-                return false;
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
 
             var chatMessage = JsonSerializer.Deserialize<ChatMessageInfo>(result.Message);
 
@@ -196,11 +202,17 @@ namespace planner_node_service.Infrastructure.Service
             var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
             var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-            bool can = true;
+            var can = (await accessService.CheckAccess(chatMessage.Message.SenderId, chatMessage.ChatId)).Body;
 
-            can = (await accessService.CheckAccess(chatMessage.Message.SenderId, chatMessage.ChatId)).Body;
-
-            if (!can) return can;
+            if (!can)
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = can,
+                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступа" }
+                };
+            }
 
             await nodeService.AddOrUpdateNode(new Node()
             {
@@ -218,17 +230,27 @@ namespace planner_node_service.Infrastructure.Service
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
 
-            return can;
+            return new ServiceResponse<bool>()
+            {
+                IsSuccess = true
+            };
         }
 
-        private async Task<bool> HandleNewChat(string message)
+        private async Task<ServiceResponse<bool>> HandleNewChat(string message)
         {
             var result = JsonSerializer.Deserialize<CreatePersonalChatEvent>(message);
 
             _logger.LogInformation($"NodeService received new chat: {message}");
 
             if (result == null)
-                return false;
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
 
             try
             {
@@ -251,7 +273,10 @@ namespace planner_node_service.Infrastructure.Service
                     await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, AccessType.Admin);
                 }
 
-                return true;
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true
+                };
             }
             catch (Exception ex)
             {
@@ -260,14 +285,21 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<bool> HandleNewBoard(string message)
+        private async Task<ServiceResponse<bool>> HandleNewBoard(string message)
         {
             var result = JsonSerializer.Deserialize<CreateBoardEvent>(message);
 
             _logger.LogInformation($"NodeService received new board: {message}");
 
             if (result == null)
-                return false;
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
 
             try
             {
@@ -290,7 +322,10 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
 
-                return true;
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true
+                };
             }
             catch (Exception ex)
             {
@@ -299,14 +334,21 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<bool> HandleNewColumn(string message)
+        private async Task<ServiceResponse<bool>> HandleNewColumn(string message)
         {
             var result = JsonSerializer.Deserialize<CreateColumnEvent>(message);
 
             _logger.LogInformation($"NodeService received new column: {message}");
 
             if (result == null)
-                return false;
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
 
             try
             {
@@ -317,13 +359,19 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
 
-                bool success = true;
-
                 if (result.Column.Link != null)
                 {
-                    success = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
+                    var can = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
 
-                    if (!success) return success;
+                    if (!can)
+                    {
+                        return new ServiceResponse<bool>()
+                        {
+                            IsSuccess = false,
+                            StatusCode = System.Net.HttpStatusCode.Forbidden,
+                            Errors = new[] { "Нет доступа" }
+                        };
+                    }
 
                     await nodeService.AddOrUpdateNode(new Node()
                     {
@@ -342,7 +390,10 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, UpdatedAt = result.Column.UpdatedAt.Value });
 
-                return success;
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true
+                };
             }
             catch (Exception ex)
             {
@@ -351,14 +402,21 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<bool> HandleNewTask(string message)
+        private async Task<ServiceResponse<bool>> HandleNewTask(string message)
         {
             var result = JsonSerializer.Deserialize<CreateTaskEvent>(message);
 
             _logger.LogInformation($"NodeService received new task: {message}");
 
             if (result == null)
-                return false;
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
 
             try
             {
@@ -368,9 +426,6 @@ namespace planner_node_service.Infrastructure.Service
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
-
-                bool can = true;
-
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -382,9 +437,17 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Task.Link != null)
                 {
-                    can = (await accessService.CheckAccess(result.CreatorId, result.Task.Id)).Body;
+                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Id)).Body;
 
-                    if (!can) return can;
+                    if (!can)
+                    {
+                        return new ServiceResponse<bool>()
+                        {
+                            IsSuccess = false,
+                            StatusCode = System.Net.HttpStatusCode.Forbidden,
+                            Errors = new[] { "Нет доступа" }
+                        };
+                    }
 
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
                 }
@@ -395,7 +458,10 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, UpdatedAt = result.Task.UpdatedAt.Value });
 
-                return can;
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true
+                };
             }
             catch (Exception ex)
             {

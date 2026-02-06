@@ -1,6 +1,7 @@
 using Microsoft.Extensions.Logging;
 using planner_common_package.Enums;
 using planner_content_service.Core.IService;
+using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -80,7 +81,7 @@ namespace planner_content_service.Infrastructure.Service
             }
         }
 
-        public async Task<string> Publish<T>(T message, PublishEvent publishEvent)
+        public async Task<ServiceResponse<bool>> Publish<T>(T message, PublishEvent publishEvent)
         {
             var exchangeName = GetQueueName(publishEvent);
 
@@ -118,12 +119,18 @@ namespace planner_content_service.Infrastructure.Service
                 autoAck: true
             );
 
+            var complete = new ServiceResponse<bool>();
+
             consumer.Received += (model, ea) =>
             {
                 if (ea.BasicProperties.CorrelationId == correlationId)
                 {
                     var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+
                     _logger.LogInformation($"Received response: {response}");
+
+                    complete = JsonSerializer.Deserialize<ServiceResponse<bool>>(response);
+
                     tcs.TrySetResult(response);
                     channel.BasicCancel(consumerTag);
                 }
@@ -147,14 +154,18 @@ namespace planner_content_service.Infrastructure.Service
             if (completedTask == timeout)
             {
                 _logger.LogInformation("Timeout! No response received.");
-                return "Timeout";
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    Errors = new[] { "Ошибка сервера" }
+                };
             }
 
             var response = await tcs.Task;
 
             _logger.LogInformation($"RabbitMQ Response : {response}");
 
-            return response;
+            return complete;
         }
 
         public string GetQueueName(PublishEvent publishEvent)

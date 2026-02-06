@@ -43,14 +43,6 @@ namespace planner_content_service.Infrastructure.Repository
 
             _context.SaveChanges();
 
-            CreateTaskEvent taskEvent = new CreateTaskEvent()
-            {
-                Task = BodyConverter.ClientToServerBody(task),
-                CreatorId = accountId
-            };
-
-            _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
-
 
             return await AddTaskAsync(node, accountId, task.PublicationStatus, task.Link);
         }

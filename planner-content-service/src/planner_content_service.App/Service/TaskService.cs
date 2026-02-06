@@ -3,7 +3,11 @@ using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
+using planner_server_package.Converters;
+using planner_server_package.Events;
+using planner_server_package.Events.Enums;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace planner_content_service.App.Service
 {
@@ -12,15 +16,18 @@ namespace planner_content_service.App.Service
         private readonly ITaskRepository _taskRepository;
         private readonly IBoardRepository _boardRepository;
         private readonly IPublicationStatusRepository _publicationStatusRepository;
+        private readonly INotifyService _notifyService;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
-            IPublicationStatusRepository publicationStatusRepository)
+            IPublicationStatusRepository publicationStatusRepository,
+            INotifyService notifyService)
         {
             _taskRepository = taskRepository;
             _boardRepository = boardRepository;
             _publicationStatusRepository = publicationStatusRepository;
+            _notifyService = notifyService;
         }
 
 
@@ -59,6 +66,25 @@ namespace planner_content_service.App.Service
 
             DateTime? startDate = taskBody.StartDate /*== null ? null : DateTime.Parse(taskBody.StartDate)*/;
             DateTime? endDate = taskBody.EndDate /*== null ? null : DateTime.Parse(taskBody.EndDate) */;
+
+
+            CreateTaskEvent taskEvent = new CreateTaskEvent()
+            {
+                Task = BodyConverter.ClientToServerBody(taskBody),
+                CreatorId = accountId
+            };
+
+            var nodeComplete = await _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
+
+            if (!nodeComplete.IsSuccess)
+            {
+                return new ServiceResponse<TaskBody>
+                {
+                    IsSuccess = nodeComplete.IsSuccess,
+                    StatusCode = nodeComplete.StatusCode,
+                    Errors = nodeComplete.Errors
+                };
+            }
 
             if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
             {
