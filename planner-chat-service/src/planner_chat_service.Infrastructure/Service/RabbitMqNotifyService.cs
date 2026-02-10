@@ -47,7 +47,7 @@ namespace planner_chat_service.Infrastructure.Service
             _createPersonalChatQueueName = createPersonalChatQueueName;
             _getNotificationSettings = getUsersWithEnabledNotifications;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _createTaskChatResponseQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName });
+            _exchanges.AddRange(new[] { _createChatQueueName, _createTaskChatResponseQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings });
 
             ExchangeDeclare();
         }
