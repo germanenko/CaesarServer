@@ -16,5 +16,6 @@ namespace planner_common_package
         public const string ChatMessage = "chatMessage";
         public const string NotificationSettings = "notificationSettings";
         public const string Profile = "profile";
+        public const string NodeLink = "nodeLink";
     }
 }

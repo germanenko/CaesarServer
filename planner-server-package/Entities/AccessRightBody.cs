@@ -13,6 +13,6 @@ namespace planner_server_package.Entities
         public AccessGroupBody AccessGroup { get; set; }
         public Guid NodeId { get; set; }
         public NodeBody Node { get; set; }
-        public AccessType AccessType { get; set; }
+        public Permission Permission { get; set; }
     }
 }

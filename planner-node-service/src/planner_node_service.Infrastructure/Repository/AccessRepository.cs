@@ -23,7 +23,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .FirstOrDefaultAsync(x =>
                     x.AccountId == accessRightBody.AccountId &&
                     x.NodeId == accessRightBody.NodeId &&
-                    x.AccessType == accessRightBody.AccessType);
+                    x.Permission == accessRightBody.Permission);
 
             if (existing != null)
             {
@@ -35,7 +35,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = accessRightBody.Id,
                 AccountId = accessRightBody.AccountId,
                 NodeId = accessRightBody.NodeId,
-                AccessType = accessRightBody.AccessType
+                Permission = accessRightBody.Permission
             };
 
             _context.AccessRights.Add(accessRight);
@@ -44,13 +44,13 @@ namespace planner_node_service.Infrastructure.Repository
             return accessRight;
         }
 
-        public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, AccessType accessType)
+        public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission accessType)
         {
             var existing = await _context.AccessRights
                 .FirstOrDefaultAsync(x =>
                     x.AccountId == accountId &&
                     x.NodeId == nodeId &&
-                    x.AccessType == accessType);
+                    x.Permission == accessType);
 
             if (existing != null)
             {
@@ -62,7 +62,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = Guid.NewGuid(),
                 AccountId = accountId,
                 NodeId = nodeId,
-                AccessType = accessType
+                Permission = accessType
             };
 
             _context.AccessRights.Add(accessRight);

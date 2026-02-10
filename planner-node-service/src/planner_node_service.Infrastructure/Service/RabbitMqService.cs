@@ -272,7 +272,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 foreach (var participant in result.Participants)
                 {
-                    await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, AccessType.Admin);
+                    await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, Permission.Admin);
                 }
 
                 return new ServiceResponse<object>()
@@ -439,7 +439,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Task.Link != null)
                 {
-                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Id)).Body;
+                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Link.ParentId)).Body;
 
                     if (!can)
                     {

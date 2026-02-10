@@ -17,6 +17,7 @@ namespace planner_client_package.Interface
     [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
     [JsonDerivedType(typeof(NotificationSettingsBody), Discriminator.NotificationSettings)]
     [JsonDerivedType(typeof(ProfileBody), Discriminator.Profile)]
+    [JsonDerivedType(typeof(NodeLinkBody), Discriminator.NodeLink)]
     public interface ISyncable
     {
     }

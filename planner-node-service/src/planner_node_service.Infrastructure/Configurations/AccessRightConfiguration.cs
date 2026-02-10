@@ -16,11 +16,11 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.HasIndex(e => e.NodeId);
             builder.HasIndex(e => e.AccountId);
 
-            builder.Property(e => e.AccessType)
+            builder.Property(e => e.Permission)
                 .IsRequired()
                 .HasConversion<int>();
 
-            builder.HasIndex(e => new { e.AccountId, e.NodeId, e.AccessType })
+            builder.HasIndex(e => new { e.AccountId, e.NodeId, e.Permission })
                 .IsUnique();
         }
     }

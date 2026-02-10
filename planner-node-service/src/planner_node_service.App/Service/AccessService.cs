@@ -39,7 +39,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(Guid accountId, Guid nodeId, AccessType accessType)
+        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(Guid accountId, Guid nodeId, Permission accessType)
         {
             var access = await _accessRepository.CreateAccessRight(accountId, nodeId, accessType);
 

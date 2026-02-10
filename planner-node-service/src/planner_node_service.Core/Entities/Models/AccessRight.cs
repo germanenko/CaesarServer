@@ -10,7 +10,7 @@ namespace planner_node_service.Core.Entities.Models
         public AccessGroup AccessGroup { get; set; }
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
-        public AccessType AccessType { get; set; }
+        public Permission Permission { get; set; }
 
         public AccessRightBody ToAccessRightBody()
         {
@@ -20,7 +20,7 @@ namespace planner_node_service.Core.Entities.Models
                 AccountId = AccountId,
                 NodeId = NodeId,
                 AccessGroupId = AccessGroupId,
-                AccessType = AccessType
+                Permission = Permission
             };
         }
     }
