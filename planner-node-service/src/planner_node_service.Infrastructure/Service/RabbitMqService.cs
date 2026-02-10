@@ -137,7 +137,7 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     var result = await handler(message);
 
-                    if (ea.BasicProperties.ReplyTo != null || ea.BasicProperties.ReplyTo != "")
+                    if (!string.IsNullOrEmpty(ea.BasicProperties.ReplyTo))
                     {
 
                         var responseBody = Encoding.UTF8.GetBytes(

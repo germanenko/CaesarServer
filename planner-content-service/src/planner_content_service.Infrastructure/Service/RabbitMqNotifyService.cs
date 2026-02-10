@@ -108,7 +108,8 @@ namespace planner_content_service.Infrastructure.Service
 
             var consumer = new EventingBasicConsumer(channel);
 
-            var tcs = new TaskCompletionSource<ServiceResponse<bool>>();
+            var tcs = new TaskCompletionSource<ServiceResponse<bool>>(
+                TaskCreationOptions.RunContinuationsAsynchronously);
 
             var correlationId = Guid.NewGuid().ToString();
 
