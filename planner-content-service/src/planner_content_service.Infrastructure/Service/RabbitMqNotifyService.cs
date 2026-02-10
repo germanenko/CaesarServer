@@ -129,13 +129,22 @@ namespace planner_content_service.Infrastructure.Service
 
                     _logger.LogInformation($"Received response: {responseJson}");
 
-                    response = JsonSerializer.Deserialize<ServiceResponse<bool>>(responseJson);
-
-                    tcs.TrySetResult(response ?? new ServiceResponse<bool>
+                    try
                     {
-                        IsSuccess = false,
-                        Errors = new[] { "Invalid response format" }
-                    });
+
+                        response = JsonSerializer.Deserialize<ServiceResponse<bool>>(responseJson);
+
+                        tcs.TrySetResult(response ?? new ServiceResponse<bool>
+                        {
+                            IsSuccess = false,
+                            Errors = new[] { "Invalid response format" }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Error in response: " + ex.Message);
+                    }
+
                     channel.BasicCancel(consumerTag);
                 }
             };
