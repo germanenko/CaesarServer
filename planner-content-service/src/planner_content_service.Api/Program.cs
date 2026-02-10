@@ -1,4 +1,3 @@
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -14,8 +13,6 @@ using planner_content_service.Infrastructure.Repository;
 using planner_content_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-
-Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
