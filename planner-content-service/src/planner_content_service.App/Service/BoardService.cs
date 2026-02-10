@@ -62,10 +62,9 @@ namespace planner_content_service.App.Service
         public async Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<ColumnBody> columns)
         {
             List<ColumnBody>? newColumns = new List<ColumnBody>();
+            List<ColumnBody> columnsToStore = new List<ColumnBody>();
             foreach (var column in columns)
             {
-                var board = await _boardRepository.GetBoard(column.Id);
-
                 var checkAccess = new CheckAccessRequest()
                 {
                     AccountId = accountId,
@@ -74,18 +73,13 @@ namespace planner_content_service.App.Service
 
                 var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-                if (!hasAccess.IsSuccess)
+                if (hasAccess.IsSuccess)
                 {
-                    return new ServiceResponse<List<ColumnBody>>
-                    {
-                        IsSuccess = false,
-                        StatusCode = HttpStatusCode.Forbidden,
-                        Errors = hasAccess.Errors
-                    };
+                    columnsToStore.Add(column);
                 }
             }
 
-            newColumns = (await _boardRepository.AddBoardColumns(columns, accountId)).Select(x => x.ToColumnBody()).ToList();
+            newColumns = (await _boardRepository.AddBoardColumns(columnsToStore, accountId)).Select(x => x.ToColumnBody()).ToList();
 
             if (newColumns == null)
             {
@@ -106,8 +100,6 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(BoardBody body, Guid accountId)
         {
-            var result = await _boardRepository.AddAsync(body, accountId);
-
             var boardEvent = new CreateBoardEvent()
             {
                 Board = BodyConverter.ClientToServerBody(body),
@@ -125,6 +117,8 @@ namespace planner_content_service.App.Service
                     Errors = nodeComplete.Errors
                 };
             }
+
+            var result = await _boardRepository.AddAsync(body, accountId);
 
             if (result is null)
             {
