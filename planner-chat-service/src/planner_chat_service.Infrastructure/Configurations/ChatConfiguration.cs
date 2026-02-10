@@ -14,6 +14,12 @@ namespace planner_chat_service.Infrastructure.Configurations
                 .WithOne(e => e.Chat)
                 .HasForeignKey(e => e.ChatId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.HasMany(e => e.Messages)
+                .WithOne(e => e.Chat)
+                .HasForeignKey(e => e.ChatId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

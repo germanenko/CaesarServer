@@ -1,16 +1,16 @@
+using planner_node_service.Core.IService;
+using planner_server_package.Entities;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.Json;
-using planner_server_package.Entities;
-using planner_node_service.Core.IService;
 
 namespace planner_node_service.Infrastructure.Service
 {
-    public class NotificationService : INotificationService
+    public class WebSocketService : IWebSocketService
     {
         private ConcurrentDictionary<Guid, ConcurrentDictionary<Guid, NotificationSession>> ActiveSessions { get; set; } = new();
 
-        public NotificationService()
+        public WebSocketService()
         {
 
         }

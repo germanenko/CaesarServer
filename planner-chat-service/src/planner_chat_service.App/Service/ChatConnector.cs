@@ -11,6 +11,7 @@ using planner_server_package.Events.Enums;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using NotificationSettingsRMQBody = planner_server_package.Entities.NotificationSettingsBody;
 
 namespace planner_chat_service.App.Service
 {
@@ -43,14 +44,14 @@ namespace planner_chat_service.App.Service
         }
 
         public async Task Invoke(
-            AccessRight accessRight,
+            Guid accountId,
             Chat chat,
             ChatLobby lobby,
             ChatSession currentSession,
             AccountChatSession accountChatSession
         )
         {
-            await Loop(lobby, currentSession, accountChatSession, chat, accessRight);
+            await Loop(lobby, currentSession, accountChatSession, chat, accountId);
         }
 
         private async Task Loop(
@@ -58,7 +59,7 @@ namespace planner_chat_service.App.Service
             ChatSession currentSession,
             AccountChatSession accountChatSession,
             Chat chat,
-            AccessRight accessRight
+            Guid accountId
         )
         {
             var ws = currentSession.Ws;
@@ -70,9 +71,9 @@ namespace planner_chat_service.App.Service
             var allUserIds = lobby.AllChatUsers;
             var activeSessionIds = lobby.ActiveSessions.Select(e => e.Key);
 
-            dateLastViewingMessage = await ProcessWebSocketState(ws, sessions, allUserIds, chat, accessRight.AccountId.Value, CancellationToken.None);
+            dateLastViewingMessage = await ProcessWebSocketState(ws, sessions, allUserIds, chat, accountId, CancellationToken.None);
 
-            var chatMembership = await _chatRepository.GetChatSettingsAsync(accessRight.NodeId, accessRight.AccountId.Value);
+            var chatMembership = await _chatRepository.GetChatSettingsAsync(chat.Id, accountId);
 
             await CloseWebSocket(ws, errorMessage);
             await UpdateLastViewingDate(chatMembership, accountChatSession, dateLastViewingMessage);
@@ -184,8 +185,14 @@ namespace planner_chat_service.App.Service
                     { "iconUrl", user.UrlIcon }
                 };
 
-                var usersWithEnabledNotifications = await _chatRepository
-                    .GetUsersWithEnabledNotifications(notConnectedAccountIds, chat.Id);
+                var accountIds = new GetNotificationSettingsRequest()
+                {
+                    AccountIds = notConnectedAccountIds.ToList()
+                };
+
+                var settings = await _notifyService.Publish<GetNotificationSettingsRequest, IEnumerable<NotificationSettingsRMQBody>>(accountIds, PublishEvent.GetNotificationSettings);
+
+                var usersWithEnabledNotifications = settings.Body.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
 
                 var notificationTasks = usersWithEnabledNotifications.Select(accountId =>
                     _notificationService.SendNotification(
@@ -218,7 +225,7 @@ namespace planner_chat_service.App.Service
                 Message = bytes
             };
 
-            _notifyService.Publish(messageSentToChatEvent, NotifyPublishEvent.MessageSentToChat);
+            _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
         }
 
         private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, byte[] bytes, WebSocketMessageType messageType)

@@ -83,7 +83,7 @@ namespace planner_content_service.Infrastructure.Service
 
         public async Task<ServiceResponse<bool>> Publish<T>(T message, PublishEvent publishEvent)
         {
-            var exchangeName = GetQueueName(publishEvent);
+            var exchangeName = GetExchangeName(publishEvent);
 
             var factory = new ConnectionFactory()
             {
@@ -168,7 +168,7 @@ namespace planner_content_service.Infrastructure.Service
             return complete;
         }
 
-        public string GetQueueName(PublishEvent publishEvent)
+        public string GetExchangeName(PublishEvent publishEvent)
         {
             return publishEvent switch
             {

@@ -8,8 +8,6 @@ namespace planner_content_service.Core.IService
     {
         Task<ServiceResponse<BoardBody>> CreateBoardAsync(BoardBody body, Guid accountId);
         Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<BoardBody> bodies, Guid accountId);
-        Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset);
-        Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId, AccessType accessType);
         Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, ColumnBody column);
         Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<ColumnBody> columns);
     }

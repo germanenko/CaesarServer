@@ -18,7 +18,7 @@ namespace planner_node_service.Infrastructure.Service
     {
         private IConnection _connection;
         private IModel _channel;
-        private readonly INotificationService _notificationService;
+        private readonly IWebSocketService _notificationService;
         private readonly INotifyService _notifyService;
         private readonly IServiceScopeFactory _scopeFactory;
         private ILogger<RabbitMqService> _logger;
@@ -26,10 +26,10 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<bool>>> Handler)> _queues;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)> _queues;
 
         public RabbitMqService(
-            INotificationService notificationService,
+            IWebSocketService notificationService,
             INotifyService notifyService,
             ILogger<RabbitMqService> logger,
             IServiceScopeFactory scopeFactory,
@@ -40,7 +40,8 @@ namespace planner_node_service.Infrastructure.Service
             string createPersonalChatQueue,
             string createBoard,
             string createColumn,
-            string createTask)
+            string createTask,
+            string getUsersWithEnabledNotifications)
         {
             _hostname = hostname;
             _userName = userName;
@@ -52,13 +53,14 @@ namespace planner_node_service.Infrastructure.Service
 
             _notificationService = notificationService;
 
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<bool>>> Handler)>
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)>
             {
                 { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
                 { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
                 { createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
                 { createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
-                { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) }
+                { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) },
+                { getUsersWithEnabledNotifications, (QueueName: GetQueueName(getUsersWithEnabledNotifications), Handler: HandleGetNotificationSettings) }
             };
 
             InitializeRabbitMQ();
@@ -122,7 +124,7 @@ namespace planner_node_service.Infrastructure.Service
                 routingKey: "");
         }
 
-        private void ConsumeQueue(string queueName, Func<string, Task<ServiceResponse<bool>>> handler)
+        private void ConsumeQueue(string queueName, Func<string, Task<ServiceResponse<object>>> handler)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
 
@@ -180,7 +182,7 @@ namespace planner_node_service.Infrastructure.Service
             await Task.CompletedTask;
         }
 
-        private async Task<ServiceResponse<bool>> HandleSendMessage(string message)
+        private async Task<ServiceResponse<object>> HandleSendMessage(string message)
         {
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
 
@@ -188,7 +190,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
@@ -206,7 +208,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (!can)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = can,
                     StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -230,13 +232,13 @@ namespace planner_node_service.Infrastructure.Service
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
 
-            return new ServiceResponse<bool>()
+            return new ServiceResponse<object>()
             {
                 IsSuccess = true
             };
         }
 
-        private async Task<ServiceResponse<bool>> HandleNewChat(string message)
+        private async Task<ServiceResponse<object>> HandleNewChat(string message)
         {
             var result = JsonSerializer.Deserialize<CreatePersonalChatEvent>(message);
 
@@ -244,7 +246,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
@@ -273,7 +275,7 @@ namespace planner_node_service.Infrastructure.Service
                     await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, AccessType.Admin);
                 }
 
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = true
                 };
@@ -285,7 +287,7 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<ServiceResponse<bool>> HandleNewBoard(string message)
+        private async Task<ServiceResponse<object>> HandleNewBoard(string message)
         {
             var result = JsonSerializer.Deserialize<CreateBoardEvent>(message);
 
@@ -293,7 +295,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
@@ -322,7 +324,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
 
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = true
                 };
@@ -334,7 +336,7 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<ServiceResponse<bool>> HandleNewColumn(string message)
+        private async Task<ServiceResponse<object>> HandleNewColumn(string message)
         {
             var result = JsonSerializer.Deserialize<CreateColumnEvent>(message);
 
@@ -342,7 +344,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
@@ -365,7 +367,7 @@ namespace planner_node_service.Infrastructure.Service
 
                     if (!can)
                     {
-                        return new ServiceResponse<bool>()
+                        return new ServiceResponse<object>()
                         {
                             IsSuccess = false,
                             StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -390,7 +392,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, UpdatedAt = result.Column.UpdatedAt.Value });
 
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = true
                 };
@@ -402,7 +404,7 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<ServiceResponse<bool>> HandleNewTask(string message)
+        private async Task<ServiceResponse<object>> HandleNewTask(string message)
         {
             var result = JsonSerializer.Deserialize<CreateTaskEvent>(message);
 
@@ -410,7 +412,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
@@ -441,7 +443,7 @@ namespace planner_node_service.Infrastructure.Service
 
                     if (!can)
                     {
-                        return new ServiceResponse<bool>()
+                        return new ServiceResponse<object>()
                         {
                             IsSuccess = false,
                             StatusCode = System.Net.HttpStatusCode.Forbidden,
@@ -458,7 +460,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, UpdatedAt = result.Task.UpdatedAt.Value });
 
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = true
                 };
@@ -466,6 +468,45 @@ namespace planner_node_service.Infrastructure.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while adding task node");
+                throw;
+            }
+        }
+
+        private async Task<ServiceResponse<object>> HandleGetNotificationSettings(string message)
+        {
+            var result = JsonSerializer.Deserialize<GetNotificationSettingsRequest>(message);
+
+            _logger.LogInformation($"NodeService received request: {message}");
+
+            if (result == null)
+            {
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
+
+            try
+            {
+                _logger.LogInformation($"{result.AccountIds}");
+
+                using var scope = _scopeFactory.CreateScope();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
+
+                var settings = notificationService.GetEnabledNotificationSettings(result.AccountIds);
+
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Body = settings
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while return enabled notification settings");
                 throw;
             }
         }

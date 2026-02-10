@@ -1,0 +1,14 @@
+﻿using planner_node_service.Core.Entities.Models;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace planner_node_service.Core.IRepository
+{
+    public interface INotificationRepository
+    {
+        public IEnumerable<NotificationSettings> GetEnabledNotificationSettingsAsync(List<Guid> accountIds);
+    }
+}

@@ -678,31 +678,6 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
-        {
-            "DownstreamPathTemplate": "/api/board/members",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/board/members",
-            "UpstreamHttpMethod": [ "GET" ]
-        },
-
-        {
-            "DownstreamPathTemplate": "/api/board/member",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/board/member",
-            "UpstreamHttpMethod": [ "POST" ]
-        },
 
         {
             "DownstreamPathTemplate": "/api/board/column",
@@ -871,19 +846,6 @@
             ],
             "UpstreamPathTemplate": "/api/allTasks",
             "UpstreamHttpMethod": [ "GET" ]
-        },
-
-        {
-            "DownstreamPathTemplate": "/api/task/column",
-            "DownstreamScheme": "http",
-            "DownstreamHostAndPorts": [
-                {
-                    "Host": "localhost",
-                    "Port": 8889
-                }
-            ],
-            "UpstreamPathTemplate": "/api/task/column",
-            "UpstreamHttpMethod": [ "DELETE", "POST" ]
         },
 
 	{

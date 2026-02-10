@@ -52,9 +52,16 @@ namespace planner_chat_service.App.Service
             };
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
-            var access = await _chatRepository.GetChatAccess(accountId, chatId);
 
-            if (chatMembership == null || access == null)
+            var checkAccess = new CheckAccessRequest()
+            {
+                AccountId = accountId,
+                NodeId = chatId
+            };
+
+            var hasAccess = await _notifyService.Publish<CheckAccessRequest, bool>(checkAccess, PublishEvent.CheckAccess);
+
+            if (chatMembership == null || hasAccess.IsSuccess == false)
                 return;
 
             var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
@@ -74,7 +81,7 @@ namespace planner_chat_service.App.Service
 
             try
             {
-                await _chatConnector.Invoke(access, chat, lobby, session, accountChatSession);
+                await _chatConnector.Invoke(accountId, chat, lobby, session, accountChatSession);
             }
             finally
             {
@@ -122,8 +129,8 @@ namespace planner_chat_service.App.Service
                 Participants = chatMemberships
             };
 
-            _notifyService.Publish(createChatEvent, NotifyPublishEvent.CreatePersonalChat);
-            _notifyService.Publish(createChatEvent, NotifyPublishEvent.AddAccountToChat);
+            _notifyService.Publish(createChatEvent, PublishEvent.CreatePersonalChat);
+            _notifyService.Publish(createChatEvent, PublishEvent.AddAccountToChat);
             return new ServiceResponse<ChatBody>
             {
                 StatusCode = HttpStatusCode.OK,
@@ -179,17 +186,6 @@ namespace planner_chat_service.App.Service
         public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options)
         {
             var messages = await _chatRepository.GetMessagesAsync(chatId, options.Count, options.LoadPosition);
-            return new ServiceResponse<IEnumerable<MessageBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = messages.Select(e => e.ToMessageBody())
-            };
-        }
-
-        public async Task<ServiceResponse<IEnumerable<MessageBody>>> GetAllMessages(Guid accountId)
-        {
-            var messages = await _chatRepository.GetAllMessagesAsync(accountId);
             return new ServiceResponse<IEnumerable<MessageBody>>
             {
                 StatusCode = HttpStatusCode.OK,
@@ -355,28 +351,6 @@ namespace planner_chat_service.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = chatSettings.MessageDraft
-            };
-        }
-
-        public async Task<ServiceResponse<NotificationSettings?>> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
-        {
-            var membership = await _chatRepository.SetEnabledNotifications(accountId, chatId, enable);
-
-            if (membership == null)
-            {
-                return new ServiceResponse<NotificationSettings?>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    IsSuccess = true,
-                    Errors = new[] { "��� ������� � ����" }
-                };
-            }
-
-            return new ServiceResponse<NotificationSettings?>
-            {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = membership
             };
         }
 

@@ -22,7 +22,6 @@ namespace planner_chat_service.Core.IRepository
         Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatAccessId);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);
-        Task<List<ChatMessage>> GetAllMessagesAsync(Guid accountId);
         Task<bool> UpdateLastViewingChatMembership(ChatSettings chatSetttings, DateTime lastViewingDate);
         Task<ChatSettings?> CreateOrGetChatSettingsAsync(Chat chat, Guid accountId);
         Task CreateChatSettingsAsync(Guid taskId, List<Guid> accountIds);
@@ -34,9 +33,5 @@ namespace planner_chat_service.Core.IRepository
         Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody message);
         Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
         Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content);
-        Task<NotificationSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable);
-        Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId);
-        Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId);
-        Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId);
     }
 }

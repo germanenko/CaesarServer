@@ -151,21 +151,21 @@ namespace planner_chat_service.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpGet("api/chat/allMessages")]
-        [SwaggerOperation("Получить все сообщения")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
-        [SwaggerResponse(403)]
-        public async Task<IActionResult> GetAllMessages(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+        //[HttpGet("api/chat/allMessages")]
+        //[SwaggerOperation("Получить все сообщения")]
+        //[SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        //[SwaggerResponse(403)]
+        //public async Task<IActionResult> GetAllMessages(
+        //    [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        //)
+        //{
+        //    var tokenPayload = _jwtService.GetTokenPayload(token);
+        //    var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
+        //    if (result.IsSuccess)
+        //        return StatusCode((int)result.StatusCode, result.Body);
 
-            return StatusCode((int)result.StatusCode);
-        }
+        //    return StatusCode((int)result.StatusCode);
+        //}
 
         [HttpPost("api/createOrUpdateMessageDraft"), Authorize]
         [SwaggerOperation("Создать/обновить черновик сообщения")]
@@ -215,24 +215,6 @@ namespace planner_chat_service.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _chatService.GetMessageDraft(tokenPayload.AccountId, chatId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
-        }
-
-        [HttpPost("api/enableNotifications"), Authorize]
-        [SwaggerOperation("Включить/отключить уведомления от чата")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
-        [SwaggerResponse(403)]
-        public async Task<IActionResult> EnableNotifications(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Guid chatId,
-            [FromQuery] bool enable
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.SetEnabledNotifications(tokenPayload.AccountId, chatId, enable);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

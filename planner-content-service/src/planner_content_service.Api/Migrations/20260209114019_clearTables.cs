@@ -1,17 +1,52 @@
-﻿using Microsoft.EntityFrameworkCore.Migrations;
+﻿using System;
+using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace planner_chat_service.Api.Migrations
+namespace planner_content_service.Api.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class clearTables : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
+            migrationBuilder.DropTable(
+                name: "AccessGroupMembers");
+
+            migrationBuilder.DropTable(
+                name: "AccessRights");
+
+            migrationBuilder.DropTable(
+                name: "AccountChatSession");
+
+            migrationBuilder.DropTable(
+                name: "ChatMessages");
+
+            migrationBuilder.DropTable(
+                name: "Histories");
+
+            migrationBuilder.DropTable(
+                name: "NodeLinks");
+
+            migrationBuilder.DropTable(
+                name: "NotificationSettings");
+
+            migrationBuilder.DropTable(
+                name: "AccessGroups");
+
+            migrationBuilder.DropTable(
+                name: "ChatSettings");
+
+            migrationBuilder.DropTable(
+                name: "Chats");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
             migrationBuilder.CreateTable(
-                name: "AccessGroup",
+                name: "AccessGroups",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
@@ -19,68 +54,7 @@ namespace planner_chat_service.Api.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccessGroup", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Nodes",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Type = table.Column<int>(type: "integer", nullable: false),
-                    Name = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false, defaultValue: "Chat Message"),
-                    Props = table.Column<string>(type: "jsonb", nullable: true, defaultValue: "{}")
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Nodes", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AccessGroupMember",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccessGroupId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
-                    JoinedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AccessGroupMember", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AccessGroupMember_AccessGroup_AccessGroupId",
-                        column: x => x.AccessGroupId,
-                        principalTable: "AccessGroup",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "AccessRights",
-                columns: table => new
-                {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uuid", nullable: true),
-                    AccessGroupId = table.Column<Guid>(type: "uuid", nullable: true),
-                    NodeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccessType = table.Column<int>(type: "integer", nullable: false),
-                    NodeType = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AccessRights", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AccessRights_AccessGroup_AccessGroupId",
-                        column: x => x.AccessGroupId,
-                        principalTable: "AccessGroup",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_AccessRights_Nodes_NodeId",
-                        column: x => x.NodeId,
-                        principalTable: "Nodes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                    table.PrimaryKey("PK_AccessGroups", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -88,8 +62,8 @@ namespace planner_chat_service.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Image = table.Column<string>(type: "text", nullable: true),
                     ChatType = table.Column<int>(type: "integer", nullable: false),
+                    Image = table.Column<string>(type: "text", nullable: true),
                     TaskId = table.Column<Guid>(type: "uuid", nullable: true)
                 },
                 constraints: table =>
@@ -109,9 +83,9 @@ namespace planner_chat_service.Api.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     NodeId = table.Column<Guid>(type: "uuid", nullable: false),
-                    CreatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
-                    UpdatedAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                    CreatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
                     CreatedBy = table.Column<Guid>(type: "uuid", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false, defaultValueSql: "NOW()"),
                     UpdatedBy = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
@@ -130,8 +104,8 @@ namespace planner_chat_service.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    ParentId = table.Column<Guid>(type: "uuid", nullable: false),
                     ChildId = table.Column<Guid>(type: "uuid", nullable: false),
+                    ParentId = table.Column<Guid>(type: "uuid", nullable: false),
                     RelationType = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
@@ -148,7 +122,7 @@ namespace planner_chat_service.Api.Migrations
                         column: x => x.ParentId,
                         principalTable: "Nodes",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -156,8 +130,8 @@ namespace planner_chat_service.Api.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     NodeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     NotificationsEnabled = table.Column<bool>(type: "boolean", nullable: false)
                 },
                 constraints: table =>
@@ -172,16 +146,61 @@ namespace planner_chat_service.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "AccessGroupMembers",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccessGroupId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccessGroupMembers", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AccessGroupMembers_AccessGroups_AccessGroupId",
+                        column: x => x.AccessGroupId,
+                        principalTable: "AccessGroups",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "AccessRights",
+                columns: table => new
+                {
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccessGroupId = table.Column<Guid>(type: "uuid", nullable: true),
+                    NodeId = table.Column<Guid>(type: "uuid", nullable: false),
+                    AccessType = table.Column<int>(type: "integer", nullable: false),
+                    AccountId = table.Column<Guid>(type: "uuid", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_AccessRights", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_AccessRights_AccessGroups_AccessGroupId",
+                        column: x => x.AccessGroupId,
+                        principalTable: "AccessGroups",
+                        principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_AccessRights_Nodes_NodeId",
+                        column: x => x.NodeId,
+                        principalTable: "Nodes",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ChatMessages",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    MessageType = table.Column<int>(type: "integer", nullable: false),
+                    ChatId = table.Column<Guid>(type: "uuid", nullable: true),
                     Content = table.Column<string>(type: "text", nullable: false),
-                    SentAt = table.Column<DateTime>(type: "timestamp with time zone", nullable: false, defaultValueSql: "NOW()"),
+                    HasBeenRead = table.Column<bool>(type: "boolean", nullable: false),
+                    MessageType = table.Column<int>(type: "integer", nullable: false),
                     SenderId = table.Column<Guid>(type: "uuid", nullable: false),
-                    HasBeenRead = table.Column<bool>(type: "boolean", nullable: false, defaultValue: false),
-                    ChatId = table.Column<Guid>(type: "uuid", nullable: true)
+                    SentAt = table.Column<DateTime>(type: "timestamp without time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -207,8 +226,8 @@ namespace planner_chat_service.Api.Migrations
                     ChatId = table.Column<Guid>(type: "uuid", nullable: false),
                     AccountId = table.Column<Guid>(type: "uuid", nullable: false),
                     ChatName = table.Column<string>(type: "text", nullable: true),
-                    MessageDraft = table.Column<string>(type: "text", nullable: true),
-                    DateLastViewing = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DateLastViewing = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    MessageDraft = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -222,19 +241,19 @@ namespace planner_chat_service.Api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AccountChatSessions",
+                name: "AccountChatSession",
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    SessionId = table.Column<Guid>(type: "uuid", nullable: false),
                     ChatSettingId = table.Column<Guid>(type: "uuid", nullable: false),
-                    DateLastViewing = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    DateLastViewing = table.Column<DateTime>(type: "timestamp without time zone", nullable: false),
+                    SessionId = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AccountChatSessions", x => x.Id);
+                    table.PrimaryKey("PK_AccountChatSession", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AccountChatSessions_ChatSettings_ChatSettingId",
+                        name: "FK_AccountChatSession_ChatSettings_ChatSettingId",
                         column: x => x.ChatSettingId,
                         principalTable: "ChatSettings",
                         principalColumn: "Id",
@@ -242,8 +261,8 @@ namespace planner_chat_service.Api.Migrations
                 });
 
             migrationBuilder.CreateIndex(
-                name: "IX_AccessGroupMember_AccessGroupId",
-                table: "AccessGroupMember",
+                name: "IX_AccessGroupMembers_AccessGroupId",
+                table: "AccessGroupMembers",
                 column: "AccessGroupId");
 
             migrationBuilder.CreateIndex(
@@ -268,50 +287,14 @@ namespace planner_chat_service.Api.Migrations
                 column: "NodeId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AccountChatSessions_ChatSettingId",
-                table: "AccountChatSessions",
+                name: "IX_AccountChatSession_ChatSettingId",
+                table: "AccountChatSession",
                 column: "ChatSettingId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AccountChatSessions_SessionId",
-                table: "AccountChatSessions",
-                column: "SessionId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatMessages_ChatId",
                 table: "ChatMessages",
                 column: "ChatId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessages_HasBeenRead",
-                table: "ChatMessages",
-                column: "HasBeenRead");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessages_MessageType",
-                table: "ChatMessages",
-                column: "MessageType");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessages_SenderId",
-                table: "ChatMessages",
-                column: "SenderId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessages_SenderId_HasBeenRead_SentAt",
-                table: "ChatMessages",
-                columns: new[] { "SenderId", "HasBeenRead", "SentAt" });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatMessages_SentAt",
-                table: "ChatMessages",
-                column: "SentAt",
-                descending: new bool[0]);
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ChatSettings_AccountId",
-                table: "ChatSettings",
-                column: "AccountId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ChatSettings_ChatId",
@@ -371,56 +354,9 @@ namespace planner_chat_service.Api.Migrations
                 column: "RelationType");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Nodes_Name",
-                table: "Nodes",
-                column: "Name");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Nodes_Type",
-                table: "Nodes",
-                column: "Type");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_NotificationSettings_NodeId",
                 table: "NotificationSettings",
                 column: "NodeId");
-        }
-
-        /// <inheritdoc />
-        protected override void Down(MigrationBuilder migrationBuilder)
-        {
-            migrationBuilder.DropTable(
-                name: "AccessGroupMember");
-
-            migrationBuilder.DropTable(
-                name: "AccessRights");
-
-            migrationBuilder.DropTable(
-                name: "AccountChatSessions");
-
-            migrationBuilder.DropTable(
-                name: "ChatMessages");
-
-            migrationBuilder.DropTable(
-                name: "Histories");
-
-            migrationBuilder.DropTable(
-                name: "NodeLinks");
-
-            migrationBuilder.DropTable(
-                name: "NotificationSettings");
-
-            migrationBuilder.DropTable(
-                name: "AccessGroup");
-
-            migrationBuilder.DropTable(
-                name: "ChatSettings");
-
-            migrationBuilder.DropTable(
-                name: "Chats");
-
-            migrationBuilder.DropTable(
-                name: "Nodes");
         }
     }
 }

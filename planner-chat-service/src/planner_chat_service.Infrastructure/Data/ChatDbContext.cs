@@ -30,9 +30,5 @@ namespace planner_chat_service.Infrastructure.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<Node> Nodes { get; set; }
-        public DbSet<NodeLink> NodeLinks { get; set; }
-        public DbSet<History> History { get; set; }
-        public DbSet<AccessRight> AccessRights { get; set; }
-        public DbSet<NotificationSettings> NotificationSettings { get; set; }
     }
 }

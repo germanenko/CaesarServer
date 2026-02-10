@@ -14,44 +14,15 @@ namespace planner_content_service.App.Service
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
-        private readonly IBoardRepository _boardRepository;
-        private readonly IPublicationStatusRepository _publicationStatusRepository;
         private readonly INotifyService _notifyService;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
-            IPublicationStatusRepository publicationStatusRepository,
             INotifyService notifyService)
         {
             _taskRepository = taskRepository;
-            _boardRepository = boardRepository;
-            _publicationStatusRepository = publicationStatusRepository;
             _notifyService = notifyService;
-        }
-
-
-        public async Task<HttpStatusCode> AddTaskToColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return HttpStatusCode.Forbidden;
-
-            var column = await _boardRepository.GetBoardColumn(columnId);
-            if (column == null)
-                return HttpStatusCode.BadRequest;
-
-            var userBoards = await _boardRepository.GetAll(accountId);
-            var boardIds = userBoards.Select(e => e.Id);
-            if (!boardIds.Contains(boardId))
-                return HttpStatusCode.Forbidden;
-
-            var task = await _taskRepository.GetAsync(taskId, false);
-            if (task == null)
-                return HttpStatusCode.BadRequest;
-
-            await _taskRepository.AssignTaskToColumn(task.Id, column.Id);
-            return HttpStatusCode.OK;
         }
 
         public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, TaskBody taskBody)
@@ -145,129 +116,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetDeletedTasks(Guid accountId, Guid boardId)
-        {
 
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return new ServiceResponse<IEnumerable<TaskBody>>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this board" },
-                    IsSuccess = false
-                };
-
-            var deletedTasks = await _publicationStatusRepository.Get(PublicationStatus.Deleted);
-            return new ServiceResponse<IEnumerable<TaskBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = deletedTasks.Select(t => ((TaskModel)t.Node).ToTaskBody()),
-                IsSuccess = true
-            };
-        }
-
-
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetTasks(Guid accountId, Guid boardId, Guid columnId, WorkflowStatus? state)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return new ServiceResponse<IEnumerable<TaskBody>>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this board" },
-                    IsSuccess = false
-                };
-
-            var tasks = state == null
-                ? await _taskRepository.GetAll(columnId, false)
-                : await _taskRepository.GetAll(columnId, state.Value, false);
-
-            return new ServiceResponse<IEnumerable<TaskBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(x => x.ToTaskBody()),
-                IsSuccess = true
-            };
-        }
-
-        public async Task<ServiceResponse<IEnumerable<TaskBody>>> GetAllTasks(Guid accountId)
-        {
-            var tasks = await _taskRepository.GetAllTasks(accountId);
-
-            return new ServiceResponse<IEnumerable<TaskBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = tasks.Select(x => x.ToTaskBody()),
-                IsSuccess = true
-            };
-        }
-
-        public async Task<ServiceResponse<TaskBody>> RemoveTask(Guid accountId, Guid boardId, Guid taskId)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return new ServiceResponse<TaskBody>
-                {
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new string[] { "You are not a member of this board" },
-                    IsSuccess = false
-                };
-
-            var task = await _taskRepository.GetAsync(taskId, true);
-            if (task == null)
-                return new ServiceResponse<TaskBody>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Errors = new string[] { "Task id isn't exist" },
-                    IsSuccess = false
-                };
-
-            var deletedTask = await _publicationStatusRepository.ChangeStatus(task.Id, PublicationStatus.Deleted);
-            return deletedTask == null ? new ServiceResponse<TaskBody>
-            {
-                StatusCode = HttpStatusCode.Conflict,
-                Errors = new string[] { "Task deleted exist" },
-                IsSuccess = false
-            } : new ServiceResponse<TaskBody>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = ((TaskModel)deletedTask.Node).ToTaskBody(),
-                IsSuccess = true
-            };
-        }
-
-        public async Task<HttpStatusCode> RemoveTaskFromColumn(Guid accountId, Guid boardId, Guid taskId, Guid columnId)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return HttpStatusCode.Forbidden;
-
-            var column = await _boardRepository.GetBoardColumn(columnId);
-            if (column == null)
-                return HttpStatusCode.BadRequest;
-
-            var userBoards = await _boardRepository.GetAll(accountId);
-            var boardIds = userBoards.Select(e => e.Id);
-            if (!boardIds.Contains(boardId))
-                return HttpStatusCode.Forbidden;
-
-            var task = await _taskRepository.GetAsync(taskId, true);
-            if (task == null)
-                return HttpStatusCode.BadRequest;
-
-            await _taskRepository.RemoveTaskFromColumn(taskId, columnId);
-            return HttpStatusCode.NoContent;
-        }
-
-        public async Task<HttpStatusCode> RestoreDeletedTask(Guid deletedTaskId, Guid boardId, Guid accountId)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember == null)
-                return HttpStatusCode.Forbidden;
-
-            var result = await _publicationStatusRepository.ChangeStatus(deletedTaskId, PublicationStatus.Active);
-            return result != null ? HttpStatusCode.NoContent : HttpStatusCode.BadRequest;
-        }
 
         public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, TaskBody taskBody)
         {

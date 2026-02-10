@@ -33,13 +33,6 @@ namespace planner_chat_service.Infrastructure.Repository
             };
             chatMembership = (await _context.ChatSettings.AddAsync(chatMembership))?.Entity;
 
-            await _context.AccessRights.AddAsync(new AccessRight
-            {
-                AccountId = accountId,
-                NodeId = chat.Id,
-                NodeType = NodeType.Message
-            });
-
             await _context.SaveChangesAsync();
 
             return chatMembership;
@@ -94,16 +87,6 @@ namespace planner_chat_service.Infrastructure.Repository
                 .ToList();
 
             chat.ChatMemberships = memberships;
-
-            var access = participants
-                .Select(participantId => new AccessRight
-                {
-                    AccountId = participantId,
-                    Node = chat
-                })
-                .ToList();
-
-            await _context.AccessRights.AddRangeAsync(access);
 
             chat = (await _context.Chats.AddAsync(chat))?.Entity;
             await _context.SaveChangesAsync();
@@ -253,21 +236,11 @@ namespace planner_chat_service.Infrastructure.Repository
             var chat = chatMembership.Chat;
             var dateLastViewing = userSession.DateLastViewing;
 
-            var countOfUnreadMessages = await _context.NodeLinks
-                .Join(_context.ChatMessages,
-                    n => n.ChildId,
-                    m => m.Id,
-                    (n, m) => new { Message = m, Link = n })
-                .CountAsync(e => e.Link.ParentId == chatId && e.Message.SenderId != accountId && e.Message.HasBeenRead == false);
+            var countOfUnreadMessages = await _context.ChatMessages.CountAsync(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false);
 
             var lastMessage = await _context.ChatMessages
-                .Join(_context.NodeLinks,
-                    m => m.Id,
-                    n => n.ChildId,
-                    (m, n) => new { Message = m, Link = n })
-                .Where(x => x.Link.ParentId == chatId && x.Message.SentAt > dateLastViewing)
-                .OrderByDescending(x => x.Message.SentAt)
-                .Select(x => x.Message)
+                .Where(e => e.ChatId == chatId && e.SenderId != accountId && e.HasBeenRead == false)
+                .OrderByDescending(x => x.SentAt)
                 .FirstOrDefaultAsync();
 
             var chatBody = new ChatBody
@@ -319,12 +292,8 @@ namespace planner_chat_service.Infrastructure.Repository
 
         public async Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true)
         {
-            var query = _context.NodeLinks
-                .Where(e => e.ParentId == chatId)
-                .Join(_context.ChatMessages,
-                n => n.ChildId,
-                m => m.Id,
-                (n, m) => m);
+            var query = _context.ChatMessages
+                .Where(e => e.ChatId == chatId);
 
             query = isDescending
                 ? query.OrderByDescending(e => e.SentAt)
@@ -333,15 +302,6 @@ namespace planner_chat_service.Infrastructure.Repository
             return await query
                 .Skip(countSkipped)
                 .Take(count)
-                .ToListAsync();
-        }
-
-        public async Task<List<ChatMessage>> GetAllMessagesAsync(Guid accountId)
-        {
-            var query = _context.AccessRights.Include(c => c.Node).Where(cm => cm.AccountId == accountId).Select(c => c.Node as Chat);
-            var messages = query.SelectMany(x => x.Messages.OrderByDescending(m => m.SentAt).Take(30));
-
-            return await messages
                 .ToListAsync();
         }
 
@@ -494,7 +454,6 @@ namespace planner_chat_service.Infrastructure.Repository
 
 
             await _context.ChatSettings.AddRangeAsync(newChatSettings);
-            await _context.NotificationSettings.AddRangeAsync(newNotificationSettings);
             await _context.SaveChangesAsync();
         }
 
@@ -518,13 +477,6 @@ namespace planner_chat_service.Infrastructure.Repository
             }
 
             message.Content = updatedMessage.Content;
-
-            _context.History.Add(new History()
-            {
-                NodeId = message.Id,
-                UpdatedAt = DateTime.UtcNow,
-                UpdatedBy = accountId,
-            });
 
             await _context.SaveChangesAsync();
 
@@ -562,44 +514,6 @@ namespace planner_chat_service.Infrastructure.Repository
             membership.MessageDraft = content;
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<bool> NotificationsIsEnabled(Guid accountId, Guid chatId)
-        {
-            var membership = await _context.NotificationSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.NodeId == chatId);
-
-            return membership.NotificationsEnabled;
-        }
-
-        public async Task<List<Guid>> GetUsersWithEnabledNotifications(IEnumerable<Guid> accountIds, Guid chatId)
-        {
-            return await _context.NotificationSettings
-                .Where(cm => accountIds.Contains(cm.AccountId) &&
-                            cm.NodeId == chatId &&
-                            cm.NotificationsEnabled)
-                .Select(cm => cm.AccountId)
-                .ToListAsync();
-        }
-
-        public async Task<NotificationSettings?> SetEnabledNotifications(Guid accountId, Guid chatId, bool enable)
-        {
-            var membership = await _context.NotificationSettings.FirstOrDefaultAsync(x => x.AccountId == accountId && x.NodeId == chatId);
-
-            if (membership == null)
-            {
-                return null;
-            }
-
-            membership.NotificationsEnabled = enable;
-
-            await _context.SaveChangesAsync();
-
-            return membership;
-        }
-
-        public async Task<AccessRight?> GetChatAccess(Guid accountId, Guid chatId)
-        {
-            return await _context.AccessRights.FirstOrDefaultAsync(cm => cm.AccountId == accountId && cm.NodeId == chatId);
         }
     }
 }

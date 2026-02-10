@@ -20,16 +20,6 @@ namespace planner_content_service.App.Service
             _notifyService = notifyService;
         }
 
-        public async Task<HttpStatusCode> AddBoardMemberAsync(Guid boardId, Guid accountId, Guid newAccountId, AccessType accessType)
-        {
-            var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, boardId);
-            if (boardMember is null)
-                return HttpStatusCode.Forbidden;
-
-            var result = await _boardRepository.AddBoardMember(newAccountId, boardId, accessType);
-            return result == null ? HttpStatusCode.BadRequest : HttpStatusCode.OK;
-        }
-
         public async Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, ColumnBody column)
         {
             CreateColumnEvent columnEvent = new CreateColumnEvent()
@@ -75,13 +65,22 @@ namespace planner_content_service.App.Service
             foreach (var column in columns)
             {
                 var board = await _boardRepository.GetBoard(column.Id);
-                var boardMember = await _boardRepository.GetBoardMemberAsync(accountId, board.Id);
-                if (boardMember == null)
+
+                var checkAccess = new CheckAccessRequest()
+                {
+                    AccountId = accountId,
+                    NodeId = column.Id
+                };
+
+                var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+
+                if (hasAccess.Body == false)
                 {
                     return new ServiceResponse<List<ColumnBody>>
                     {
                         IsSuccess = false,
-                        StatusCode = HttpStatusCode.Forbidden
+                        StatusCode = HttpStatusCode.Forbidden,
+                        Errors = hasAccess.Errors
                     };
                 }
             }
@@ -158,18 +157,6 @@ namespace planner_content_service.App.Service
             }
 
             return new ServiceResponse<List<BoardBody>>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result
-            };
-        }
-
-        public async Task<ServiceResponse<IEnumerable<Guid>>> GetBoardMembersAsync(Guid boardId, int count, int offset)
-        {
-            var result = await _boardRepository.GetBoardMembers(boardId, count, offset);
-
-            return new ServiceResponse<IEnumerable<Guid>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,

@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -13,6 +14,8 @@ using planner_content_service.Infrastructure.Repository;
 using planner_content_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
@@ -40,7 +43,6 @@ void ConfigureServices(IServiceCollection services)
     var username = GetEnvVar("RABBITMQ_USERNAME");
     var password = GetEnvVar("RABBITMQ_PASSWORD");
     var createTaskChatQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_QUEUE_NAME");
-    var createTaskChatResponseQueue = GetEnvVar("RABBITMQ_CREATE_TASK_CHAT_RESPONSE_QUEUE");
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
     var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
@@ -108,13 +110,10 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
     services.AddScoped<IBoardService, BoardService>();
-    services.AddScoped<IAccessService, AccessService>();
 
     services.AddScoped<IBoardRepository, BoardRepository>();
-    services.AddScoped<IPublicationStatusRepository, PublicationStatusRepository>();
     services.AddScoped<ITaskRepository, TaskRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
-    services.AddScoped<IAccessRepository, AccessRepository>();
 
     services.AddSingleton<IJwtService, JwtService>();
 
@@ -138,7 +137,6 @@ void ConfigureServices(IServiceCollection services)
         hostname,
         username,
         password,
-        createTaskChatResponseQueue,
         contentNodesExchange
     ));
 }

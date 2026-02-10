@@ -43,6 +43,7 @@ void ConfigureServices(IServiceCollection services)
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
+    var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -107,7 +108,7 @@ void ConfigureServices(IServiceCollection services)
 
 
     services.AddSingleton<IJwtService, JwtService>();
-    services.AddSingleton<INotificationService, NotificationService>();
+    services.AddSingleton<IWebSocketService, WebSocketService>();
 
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
         new RabbitMqNotifyService(
@@ -125,9 +126,10 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IAccessRepository, AccessRepository>();
     services.AddScoped<IHistoryRepository, HistoryRepository>();
+    services.AddScoped<INotificationRepository, NotificationRepository>();
 
     services.AddHostedService(sp => new RabbitMqService(
-        sp.GetRequiredService<INotificationService>(),
+        sp.GetRequiredService<IWebSocketService>(),
         sp.GetRequiredService<INotifyService>(),
         sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<IServiceScopeFactory>(),
@@ -138,7 +140,8 @@ void ConfigureServices(IServiceCollection services)
         createPersonalChatQueue,
         createBoardExchange,
         createColumnExchange,
-        createTaskExchange
+        createTaskExchange,
+        getUsersWithEnabledNotifications
     ));
 }
 

@@ -63,41 +63,6 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-
-        [HttpGet("board/members"), Authorize]
-        [SwaggerOperation("Получить список участников доски")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<Guid>))]
-        public async Task<IActionResult> GetBoardMembers(
-            [FromQuery, Required] Guid boardId,
-            [FromQuery] int count = 1,
-            [FromQuery] int offset = 0
-        )
-        {
-            var result = await _boardService.GetBoardMembersAsync(boardId, count, offset);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
-        [HttpPost("board/member"), Authorize]
-        [SwaggerOperation("Добавить участника доски")]
-        [SwaggerResponse(200)]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(404)]
-
-        public async Task<IActionResult> AddMember(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery, Required] Guid boardId,
-            [FromQuery, Required] Guid accountId,
-            [FromQuery, Required] AccessType accessType
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddBoardMemberAsync(boardId, tokenPayload.AccountId, accountId, accessType);
-            return StatusCode((int)result);
-        }
-
         [HttpPost("board/column"), Authorize]
         [SwaggerOperation("Создать колонку")]
         [SwaggerResponse(200)]

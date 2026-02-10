@@ -42,6 +42,7 @@ void ConfigureServices(IServiceCollection services)
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
+    var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -91,6 +92,10 @@ void ConfigureServices(IServiceCollection services)
 
 
 
+    services.AddScoped<IChatRepository, ChatRepository>();
+    services.AddScoped<IChatService, ChatService>();
+    services.AddScoped<IChatConnector, ChatConnector>();
+
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
         new RabbitMqNotifyService(
             rabbitMqHostname,
@@ -99,13 +104,10 @@ void ConfigureServices(IServiceCollection services)
             createChatQueue,
             createTaskChatResponseQueue,
             messageSentToChatQueue,
-            createPersonalChatQueue
+            createPersonalChatQueue,
+            getUsersWithEnabledNotifications,
+            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
-
-
-    services.AddScoped<IChatRepository, ChatRepository>();
-    services.AddScoped<IChatService, ChatService>();
-    services.AddScoped<IChatConnector, ChatConnector>();
 
     services.AddHostedService(e => new RabbitMqService(
         e.GetRequiredService<IServiceScopeFactory>(),

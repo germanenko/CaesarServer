@@ -138,19 +138,38 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
         {
-            //var canEdit = await _context.AccessRights
-            //    .AnyAsync(n => n.Id == nodeId && (n.AccessType == AccessType.Creator || n.AccessType == AccessType.Admin || n.AccessType == AccessType.Editor));
+            bool access = false;
 
-            //if (canEdit)
-            //    return true;
+            var currentNodeId = nodeId;
 
-            return await _context.AccessRights
-                .Where(ar => ar.NodeId == nodeId)
-                .Include(x => x.AccessGroup)
-                    .ThenInclude(x => x.Members)
-                .AnyAsync(ar =>
-                    ar.AccessGroupId == null && ar.AccountId == accountId ||
-                    ar.AccessGroupId != null && ar.AccessGroup.Members.Any(m => m.AccountId == accountId));
+            while (currentNodeId != null)
+            {
+                var rules = await _context.AccessRights
+                    .Where(ar => ar.NodeId == currentNodeId)
+                    .Select(ar => new
+                    {
+                        ar.AccountId,
+                        ar.AccessGroupId,
+                        HasGroupMember = ar.AccessGroupId != null &&
+                            ar.AccessGroup.Members.Any(m => m.AccountId == accountId)
+                    })
+                    .ToListAsync();
+
+                if (rules.Any())
+                {
+                    return rules.Any(r =>
+                        r.AccountId == accountId ||
+                        r.HasGroupMember
+                    );
+                }
+
+                currentNodeId = await _context.NodeLinks
+                    .Where(x => x.ChildId == currentNodeId && x.ParentId != x.ChildId)
+                    .Select(x => x.ParentId)
+                    .FirstOrDefaultAsync();
+            }
+
+            return access;
         }
 
 

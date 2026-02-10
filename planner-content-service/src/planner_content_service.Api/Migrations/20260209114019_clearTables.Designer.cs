@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_content_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_content_service.Infrastructure.Data;
 namespace planner_content_service.Api.Migrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209114019_clearTables")]
+    partial class clearTables
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -48,6 +51,54 @@ namespace planner_content_service.Api.Migrations
                     b.ToTable("Nodes", (string)null);
 
                     b.UseTptMappingStrategy();
+                });
+
+            modelBuilder.Entity("planner_content_service.Core.Entities.Models.PublicationStatusModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NodeId");
+
+                    b.HasIndex("NodeId", "UpdatedAt");
+
+                    b.ToTable("PublicationStatuses");
+                });
+
+            modelBuilder.Entity("planner_content_service.Core.Entities.Models.WorkflowStatusModel", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<DateTime?>("UpdatedAt")
+                        .HasColumnType("timestamp without time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NodeId");
+
+                    b.HasIndex("NodeId", "UpdatedAt");
+
+                    b.ToTable("WorkflowStatuses");
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Board", b =>
@@ -90,6 +141,28 @@ namespace planner_content_service.Api.Migrations
                     b.HasIndex("StartDate");
 
                     b.ToTable("Tasks", (string)null);
+                });
+
+            modelBuilder.Entity("planner_content_service.Core.Entities.Models.PublicationStatusModel", b =>
+                {
+                    b.HasOne("planner_content_service.Core.Entities.Models.Node", "Node")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Node");
+                });
+
+            modelBuilder.Entity("planner_content_service.Core.Entities.Models.WorkflowStatusModel", b =>
+                {
+                    b.HasOne("planner_content_service.Core.Entities.Models.Node", "Node")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Node");
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Board", b =>

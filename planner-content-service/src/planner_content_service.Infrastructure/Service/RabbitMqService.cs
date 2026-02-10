@@ -30,7 +30,6 @@ namespace planner_content_service.Infrastructure.Service
             string hostname,
             string userName,
             string password,
-            string createTaskChatResponseQueue,
             string contentNodes)
         {
             _hostname = hostname;
@@ -41,7 +40,6 @@ namespace planner_content_service.Infrastructure.Service
 
             _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
             {
-                { createTaskChatResponseQueue, (QueueName: GetQueueName(createTaskChatResponseQueue), Handler: HandleCreateTaskChatResponseMessageAsync) },
                 { contentNodes, (QueueName: GetQueueName(contentNodes), Handler: HandleContentNodes) }
             };
 
@@ -164,17 +162,6 @@ namespace planner_content_service.Infrastructure.Service
             await boardService.CreateBoardsAsync(boardBodies, response.TokenPayload.AccountId);
             await boardService.AddColumns(response.TokenPayload.AccountId, columnBodies);
             await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
-        }
-
-        private async Task HandleCreateTaskChatResponseMessageAsync(string message)
-        {
-            using var scope = _serviceFactory.CreateScope();
-            var taskRepository = scope.ServiceProvider.GetRequiredService<ITaskRepository>();
-            var response = JsonSerializer.Deserialize<CreateTaskChatEvent>(message);
-            if (response == null)
-                return;
-
-            await taskRepository.UpdateTaskChatId(response.CreateTaskChat.TaskId, (Guid)response.CreateTaskChat.ChatId);
         }
 
         private string GetQueueName(string exchange)

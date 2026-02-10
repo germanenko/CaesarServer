@@ -2,6 +2,11 @@ namespace planner_server_package.Events.Enums
 {
     public enum PublishEvent
     {
+        CreatePersonalChat,
+        GetNotificationSettings,
+        AddAccountToChat,
+        ResponseTaskChat,
+        MessageSentToChat,
         InitChat,
         CreateAccountMailCredentials,
         CreateTaskChatResponse,
@@ -10,6 +15,7 @@ namespace planner_server_package.Events.Enums
         ChatNodes,
         CreateBoard,
         CreateColumn,
-        CreateTask
+        CreateTask,
+        CheckAccess
     }
 }
