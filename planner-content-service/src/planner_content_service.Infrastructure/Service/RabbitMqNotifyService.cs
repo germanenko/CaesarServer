@@ -158,6 +158,7 @@ namespace planner_content_service.Infrastructure.Service
 
             if (completedTask == timeout)
             {
+                channel.BasicCancel(consumerTag);
                 _logger.LogInformation("Timeout! No response received.");
                 return new ServiceResponse<bool>()
                 {
