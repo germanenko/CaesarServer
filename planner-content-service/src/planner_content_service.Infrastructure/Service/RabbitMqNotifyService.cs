@@ -108,8 +108,7 @@ namespace planner_content_service.Infrastructure.Service
 
             var consumer = new EventingBasicConsumer(channel);
 
-            var tcs = new TaskCompletionSource<string>(
-                TaskCreationOptions.RunContinuationsAsynchronously);
+            var tcs = new TaskCompletionSource<ServiceResponse<bool>>();
 
             var correlationId = Guid.NewGuid().ToString();
 
@@ -119,19 +118,23 @@ namespace planner_content_service.Infrastructure.Service
                 autoAck: true
             );
 
-            var complete = new ServiceResponse<bool>();
+            var response = new ServiceResponse<bool>();
 
             consumer.Received += (model, ea) =>
             {
                 if (ea.BasicProperties.CorrelationId == correlationId)
                 {
-                    var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    var responseJson = Encoding.UTF8.GetString(ea.Body.ToArray());
 
-                    _logger.LogInformation($"Received response: {response}");
+                    _logger.LogInformation($"Received response: {responseJson}");
 
-                    complete = JsonSerializer.Deserialize<ServiceResponse<bool>>(response);
+                    response = JsonSerializer.Deserialize<ServiceResponse<bool>>(responseJson);
 
-                    tcs.TrySetResult(response);
+                    tcs.TrySetResult(response ?? new ServiceResponse<bool>
+                    {
+                        IsSuccess = false,
+                        Errors = new[] { "Invalid response format" }
+                    });
                     channel.BasicCancel(consumerTag);
                 }
             };
@@ -148,6 +151,7 @@ namespace planner_content_service.Infrastructure.Service
                                  basicProperties: properties,
                                  body: body);
 
+
             var timeout = Task.Delay(TimeSpan.FromSeconds(10));
             var completedTask = await Task.WhenAny(tcs.Task, timeout);
 
@@ -161,11 +165,7 @@ namespace planner_content_service.Infrastructure.Service
                 };
             }
 
-            var response = await tcs.Task;
-
-            _logger.LogInformation($"RabbitMQ Response : {response}");
-
-            return complete;
+            return await tcs.Task;
         }
 
         public string GetExchangeName(PublishEvent publishEvent)
