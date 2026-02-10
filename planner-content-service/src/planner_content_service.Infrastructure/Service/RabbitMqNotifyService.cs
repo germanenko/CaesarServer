@@ -81,7 +81,7 @@ namespace planner_content_service.Infrastructure.Service
             }
         }
 
-        public async Task<ServiceResponse<bool>> Publish<T>(T message, PublishEvent publishEvent)
+        public async Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent)
         {
             var exchangeName = GetExchangeName(publishEvent);
 
@@ -108,7 +108,7 @@ namespace planner_content_service.Infrastructure.Service
 
             var consumer = new EventingBasicConsumer(channel);
 
-            var tcs = new TaskCompletionSource<ServiceResponse<bool>>(
+            var tcs = new TaskCompletionSource<ServiceResponse<object>>(
                 TaskCreationOptions.RunContinuationsAsynchronously);
 
             var correlationId = Guid.NewGuid().ToString();
@@ -119,7 +119,7 @@ namespace planner_content_service.Infrastructure.Service
                 autoAck: true
             );
 
-            var response = new ServiceResponse<bool>();
+            var response = new ServiceResponse<object>();
 
             consumer.Received += (model, ea) =>
             {
@@ -132,9 +132,9 @@ namespace planner_content_service.Infrastructure.Service
                     try
                     {
 
-                        response = JsonSerializer.Deserialize<ServiceResponse<bool>>(responseJson);
+                        response = JsonSerializer.Deserialize<ServiceResponse<object>>(responseJson);
 
-                        tcs.TrySetResult(response ?? new ServiceResponse<bool>
+                        tcs.TrySetResult(response ?? new ServiceResponse<object>
                         {
                             IsSuccess = false,
                             Errors = new[] { "Invalid response format" }
@@ -169,7 +169,7 @@ namespace planner_content_service.Infrastructure.Service
             {
                 channel.BasicCancel(consumerTag);
                 _logger.LogInformation("Timeout! No response received.");
-                return new ServiceResponse<bool>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     Errors = new[] { "Ошибка сервера" }

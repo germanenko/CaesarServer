@@ -5,6 +5,6 @@ namespace planner_content_service.Core.IService
 {
     public interface INotifyService
     {
-        Task<ServiceResponse<bool>> Publish<T>(T message, PublishEvent publishEvent);
+        Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent);
     }
 }

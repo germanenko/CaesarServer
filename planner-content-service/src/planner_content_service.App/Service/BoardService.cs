@@ -74,7 +74,7 @@ namespace planner_content_service.App.Service
 
                 var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-                if (hasAccess.Body == false)
+                if (!hasAccess.IsSuccess)
                 {
                     return new ServiceResponse<List<ColumnBody>>
                     {
