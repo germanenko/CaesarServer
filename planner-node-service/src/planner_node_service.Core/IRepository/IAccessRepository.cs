@@ -7,7 +7,7 @@ namespace planner_node_service.Core.IRepository
     public interface IAccessRepository
     {
 
-        Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission accessType);
+        Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission permission);
         Task<AccessRight?> CreateAccessRight(AccessRightBody accessRightBody);
         Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
         Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);

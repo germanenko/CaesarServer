@@ -44,13 +44,13 @@ namespace planner_node_service.Infrastructure.Repository
             return accessRight;
         }
 
-        public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission accessType)
+        public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission permission)
         {
             var existing = await _context.AccessRights
                 .FirstOrDefaultAsync(x =>
                     x.AccountId == accountId &&
                     x.NodeId == nodeId &&
-                    x.Permission == accessType);
+                    x.Permission == permission);
 
             if (existing != null)
             {
@@ -62,7 +62,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = Guid.NewGuid(),
                 AccountId = accountId,
                 NodeId = nodeId,
-                Permission = accessType
+                Permission = permission
             };
 
             _context.AccessRights.Add(accessRight);
