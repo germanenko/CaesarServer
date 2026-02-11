@@ -6,21 +6,15 @@ namespace planner_content_service.Core.IRepository
 {
     public interface ITaskRepository
     {
-        Task<TaskModel?> AddAsync(TaskBody task, Guid accountId);
-        Task<TaskModel?> GetAsync(Guid id, bool isDraft);
+        Task<TaskBody?> AddAsync(TaskBody task, Guid accountId);
+        Task<TaskBody?> GetAsync(Guid id, bool isDraft);
         Task<bool> RemoveAsync(Guid id, bool isDraft);
-        IEnumerable<TaskModel?>? GetAll(List<Guid> ids);
-        Task<TaskModel?> UpdateAsync(
-            Guid id,
-            Guid accountId,
-            TaskBody updatedNode,
-            Guid? columnId,
-            DateTime changeDate);
-        Task<TaskModel?> UpdateAsync(
+        IEnumerable<TaskBody?>? GetAll(List<Guid> ids);
+
+        Task<TaskBody?> UpdateAsync(
             Guid id,
             Guid accountId,
             TaskBody updatedNode,
             DateTime changeDate);
-        //Task<IEnumerable<TaskAttachedMessage>> GetTasksAttachedMessages(Guid accountId);
     }
 }

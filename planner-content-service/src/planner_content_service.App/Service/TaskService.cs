@@ -80,7 +80,7 @@ namespace planner_content_service.App.Service
             return new ServiceResponse<TaskBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToTaskBody(),
+                Body = result,
                 IsSuccess = true
             };
         }
@@ -148,7 +148,7 @@ namespace planner_content_service.App.Service
             } : new ServiceResponse<TaskBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToTaskBody(),
+                Body = result,
                 IsSuccess = true
             };
         }
@@ -176,7 +176,7 @@ namespace planner_content_service.App.Service
                 DateTime? startDate = taskBody.StartDate/* == null ? null : DateTime.Parse(taskBody.StartDate)*/;
                 DateTime? endDate = taskBody.EndDate/* == null ? null : DateTime.Parse(taskBody.EndDate)*/;
 
-                result.Add((await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow)).ToTaskBody());
+                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow));
             }
 
             return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>

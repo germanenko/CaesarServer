@@ -23,114 +23,28 @@ namespace planner_content_service.Infrastructure.Repository
             _notifyService = notifyService;
         }
 
-        public async Task<TaskModel?> AddAsync
+        public async Task<TaskBody?> AddAsync
         (
-            TaskBody task,
+            TaskBody taskBody,
             Guid accountId
         )
         {
-            var node = new TaskModel()
+            var taskModel = new TaskModel()
             {
-                Id = task.Id,
-                Name = task.Name,
+                Id = taskBody.Id,
+                Name = taskBody.Name,
                 Type = NodeType.Task,
-                Description = task.Description,
-                EndDate = task.EndDate,
-                HexColor = task.HexColor,
-                Props = task.Props,
-                StartDate = task.StartDate
+                Description = taskBody.Description,
+                EndDate = taskBody.EndDate,
+                HexColor = taskBody.HexColor,
+                Props = taskBody.Props,
+                StartDate = taskBody.StartDate
             };
-
-            _context.SaveChanges();
-
-
-            return await AddTaskAsync(node, accountId, task.PublicationStatus, task.Link);
-        }
-
-        public IEnumerable<TaskModel?>? GetAll(List<Guid> ids)
-        {
-            var result = _context.Nodes
-                .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Task)
-                .Select(x => x as TaskModel)
-                .AsEnumerable();
-
-            return result;
-        }
-
-
-        public async Task<TaskModel?> GetAsync(Guid id, bool isDraft)
-            => await _context.Tasks
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-        public async Task<bool> RemoveAsync(Guid id, bool isDraft)
-        {
-            var task = await GetAsync(id, isDraft);
-            if (task == null)
-                return true;
-
-            _context.Nodes.Remove(task);
-            await _context.SaveChangesAsync();
-            return true;
-        }
-
-
-        public async Task<TaskModel?> UpdateAsync(
-            Guid id,
-            Guid accountId,
-            TaskBody updatedNode,
-            Guid? columnId,
-            DateTime changeDate)
-        {
-            var task = await _context.Tasks
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (task == null)
-                return null;
-
-            task.Name = updatedNode.Name;
-            task.Props = JsonSerializer.Serialize(updatedNode);
-
-            var node = await _context.Tasks
-                .FirstOrDefaultAsync(e => e.Id == id);
-
-            node = task;
-
-            await _context.SaveChangesAsync();
-
-            return node;
-        }
-
-        public async Task<TaskModel?> UpdateAsync(
-            Guid id,
-            Guid accountId,
-            TaskBody updatedNode,
-            DateTime changeDate)
-        {
-            var task = await _context.Tasks
-                .FirstOrDefaultAsync(e => e.Id == id);
-            if (task == null)
-                return null;
-
-            task.Name = updatedNode.Name;
-            task.Props = JsonSerializer.Serialize(updatedNode);
-
-            await _context.SaveChangesAsync();
-            return task;
-        }
-
-
-        private async Task<TaskModel?> AddTaskAsync(
-            TaskModel task,
-            Guid accountId,
-            PublicationStatus publicationStatus,
-            NodeLinkBody? attach = null)
-        {
-            if (task == null)
-                return null;
 
             try
             {
 
-                task = (await _context.Tasks.AddAsync(task)).Entity;
+                var task = (await _context.Tasks.AddAsync(taskModel)).Entity;
 
                 await _context.SaveChangesAsync();
 
@@ -145,10 +59,9 @@ namespace planner_content_service.Infrastructure.Repository
                     }
                 };
 
-                _ = Task.Run(() => _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse));
+                await _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
 
-
-                return task;
+                return taskBody;
             }
             catch (Exception ex)
             {
@@ -156,7 +69,55 @@ namespace planner_content_service.Infrastructure.Repository
 
                 throw;
             }
+        }
 
+        public IEnumerable<TaskBody?>? GetAll(List<Guid> ids)
+        {
+            var result = _context.Nodes
+                .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Task)
+                .Select(x => x as TaskModel)
+                .AsEnumerable();
+
+            return result.Select(x => x?.ToTaskBody());
+        }
+
+
+        public async Task<TaskBody?> GetAsync(Guid id, bool isDraft)
+            => (await _context.Tasks
+                .FirstOrDefaultAsync(e => e.Id == id))?.ToTaskBody();
+
+        public async Task<bool> RemoveAsync(Guid id, bool isDraft)
+        {
+            var task = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == id);
+            if (task == null)
+                return true;
+
+            _context.Nodes.Remove(task);
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task<TaskBody?> UpdateAsync(
+            Guid id,
+            Guid accountId,
+            TaskBody updatedNode,
+            DateTime changeDate)
+        {
+            var task = await _context.Tasks
+                .FirstOrDefaultAsync(e => e.Id == id);
+
+            if (task == null)
+                return null;
+
+            task.StartDate = updatedNode.StartDate;
+            task.EndDate = updatedNode.EndDate;
+            task.Description = updatedNode.Description;
+            task.HexColor = updatedNode.HexColor;
+            task.Name = updatedNode.Name;
+            task.Props = updatedNode.Props;
+
+            await _context.SaveChangesAsync();
+            return updatedNode;
         }
     }
 }
