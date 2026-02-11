@@ -51,11 +51,15 @@ namespace planner_content_service.App.Service
                 };
             }
 
+            var body = result.ToColumnBody();
+
+            body.Link = column.Link;
+
             return new ServiceResponse<ColumnBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ToColumnBody()
+                Body = body
             };
         }
 
