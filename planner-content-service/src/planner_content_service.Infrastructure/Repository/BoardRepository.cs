@@ -67,29 +67,7 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<Node?> GetAsync(Guid id)
-            => await _context.Nodes.FindAsync(id);
-
-        public async Task<IEnumerable<Node>> GetBoardColumns(List<Guid> columnIds)
-        {
-            return await _context.Nodes.Where(x => columnIds.Contains(x.Id)).ToListAsync();
-        }
-
-
-        public async Task<Node?> GetBoardColumn(Guid columnId)
-        {
-            return await _context.Nodes
-                .FirstOrDefaultAsync(e => e.Id == columnId);
-        }
-
-
-        public async Task<Node?> GetBoard(Guid boardId)
-        {
-            return await _context.Nodes
-                .Where(e => e.Id == boardId).FirstOrDefaultAsync();
-        }
-
-        public async Task<Column?> AddBoardColumn(ColumnBody column, Guid accountId)
+        public async Task<ColumnBody?> AddBoardColumn(ColumnBody column, Guid accountId)
         {
             try
             {
@@ -104,7 +82,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                return columnNode;
+                return column;
             }
             catch (Exception ex)
             {
@@ -115,66 +93,17 @@ namespace planner_content_service.Infrastructure.Repository
 
         }
 
-        public async Task<List<Column>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
+        public async Task<List<ColumnBody>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
         {
-            var columnNodes = new List<Column>();
-            //var statuses = new List<PublicationStatusModel>();
-            //var links = new List<NodeLink>();
+            var columnNodes = new List<ColumnBody>();
 
             foreach (var column in columns)
             {
                 var addedColumn = await AddBoardColumn(column, accountId);
                 if (addedColumn != null)
                     columnNodes.Add(addedColumn);
-
-                //columnNodes.Add(new Column
-                //{
-                //    Id = column.Id,
-                //    Name = column.Name
-                //});
-
-                //statuses.Add(new PublicationStatusModel()
-                //{
-                //    NodeId = column.Id,
-                //    Status = column.PublicationStatus,
-                //    UpdatedAt = column.UpdatedAt
-                //});
-
-                //links.Add(new NodeLink()
-                //{
-                //    ParentId = column.Id,
-                //    ChildId = column.Id
-                //});
             }
             return columnNodes;
-
-            //try
-            //{
-            //    await _context.Columns.AddRangeAsync(columnNodes);
-            //    await _context.PublicationStatuses.AddRangeAsync(statuses);
-            //    await _context.NodeLinks.AddRangeAsync(links);
-
-            //    await _context.SaveChangesAsync();
-
-            //    foreach (var column in columns)
-            //    {
-            //        CreateColumnEvent columnEvent = new CreateColumnEvent()
-            //        {
-            //            Column = BodyConverter.ClientToServerBody(column),
-            //            CreatorId = accountId
-            //        };
-
-            //        _ = Task.Run(() => _notifyService.Publish(columnEvent, PublishEvent.CreateColumn));
-            //    }
-
-            //}
-            //catch (Exception ex)
-            //{
-            //    Console.WriteLine($"Ошибка при создании колонок: {ex.Message}");
-
-            //    throw;
-            //}
-
         }
     }
 }

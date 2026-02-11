@@ -8,10 +8,7 @@ namespace planner_content_service.Core.IRepository
     {
         Task<BoardBody?> AddAsync(BoardBody createBoardBody, Guid accountId);
         Task<List<BoardBody>?> AddRangeAsync(List<BoardBody> boards, Guid accountId);
-        //Task<Board?> GetAsync(Guid id);
-        Task<Node?> GetBoardColumn(Guid columnId);
-        Task<Column?> AddBoardColumn(ColumnBody column, Guid accountId);
-        Task<List<Column>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId);
-        Task<Node?> GetBoard(Guid boardId);
+        Task<ColumnBody?> AddBoardColumn(ColumnBody column, Guid accountId);
+        Task<List<ColumnBody>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId);
     }
 }

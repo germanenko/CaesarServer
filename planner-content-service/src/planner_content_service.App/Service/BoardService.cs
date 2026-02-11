@@ -51,15 +51,11 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var body = result.ToColumnBody();
-
-            body.Link = column.Link;
-
             return new ServiceResponse<ColumnBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = body
+                Body = result
             };
         }
 
@@ -83,7 +79,7 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            newColumns = (await _boardRepository.AddBoardColumns(columnsToStore, accountId)).Select(x => x.ToColumnBody()).ToList();
+            newColumns = await _boardRepository.AddBoardColumns(columnsToStore, accountId);
 
             if (newColumns == null)
             {
