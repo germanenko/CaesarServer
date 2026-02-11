@@ -18,7 +18,6 @@ namespace planner_chat_service.Infrastructure.Service
         private readonly ILogger<RabbitMqNotifyService> _logger;
 
         private readonly string _createChatQueueName;
-        private readonly string _createTaskChatResponseQueueName;
         private readonly string _messageSentToChatQueueName;
         private readonly string _createPersonalChatQueueName;
         private readonly string _getNotificationSettings;
@@ -30,7 +29,6 @@ namespace planner_chat_service.Infrastructure.Service
             string username,
             string password,
             string createChatQueueName,
-            string createTaskChatResponseQueueName,
             string messageSentToChatQueueName,
             string createPersonalChatQueueName,
             string getUsersWithEnabledNotifications,
@@ -42,12 +40,11 @@ namespace planner_chat_service.Infrastructure.Service
             _username = username;
             _password = password;
             _createChatQueueName = createChatQueueName;
-            _createTaskChatResponseQueueName = createTaskChatResponseQueueName;
             _messageSentToChatQueueName = messageSentToChatQueueName;
             _createPersonalChatQueueName = createPersonalChatQueueName;
             _getNotificationSettings = getUsersWithEnabledNotifications;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _createTaskChatResponseQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings });
+            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings });
 
             ExchangeDeclare();
         }
@@ -188,7 +185,6 @@ namespace planner_chat_service.Infrastructure.Service
             return eventType switch
             {
                 PublishEvent.AddAccountToChat => _createChatQueueName,
-                PublishEvent.ResponseTaskChat => _createTaskChatResponseQueueName,
                 PublishEvent.MessageSentToChat => _messageSentToChatQueueName,
                 PublishEvent.CreatePersonalChat => _createPersonalChatQueueName,
                 PublishEvent.GetNotificationSettings => _getNotificationSettings,

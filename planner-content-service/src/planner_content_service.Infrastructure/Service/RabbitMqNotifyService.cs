@@ -18,7 +18,6 @@ namespace planner_content_service.Infrastructure.Service
 
         private readonly ILogger<RabbitMqNotifyService> _logger;
 
-        private readonly string _createTaskChatResponseQueue;
         private readonly string _addAccountsToTaskChatsQueue;
         private readonly string _createBoardExchange;
         private readonly string _createColumnExchange;
@@ -30,7 +29,6 @@ namespace planner_content_service.Infrastructure.Service
             string hostname,
             string username,
             string password,
-            string createTaskChatResponseQueue,
             string addAccountsToTaskChatsQueue,
             string createBoardExchange,
             string createColumnExchange,
@@ -42,13 +40,12 @@ namespace planner_content_service.Infrastructure.Service
             _username = username;
             _password = password;
 
-            _createTaskChatResponseQueue = createTaskChatResponseQueue;
             _addAccountsToTaskChatsQueue = addAccountsToTaskChatsQueue;
             _createBoardExchange = createBoardExchange;
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
 
-            _exchanges.AddRange(new[] { _createTaskChatResponseQueue, _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
+            _exchanges.AddRange(new[] { _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
             _logger = logger;
 
@@ -183,7 +180,6 @@ namespace planner_content_service.Infrastructure.Service
         {
             return publishEvent switch
             {
-                PublishEvent.CreateTaskChatResponse => _createTaskChatResponseQueue,
                 PublishEvent.AddAccountsToTaskChats => _addAccountsToTaskChatsQueue,
                 PublishEvent.CreateBoard => _createBoardExchange,
                 PublishEvent.CreateColumn => _createColumnExchange,

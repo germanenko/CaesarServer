@@ -34,9 +34,6 @@ namespace planner_chat_service.Infrastructure.Service
             string hostname,
             string userName,
             string password,
-            //string initChatQueue,
-            //string chatAttachmentQueue,
-            //string chatImageQueue,
             string chatAddAccountsToTaskChats,
             string chatNodesExchange)
         {
@@ -46,9 +43,6 @@ namespace planner_chat_service.Infrastructure.Service
 
             _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
             {
-                //{ initChatQueue, (QueueName: GetQueueName(initChatQueue), Handler: HandleInitChatMessageAsync) },
-                //{ chatAttachmentQueue, (QueueName: GetQueueName(chatAttachmentQueue), Handler: HandleChatAttachmentMessageAsync) },
-                //{ chatImageQueue, (QueueName: GetQueueName(chatImageQueue), Handler: HandleChatImageMessageAsync) },
                 { chatAddAccountsToTaskChats, (QueueName: GetQueueName(chatAddAccountsToTaskChats), Handler: HandleAddAccountToTaskChatMessageAsync) },
                 { chatNodesExchange, (QueueName: GetQueueName(chatNodesExchange), Handler: HandleChatNodes) },
             };
@@ -115,10 +109,6 @@ namespace planner_chat_service.Infrastructure.Service
                 ConsumeQueue(func.Value.QueueName, func.Value.Handler);
             }
 
-            //ConsumeQueue(_queueInitChatName, HandleInitChatMessageAsync);
-            //ConsumeQueue(_chatAddAccountsToTaskChats, HandleAddAccountToTaskChatMessageAsync);
-            //ConsumeQueue(_chatAttachmentQueue, HandleChatAttachmentMessageAsync);
-            //ConsumeQueue(_chatImageQueue, HandleChatImageMessageAsync);
             await Task.CompletedTask;
         }
 
@@ -137,70 +127,6 @@ namespace planner_chat_service.Infrastructure.Service
             foreach (var taskId in addAccountToTaskChatBody.TaskIds)
                 await chatRepository.CreateChatSettingsAsync(taskId, addAccountToTaskChatBody.AccountIds);
         }
-
-
-        //private async Task HandleInitChatMessageAsync(string message)
-        //{
-        //    using var scope = _serviceFactory.CreateScope();
-        //    var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
-        //    var createChatResponseEvent = JsonSerializer.Deserialize<CreateChatResponseEvent>(message);
-        //    if (createChatResponseEvent == null)
-        //        return;
-
-        //    foreach (var participant in createChatResponseEvent.Participants)
-        //    {
-        //        var chatMembership = await chatRepository.GetChatSettingsAsync(createChatResponseEvent.ChatId, participant.AccountId);
-        //        if (chatMembership == null)
-        //            continue;
-
-        //        var date = DateTime.Now;
-        //        await chatRepository.CreateAccountChatSessionAsync(participant.SessionIds, chatMembership, date);
-        //    }
-        //}
-
-        //private async Task HandleChatAttachmentMessageAsync(string message)
-        //{
-        //    using var scope = _serviceFactory.CreateScope();
-        //    var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
-        //    var chatAttachment = JsonSerializer.Deserialize<ChatAttachmentEvent>(message);
-        //    if (chatAttachment == null)
-        //        return;
-
-        //    var chat = await chatRepository.GetAsync(chatAttachment.ChatId);
-        //    if (chat == null)
-        //        return;
-
-        //    var chatMessage = await chatRepository.AddMessageAsync(MessageType.File, chatAttachment.FileName, chat, chatAttachment.AccountId, Guid.NewGuid());
-        //    if (chatMessage == null)
-        //        return;
-
-        //    var lobby = _chatConnectionService.GetConnections(chatAttachment.ChatId);
-        //    if (lobby == null)
-        //        return;
-
-        //    var sessions = lobby.ActiveSessions.Select(e => e.Value);
-        //    var account = lobby.AllChatUsers;
-
-        //    await SendMessage(
-        //        sessions,
-        //        chatMessage.ToMessageBody(),
-        //        WebSocketMessageType.Text,
-        //        account,
-        //        chat.ChatType,
-        //        chatAttachment.ChatId);
-
-        //}
-
-        //private async Task HandleChatImageMessageAsync(string message)
-        //{
-        //    using var scope = _serviceFactory.CreateScope();
-        //    var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
-        //    var chatImage = JsonSerializer.Deserialize<ChatImageEvent>(message);
-        //    if (chatImage == null)
-        //        return;
-
-        //    await chatRepository.UpdateChatImage(chatImage.ChatId, chatImage.Filename);
-        //}
 
         private async Task HandleChatNodes(string message)
         {

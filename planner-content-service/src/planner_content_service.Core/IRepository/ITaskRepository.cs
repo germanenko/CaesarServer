@@ -7,8 +7,8 @@ namespace planner_content_service.Core.IRepository
     public interface ITaskRepository
     {
         Task<TaskBody?> AddAsync(TaskBody task, Guid accountId);
-        Task<TaskBody?> GetAsync(Guid id, bool isDraft);
-        Task<bool> RemoveAsync(Guid id, bool isDraft);
+        Task<TaskBody?> GetAsync(Guid id);
+        Task<bool> RemoveAsync(Guid id);
         IEnumerable<TaskBody?>? GetAll(List<Guid> ids);
 
         Task<TaskBody?> UpdateAsync(

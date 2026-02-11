@@ -9,7 +9,6 @@ namespace planner_server_package.Events.Enums
         MessageSentToChat,
         InitChat,
         CreateAccountMailCredentials,
-        CreateTaskChatResponse,
         AddAccountsToTaskChats,
         ContentNodes,
         ChatNodes,

@@ -59,8 +59,6 @@ namespace planner_content_service.Infrastructure.Repository
                     }
                 };
 
-                await _notifyService.Publish(createTaskChatEvent, PublishEvent.CreateTaskChatResponse);
-
                 return taskBody;
             }
             catch (Exception ex)
@@ -82,11 +80,11 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<TaskBody?> GetAsync(Guid id, bool isDraft)
+        public async Task<TaskBody?> GetAsync(Guid id)
             => (await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id))?.ToTaskBody();
 
-        public async Task<bool> RemoveAsync(Guid id, bool isDraft)
+        public async Task<bool> RemoveAsync(Guid id)
         {
             var task = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)

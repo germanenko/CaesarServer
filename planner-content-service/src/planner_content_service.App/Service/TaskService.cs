@@ -57,7 +57,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            if (await _taskRepository.GetAsync(taskBody.Id, false) != null)
+            if (await _taskRepository.GetAsync(taskBody.Id) != null)
             {
                 var task = await UpdateTask(accountId, taskBody);
 
