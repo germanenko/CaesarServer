@@ -30,14 +30,14 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
 
-        public async Task<IActionResult> CreateBoard(
+        public async Task<IActionResult> CreateOrUpdateBoard(
             BoardBody boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
-            var result = await _boardService.CreateBoardAsync(boardBody, tokenInfo.AccountId);
+            var result = await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

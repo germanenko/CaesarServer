@@ -26,11 +26,23 @@ namespace planner_content_service.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<BoardBody?> AddAsync(BoardBody createBoardBody, Guid accountId)
+        public async Task<BoardBody?> AddOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
         {
             try
             {
-                var board = new Board
+                var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == createBoardBody.Id);
+
+                if (board != null)
+                {
+                    board.Name = createBoardBody.Name;
+                    board.Props = createBoardBody.Props;
+
+                    await _context.SaveChangesAsync();
+
+                    return createBoardBody;
+                }
+
+                var newBoard = new Board
                 {
                     Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
                     Name = createBoardBody.Name,
@@ -38,7 +50,7 @@ namespace planner_content_service.Infrastructure.Repository
                     Props = createBoardBody.Props
                 };
 
-                await _context.Boards.AddAsync(board);
+                await _context.Boards.AddAsync(newBoard);
 
                 await _context.SaveChangesAsync();
 
@@ -58,7 +70,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             foreach (var board in boards)
             {
-                newBoardNodes.Add(await AddAsync(board, accountId));
+                newBoardNodes.Add(await AddOrUpdateBoardAsync(board, accountId));
             }
 
             await _context.SaveChangesAsync();

@@ -98,7 +98,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<BoardBody>> CreateBoardAsync(BoardBody body, Guid accountId)
+        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(BoardBody body, Guid accountId)
         {
             var boardEvent = new CreateBoardEvent()
             {
@@ -118,7 +118,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var result = await _boardRepository.AddAsync(body, accountId);
+            var result = await _boardRepository.AddOrUpdateBoardAsync(body, accountId);
 
             if (result is null)
             {
