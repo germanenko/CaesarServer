@@ -49,14 +49,14 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
 
-        public async Task<IActionResult> CreateBoards(
+        public async Task<IActionResult> CreateOrUpdateBoards(
             List<BoardBody> boardBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
-            var result = await _boardService.CreateBoardsAsync(boardBodies, tokenInfo.AccountId);
+            var result = await _boardService.CreateOrUpdateBoards(boardBodies, tokenInfo.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 
@@ -67,13 +67,13 @@ namespace planner_content_service.Api.Controllers
         [SwaggerOperation("Создать колонку")]
         [SwaggerResponse(200)]
 
-        public async Task<IActionResult> AddColumn(
+        public async Task<IActionResult> CreateOrUpdateColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             ColumnBody column
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddColumn(tokenPayload.AccountId, column);
+            var result = await _boardService.CreateOrUpdateColumn(tokenPayload.AccountId, column);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -81,13 +81,13 @@ namespace planner_content_service.Api.Controllers
         [SwaggerOperation("Создать колонки")]
         [SwaggerResponse(200)]
 
-        public async Task<IActionResult> AddColumns(
+        public async Task<IActionResult> CreateOrUpdateColumns(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             List<ColumnBody> columns
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddColumns(tokenPayload.AccountId, columns);
+            var result = await _boardService.CreateOrUpdateColumns(tokenPayload.AccountId, columns);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

@@ -26,7 +26,7 @@ namespace planner_content_service.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<BoardBody?> AddOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
+        public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
         {
             try
             {
@@ -64,13 +64,13 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<BoardBody>?> AddRangeAsync(List<BoardBody> boards, Guid accountId)
+        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId)
         {
             List<BoardBody> newBoardNodes = new List<BoardBody>();
 
             foreach (var board in boards)
             {
-                newBoardNodes.Add(await AddOrUpdateBoardAsync(board, accountId));
+                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId));
             }
 
             await _context.SaveChangesAsync();
@@ -79,39 +79,52 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<ColumnBody?> AddBoardColumn(ColumnBody column, Guid accountId)
+        public async Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody columnBody, Guid accountId)
         {
             try
             {
+                var column = await _context.Columns.FirstOrDefaultAsync(x => x.Id == columnBody.Id);
+
+                if (column != null)
+                {
+                    column.Name = columnBody.Name;
+                    column.Props = columnBody.Props;
+
+                    await _context.SaveChangesAsync();
+
+                    return columnBody;
+                }
+
                 var columnNode = new Column
                 {
-                    Id = column.Id != Guid.Empty ? column.Id : Guid.NewGuid(),
-                    Name = column.Name,
-                    Type = NodeType.Column
+                    Id = columnBody.Id != Guid.Empty ? columnBody.Id : Guid.NewGuid(),
+                    Name = columnBody.Name,
+                    Type = NodeType.Column,
+                    Props = columnBody.Props
                 };
 
                 columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
 
                 await _context.SaveChangesAsync();
 
-                return column;
+                return columnBody;
             }
             catch (Exception ex)
             {
-                _logger.LogError($"Ошибка при создании колонки {column.Id}: {ex.Message}");
+                _logger.LogError($"Ошибка при создании колонки {columnBody.Id}: {ex.Message}");
 
                 throw;
             }
 
         }
 
-        public async Task<List<ColumnBody>?> AddBoardColumns(List<ColumnBody> columns, Guid accountId)
+        public async Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId)
         {
             var columnNodes = new List<ColumnBody>();
 
             foreach (var column in columns)
             {
-                var addedColumn = await AddBoardColumn(column, accountId);
+                var addedColumn = await CreateOrUpdateColumn(column, accountId);
                 if (addedColumn != null)
                     columnNodes.Add(addedColumn);
             }

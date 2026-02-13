@@ -159,8 +159,8 @@ namespace planner_content_service.Infrastructure.Service
                 TaskType = x.TaskType
             }).ToList();
 
-            await boardService.CreateBoardsAsync(boardBodies, response.TokenPayload.AccountId);
-            await boardService.AddColumns(response.TokenPayload.AccountId, columnBodies);
+            await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
+            await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);
             await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
         }
 

@@ -20,7 +20,7 @@ namespace planner_content_service.App.Service
             _notifyService = notifyService;
         }
 
-        public async Task<ServiceResponse<ColumnBody>> AddColumn(Guid accountId, ColumnBody column)
+        public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
         {
             CreateColumnEvent columnEvent = new CreateColumnEvent()
             {
@@ -40,7 +40,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var result = await _boardRepository.AddBoardColumn(column, accountId);
+            var result = await _boardRepository.CreateOrUpdateColumn(column, accountId);
 
             if (result == null)
             {
@@ -59,7 +59,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> AddColumns(Guid accountId, List<ColumnBody> columns)
+        public async Task<ServiceResponse<List<ColumnBody>>> CreateOrUpdateColumns(Guid accountId, List<ColumnBody> columns)
         {
             List<ColumnBody>? newColumns = new List<ColumnBody>();
             List<ColumnBody> columnsToStore = new List<ColumnBody>();
@@ -79,7 +79,7 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            newColumns = await _boardRepository.AddBoardColumns(columnsToStore, accountId);
+            newColumns = await _boardRepository.CreateOtUpdateColumns(columnsToStore, accountId);
 
             if (newColumns == null)
             {
@@ -118,7 +118,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var result = await _boardRepository.AddOrUpdateBoardAsync(body, accountId);
+            var result = await _boardRepository.CreateOrUpdateBoardAsync(body, accountId);
 
             if (result is null)
             {
@@ -137,9 +137,9 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<BoardBody>>> CreateBoardsAsync(List<BoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<BoardBody> bodies, Guid accountId)
         {
-            var result = await _boardRepository.AddRangeAsync(bodies, accountId);
+            var result = await _boardRepository.CreateOrUpdateBoards(bodies, accountId);
 
             if (result is null)
             {
