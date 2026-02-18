@@ -5,9 +5,9 @@ namespace planner_client_package.Entities
 {
     public class AccessBody : ISyncable, IBody
     {
-        public List<AccessRightBody> AccessRights { get; set; }
-        public List<AccessGroupBody> AccessGroups { get; set; }
-        public List<AccessGroupMemberBody> AccessGroupMembers { get; set; }
-        public List<ProfileBody> Profiles { get; set; }
+        public List<AccessRightBody> AccessRights { get; set; } = new List<AccessRightBody>();
+        public List<AccessGroupBody> AccessGroups { get; set; } = new List<AccessGroupBody>();
+        public List<AccessGroupMemberBody> AccessGroupMembers { get; set; } = new List<AccessGroupMemberBody>();
+        public List<ProfileBody> Profiles { get; set; } = new List<ProfileBody>();
     }
 }
