@@ -10,6 +10,8 @@ using planner_chat_service.Core.IService;
 using planner_chat_service.Infrastructure.Data;
 using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
+using planner_content_service.App.Service;
+using planner_content_service.Infrastructure.Repository;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -89,7 +91,9 @@ void ConfigureServices(IServiceCollection services)
 
 
     services.AddScoped<IChatRepository, ChatRepository>();
+    services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IChatService, ChatService>();
+    services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IChatConnector, ChatConnector>();
 
     services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
