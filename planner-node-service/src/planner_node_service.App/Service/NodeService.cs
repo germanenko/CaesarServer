@@ -184,7 +184,7 @@ namespace planner_node_service.App.Service
 
             var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}"));
 
-            var response = await client.GetAsync($"getNodesByIds?{queryString}");
+            var response = await client.GetAsync($"content/getNodesByIds?{queryString}");
 
             if (response.StatusCode == HttpStatusCode.OK)
             {
@@ -221,7 +221,7 @@ namespace planner_node_service.App.Service
 
             var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}"));
 
-            var response = await client.GetAsync($"getNodesByIds?{queryString}");
+            var response = await client.GetAsync($"chat/getNodesByIds?{queryString}");
 
             if (response.StatusCode == HttpStatusCode.OK)
             {

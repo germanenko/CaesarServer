@@ -20,7 +20,7 @@ namespace planner_chat_service.Api.Controllers
             _nodeService = nodeService;
         }
 
-        [HttpGet("getNodesByIds")]
+        [HttpGet("chat/getNodesByIds")]
         [SwaggerOperation("Получить ноды по ID")]
         [SwaggerResponse(200)]
 

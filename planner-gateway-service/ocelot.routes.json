@@ -575,7 +575,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getNodesByIds",
+            "DownstreamPathTemplate": "/api/content/getNodesByIds",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -583,7 +583,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/api/getNodesByIds",
+            "UpstreamPathTemplate": "/api/content/getNodesByIds",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
@@ -927,7 +927,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getNodesByIds",
+            "DownstreamPathTemplate": "/api/chat/getNodesByIds",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -935,7 +935,7 @@
                     "Port": 8090
                 }
             ],
-            "UpstreamPathTemplate": "/api/getNodesByIds",
+            "UpstreamPathTemplate": "/api/chat/getNodesByIds",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
