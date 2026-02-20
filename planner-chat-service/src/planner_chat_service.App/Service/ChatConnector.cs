@@ -132,21 +132,21 @@ namespace planner_chat_service.App.Service
                     var message = await _chatRepository.GetMessageAsync(messageId);
                     if (message != null)
                     {
-                        await SendMessage(sessions, message.ToMessageBody(sentMessage.DeviceId), WebSocketMessageType.Text, allUserIds, chat);
+                        await SendMessage(sessions, message.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
                         return message.SentAt;
                     }
                 }
                 else
                 {
-                    var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId, messageBody.Id);
-                    await SendMessage(sessions, chatMessage.ToMessageBody(sentMessage.DeviceId), WebSocketMessageType.Text, allUserIds, chat);
+                    var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId, messageBody.Id, sentMessage.DeviceId.Value);
+                    await SendMessage(sessions, chatMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
                     return chatMessage.SentAt;
                 }
             }
 
             var lastMessage = await _chatRepository.GetMessageAsync((Guid)sentMessage.LastMessageReadId);
             lastMessage = await _chatRepository.SetMessageIsRead(lastMessage);
-            await SendMessage(sessions, lastMessage.ToMessageBody(sentMessage.DeviceId), WebSocketMessageType.Text, allUserIds, chat);
+            await SendMessage(sessions, lastMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
 
             return lastMessage?.SentAt;
         }

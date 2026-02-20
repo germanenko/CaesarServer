@@ -146,7 +146,7 @@ namespace planner_chat_service.Infrastructure.Service
 
             foreach (var chatMessage in messages)
             {
-                await chatService.SendMessageToChat(chatMessage.SenderId, chatMessage.ChatId, chatMessage.Content);
+                await chatService.SendMessageToChat(chatMessage.SenderId, chatMessage.SenderDeviceId, chatMessage.ChatId, chatMessage.Content);
             }
         }
 

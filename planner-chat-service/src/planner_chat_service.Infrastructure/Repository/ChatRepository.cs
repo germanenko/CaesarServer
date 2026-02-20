@@ -38,7 +38,7 @@ namespace planner_chat_service.Infrastructure.Repository
             return chatMembership;
         }
 
-        public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId)
+        public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId, Guid? senderDeviceId)
         {
             var message = new ChatMessage
             {
@@ -47,6 +47,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 MessageType = messageType,
                 Content = content,
                 SenderId = senderId,
+                SenderDeviceId = senderDeviceId,
                 Type = NodeType.Message
             };
 
@@ -255,7 +256,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 .Where(x => x.ChatId == chatId && x.AccountId != accountId)
                 .Select(e => e.AccountId)
                 .ToList(),
-                LastMessage = lastMessage?.ToMessageBody()
+                LastMessage = lastMessage?.ToNodeBody()
             };
 
             return chatBody;

@@ -121,7 +121,7 @@ namespace planner_chat_service.App.Service
                 });
             }
 
-            var chatBody = result.ToChatBody();
+            var chatBody = result.ToNodeBody();
 
             var createChatEvent = new CreatePersonalChatEvent
             {
@@ -195,7 +195,7 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = messages.Select(e => e.ToMessageBody())
+                Body = messages.Select(e => e.ToNodeBody())
             };
         }
 
@@ -206,12 +206,12 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = message.ToMessageBody()
+                Body = message.ToNodeBody()
             };
         }
 
         public async Task<ServiceResponse<MessageBody>> SendMessage(
-            Guid senderId, Guid receiverId, string content)
+            Guid senderId, Guid? senderDeviceId, Guid receiverId, string content)
         {
             var chat = await _chatRepository.GetPersonalChatAsync(senderId, receiverId);
 
@@ -225,7 +225,7 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid());
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid(), null);
 
             ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
 
@@ -236,7 +236,7 @@ namespace planner_chat_service.App.Service
                 lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
             }
 
-            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
 
             _chatConnectionService.RemoveLobby(chat.ChatId);
 
@@ -244,12 +244,12 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = message.ToMessageBody()
+                Body = message.ToNodeBody()
             };
         }
 
         public async Task<ServiceResponse<MessageBody>> SendMessageToChat(
-            Guid senderId, Guid chatId, string content)
+            Guid senderId, Guid? senderDeviceId, Guid chatId, string content)
         {
             var chat = (await _chatRepository.GetChatSettingsAsync(chatId)).FirstOrDefault();
 
@@ -263,7 +263,7 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid());
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid(), senderDeviceId);
 
             ChatLobby? lobby = _chatConnectionService.GetConnections(chat.ChatId);
 
@@ -284,7 +284,7 @@ namespace planner_chat_service.App.Service
                 lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
             }
 
-            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToMessageBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
 
             _chatConnectionService.RemoveLobby(chat.ChatId);
 
@@ -292,7 +292,7 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = message.ToMessageBody()
+                Body = message.ToNodeBody()
             };
         }
 

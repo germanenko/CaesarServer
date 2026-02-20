@@ -13,7 +13,7 @@ namespace planner_chat_service.Core.IRepository
         Task<List<ChatSettings>> GetChatSettingsByAccountIdAsync(Guid accountId);
         Task<ChatSettings?> GetChatSettingsAsync(Guid chatId, Guid accountId);
         Task<List<ChatMessage>> GetMessages(IEnumerable<Guid> messageIds);
-        Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId);
+        Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId, Guid? senderDeviceId);
         Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatSettings chatSettings, DateTime date);
         Task CreateAccountChatSessionsAsync(Guid session);
         Task<ChatMessage?> GetMessageAsync(Guid id);

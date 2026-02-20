@@ -13,6 +13,7 @@ namespace planner_chat_service.Core.Entities.Models
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
 
         public Guid SenderId { get; set; }
+        public Guid? SenderDeviceId { get; set; }
         public bool HasBeenRead { get; set; }
 
         public CreateMessageBody ToCreateMessageBody()
@@ -26,7 +27,7 @@ namespace planner_chat_service.Core.Entities.Models
             };
         }
 
-        public MessageBody ToMessageBody(Guid? deviceId = null)
+        public override MessageBody ToNodeBody()
         {
             var messageType = MessageType;
 
@@ -38,7 +39,7 @@ namespace planner_chat_service.Core.Entities.Models
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
                 Date = SentAt,
                 SenderId = SenderId,
-                SenderDeviceId = deviceId,
+                SenderDeviceId = SenderDeviceId,
                 HasBeenRead = HasBeenRead
             };
         }

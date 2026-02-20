@@ -12,7 +12,7 @@ namespace planner_chat_service.Core.Entities.Models
         public List<ChatMessage> Messages { get; set; } = new();
         public List<ChatSettings> ChatMemberships { get; set; } = new();
 
-        public ChatBody ToChatBody()
+        public override ChatBody ToNodeBody()
         {
             return new ChatBody
             {

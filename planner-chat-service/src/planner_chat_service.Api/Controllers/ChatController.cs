@@ -54,7 +54,7 @@ namespace planner_chat_service.Api.Controllers
             [FromQuery] string content
         )
         {
-            var result = await _chatService.SendMessage(senderId, receiverId, content);
+            var result = await _chatService.SendMessage(senderId, null, receiverId, content);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
