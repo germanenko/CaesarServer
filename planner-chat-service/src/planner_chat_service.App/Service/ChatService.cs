@@ -129,6 +129,8 @@ namespace planner_chat_service.App.Service
                 Participants = chatMemberships
             };
 
+            var partner = await _userService.GetUserData(createChatBody.Profile.Id);
+
             _notifyService.Publish(createChatEvent, PublishEvent.CreatePersonalChat);
             _notifyService.Publish(createChatEvent, PublishEvent.AddAccountToChat);
             return new ServiceResponse<ChatBody>
@@ -143,7 +145,8 @@ namespace planner_chat_service.App.Service
                     ParticipantIds = participants,
                     LastMessage = null,
                     IsSyncedReadStatus = false,
-                    CountOfUnreadMessages = 0
+                    CountOfUnreadMessages = 0,
+                    Profile = partner
                 }
             };
         }
@@ -158,6 +161,8 @@ namespace planner_chat_service.App.Service
                 {
                     var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
                     chat.ImageUrl = user.UrlIcon;
+                    chat.Profile = user;
+                    chat.Name = user.Nickname;
                 }
             }
 
