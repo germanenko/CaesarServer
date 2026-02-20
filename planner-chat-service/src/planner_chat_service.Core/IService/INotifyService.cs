@@ -5,7 +5,7 @@ namespace planner_chat_service.Core.IService
 {
     public interface INotifyService
     {
-        Task<ServiceResponse<TResult>> Publish<T, TResult>(T message, PublishEvent eventType);
-        void Publish<T>(T message, PublishEvent eventType);
+        Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent eventType);
+        //void Publish<T>(T message, PublishEvent eventType);
     }
 }

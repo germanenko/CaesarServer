@@ -59,7 +59,7 @@ namespace planner_chat_service.App.Service
                 NodeId = chatId
             };
 
-            var hasAccess = await _notifyService.Publish<CheckAccessRequest, bool>(checkAccess, PublishEvent.CheckAccess);
+            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
             if (chatMembership == null || hasAccess.IsSuccess == false)
                 return;

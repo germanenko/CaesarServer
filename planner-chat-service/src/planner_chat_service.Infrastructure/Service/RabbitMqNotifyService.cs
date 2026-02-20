@@ -75,8 +75,10 @@ namespace planner_chat_service.Infrastructure.Service
             }
         }
 
-        public async Task<ServiceResponse<TResult>> Publish<T, TResult>(T message, PublishEvent eventType)
+        public async Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent)
         {
+            var exchangeName = GetExchangeName(publishEvent);
+
             var factory = new ConnectionFactory()
             {
                 HostName = _hostname,
@@ -86,19 +88,21 @@ namespace planner_chat_service.Infrastructure.Service
             using var connection = factory.CreateConnection();
             using var channel = connection.CreateModel();
 
-            var queue = GetQueueName(eventType);
+            channel.ExchangeDeclare(
+                exchange: exchangeName,
+                type: ExchangeType.Fanout,
+                durable: true,
+                autoDelete: false,
+                arguments: null
+            );
 
-            channel.ExchangeDeclare(exchange: queue,
-                                 type: ExchangeType.Fanout,
-                                 durable: true,
-                                 autoDelete: false,
-                                 arguments: null);
+            _logger.LogInformation(JsonSerializer.Serialize(message));
 
             var replyQueueName = channel.QueueDeclare(queue: "", exclusive: true, autoDelete: true).QueueName;
 
             var consumer = new EventingBasicConsumer(channel);
 
-            var tcs = new TaskCompletionSource<string>(
+            var tcs = new TaskCompletionSource<ServiceResponse<object>>(
                 TaskCreationOptions.RunContinuationsAsynchronously);
 
             var correlationId = Guid.NewGuid().ToString();
@@ -109,19 +113,32 @@ namespace planner_chat_service.Infrastructure.Service
                 autoAck: true
             );
 
-            var complete = new ServiceResponse<TResult>();
+            var response = new ServiceResponse<object>();
 
             consumer.Received += (model, ea) =>
             {
                 if (ea.BasicProperties.CorrelationId == correlationId)
                 {
-                    var response = Encoding.UTF8.GetString(ea.Body.ToArray());
+                    var responseJson = Encoding.UTF8.GetString(ea.Body.ToArray());
 
-                    _logger.LogInformation($"Received response: {response}");
+                    _logger.LogInformation($"Received response: {responseJson}");
 
-                    complete = JsonSerializer.Deserialize<ServiceResponse<TResult>>(response);
+                    try
+                    {
 
-                    tcs.TrySetResult(response);
+                        response = JsonSerializer.Deserialize<ServiceResponse<object>>(responseJson);
+
+                        tcs.TrySetResult(response ?? new ServiceResponse<object>
+                        {
+                            IsSuccess = false,
+                            Errors = new[] { "Invalid response format" }
+                        });
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError("Error in response: " + ex.Message);
+                    }
+
                     channel.BasicCancel(consumerTag);
                 }
             };
@@ -129,61 +146,61 @@ namespace planner_chat_service.Infrastructure.Service
             var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
             var properties = channel.CreateBasicProperties();
+            properties.CorrelationId = correlationId;
+            properties.ReplyTo = replyQueueName;
             properties.Persistent = true;
 
-            channel.BasicPublish(exchange: queue,
+            channel.BasicPublish(exchange: exchangeName,
                                  routingKey: "",
                                  basicProperties: properties,
                                  body: body);
+
 
             var timeout = Task.Delay(TimeSpan.FromSeconds(10));
             var completedTask = await Task.WhenAny(tcs.Task, timeout);
 
             if (completedTask == timeout)
             {
+                channel.BasicCancel(consumerTag);
                 _logger.LogInformation("Timeout! No response received.");
-                return new ServiceResponse<TResult>()
+                return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
                     Errors = new[] { "Ошибка сервера" }
                 };
             }
 
-            var response = await tcs.Task;
-
-            _logger.LogInformation($"RabbitMQ Response : {response}");
-
-            return complete;
+            return await tcs.Task;
         }
 
-        public void Publish<T>(T message, PublishEvent eventType)
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = _hostname,
-                UserName = _username,
-                Password = _password
-            };
-            using var connection = factory.CreateConnection();
-            using var channel = connection.CreateModel();
+        //public void Publish<T>(T message, PublishEvent eventType)
+        //{
+        //    var factory = new ConnectionFactory()
+        //    {
+        //        HostName = _hostname,
+        //        UserName = _username,
+        //        Password = _password
+        //    };
+        //    using var connection = factory.CreateConnection();
+        //    using var channel = connection.CreateModel();
 
-            var queue = GetQueueName(eventType);
+        //    var queue = GetExchangeName(eventType);
 
-            channel.ExchangeDeclare(exchange: queue,
-                                 type: ExchangeType.Fanout,
-                                 durable: true,
-                                 autoDelete: false,
-                                 arguments: null);
+        //    channel.ExchangeDeclare(exchange: queue,
+        //                         type: ExchangeType.Fanout,
+        //                         durable: true,
+        //                         autoDelete: false,
+        //                         arguments: null);
 
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+        //    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
 
-            channel.BasicPublish(exchange: queue,
-                                 routingKey: "",
-                                 basicProperties: null,
-                                 body: body);
-        }
+        //    channel.BasicPublish(exchange: queue,
+        //                         routingKey: "",
+        //                         basicProperties: null,
+        //                         body: body);
+        //}
 
-        private string GetQueueName(PublishEvent eventType)
+        private string GetExchangeName(PublishEvent eventType)
         {
             return eventType switch
             {

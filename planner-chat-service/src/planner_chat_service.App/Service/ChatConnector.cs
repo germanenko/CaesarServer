@@ -190,11 +190,11 @@ namespace planner_chat_service.App.Service
                     AccountIds = notConnectedAccountIds.ToList()
                 };
 
-                var settings = await _notifyService.Publish<GetNotificationSettingsRequest, IEnumerable<NotificationSettingsRMQBody>>(accountIds, PublishEvent.GetNotificationSettings);
+                var settings = (await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings)).Body as List<NotificationSettingsRMQBody>;
 
-                var usersWithEnabledNotifications = settings.Body.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
+                var usersWithEnabledNotifications = settings?.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
 
-                var notificationTasks = usersWithEnabledNotifications.Select(accountId =>
+                var notificationTasks = usersWithEnabledNotifications?.Select(accountId =>
                     _notificationService.SendNotification(
                         accountId,
                         user.Nickname,
