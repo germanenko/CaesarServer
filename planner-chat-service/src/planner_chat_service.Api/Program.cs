@@ -1,4 +1,3 @@
-using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
@@ -13,8 +12,6 @@ using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
-
-Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
