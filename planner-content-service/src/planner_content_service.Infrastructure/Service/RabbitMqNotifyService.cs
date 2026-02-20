@@ -22,6 +22,7 @@ namespace planner_content_service.Infrastructure.Service
         private readonly string _createBoardExchange;
         private readonly string _createColumnExchange;
         private readonly string _createTaskExchange;
+        private readonly string _checkAccess;
 
         private readonly List<string> _exchanges = new List<string>();
 
@@ -33,6 +34,7 @@ namespace planner_content_service.Infrastructure.Service
             string createBoardExchange,
             string createColumnExchange,
             string createTaskExchange,
+            string checkAccess,
             ILogger<RabbitMqNotifyService> logger)
         {
 
@@ -44,6 +46,7 @@ namespace planner_content_service.Infrastructure.Service
             _createBoardExchange = createBoardExchange;
             _createColumnExchange = createColumnExchange;
             _createTaskExchange = createTaskExchange;
+            _checkAccess = checkAccess;
 
             _exchanges.AddRange(new[] { _addAccountsToTaskChatsQueue, _createBoardExchange, _createColumnExchange, _createTaskExchange });
 
@@ -184,6 +187,7 @@ namespace planner_content_service.Infrastructure.Service
                 PublishEvent.CreateBoard => _createBoardExchange,
                 PublishEvent.CreateColumn => _createColumnExchange,
                 PublishEvent.CreateTask => _createTaskExchange,
+                PublishEvent.CheckAccess => _checkAccess,
                 _ => throw new ArgumentException("Invalid publish event")
             };
         }

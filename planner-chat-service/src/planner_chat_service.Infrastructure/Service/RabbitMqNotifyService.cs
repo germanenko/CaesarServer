@@ -21,6 +21,7 @@ namespace planner_chat_service.Infrastructure.Service
         private readonly string _messageSentToChatQueueName;
         private readonly string _createPersonalChatQueueName;
         private readonly string _getNotificationSettings;
+        private readonly string _checkAccess;
 
         private readonly List<string> _exchanges = new List<string>();
 
@@ -32,6 +33,7 @@ namespace planner_chat_service.Infrastructure.Service
             string messageSentToChatQueueName,
             string createPersonalChatQueueName,
             string getUsersWithEnabledNotifications,
+            string checkAccess,
             ILogger<RabbitMqNotifyService> logger)
         {
             _logger = logger;
@@ -43,8 +45,9 @@ namespace planner_chat_service.Infrastructure.Service
             _messageSentToChatQueueName = messageSentToChatQueueName;
             _createPersonalChatQueueName = createPersonalChatQueueName;
             _getNotificationSettings = getUsersWithEnabledNotifications;
+            _checkAccess = checkAccess;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings });
+            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess });
 
             ExchangeDeclare();
         }
@@ -188,6 +191,7 @@ namespace planner_chat_service.Infrastructure.Service
                 PublishEvent.MessageSentToChat => _messageSentToChatQueueName,
                 PublishEvent.CreatePersonalChat => _createPersonalChatQueueName,
                 PublishEvent.GetNotificationSettings => _getNotificationSettings,
+                PublishEvent.CheckAccess => _checkAccess,
                 _ => throw new ArgumentException("Invalid event type")
             };
         }

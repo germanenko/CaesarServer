@@ -41,7 +41,8 @@ namespace planner_node_service.Infrastructure.Service
             string createBoard,
             string createColumn,
             string createTask,
-            string getUsersWithEnabledNotifications)
+            string getUsersWithEnabledNotifications,
+            string checkAccess)
         {
             _hostname = hostname;
             _userName = userName;
@@ -60,7 +61,8 @@ namespace planner_node_service.Infrastructure.Service
                 { createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
                 { createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
                 { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) },
-                { getUsersWithEnabledNotifications, (QueueName: GetQueueName(getUsersWithEnabledNotifications), Handler: HandleGetNotificationSettings) }
+                { getUsersWithEnabledNotifications, (QueueName: GetQueueName(getUsersWithEnabledNotifications), Handler: HandleGetNotificationSettings) },
+                { checkAccess, (QueueName: GetQueueName(checkAccess), Handler: CheckAccess) }
             };
 
             InitializeRabbitMQ();
@@ -502,6 +504,43 @@ namespace planner_node_service.Infrastructure.Service
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.OK,
                     Body = settings
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while return enabled notification settings");
+                throw;
+            }
+        }
+
+        private async Task<ServiceResponse<object>> CheckAccess(string message)
+        {
+            var result = JsonSerializer.Deserialize<CheckAccessRequest>(message);
+
+            _logger.LogInformation($"NodeService received request: {message}");
+
+            if (result == null)
+            {
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
+
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+
+                var access = await accessService.CheckAccess(result.AccountId, result.NodeId);
+
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Body = access
                 };
             }
             catch (Exception ex)

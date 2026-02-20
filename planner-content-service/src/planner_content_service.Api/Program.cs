@@ -44,6 +44,7 @@ void ConfigureServices(IServiceCollection services)
     var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
     var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
+    var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
 
     builder.Logging.AddConsole();
     builder.Logging.AddDebug();
@@ -122,6 +123,7 @@ void ConfigureServices(IServiceCollection services)
             createBoardExchange,
             createColumnExchange,
             createTaskExchange,
+            checkAccessExchange,
             sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
 
