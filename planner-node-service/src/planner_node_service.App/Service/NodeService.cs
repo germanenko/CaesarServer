@@ -56,7 +56,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = bodies
+                Body = result
             };
         }
 
