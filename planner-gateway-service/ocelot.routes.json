@@ -926,6 +926,18 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/getNodesByIds",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getNodesByIds",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
 
 	{
             "DownstreamPathTemplate": "/api/createOrUpdateMessageDraft",

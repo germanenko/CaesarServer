@@ -40,7 +40,10 @@ namespace planner_node_service.App.Service
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
-            bodies = await GetNodesByIdAsync(bodies);
+            var result = new List<NodeBody>();
+
+            result.AddRange(await GetContentNodesByIdAsync(bodies));
+            result.AddRange(await GetChatNodesByIdAsync(bodies));
 
             foreach (var body in bodies)
             {
@@ -170,11 +173,48 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<List<NodeBody>> GetNodesByIdAsync(List<NodeBody> nodes)
+        public async Task<List<NodeBody>> GetContentNodesByIdAsync(List<NodeBody> nodes)
         {
             var client = new HttpClient()
             {
                 BaseAddress = new Uri("http://planner-content-service:80/api/"),
+            };
+
+            var nodeIds = nodes.Select(x => x.Id);
+
+            var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}"));
+
+            var response = await client.GetAsync($"getNodesByIds?{queryString}");
+
+            if (response.StatusCode == HttpStatusCode.OK)
+            {
+                var resultString = await response.Content.ReadAsStringAsync();
+
+                _logger.LogInformation(resultString);
+
+                var options = new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = false,
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
+                };
+
+                var result = JsonSerializer.Deserialize<List<NodeBody>>(resultString, options);
+
+                return result;
+            }
+            else
+            {
+                _logger.LogInformation($"Error: {response.StatusCode}");
+                return nodes;
+            }
+        }
+
+        public async Task<List<NodeBody>> GetChatNodesByIdAsync(List<NodeBody> nodes)
+        {
+            var client = new HttpClient()
+            {
+                BaseAddress = new Uri("http://planner-chat-service:80/api/"),
             };
 
             var nodeIds = nodes.Select(x => x.Id);
