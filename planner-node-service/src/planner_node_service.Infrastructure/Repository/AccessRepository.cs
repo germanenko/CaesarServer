@@ -199,7 +199,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<AccessBody?> GetAccessRights(Guid accountId)
         {
-            var accessRights = await _context.AccessRights
+            var userAccessRights = await _context.AccessRights
                 .Include(x => x.AccessGroup)
                     .ThenInclude(x => x.Members)
                 .Where(ar =>
@@ -209,16 +209,25 @@ namespace planner_node_service.Infrastructure.Repository
                 )
                 .ToListAsync();
 
-            if (!accessRights.Any())
+
+            var allRights = new List<AccessRight>();
+
+            foreach (var access in userAccessRights)
+            {
+                var nodeAccess = _context.AccessRights.Where(a => a.NodeId == access.NodeId).ToList();
+                allRights.AddRange(nodeAccess);
+            }
+
+            if (!allRights.Any())
                 return null;
 
             var accessBody = new AccessBody();
 
-            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+            allRights = allRights.DistinctBy(x => x.Id).ToList();
 
-            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRightBody()).ToList();
+            accessBody.AccessRights = allRights.Select(x => x.ToAccessRightBody()).ToList();
 
-            var accessGroups = accessRights
+            var accessGroups = allRights
                 .Select(x => x.AccessGroup)
                 .Where(x => x != null)
                 .Distinct()
