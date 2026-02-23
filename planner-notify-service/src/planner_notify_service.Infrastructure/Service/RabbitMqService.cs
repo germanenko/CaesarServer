@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using planner_notify_service.Core.IService;
@@ -15,19 +16,20 @@ namespace planner_notify_service.Infrastructure.Service
         private IConnection _connection;
         private IModel _channel;
         private readonly INotificationService _notificationService;
-        private readonly INotifyService _notifyService;
         private readonly string _hostname;
         private readonly string _userName;
         private readonly string _password;
 
         private ILogger<RabbitMqService> _logger;
 
+        private readonly IServiceScopeFactory _scopeFactory;
+
         private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)> _queues;
 
         public RabbitMqService(
             INotificationService notificationService,
-            INotifyService notifyService,
             ILogger<RabbitMqService> logger,
+            IServiceScopeFactory scopeFactory,
             string hostname,
             string userName,
             string password,
@@ -39,9 +41,9 @@ namespace planner_notify_service.Infrastructure.Service
             _password = password;
 
             _logger = logger;
+            _scopeFactory = scopeFactory;
 
             _notificationService = notificationService;
-            _notifyService = notifyService;
 
             _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)>
             {
@@ -200,7 +202,10 @@ namespace planner_notify_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
-            await _notifyService.SendFCMNotification(result.AccountId, result.Title, result.Content, result.Data);
+            using var scope = _scopeFactory.CreateScope();
+            var notifyService = scope.ServiceProvider.GetRequiredService<INotifyService>();
+
+            await notifyService.SendFCMNotification(result.AccountId, result.Title, result.Content, result.Data);
 
             return new ServiceResponse<object>()
             {
