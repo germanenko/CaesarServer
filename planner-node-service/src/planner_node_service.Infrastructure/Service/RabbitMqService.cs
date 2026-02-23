@@ -499,6 +499,8 @@ namespace planner_node_service.Infrastructure.Service
 
                 var settings = await notificationService.GetEnabledNotificationSettings(result.AccountIds);
 
+                _logger.LogInformation($"Notification settings: {JsonSerializer.Serialize(settings.Body)}");
+
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = true,
