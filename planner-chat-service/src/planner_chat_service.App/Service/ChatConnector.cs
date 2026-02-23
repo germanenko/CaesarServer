@@ -11,7 +11,7 @@ using planner_server_package.Events.Enums;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using NotificationSettingsRMQBody = planner_server_package.Entities.NotificationSettingsBody;
+using ServerNotificationSettingsBody = planner_server_package.Entities.NotificationSettingsBody;
 
 namespace planner_chat_service.App.Service
 {
@@ -183,15 +183,15 @@ namespace planner_chat_service.App.Service
                     AccountIds = notConnectedAccountIds.ToList()
                 };
 
-                var settings = (await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings)).Body as List<NotificationSettingsRMQBody>;
+                var settings = (await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings)).Body as List<ServerNotificationSettingsBody>;
 
                 if (settings != null)
                 {
-                    var usersWithEnabledNotifications = settings.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
+                    _logger.LogInformation($"Send notification requests");
 
-                    var notificationTasks = usersWithEnabledNotifications.Select(accountId =>
+                    var notificationTasks = settings.Select(x =>
                         _notificationService.SendNotification(
-                            accountId,
+                            x.AccountId,
                             user.Nickname,
                             message.Content,
                             NotificationType.ChatMessage,
