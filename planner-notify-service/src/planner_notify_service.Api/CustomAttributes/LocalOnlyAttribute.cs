@@ -9,23 +9,13 @@ namespace planner_notify_service.Api.CustomAttributes
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var connectionInfo = context.HttpContext.Connection;
-            var remoteIp = connectionInfo.RemoteIpAddress;
+            var requestHost = context.HttpContext.Request.Host.Host;
+            var allowedHosts = new[] { "127.0.0.1", "planner-chat-service", "planner_notify_service" };
 
-            if (remoteIp != null && (
-                remoteIp.ToString().StartsWith("172.") ||
-                remoteIp.ToString().StartsWith("10.")))
+            if (!allowedHosts.Contains(requestHost))
             {
-                return;
+                context.Result = new ForbidResult();
             }
-
-            //var requestHost = context.HttpContext.Request.Host.Host;
-            //var allowedHosts = new[] { "127.0.0.1", "planner-chat-service", "planner_notify_service" };
-
-            //if (!allowedHosts.Contains(requestHost))
-            //{
-            //    context.Result = new ForbidResult();
-            //}
         }
     }
 }
