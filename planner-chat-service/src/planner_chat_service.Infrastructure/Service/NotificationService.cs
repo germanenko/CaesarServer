@@ -56,14 +56,14 @@ namespace planner_chat_service.Infrastructure.Service
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogWarning("❌ Ошибка при отправке уведомления. Status: {StatusCode}, Response: {ErrorContent}",
+                    _logger.LogWarning("Ошибка при отправке уведомления. Status: {StatusCode}, Response: {ErrorContent}",
                         response.StatusCode, errorContent);
                     return false;
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "💥 Исключение при отправке уведомления через HTTP");
+                _logger.LogError(ex, "Исключение при отправке уведомления через HTTP");
                 return false;
             }
         }
