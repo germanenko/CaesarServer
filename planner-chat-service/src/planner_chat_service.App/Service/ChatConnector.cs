@@ -187,19 +187,25 @@ namespace planner_chat_service.App.Service
 
                 if (settings != null)
                 {
-                    _logger.LogInformation($"Send notification requests");
+                    _logger.LogInformation($"Send notification requests for {settings.Count} recipients");
 
-                    var notificationTasks = settings.Select(x =>
-                        _notificationService.SendNotification(
-                            x.AccountId,
-                            user.Nickname,
-                            message.Content,
-                            NotificationType.ChatMessage,
-                            data
-                        )
-                    );
-
-                    await Task.WhenAll(notificationTasks);
+                    foreach (var x in settings)
+                    {
+                        try
+                        {
+                            await _notificationService.SendNotification(
+                                x.AccountId,
+                                user.Nickname,
+                                message.Content,
+                                NotificationType.ChatMessage,
+                                data
+                            );
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogError(ex, $"Failed to send notification to account {x.AccountId}");
+                        }
+                    }
                 }
             }
             catch (Exception ex)
