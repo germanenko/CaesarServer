@@ -159,12 +159,6 @@ namespace planner_chat_service.App.Service
             Chat chat
         )
         {
-            var chatMessageBody = new ChatMessageInfo
-            {
-                ChatId = chat.Id,
-                ChatType = chat.ChatType,
-                Message = message
-            };
 
             var connectedSessionIds = sessions.Select(e => e.SessionId);
             var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
@@ -191,26 +185,29 @@ namespace planner_chat_service.App.Service
 
                 var settings = (await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings)).Body as List<NotificationSettingsRMQBody>;
 
-                var usersWithEnabledNotifications = settings?.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
+                if (settings != null)
+                {
+                    var usersWithEnabledNotifications = settings.Where(x => x.NotificationsEnabled == true).Select(x => x.AccountId);
 
-                var notificationTasks = usersWithEnabledNotifications?.Select(accountId =>
-                    _notificationService.SendNotification(
-                        accountId,
-                        user.Nickname,
-                        message.Content,
-                        NotificationType.ChatMessage,
-                        data
-                    )
-                );
+                    var notificationTasks = usersWithEnabledNotifications.Select(accountId =>
+                        _notificationService.SendNotification(
+                            accountId,
+                            user.Nickname,
+                            message.Content,
+                            NotificationType.ChatMessage,
+                            data
+                        )
+                    );
 
-                await Task.WhenAll(notificationTasks);
+                    await Task.WhenAll(notificationTasks);
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
             }
 
-            var bytes = SerializeObject(chatMessageBody);
+            var bytes = SerializeObject(message);
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
             DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
         }
