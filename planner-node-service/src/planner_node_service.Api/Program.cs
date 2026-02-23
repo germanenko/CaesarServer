@@ -124,6 +124,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<IHistoryService, HistoryService>();
+    services.AddScoped<INotificationService, NotificationService>();
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IAccessRepository, AccessRepository>();
     services.AddScoped<IHistoryRepository, HistoryRepository>();
