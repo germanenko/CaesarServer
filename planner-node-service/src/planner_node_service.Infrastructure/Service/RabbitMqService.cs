@@ -188,7 +188,7 @@ namespace planner_node_service.Infrastructure.Service
         {
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
 
-            _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<ChatMessageInfo>(result.Message)}");
+            _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<MessageBody>(result.Message)}");
 
             if (result == null)
             {
@@ -200,13 +200,13 @@ namespace planner_node_service.Infrastructure.Service
                 };
             }
 
-            var chatMessage = JsonSerializer.Deserialize<ChatMessageInfo>(result.Message);
+            var chatMessage = JsonSerializer.Deserialize<MessageBody>(result.Message);
 
             using var scope = _scopeFactory.CreateScope();
             var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
             var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-            var can = (await accessService.CheckAccess(chatMessage.Message.SenderId, chatMessage.ChatId)).Body;
+            var can = (await accessService.CheckAccess(chatMessage.SenderId, chatMessage.ChatId)).Body;
 
             if (!can)
             {
@@ -220,13 +220,13 @@ namespace planner_node_service.Infrastructure.Service
 
             await nodeService.AddOrUpdateNode(new Node()
             {
-                Id = chatMessage.Message.Id,
+                Id = chatMessage.Id,
                 Name = "Message",
                 Type = NodeType.Message,
-                BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage.Message)
+                BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage)
             });
 
-            await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(chatMessage.Message.Link));
+            await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(chatMessage.Link));
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
