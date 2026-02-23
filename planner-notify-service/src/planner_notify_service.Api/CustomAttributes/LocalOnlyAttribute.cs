@@ -13,10 +13,8 @@ namespace planner_notify_service.Api.CustomAttributes
             var remoteIp = connectionInfo.RemoteIpAddress;
 
             if (remoteIp != null && (
-                IPAddress.IsLoopback(remoteIp) ||
                 remoteIp.ToString().StartsWith("172.") ||
-                remoteIp.ToString().StartsWith("10.") ||
-                remoteIp.ToString().StartsWith("192.168.")))
+                remoteIp.ToString().StartsWith("10.")))
             {
                 return;
             }
