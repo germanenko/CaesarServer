@@ -11,6 +11,7 @@ using planner_server_package.Events.Enums;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
+using static Google.Apis.Requests.BatchRequest;
 using ServerNotificationSettingsBody = planner_server_package.Entities.NotificationSettingsBody;
 
 namespace planner_chat_service.App.Service
@@ -183,28 +184,37 @@ namespace planner_chat_service.App.Service
                     AccountIds = notConnectedAccountIds.ToList()
                 };
 
-                var settings = (await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings)).Body as List<ServerNotificationSettingsBody>;
+                var response = await _notifyService.Publish(accountIds, PublishEvent.GetNotificationSettings);
 
-                if (settings != null)
+                if (response?.IsSuccess == true && response.Body != null)
                 {
-                    _logger.LogInformation($"Send notification requests for {settings.Count} recipients");
+                    _logger.LogInformation($"Response body type: {response.Body.GetType().Name}");
 
-                    foreach (var x in settings)
+                    if (response.Body is List<ServerNotificationSettingsBody> settingsArray)
                     {
-                        try
+                        _logger.LogInformation($"Found array with {settingsArray.Count} items");
+
+                        foreach (var x in settingsArray)
                         {
-                            await _notificationService.SendNotification(
-                                x.AccountId,
-                                user.Nickname,
-                                message.Content,
-                                NotificationType.ChatMessage,
-                                data
-                            );
+                            try
+                            {
+                                await _notificationService.SendNotification(
+                                    x.AccountId,
+                                    user.Nickname,
+                                    message.Content,
+                                    NotificationType.ChatMessage,
+                                    data
+                                );
+                            }
+                            catch (Exception ex)
+                            {
+                                _logger.LogError(ex, $"Failed to send notification to account {x.AccountId}");
+                            }
                         }
-                        catch (Exception ex)
-                        {
-                            _logger.LogError(ex, $"Failed to send notification to account {x.AccountId}");
-                        }
+                    }
+                    else
+                    {
+                        _logger.LogError($"Cannot cast {response.Body.GetType().Name} to List<ServerNotificationSettingsBody>");
                     }
                 }
             }
