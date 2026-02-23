@@ -151,77 +151,77 @@ namespace planner_chat_service.Infrastructure.Service
         }
 
 
-        public async Task SendMessage(
-            IEnumerable<ChatSession> sessions,
-            MessageBody message,
-            WebSocketMessageType messageType,
-            IEnumerable<Guid> userIds,
-            ChatType chatType,
-            Guid chatId
-        )
-        {
-            var chatMessageBody = new ChatMessageInfo
-            {
-                ChatId = chatId,
-                ChatType = chatType,
-                Message = message
-            };
+        //public async Task SendMessage(
+        //    IEnumerable<ChatSession> sessions,
+        //    MessageBody message,
+        //    WebSocketMessageType messageType,
+        //    IEnumerable<Guid> userIds,
+        //    ChatType chatType,
+        //    Guid chatId
+        //)
+        //{
+        //    var chatMessageBody = new ChatMessageInfo
+        //    {
+        //        ChatId = chatId,
+        //        ChatType = chatType,
+        //        Message = message
+        //    };
 
-            var connectedSessionIds = sessions.Select(e => e.SessionId);
-            var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
-            var notConnectedAccountIds = userIds.Except(connectedAccountIds);
+        //    var connectedSessionIds = sessions.Select(e => e.SessionId);
+        //    var connectedAccountIds = sessions.GroupBy(e => e.AccountId).Select(e => e.Key);
+        //    var notConnectedAccountIds = userIds.Except(connectedAccountIds);
 
-            var str = JsonSerializer.Serialize(chatMessageBody);
-            var bytes = Encoding.UTF8.GetBytes(str);
-            var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
-            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
-        }
+        //    var str = JsonSerializer.Serialize(chatMessageBody);
+        //    var bytes = Encoding.UTF8.GetBytes(str);
+        //    var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
+        //    DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
+        //}
 
-        private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, byte[] bytes, WebSocketMessageType messageType)
-        {
-            var userSessionsDeliveryMessage = new List<AccountSessions>();
+        //private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, byte[] bytes, WebSocketMessageType messageType)
+        //{
+        //    var userSessionsDeliveryMessage = new List<AccountSessions>();
 
-            foreach (var groupedSessions in sessions.GroupBy(e => e.AccountId))
-            {
-                var sessionsReceivedMessage = new List<Guid>();
-                foreach (var session in groupedSessions)
-                {
-                    if (await SendMessageToSession(session.Ws, bytes, messageType))
-                        sessionsReceivedMessage.Add(session.SessionId);
-                }
+        //    foreach (var groupedSessions in sessions.GroupBy(e => e.AccountId))
+        //    {
+        //        var sessionsReceivedMessage = new List<Guid>();
+        //        foreach (var session in groupedSessions)
+        //        {
+        //            if (await SendMessageToSession(session.Ws, bytes, messageType))
+        //                sessionsReceivedMessage.Add(session.SessionId);
+        //        }
 
-                if (sessionsReceivedMessage.Any())
-                    userSessionsDeliveryMessage.Add(new AccountSessions { AccountId = groupedSessions.Key, SessionIds = sessionsReceivedMessage });
-            }
+        //        if (sessionsReceivedMessage.Any())
+        //            userSessionsDeliveryMessage.Add(new AccountSessions { AccountId = groupedSessions.Key, SessionIds = sessionsReceivedMessage });
+        //    }
 
-            return userSessionsDeliveryMessage;
-        }
+        //    return userSessionsDeliveryMessage;
+        //}
 
-        private async Task<bool> SendMessageToSession(WebSocket webSocket, byte[] bytes, WebSocketMessageType messageType)
-        {
-            try
-            {
-                await webSocket.SendAsync(bytes, messageType, true, CancellationToken.None);
-            }
-            catch (Exception)
-            {
-                return false;
-            }
+        //private async Task<bool> SendMessageToSession(WebSocket webSocket, byte[] bytes, WebSocketMessageType messageType)
+        //{
+        //    try
+        //    {
+        //        await webSocket.SendAsync(bytes, messageType, true, CancellationToken.None);
+        //    }
+        //    catch (Exception)
+        //    {
+        //        return false;
+        //    }
 
-            return true;
-        }
+        //    return true;
+        //}
 
-        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, byte[] bytes)
-        {
-            var messageSentToChatEvent = new MessageSentToChatEvent
-            {
-                AccountIds = accountIds,
-                AccountSessions = accountSessions,
-                Message = bytes
-            };
+        //private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, byte[] bytes)
+        //{
+        //    var messageSentToChatEvent = new MessageSentToChatEvent
+        //    {
+        //        AccountIds = accountIds,
+        //        AccountSessions = accountSessions,
+        //        Message = bytes
+        //    };
 
-            _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
-        }
+        //    _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
+        //}
 
         private string GetQueueName(string exchange)
         {

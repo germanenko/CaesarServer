@@ -117,38 +117,37 @@ namespace planner_chat_service.App.Service
         }
 
         private async Task<DateTime?> ProcessSentMessage(
-            SentMessage sentMessage,
+            MessageBody sentMessage,
             IEnumerable<ChatSession> sessions,
             IEnumerable<Guid> allUserIds,
             Chat chat,
             Guid accountId
         )
         {
-            if (sentMessage.LastMessageReadId == null)
+            //if (sentMessage.LastMessageReadId == null)
+            //{
+            if (sentMessage.MessageType == MessageType.File && Guid.TryParse(sentMessage.Content, out var messageId))
             {
-                var messageBody = sentMessage.MessageBody;
-                if (messageBody.Type == MessageType.File && Guid.TryParse(messageBody.Content, out var messageId))
+                var message = await _chatRepository.GetMessageAsync(messageId);
+                if (message != null)
                 {
-                    var message = await _chatRepository.GetMessageAsync(messageId);
-                    if (message != null)
-                    {
-                        await SendMessage(sessions, message.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
-                        return message.SentAt;
-                    }
-                }
-                else
-                {
-                    var chatMessage = await _chatRepository.AddMessageAsync(messageBody.Type, messageBody.Content, chat, accountId, messageBody.Id, sentMessage.DeviceId.Value);
-                    await SendMessage(sessions, chatMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
-                    return chatMessage.SentAt;
+                    await SendMessage(sessions, message.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
+                    return message.SentAt;
                 }
             }
+            else
+            {
+                var chatMessage = await _chatRepository.AddMessageAsync(sentMessage.MessageType, sentMessage.Content, chat, accountId, sentMessage.Id, sentMessage.SenderDeviceId.Value);
+                await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
+                return chatMessage.SentAt;
+            }
+            //}
 
-            var lastMessage = await _chatRepository.GetMessageAsync((Guid)sentMessage.LastMessageReadId);
-            lastMessage = await _chatRepository.SetMessageIsRead(lastMessage);
-            await SendMessage(sessions, lastMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
+            //var lastMessage = await _chatRepository.GetMessageAsync((Guid)sentMessage.LastMessageReadId);
+            //lastMessage = await _chatRepository.SetMessageIsRead(lastMessage);
+            await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
 
-            return lastMessage?.SentAt;
+            return sentMessage?.Date;
         }
 
 
@@ -280,7 +279,7 @@ namespace planner_chat_service.App.Service
 
             _logger.LogInformation("Received message: {Message}", input);
             input = input.Replace("\0", "");
-            var sentMessage = JsonSerializer.Deserialize<SentMessage>(input, options);
+            var sentMessage = JsonSerializer.Deserialize<MessageBody>(input, options);
 
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);
         }

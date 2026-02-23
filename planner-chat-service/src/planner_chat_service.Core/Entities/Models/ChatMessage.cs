@@ -16,17 +16,6 @@ namespace planner_chat_service.Core.Entities.Models
         public Guid? SenderDeviceId { get; set; }
         public bool HasBeenRead { get; set; }
 
-        public CreateMessageBody ToCreateMessageBody()
-        {
-            var messageType = MessageType;
-
-            return new CreateMessageBody
-            {
-                Type = messageType,
-                Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
-            };
-        }
-
         public override MessageBody ToNodeBody()
         {
             var messageType = MessageType;
