@@ -137,7 +137,7 @@ namespace planner_chat_service.App.Service
             }
             else
             {
-                var chatMessage = await _chatRepository.AddMessageAsync(sentMessage.MessageType, sentMessage.Content, chat, accountId, sentMessage.Id, sentMessage.SenderDeviceId.Value);
+                var chatMessage = await _chatRepository.AddMessageAsync(sentMessage.MessageType, sentMessage.Content, chat, accountId, sentMessage.Id, sentMessage.SenderDeviceId);
                 await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
                 return chatMessage.SentAt;
             }
