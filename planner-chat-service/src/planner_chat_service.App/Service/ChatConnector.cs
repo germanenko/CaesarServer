@@ -1,6 +1,5 @@
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.Entities.Models;
-using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
@@ -11,7 +10,7 @@ using planner_server_package.Events.Enums;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;
-using static Google.Apis.Requests.BatchRequest;
+using NotificationBody = planner_server_package.Entities.NotificationBody;
 using ServerNotificationSettingsBody = planner_server_package.Entities.NotificationSettingsBody;
 
 namespace planner_chat_service.App.Service
@@ -20,7 +19,6 @@ namespace planner_chat_service.App.Service
     {
         private readonly IChatRepository _chatRepository;
         private readonly INotifyService _notifyService;
-        private readonly INotificationService _notificationService;
         private readonly IUserService _userService;
         private readonly ILogger<ChatConnector> _logger;
         private readonly JsonSerializerOptions options = new()
@@ -33,14 +31,12 @@ namespace planner_chat_service.App.Service
             IChatRepository chatRepository,
             INotifyService notifyService,
             ILogger<ChatConnector> logger,
-            INotificationService notificationService,
             IUserService userService
         )
         {
             _chatRepository = chatRepository;
             _notifyService = notifyService;
             _logger = logger;
-            _notificationService = notificationService;
             _userService = userService;
         }
 
@@ -198,13 +194,7 @@ namespace planner_chat_service.App.Service
                         {
                             try
                             {
-                                await _notificationService.SendNotification(
-                                    x.AccountId,
-                                    user.Nickname,
-                                    message.Content,
-                                    NotificationType.ChatMessage,
-                                    data
-                                );
+                                await _notifyService.Publish(new NotificationBody(x.AccountId, user.Nickname, message.Content, NotificationType.ChatMessage, data), PublishEvent.SendNotification);
                             }
                             catch (Exception ex)
                             {

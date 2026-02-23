@@ -36,7 +36,8 @@ void ConfigureServices(IServiceCollection services)
     var rabbitMqUsername = GetEnvVar("RABBITMQ_USERNAME");
     var rabbitMqPassword = GetEnvVar("RABBITMQ_PASSWORD");
 
-    var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
+    var messageSentToChatExchange = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
+    var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -106,10 +107,13 @@ void ConfigureServices(IServiceCollection services)
     services.AddHostedService<TokenCleanupService>();
     services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
         sp.GetRequiredService<INotificationService>(),
+        sp.GetRequiredService<INotifyService>(),
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
-        messageSentToChatQueue
+        messageSentToChatExchange,
+        sendNotificationExchange
     ));
 }
 

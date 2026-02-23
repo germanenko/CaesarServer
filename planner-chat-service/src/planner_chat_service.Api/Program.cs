@@ -42,6 +42,7 @@ void ConfigureServices(IServiceCollection services)
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
+    var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -98,11 +99,6 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
     services.AddScoped<IUserService, UserService>();
 
-    services.AddSingleton<INotificationService, NotificationService>(sp =>
-        new NotificationService(
-            sp.GetRequiredService<ILogger<NotificationService>>()
-        ));
-
 
 
     services.AddScoped<IChatRepository, ChatRepository>();
@@ -121,6 +117,7 @@ void ConfigureServices(IServiceCollection services)
             createPersonalChatQueue,
             getUsersWithEnabledNotifications,
             checkAccessExchange,
+            sendNotificationExchange,
             sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
 

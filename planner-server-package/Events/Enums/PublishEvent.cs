@@ -15,6 +15,7 @@ namespace planner_server_package.Events.Enums
         CreateBoard,
         CreateColumn,
         CreateTask,
-        CheckAccess
+        CheckAccess,
+        SendNotification
     }
 }
