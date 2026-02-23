@@ -150,6 +150,8 @@ namespace planner_chat_service.Infrastructure.Service
             properties.ReplyTo = replyQueueName;
             properties.Persistent = true;
 
+            _logger.LogInformation($"Publish event: {exchangeName}:{body}");
+
             channel.BasicPublish(exchange: exchangeName,
                                  routingKey: "",
                                  basicProperties: properties,
