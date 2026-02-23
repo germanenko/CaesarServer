@@ -1,7 +1,7 @@
-using System.Net;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_notify_service.Core.IService;
+using System.Net;
 
 namespace planner_notify_service.Api.Controllers
 {
