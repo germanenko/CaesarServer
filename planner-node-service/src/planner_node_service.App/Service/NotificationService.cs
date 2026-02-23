@@ -16,15 +16,15 @@ namespace planner_node_service.App.Service
             _notificationRepository = notificationRepository;
         }
 
-        public ServiceResponse<IEnumerable<ServerNotificationSettings>> GetEnabledNotificationSettings(List<Guid> accountIds)
+        public async Task<ServiceResponse<List<ServerNotificationSettings>>> GetEnabledNotificationSettings(List<Guid> accountIds)
         {
-            var settings = _notificationRepository.GetEnabledNotificationSettingsAsync(accountIds);
+            var settings = await _notificationRepository.GetEnabledNotificationSettingsAsync(accountIds);
 
-            return new ServiceResponse<IEnumerable<ServerNotificationSettings>>()
+            return new ServiceResponse<List<ServerNotificationSettings>>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = settings.Select(x => new ServerNotificationSettings() { NodeId = x.NodeId, NotificationsEnabled = x.NotificationsEnabled, AccountId = x.AccountId })
+                Body = settings.Select(x => new ServerNotificationSettings() { NodeId = x.NodeId, NotificationsEnabled = x.NotificationsEnabled, AccountId = x.AccountId }).ToList()
             };
         }
     }

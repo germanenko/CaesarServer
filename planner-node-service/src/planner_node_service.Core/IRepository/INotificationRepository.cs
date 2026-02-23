@@ -9,6 +9,6 @@ namespace planner_node_service.Core.IRepository
 {
     public interface INotificationRepository
     {
-        public IEnumerable<NotificationSettings> GetEnabledNotificationSettingsAsync(List<Guid> accountIds);
+        public Task<List<NotificationSettings>> GetEnabledNotificationSettingsAsync(List<Guid> accountIds);
     }
 }

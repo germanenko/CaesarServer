@@ -5,6 +5,6 @@ namespace planner_node_service.Core.IService
 {
     public interface INotificationService
     {
-        public ServiceResponse<IEnumerable<ServerNotificationSettings>> GetEnabledNotificationSettings(List<Guid> accountIds);
+        public Task<ServiceResponse<List<ServerNotificationSettings>>> GetEnabledNotificationSettings(List<Guid> accountIds);
     }
 }

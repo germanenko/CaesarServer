@@ -497,7 +497,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                var settings = notificationService.GetEnabledNotificationSettings(result.AccountIds);
+                var settings = await notificationService.GetEnabledNotificationSettings(result.AccountIds);
 
                 return new ServiceResponse<object>()
                 {
