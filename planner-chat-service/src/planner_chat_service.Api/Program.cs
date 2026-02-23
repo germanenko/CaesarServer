@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.WebSockets;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_chat_service.App.Service;
@@ -48,6 +49,20 @@ void ConfigureServices(IServiceCollection services)
 
     var chatConnectionString = GetEnvVar("CHAT_DB_CONNECTION_STRING");
     var corsAllowedOrigins = GetEnvVar("CORS_ALLOWED_ORIGINS");
+
+
+    builder.Logging.AddConsole();
+    builder.Logging.AddDebug();
+
+    builder.Logging.AddSimpleConsole(options =>
+    {
+        options.IncludeScopes = true;
+        options.SingleLine = false;
+        options.TimestampFormat = "HH:mm:ss ";
+        options.ColorBehavior = LoggerColorBehavior.Enabled;
+    });
+
+    builder.Logging.SetMinimumLevel(LogLevel.Information);
 
 
     services.AddControllers(e =>
