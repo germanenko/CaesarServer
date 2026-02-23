@@ -188,10 +188,10 @@ namespace planner_chat_service.App.Service
 
                 if (response?.IsSuccess == true && response.Body != null)
                 {
-                    _logger.LogInformation($"Response body type: {response.Body.GetType().Name}");
-
-                    if (response.Body is List<ServerNotificationSettingsBody> settingsArray)
+                    if (response.Body is JsonElement jsonElement)
                     {
+                        var settingsArray = JsonSerializer.Deserialize<List<ServerNotificationSettingsBody>>(jsonElement);
+
                         _logger.LogInformation($"Found array with {settingsArray.Count} items");
 
                         foreach (var x in settingsArray)
