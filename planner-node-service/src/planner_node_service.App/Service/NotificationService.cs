@@ -1,4 +1,5 @@
 ﻿using planner_client_package.Entities;
+using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using System.Net;
@@ -25,6 +26,18 @@ namespace planner_node_service.App.Service
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
                 Body = settings.Select(x => new ServerNotificationSettings() { NodeId = x.NodeId, NotificationsEnabled = x.NotificationsEnabled, AccountId = x.AccountId }).ToList()
+            };
+        }
+
+        public async Task<ServiceResponse<NotificationSettings>> AddNotificationSettings(ServerNotificationSettings notificationSettingsBody)
+        {
+            var settings = await _notificationRepository.AddNotificationSettings(notificationSettingsBody);
+
+            return new ServiceResponse<NotificationSettings>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = settings
             };
         }
     }

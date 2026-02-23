@@ -263,6 +263,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -275,6 +276,7 @@ namespace planner_node_service.Infrastructure.Service
                 foreach (var participant in result.Participants)
                 {
                     await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, Permission.Admin);
+                    await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant.AccountId, NodeId = result.Chat.Id, NotificationsEnabled = true });
                 }
 
                 return new ServiceResponse<object>()
@@ -313,6 +315,7 @@ namespace planner_node_service.Infrastructure.Service
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
+                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {
@@ -325,6 +328,8 @@ namespace planner_node_service.Infrastructure.Service
                 await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
 
                 await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
+
+                //await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = result.CreatorId, NodeId = result.Board.Id, NotificationsEnabled = true });
 
                 return new ServiceResponse<object>()
                 {

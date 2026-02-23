@@ -2,6 +2,7 @@
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using planner_server_package.Entities;
 namespace planner_node_service.Infrastructure.Repository
 {
     public class NotificationRepository : INotificationRepository
@@ -16,6 +17,21 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<List<NotificationSettings>> GetEnabledNotificationSettingsAsync(List<Guid> accountIds)
         {
             return await _context.NotificationSettings.Where(x => accountIds.Contains(x.AccountId) && x.NotificationsEnabled).ToListAsync();
+        }
+
+        public async Task<NotificationSettings> AddNotificationSettings(NotificationSettingsBody notificationSettingsBody)
+        {
+            var result = (await _context.NotificationSettings.AddAsync(
+                new NotificationSettings()
+                {
+                    AccountId = notificationSettingsBody.AccountId,
+                    NodeId = notificationSettingsBody.NodeId,
+                    NotificationsEnabled = notificationSettingsBody.NotificationsEnabled
+                })).Entity;
+
+            await _context.SaveChangesAsync();
+
+            return result;
         }
     }
 }
