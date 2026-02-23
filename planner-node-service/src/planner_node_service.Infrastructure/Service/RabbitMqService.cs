@@ -547,7 +547,7 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.OK,
-                    Body = access
+                    Body = access.Body
                 };
             }
             catch (Exception ex)
