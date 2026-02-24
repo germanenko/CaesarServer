@@ -15,7 +15,9 @@ namespace planner_notify_service.Infrastructure.Service
 {
     public class FirebaseService : IFirebaseService
     {
-        public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey)
+        private ILogger<FirebaseService> _logger;
+
+        public FirebaseService(string fbProjectId, string fbClientEmail, string fbPrivateKey, ILogger<FirebaseService> logger)
         {
             if (FirebaseApp.DefaultInstance == null)
             {
@@ -37,6 +39,8 @@ namespace planner_notify_service.Infrastructure.Service
                     ProjectId = fbProjectId
                 });
             }
+
+            _logger = logger;
         }
 
         public async Task<string> SendNotificationAsync(List<FirebaseToken> tokens, string title, string body, Dictionary<string, string>? data = null)
@@ -60,10 +64,12 @@ namespace planner_notify_service.Infrastructure.Service
 
                     string response = await FirebaseMessaging.DefaultInstance.SendAsync(message);
                 }
+                _logger.LogInformation("Уведомления отправлены");
                 return "Уведомления отправлены";
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "Ошибка при отправке уведомлений");
                 throw;
             }
         }
