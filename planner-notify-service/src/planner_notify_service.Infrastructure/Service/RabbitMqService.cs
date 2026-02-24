@@ -121,6 +121,8 @@ namespace planner_notify_service.Infrastructure.Service
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
 
+                _logger.LogInformation($"Received {queueName}: {message}");
+
                 try
                 {
                     var result = await handler(message);
