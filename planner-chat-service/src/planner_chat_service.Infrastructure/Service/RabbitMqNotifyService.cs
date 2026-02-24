@@ -50,7 +50,7 @@ namespace planner_chat_service.Infrastructure.Service
             _checkAccess = checkAccess;
             _sendNotification = sendNotification;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess });
+            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess, _sendNotification });
 
             ExchangeDeclare();
         }
