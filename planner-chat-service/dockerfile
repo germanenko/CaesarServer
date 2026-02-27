@@ -3,7 +3,6 @@ WORKDIR /App
 
 COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
-COPY key.json .
 COPY . .
 
 RUN dotnet restore planner-chat-service/planner_chat_service.sln
@@ -17,14 +16,5 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 COPY --from=build-env /App/key.json .
-
-RUN ls -la /App/ && \
-    echo "=== Checking key.json ===" && \
-    if [ -f /App/key.json ]; then \
-        echo "key.json exists in final image"; \
-        ls -la /App/key.json; \
-    else \
-        echo "WARNING: key.json NOT found in final image!"; \
-    fi
 
 ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]
