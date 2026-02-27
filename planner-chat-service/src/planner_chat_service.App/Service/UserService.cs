@@ -66,7 +66,10 @@ namespace planner_chat_service.App.Service
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    var user = JsonSerializer.Deserialize<List<ProfileBody>>(content);
+                    var user = JsonSerializer.Deserialize<List<ProfileBody>>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
 
                     return user.FirstOrDefault();
                 }
