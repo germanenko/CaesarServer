@@ -1,4 +1,4 @@
-using planner_file_service.Core.Entities.Request;
+using planner_common_package.Entities;
 
 namespace planner_file_service.Core.IService
 {

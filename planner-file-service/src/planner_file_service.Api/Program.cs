@@ -1,5 +1,3 @@
-using System.IO.Compression;
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -11,6 +9,8 @@ using planner_file_service.App.Service;
 using planner_file_service.Core.IService;
 using planner_file_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.IO.Compression;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -91,7 +91,8 @@ void ConfigureServices(IServiceCollection services)
             rabbitMqPassword,
             rabbitMqProfileImageQueue,
             rabbitMqChatImageQueue,
-            rabbitMqChatAttachmentQueue
+            rabbitMqChatAttachmentQueue,
+            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
     services.AddSingleton(fileInspector);
 }
