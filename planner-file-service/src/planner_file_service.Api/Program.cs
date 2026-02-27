@@ -82,9 +82,8 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddSingleton<INotifyService>(sp =>
-    {
-        var service = new RabbitMqNotifyService(
+    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
+        new RabbitMqNotifyService(
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
@@ -92,17 +91,19 @@ void ConfigureServices(IServiceCollection services)
             rabbitMqChatImageQueue,
             rabbitMqChatAttachmentQueue,
             sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
-        );
-
-        service.ExchangeDeclare();
-
-        return service;
-    });
+        ));
 
     services.AddSingleton<IFileUploaderService, LocalFileUploaderService>();
     services.AddSingleton<IJwtService, JwtService>();
 
     services.AddSingleton(fileInspector);
+
+    services.AddHostedService(e => new RabbitMqService(
+        e.GetRequiredService<INotifyService>(),
+        rabbitMqHostname,
+        rabbitMqUsername,
+        rabbitMqPassword
+    ));
 }
 
 WebApplication ConfigureApplication(WebApplication app)

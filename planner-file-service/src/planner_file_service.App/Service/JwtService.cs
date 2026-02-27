@@ -7,6 +7,13 @@ namespace planner_file_service.App.Service
 {
     public class JwtService : IJwtService
     {
+        private readonly INotifyService _notifyService;
+
+        public JwtService(INotifyService notifyService)
+        {
+            _notifyService = notifyService;
+        }
+
         private List<Claim> GetClaims(string token) =>
             new JwtSecurityTokenHandler()
                 .ReadJwtToken(token.Replace("Bearer ", ""))
