@@ -21,7 +21,7 @@ namespace planner_file_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>();
 
         public RabbitMqService(
             INotifyService notifyService,
