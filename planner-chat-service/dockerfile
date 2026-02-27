@@ -16,4 +16,5 @@ RUN dotnet publish \
 FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
+COPY --from=build-env /App/key.json .
 ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]
