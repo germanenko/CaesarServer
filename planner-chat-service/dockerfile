@@ -3,7 +3,7 @@ WORKDIR /App
 
 COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
-COPY key.json .
+COPY key.json /App/key.json
 COPY . .
 
 RUN dotnet restore planner-chat-service/planner_chat_service.sln
