@@ -41,7 +41,7 @@ namespace planner_chat_service.App.Service
             ProjectId = GetEnvVar("PROJECT_ID");
             SubscriptionId = GetEnvVar("SUBSCRIPTION_ID");
 
-            using (var stream = new FileStream("src/key.json", FileMode.Open, FileAccess.Read))
+            using (var stream = new FileStream("key.json", FileMode.Open, FileAccess.Read))
             {
                 _serviceCredential = await GoogleCredential.FromStreamAsync(stream, CancellationToken.None);
             }
