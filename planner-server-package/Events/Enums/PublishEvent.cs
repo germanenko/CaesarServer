@@ -16,6 +16,7 @@ namespace planner_server_package.Events.Enums
         CreateColumn,
         CreateTask,
         CheckAccess,
-        SendNotification
+        SendNotification,
+        GetGoogleToken
     }
 }

@@ -12,21 +12,18 @@ namespace planner_auth_service.Infrastructure.Service
         private readonly string _username;
         private readonly string _password;
 
-        private readonly string _queueInitChatName;
         private readonly string _createAccountMailCredentialsQueue;
 
         public RabbitMqNotifyService(
             string hostname,
             string username,
             string password,
-            string queueInitChatName,
             string createAccountMailCredentialsQueue)
         {
             _hostname = hostname;
             _username = username;
             _password = password;
 
-            _queueInitChatName = queueInitChatName;
             _createAccountMailCredentialsQueue = createAccountMailCredentialsQueue;
         }
 
@@ -64,7 +61,6 @@ namespace planner_auth_service.Infrastructure.Service
         {
             return eventType switch
             {
-                PublishEvent.InitChat => _queueInitChatName,
                 PublishEvent.CreateAccountMailCredentials => _createAccountMailCredentialsQueue,
                 _ => throw new ArgumentException("Invalid event type")
             };

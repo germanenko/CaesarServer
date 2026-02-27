@@ -45,12 +45,43 @@ namespace planner_chat_service.App.Service
                 else
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
-                    _logger.LogWarning("❌ HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
+                    _logger.LogWarning("HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
                 }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "❌ Unexpected error for {UserId}", userId);
+                _logger.LogError(ex, "Unexpected error for {UserId}", userId);
+            }
+
+            return null;
+        }
+
+        public async Task<ProfileBody?> GetUserData(string identifier)
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync($"users/identifier?identifierPattern={identifier}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var user = JsonSerializer.Deserialize<ProfileBody>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return user;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning($"HTTP {response.StatusCode}: {errorContent}");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error for {identifier}");
             }
 
             return null;

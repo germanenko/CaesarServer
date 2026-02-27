@@ -1,13 +1,12 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace planner_server_package.Entities
 {
     public class GoogleTokenBody
     {
-        [Required]
+        public Guid AccountId { get; set; }
         public string AccessToken { get; set; }
-
-        [Required]
         public string RefreshToken { get; set; }
 
     }

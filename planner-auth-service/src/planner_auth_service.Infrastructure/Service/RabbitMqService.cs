@@ -1,5 +1,6 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using planner_auth_service.Core.IRepository;
 using planner_auth_service.Core.IService;
 using planner_common_package.Enums;
@@ -21,10 +22,12 @@ namespace planner_auth_service.Infrastructure.Service
         private IModel _channel;
         private readonly IServiceScopeFactory _serviceFactory;
         private readonly string _hostname;
-        private readonly string _updateProfileQueue;
-        private readonly string _queueCreateChatName;
         private readonly string _userName;
         private readonly string _password;
+
+        private readonly ILogger<RabbitMqService> _logger;
+
+        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)> _queues;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
@@ -33,7 +36,9 @@ namespace planner_auth_service.Infrastructure.Service
             string password,
             string updateProfileQueue,
             string queueCreateChatName,
-            INotifyService notifyService)
+            string getGoogleTokenExchange,
+            INotifyService notifyService,
+            ILogger<RabbitMqService> logger)
         {
             _hostname = hostname;
             _userName = userName;
@@ -41,8 +46,14 @@ namespace planner_auth_service.Infrastructure.Service
             _serviceFactory = serviceFactory;
             _notifyService = notifyService;
 
-            _updateProfileQueue = updateProfileQueue;
-            _queueCreateChatName = queueCreateChatName;
+            _logger = logger;
+
+            _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)>
+            {
+                { updateProfileQueue, (QueueName: GetQueueName(updateProfileQueue), Handler: HandleUpdateProfileMessageAsync) },
+                { queueCreateChatName, (QueueName: GetQueueName(queueCreateChatName), Handler: HandleCreateChatMessageAsync) },
+                { getGoogleTokenExchange, (QueueName: GetQueueName(getGoogleTokenExchange), Handler: HandleGoogleTokenRequest) }
+            };
 
             InitializeRabbitMQ();
         }
@@ -59,60 +70,141 @@ namespace planner_auth_service.Infrastructure.Service
             _connection = factory.CreateConnection();
             _channel = _connection.CreateModel();
 
-            DeclareQueue(_updateProfileQueue);
-            DeclareQueue(_queueCreateChatName);
-        }
+            _channel.ExchangeDeclare(
+                exchange: "dlx-exchange",
+                type: ExchangeType.Direct,
+                durable: true,
+                autoDelete: false,
+                arguments: null);
 
-        private void DeclareQueue(string queueName)
-        {
             _channel.QueueDeclare(
-                queue: queueName,
+                queue: "dead-letter-queue",
                 durable: true,
                 exclusive: false,
                 autoDelete: false,
                 arguments: null);
+
+            _channel.QueueBind(
+                queue: "dead-letter-queue",
+                exchange: "dlx-exchange",
+                routingKey: "");
+
+            foreach (var queue in _queues)
+            {
+                DeclareQueue(queue.Key, queue.Value.QueueName);
+            }
         }
 
-        private void ConsumeQueue(string queueName, Func<string, Task> handler)
+        private void DeclareQueue(string exchange, string queue)
+        {
+            var args = new Dictionary<string, object>
+            {
+                { "x-dead-letter-exchange", "dlx-exchange" },
+                { "x-dead-letter-routing-key", "" }
+            };
+
+            _channel.QueueDeclare(
+                queue: queue,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: args);
+
+            _channel.QueueBind(
+                queue: queue,
+                exchange: exchange,
+                routingKey: "");
+        }
+
+        private void ConsumeQueue(string queueName, Func<string, Task<ServiceResponse<object>>> handler)
         {
             var consumer = new AsyncEventingBasicConsumer(_channel);
+
             consumer.Received += async (model, ea) =>
             {
                 var body = ea.Body.ToArray();
                 var message = Encoding.UTF8.GetString(body);
-                await handler(message);
+
+                try
+                {
+                    var result = await handler(message);
+
+                    if (!string.IsNullOrEmpty(ea.BasicProperties.ReplyTo))
+                    {
+
+                        var responseBody = Encoding.UTF8.GetBytes(
+                            JsonSerializer.Serialize(result)
+                        );
+
+                        var replyProps = _channel.CreateBasicProperties();
+                        replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
+
+                        _channel.BasicPublish(
+                            exchange: "",
+                            routingKey: ea.BasicProperties.ReplyTo,
+                            basicProperties: replyProps,
+                            body: responseBody
+                        );
+                    }
+
+
+                    _channel.BasicAck(ea.DeliveryTag, false);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Error while receive message");
+                    _channel.BasicNack(ea.DeliveryTag, false, false);
+                }
             };
-            _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
+            _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
         }
 
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             stoppingToken.ThrowIfCancellationRequested();
 
-            ConsumeQueue(_updateProfileQueue, HandleUpdateProfileMessageAsync);
-            ConsumeQueue(_queueCreateChatName, HandleCreateChatMessageAsync);
+            foreach (var func in _queues)
+            {
+                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
+            }
 
             await Task.CompletedTask;
         }
 
-        private async Task HandleUpdateProfileMessageAsync(string message)
+        private async Task<ServiceResponse<object>> HandleUpdateProfileMessageAsync(string message)
         {
             using var scope = _serviceFactory.CreateScope();
             var accountRepository = scope.ServiceProvider.GetRequiredService<IAccountRepository>();
             var updateProfileBody = JsonSerializer.Deserialize<UpdateProfileBody>(message);
             if (updateProfileBody == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
 
             var account = await accountRepository.UpdateProfileIconAsync(updateProfileBody.AccountId, updateProfileBody.FileName);
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
 
-        private async Task HandleCreateChatMessageAsync(string message)
+        private async Task<ServiceResponse<object>> HandleCreateChatMessageAsync(string message)
         {
             using var scope = _serviceFactory.CreateScope();
             var accountRepository = scope.ServiceProvider.GetRequiredService<IAccountRepository>();
             var createChatBody = JsonSerializer.Deserialize<CreateChatResponseEvent>(message);
             if (createChatBody == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
 
             var result = new List<ChatParticipant>();
 
@@ -134,7 +226,57 @@ namespace planner_auth_service.Infrastructure.Service
                 Participants = result
             };
 
-            _notifyService.Publish(createChatEvent, PublishEvent.InitChat);
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
+        private async Task<ServiceResponse<object>> HandleGoogleTokenRequest(string message)
+        {
+            using var scope = _serviceFactory.CreateScope();
+            var accountRepository = scope.ServiceProvider.GetRequiredService<IAccountRepository>();
+            var username = JsonSerializer.Deserialize<string>(message);
+            if (string.IsNullOrEmpty(username))
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            var user = (await accountRepository.GetAccountsByPatternIdentifier(username)).FirstOrDefault();
+
+            if (user == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Пользователя не существует" }
+                };
+
+            var googleToken = await accountRepository.GetGoogleTokenAsync(user.Id);
+
+            if (googleToken == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Пользователь не добавил Google токен" }
+                };
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = googleToken.ToBody()
+            };
+        }
+
+        private string GetQueueName(string exchange)
+        {
+            return exchange + "_auth";
         }
 
         public override void Dispose()

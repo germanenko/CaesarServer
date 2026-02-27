@@ -43,6 +43,7 @@ void ConfigureServices(IServiceCollection services)
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
+    var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -118,9 +119,11 @@ void ConfigureServices(IServiceCollection services)
             getUsersWithEnabledNotifications,
             checkAccessExchange,
             sendNotificationExchange,
+            getGoogleTokenExchange,
             sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
         ));
 
+    services.AddHostedService<GmailReaderService>();
     services.AddHostedService(e => new RabbitMqService(
         e.GetRequiredService<IServiceScopeFactory>(),
         e.GetRequiredService<INotifyService>(),

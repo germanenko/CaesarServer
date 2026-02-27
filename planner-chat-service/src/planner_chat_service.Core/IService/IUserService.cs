@@ -5,5 +5,6 @@ namespace planner_chat_service.Core.IService
     public interface IUserService
     {
         Task<ProfileBody?> GetUserData(Guid userId);
+        Task<ProfileBody?> GetUserData(string identifier);
     }
 }

@@ -23,6 +23,7 @@ namespace planner_chat_service.Infrastructure.Service
         private readonly string _getNotificationSettings;
         private readonly string _checkAccess;
         private readonly string _sendNotification;
+        private readonly string _getGoogleToken;
 
         private readonly List<string> _exchanges = new List<string>();
 
@@ -36,6 +37,7 @@ namespace planner_chat_service.Infrastructure.Service
             string getUsersWithEnabledNotifications,
             string checkAccess,
             string sendNotification,
+            string getGoogleToken,
             ILogger<RabbitMqNotifyService> logger)
         {
             _logger = logger;
@@ -49,8 +51,9 @@ namespace planner_chat_service.Infrastructure.Service
             _getNotificationSettings = getUsersWithEnabledNotifications;
             _checkAccess = checkAccess;
             _sendNotification = sendNotification;
+            _getGoogleToken = getGoogleToken;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess, _sendNotification });
+            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess, _sendNotification, _getGoogleToken });
 
             ExchangeDeclare();
         }
@@ -215,6 +218,7 @@ namespace planner_chat_service.Infrastructure.Service
                 PublishEvent.GetNotificationSettings => _getNotificationSettings,
                 PublishEvent.CheckAccess => _checkAccess,
                 PublishEvent.SendNotification => _sendNotification,
+                PublishEvent.GetGoogleToken => _getGoogleToken,
                 _ => throw new ArgumentException("Invalid event type")
             };
         }

@@ -76,7 +76,7 @@ void ConfigureServices(IServiceCollection services)
     var mailCredentialsQueueName = GetEnvVar("RABBITMQ_MAIL_CREDENTIALS_QUEUE_NAME");
     var profileImageQueueName = GetEnvVar("RABBITMQ_PROFILE_IMAGE_QUEUE_NAME");
     var createChatQueueName = GetEnvVar("RABBITMQ_CREATE_CHAT_QUEUE_NAME");
-    var initChatQueue = GetEnvVar("RABBITMQ_INIT_CHAT_QUEUE_NAME");
+    var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
 
     services.AddControllers(e =>
     {
@@ -171,7 +171,7 @@ void ConfigureServices(IServiceCollection services)
     //    sp.GetRequiredService<ILogger<EmailService>>()));
 
     services.AddSingleton<IHashPasswordService, HashPasswordService>(sp => new HashPasswordService(passwordHashKey));
-    services.AddSingleton<RabbitMqService>(provider =>
+    services.AddSingleton(provider =>
         {
             var scopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
             return new RabbitMqService(
@@ -181,7 +181,9 @@ void ConfigureServices(IServiceCollection services)
                 rabbitMqPassword,
                 profileImageQueueName,
                 createChatQueueName,
-                provider.GetRequiredService<INotifyService>()
+                getGoogleTokenExchange,
+                provider.GetRequiredService<INotifyService>(),
+                provider.GetRequiredService<ILogger<RabbitMqService>>()
             );
         });
     services.AddScoped<IUserService, UserService>();
@@ -190,7 +192,6 @@ void ConfigureServices(IServiceCollection services)
         rabbitMqHostname,
         rabbitMqUserName,
         rabbitMqPassword,
-        initChatQueue,
         mailCredentialsQueueName
     ));
 
