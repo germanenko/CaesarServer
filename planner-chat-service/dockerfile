@@ -17,4 +17,10 @@ FROM mcr.microsoft.com/dotnet/aspnet:7.0
 WORKDIR /App
 COPY --from=build-env /App/out .
 COPY --from=build-env /App/key.json .
+
+RUN echo "=== Проверка файлов в финальном образе ===" && \
+    ls -la /App/ && \
+    echo "=== Поиск key.json ===" && \
+    find /App -name "key.json" -ls || echo "key.json не найден!"
+
 ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]
