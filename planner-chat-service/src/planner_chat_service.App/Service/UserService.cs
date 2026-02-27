@@ -68,9 +68,9 @@ namespace planner_chat_service.App.Service
 
                     _logger.LogInformation(content);
 
-                    var user = JsonSerializer.Deserialize<ProfileBody>(content);
+                    var user = JsonSerializer.Deserialize<List<ProfileBody>>(content);
 
-                    return user;
+                    return user.FirstOrDefault();
                 }
                 else
                 {
