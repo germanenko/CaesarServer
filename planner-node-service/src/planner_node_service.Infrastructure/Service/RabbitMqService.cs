@@ -26,7 +26,7 @@ namespace planner_node_service.Infrastructure.Service
         private readonly string _userName;
         private readonly string _password;
 
-        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
+        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)> _queues;
 
         public RabbitMqService(
             IWebSocketService notificationService,

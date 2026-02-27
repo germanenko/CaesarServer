@@ -268,17 +268,17 @@ namespace planner_auth_service.App.Service
                 return null;
 
             var session = await _accountRepository.AddSessionAsync(deviceId, account);
-            if (session != null)
-            {
-                var initChatEvent = new InitChatEvent
-                {
-                    AccountId = account.Id,
-                    SessionIds = new List<Guid> { session.Id }
-                };
-                _notifyService.Publish(initChatEvent, PublishEvent.InitChat);
-            }
-            else
-                session = await _accountRepository.GetSessionAsync(account.Id, deviceId);
+            //if (session != null)
+            //{
+            //    var initChatEvent = new InitChatEvent
+            //    {
+            //        AccountId = account.Id,
+            //        SessionIds = new List<Guid> { session.Id }
+            //    };
+            //    _notifyService.Publish(initChatEvent, PublishEvent.InitChat);
+            //}
+            //else
+            session = await _accountRepository.GetSessionAsync(account.Id, deviceId);
             return session?.Id;
         }
 
