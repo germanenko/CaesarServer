@@ -8,10 +8,12 @@ namespace planner_file_service.App.Service
     public class LocalFileUploaderService : IFileUploaderService
     {
         private readonly ContentInspector _contentInspector;
+        private readonly INotifyService _notifyService;
 
-        public LocalFileUploaderService(ContentInspector contentInspector)
+        public LocalFileUploaderService(ContentInspector contentInspector, INotifyService notifyService)
         {
             _contentInspector = contentInspector;
+            _notifyService = notifyService;
         }
 
         public async Task<ServiceResponse<string>> UploadFileAsync(string directoryPath, Stream stream, string[] supportedExtensions)
