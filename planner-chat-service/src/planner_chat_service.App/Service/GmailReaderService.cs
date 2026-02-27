@@ -157,7 +157,8 @@ namespace planner_chat_service.App.Service
                         if (receiver != null)
                         {
                             _logger.LogInformation("Sending from email to chat");
-                            await chatService.SendMessage(googleTokenBody.AccountId, null, receiver.Id, $"Тема письма: {m.Payload.Headers.Where(x => x.Name == "Subject").First().Value}\n{m.Snippet}");
+                            var result = await chatService.SendMessage(googleTokenBody.AccountId, null, receiver.Id, $"Тема письма: {m.Payload.Headers.Where(x => x.Name == "Subject").First().Value}\n{m.Snippet}");
+                            _logger.LogInformation($"sending result: {result}");
                         }
                     }
 
