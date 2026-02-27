@@ -6,6 +6,7 @@ using Google.Apis.Gmail.v1.Data;
 using Google.Apis.Services;
 using Google.Apis.Util.Store;
 using Google.Cloud.PubSub.V1;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.IService;
@@ -17,15 +18,11 @@ namespace planner_chat_service.App.Service
 {
     public class GmailReaderService : BackgroundService
     {
-        private readonly IChatService _chatService;
-        private readonly INotifyService _notifyService;
-        private readonly IUserService _userService;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly ILogger<GmailReaderService> _logger;
-        public GmailReaderService(IChatService chatService, INotifyService notifyService, IUserService userService, ILogger<GmailReaderService> logger)
+        public GmailReaderService(IServiceScopeFactory serviceFactory, ILogger<GmailReaderService> logger)
         {
-            _chatService = chatService;
-            _notifyService = notifyService;
-            _userService = userService;
+            _scopeFactory = serviceFactory;
             _logger = logger;
         }
 
@@ -97,7 +94,15 @@ namespace planner_chat_service.App.Service
                     emailAddress = eElem.GetRawText().Trim('"');
                 }
 
-                var googleToken = await _notifyService.Publish(emailAddress, PublishEvent.GetGoogleToken);
+                ServiceResponse<object> googleToken = new ServiceResponse<object>();
+
+                using (var scope = _scopeFactory.CreateScope())
+                {
+                    var notifyService = scope.ServiceProvider.GetRequiredService<INotifyService>();
+
+                    googleToken = await notifyService.Publish(emailAddress, PublishEvent.GetGoogleToken);
+                }
+
                 GoogleTokenBody googleTokenBody = new GoogleTokenBody();
                 if (googleToken?.IsSuccess == true && googleToken.Body != null)
                 {
@@ -142,9 +147,16 @@ namespace planner_chat_service.App.Service
 
                     var receiverEmail = m.Payload.Headers.Where(x => x.Name == "To").First().Value;
 
-                    var receiver = await _userService.GetUserData(receiverEmail);
+                    using (var scope = _scopeFactory.CreateScope())
+                    {
+                        var userService = scope.ServiceProvider.GetRequiredService<IUserService>();
+                        var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
 
-                    if (receiver != null) await _chatService.SendMessage(googleTokenBody.AccountId, null, receiver.Id, $"Тема письма: {m.Payload.Headers.Where(x => x.Name == "Subject").First().Value}\n{m.Snippet}");
+                        var receiver = await userService.GetUserData(receiverEmail);
+
+                        if (receiver != null) await chatService.SendMessage(googleTokenBody.AccountId, null, receiver.Id, $"Тема письма: {m.Payload.Headers.Where(x => x.Name == "Subject").First().Value}\n{m.Snippet}");
+                    }
+
                 }
                 catch (Exception ex)
                 {
