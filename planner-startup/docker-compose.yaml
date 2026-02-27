@@ -26,6 +26,8 @@ services:
       service: planner-mail-credentials-db
 
   planner-chat-service:
+    volumes:
+        - /root/CaesarServer/planner-chat-service/key.json:/App/key.json:ro
     extends:
       file: services/chat-service.yaml
       service: planner-chat-service
