@@ -66,8 +66,6 @@ namespace planner_chat_service.App.Service
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    _logger.LogInformation(content);
-
                     var user = JsonSerializer.Deserialize<List<ProfileBody>>(content);
 
                     return user.FirstOrDefault();
