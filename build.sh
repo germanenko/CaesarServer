@@ -85,14 +85,14 @@ build_service() {
     # Собираем образ
     # Важно! Запускаем из корневой директории, где находятся все сервисы
     # и родительская директория (..) содержит NuGet.config и nuget-local
-    cd ..
+    cd "$service"
     
-    docker build -f "$service/dockerfile" -t "$service" ..
+    ./build.sh
     
     local build_result=$?
     
     # Возвращаемся в исходную директорию
-    cd - > /dev/null
+    cd ..
     
     if [ $build_result -eq 0 ]; then
         echo -e "${GREEN}✓ $service успешно собран${NC}"
