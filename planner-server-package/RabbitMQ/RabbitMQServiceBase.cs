@@ -91,19 +91,12 @@ namespace planner_server_package.RabbitMQ
                 { "x-dead-letter-routing-key", "" }
             };
 
-            try
-            {
-                _channel.QueueDeclarePassive(queue);
-            }
-            catch (OperationInterruptedException)
-            {
-                _channel.QueueDeclare(
-                    queue: queue,
-                    durable: true,
-                    exclusive: false,
-                    autoDelete: false,
-                    arguments: args);
-            }
+            _channel.QueueDeclare(
+                queue: queue,
+                durable: true,
+                exclusive: false,
+                autoDelete: false,
+                arguments: args);
 
             _channel.QueueBind(
                 queue: queue,
