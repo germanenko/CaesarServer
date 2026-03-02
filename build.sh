@@ -11,9 +11,6 @@ NC='\033[0m' # No Color
 check_prerequisites() {
     echo -e "${YELLOW}Проверка необходимых файлов в родительской директории...${NC}"
     
-    # Переходим в родительскую директорию
-    cd ..
-    
     # Проверяем наличие NuGet.config
     if [ ! -f "NuGet.config" ]; then
         echo -e "${YELLOW}NuGet.config не найден, создаю базовый...${NC}"
