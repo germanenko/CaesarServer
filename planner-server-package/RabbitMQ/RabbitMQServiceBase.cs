@@ -5,6 +5,7 @@ using planner_server_package.Entities;
 using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -90,12 +91,19 @@ namespace planner_server_package.RabbitMQ
                 { "x-dead-letter-routing-key", "" }
             };
 
-            _channel.QueueDeclare(
-                queue: queue,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: args);
+            try
+            {
+                _channel.QueueDeclarePassive(queue);
+            }
+            catch (OperationInterruptedException)
+            {
+                _channel.QueueDeclare(
+                    queue: queue,
+                    durable: true,
+                    exclusive: false,
+                    autoDelete: false,
+                    arguments: args);
+            }
 
             _channel.QueueBind(
                 queue: queue,
