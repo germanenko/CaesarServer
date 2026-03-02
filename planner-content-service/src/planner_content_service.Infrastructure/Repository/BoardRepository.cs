@@ -9,6 +9,7 @@ using planner_content_service.Infrastructure.Data;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Diagnostics;
 
 namespace planner_content_service.Infrastructure.Repository
@@ -16,13 +17,13 @@ namespace planner_content_service.Infrastructure.Repository
     public class BoardRepository : IBoardRepository
     {
         private readonly ContentDbContext _context;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly ILogger<BoardRepository> _logger;
 
-        public BoardRepository(ContentDbContext context, INotifyService notifyService, ILogger<BoardRepository> logger)
+        public BoardRepository(ContentDbContext context, IPublisherService publisherService, ILogger<BoardRepository> logger)
         {
             _context = context;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
             _logger = logger;
         }
 

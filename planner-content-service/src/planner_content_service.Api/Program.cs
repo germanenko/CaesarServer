@@ -11,6 +11,8 @@ using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
 using planner_content_service.Infrastructure.Repository;
 using planner_content_service.Infrastructure.Service;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -114,26 +116,30 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddSingleton<IJwtService, JwtService>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
-        new RabbitMqNotifyService(
+    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
+        new RabbitMQPublisher(
             hostname,
             username,
             password,
-            addAccountsToTaskChatsQueue,
-            createBoardExchange,
-            createColumnExchange,
-            createTaskExchange,
-            checkAccessExchange,
-            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
+            new Dictionary<PublishEvent, string> {
+                { PublishEvent.AddAccountsToTaskChats, addAccountsToTaskChatsQueue },
+                { PublishEvent.CreateBoard, createBoardExchange },
+                { PublishEvent.CreateColumn, createColumnExchange },
+                { PublishEvent.CreateTask, createTaskExchange },
+                { PublishEvent.CheckAccess, checkAccessExchange }
+            },
+            sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
     services.AddHostedService(sp => new RabbitMqService
     (
         sp.GetRequiredService<IServiceScopeFactory>(),
-        sp.GetRequiredService<INotifyService>(),
         hostname,
         username,
         password,
+        "_content",
+        sp.GetRequiredService<IPublisherService>(),
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
         contentNodesExchange
     ));
 }

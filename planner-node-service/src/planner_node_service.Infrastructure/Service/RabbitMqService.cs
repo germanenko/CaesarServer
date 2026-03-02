@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
@@ -7,35 +6,26 @@ using planner_node_service.Core.IService;
 using planner_server_package.Converters;
 using planner_server_package.Entities;
 using planner_server_package.Events;
-using RabbitMQ.Client;
-using RabbitMQ.Client.Events;
-using System.Text;
+using planner_server_package.RabbitMQ;
 using System.Text.Json;
 
 namespace planner_node_service.Infrastructure.Service
 {
-    public class RabbitMqService : BackgroundService
+    public class RabbitMqService : RabbitMQServiceBase
     {
-        private IConnection _connection;
-        private IModel _channel;
         private readonly IWebSocketService _notificationService;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly IServiceScopeFactory _scopeFactory;
-        private ILogger<RabbitMqService> _logger;
-        private readonly string _hostname;
-        private readonly string _userName;
-        private readonly string _password;
-
-        private readonly Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)> _queues;
 
         public RabbitMqService(
-            IWebSocketService notificationService,
-            INotifyService notifyService,
-            ILogger<RabbitMqService> logger,
-            IServiceScopeFactory scopeFactory,
+            IServiceScopeFactory serviceFactory,
             string hostname,
             string userName,
             string password,
+            string prefix,
+            IPublisherService publisherService,
+            ILogger<RabbitMQServiceBase> logger,
+            IWebSocketService notificationService,
             string queue,
             string createPersonalChatQueue,
             string createBoard,
@@ -43,145 +33,23 @@ namespace planner_node_service.Infrastructure.Service
             string createTask,
             string getUsersWithEnabledNotifications,
             string checkAccess)
+            : base(hostname, userName, password, prefix, logger)
         {
-            _hostname = hostname;
-            _userName = userName;
-            _password = password;
-            _logger = logger;
+            _scopeFactory = serviceFactory;
 
-            _scopeFactory = scopeFactory;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
 
             _notificationService = notificationService;
 
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task<ServiceResponse<object>>> Handler)>
-            {
-                { queue, (QueueName: GetQueueName(queue), Handler: HandleSendMessage) },
-                { createPersonalChatQueue, (QueueName: GetQueueName(createPersonalChatQueue), Handler: HandleNewChat) },
-                { createBoard, (QueueName: GetQueueName(createBoard), Handler: HandleNewBoard) },
-                { createColumn, (QueueName: GetQueueName(createColumn), Handler: HandleNewColumn) },
-                { createTask, (QueueName: GetQueueName(createTask), Handler: HandleNewTask) },
-                { getUsersWithEnabledNotifications, (QueueName: GetQueueName(getUsersWithEnabledNotifications), Handler: HandleGetNotificationSettings) },
-                { checkAccess, (QueueName: GetQueueName(checkAccess), Handler: CheckAccess) }
-            };
+            AddQueue(queue, HandleSendMessage);
+            AddQueue(createPersonalChatQueue, HandleNewChat);
+            AddQueue(createBoard, HandleNewBoard);
+            AddQueue(createColumn, HandleNewColumn);
+            AddQueue(createTask, HandleNewTask);
+            AddQueue(getUsersWithEnabledNotifications, HandleGetNotificationSettings);
+            AddQueue(checkAccess, CheckAccess);
 
             InitializeRabbitMQ();
-        }
-
-        private void InitializeRabbitMQ()
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = _hostname,
-                UserName = _userName,
-                Password = _password,
-                DispatchConsumersAsync = true
-            };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-
-            _channel.ExchangeDeclare(
-                exchange: "dlx-exchange",
-                type: ExchangeType.Direct,
-                durable: true,
-                autoDelete: false,
-                arguments: null);
-
-            _channel.QueueDeclare(
-                queue: "dead-letter-queue",
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            _channel.QueueBind(
-                queue: "dead-letter-queue",
-                exchange: "dlx-exchange",
-                routingKey: "");
-
-            foreach (var queue in _queues)
-            {
-                DeclareQueue(queue.Key, queue.Value.QueueName);
-            }
-        }
-
-        private void DeclareQueue(string exchange, string queue)
-        {
-            var args = new Dictionary<string, object>
-            {
-                { "x-dead-letter-exchange", "dlx-exchange" },
-                { "x-dead-letter-routing-key", "" }
-            };
-
-            _channel.QueueDeclare(
-                queue: queue,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: args);
-
-            _channel.QueueBind(
-                queue: queue,
-                exchange: exchange,
-                routingKey: "");
-        }
-
-        private void ConsumeQueue(string queueName, Func<string, Task<ServiceResponse<object>>> handler)
-        {
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-
-            consumer.Received += async (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-
-                try
-                {
-                    var result = await handler(message);
-
-                    if (!string.IsNullOrEmpty(ea.BasicProperties.ReplyTo))
-                    {
-
-                        var responseBody = Encoding.UTF8.GetBytes(
-                            JsonSerializer.Serialize(result)
-                        );
-
-                        var replyProps = _channel.CreateBasicProperties();
-                        replyProps.CorrelationId = ea.BasicProperties.CorrelationId;
-
-                        _channel.BasicPublish(
-                            exchange: "",
-                            routingKey: ea.BasicProperties.ReplyTo,
-                            basicProperties: replyProps,
-                            body: responseBody
-                        );
-                    }
-
-
-                    _channel.BasicAck(ea.DeliveryTag, false);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error while receive message");
-                    _channel.BasicNack(ea.DeliveryTag, false, false);
-                }
-            };
-            _channel.BasicConsume(queue: queueName, autoAck: false, consumer: consumer);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            foreach (var func in _queues)
-            {
-                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
-            }
-
-            //ConsumeQueue(_messageSentToChatQueue, HandleSendMessage);
-            //ConsumeQueue(_createPersonalChatQueue, HandleNewChat);
-
-            await Task.CompletedTask;
         }
 
         private async Task<ServiceResponse<object>> HandleSendMessage(string message)
@@ -565,11 +433,6 @@ namespace planner_node_service.Infrastructure.Service
                 AccountId = accountSessions.AccountId,
                 SessionIds = sessionsNotReceiveMessage.ToList()
             } : null;
-        }
-
-        private string GetQueueName(string exchange)
-        {
-            return exchange + "_node";
         }
     }
 }

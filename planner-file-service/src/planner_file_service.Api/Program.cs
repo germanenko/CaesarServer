@@ -7,7 +7,8 @@ using MimeDetective;
 using MimeDetective.Definitions.Licensing;
 using planner_file_service.App.Service;
 using planner_file_service.Core.IService;
-using planner_file_service.Infrastructure.Service;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.IO.Compression;
 using System.Text;
@@ -82,28 +83,24 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
-        new RabbitMqNotifyService(
+    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
+        new RabbitMQPublisher(
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
-            rabbitMqProfileImageQueue,
-            rabbitMqChatImageQueue,
-            rabbitMqChatAttachmentQueue,
-            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
+            new Dictionary<PublishEvent, string>
+            {
+                { PublishEvent.UpdateProfileImage, rabbitMqProfileImageQueue },
+                { PublishEvent.UpdateChatImage, rabbitMqChatImageQueue },
+                { PublishEvent.SentFileToChat, rabbitMqChatAttachmentQueue },
+            },
+            sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
     services.AddSingleton<IFileUploaderService, LocalFileUploaderService>();
     services.AddSingleton<IJwtService, JwtService>();
 
     services.AddSingleton(fileInspector);
-
-    services.AddHostedService(e => new RabbitMqService(
-        e.GetRequiredService<INotifyService>(),
-        rabbitMqHostname,
-        rabbitMqUsername,
-        rabbitMqPassword
-    ));
 }
 
 WebApplication ConfigureApplication(WebApplication app)

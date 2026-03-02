@@ -1,4 +1,3 @@
-using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +8,7 @@ using planner_mailbox_service.Core.IService;
 using planner_mailbox_service.Infrastructure.Data;
 using planner_mailbox_service.Infrastructure.Service;
 using Swashbuckle.AspNetCore.Filters;
+using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
@@ -98,12 +98,14 @@ void ConfigureServices(IServiceCollection services)
         mailRuClientSecret,
         mailRuRedirectUri));
     services.AddSingleton<ITokenService, TokenService>();
-    services.AddHostedService<RabbitMqService>(sp => new RabbitMqService(
+    services.AddHostedService(sp => new RabbitMqService(
         sp.GetRequiredService<IServiceScopeFactory>(),
         hostname,
-        queueName,
         userName,
-        password
+        password,
+        "_mail",
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
+        queueName
     ));
 }
 

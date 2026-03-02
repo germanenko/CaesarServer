@@ -1,7 +1,8 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using planner_common_package.Entities;
 using planner_mailbox_service.Core.Entities.Response;
 using planner_mailbox_service.Core.IService;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 
 namespace planner_mailbox_service.App.Service
 {

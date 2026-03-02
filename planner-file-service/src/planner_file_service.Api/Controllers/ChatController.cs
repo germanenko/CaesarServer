@@ -1,10 +1,11 @@
-using System.ComponentModel.DataAnnotations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_file_service.Core;
-using planner_file_service.Core.Enums;
 using planner_file_service.Core.IService;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Annotations;
+using System.ComponentModel.DataAnnotations;
 
 namespace planner_file_service.Api.Controllers
 {
@@ -13,7 +14,7 @@ namespace planner_file_service.Api.Controllers
     public class ChatController : ControllerBase
     {
         private readonly IFileUploaderService _fileUploaderService;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly IJwtService _jwtService;
         private readonly string[] _supportedImageExtensions = new string[]
         {
@@ -27,11 +28,11 @@ namespace planner_file_service.Api.Controllers
 
         public ChatController(
             IFileUploaderService fileUploaderService,
-            INotifyService notifyService,
+            IPublisherService publisherService,
             IJwtService jwtService)
         {
             _fileUploaderService = fileUploaderService;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
             _jwtService = jwtService;
         }
 
@@ -57,7 +58,7 @@ namespace planner_file_service.Api.Controllers
                 FileName = uploadResult.Body,
                 AccountId = accountId
             };
-            _notifyService.Publish(body, ContentUploaded.ChatAttachment);
+            await _publisherService.Publish(body, PublishEvent.SentFileToChat);
             return Ok();
         }
 
@@ -93,7 +94,7 @@ namespace planner_file_service.Api.Controllers
                 ChatId = chatId,
                 FileName = uploadResult.Body
             };
-            _notifyService.Publish(body, ContentUploaded.ChatImage);
+            await _publisherService.Publish(body, PublishEvent.UpdateChatImage);
             return Ok();
         }
 

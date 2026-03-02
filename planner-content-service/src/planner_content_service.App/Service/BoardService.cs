@@ -5,6 +5,7 @@ using planner_content_service.Core.IService;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Net;
 
 namespace planner_content_service.App.Service
@@ -12,12 +13,12 @@ namespace planner_content_service.App.Service
     public class BoardService : IBoardService
     {
         private readonly IBoardRepository _boardRepository;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
 
-        public BoardService(IBoardRepository boardRepository, INotifyService notifyService)
+        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService)
         {
             _boardRepository = boardRepository;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
         }
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
@@ -28,7 +29,7 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _notifyService.Publish(columnEvent, PublishEvent.CreateColumn);
+            var nodeComplete = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -71,7 +72,7 @@ namespace planner_content_service.App.Service
                     NodeId = column.Id
                 };
 
-                var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+                var hasAccess = await _publisherService.Publish(checkAccess, PublishEvent.CheckAccess);
 
                 if (hasAccess.IsSuccess)
                 {
@@ -106,7 +107,7 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _notifyService.Publish(boardEvent, PublishEvent.CreateBoard);
+            var nodeComplete = await _publisherService.Publish(boardEvent, PublishEvent.CreateBoard);
 
             if (!nodeComplete.IsSuccess)
             {

@@ -1,95 +1,64 @@
-using System.Text;
-using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using planner_mailbox_service.Core.Entities.Models;
 using planner_mailbox_service.Core.Entities.Request;
 using planner_mailbox_service.Infrastructure.Data;
+using planner_server_package.Entities;
+using planner_server_package.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System.Text;
+using System.Text.Json;
 
 namespace planner_mailbox_service.Infrastructure.Service
 {
-    public class RabbitMqService : BackgroundService
+    public class RabbitMqService : RabbitMQServiceBase
     {
-        private IConnection _connection;
-        private IModel _channel;
-        private readonly IServiceScopeFactory _serviceFactory;
-        private readonly string _hostname;
-        private readonly string _queueName;
-        private readonly string _userName;
-        private readonly string _password;
+        private readonly IServiceScopeFactory _scopeFactory;
 
         public RabbitMqService(
-            IServiceScopeFactory serviceFactory,
+            IServiceScopeFactory scopeFactory,
             string hostname,
-            string queueName,
             string userName,
-            string password)
+            string password,
+            string prefix,
+            ILogger<RabbitMQServiceBase> logger,
+            string queueName)
+            : base(hostname, userName, password, prefix, logger)
         {
-            _hostname = hostname;
-            _queueName = queueName;
-            _userName = userName;
-            _password = password;
-            _serviceFactory = serviceFactory;
+            _scopeFactory = scopeFactory;
+
+            AddQueue(queueName, HandleMessageAsync);
 
             InitializeRabbitMQ();
         }
 
-        private void InitializeRabbitMQ()
+
+        private async Task<ServiceResponse<object>> HandleMessageAsync(string message)
         {
-            var factory = new ConnectionFactory()
-            {
-                HostName = _hostname,
-                UserName = _userName,
-                Password = _password,
-                DispatchConsumersAsync = true
-            };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-            _channel.QueueDeclare(
-                queue: _queueName,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                await HandleMessageAsync(message);
-            };
-
-            _channel.BasicConsume(
-                queue: _queueName,
-                autoAck: true,
-                consumer: consumer);
-
-            await Task.CompletedTask;
-        }
-
-        private async Task HandleMessageAsync(string message)
-        {
-            using var scope = _serviceFactory.CreateScope();
+            using var scope = _scopeFactory.CreateScope();
             using var context = scope.ServiceProvider.GetRequiredService<AccountCredentialsDbContext>();
             var mailCredentials = JsonSerializer.Deserialize<AccountMailCredentialsDto>(message);
 
             if (mailCredentials == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
 
 
             var account = await context.MailCredentials.FirstOrDefaultAsync(x => x.Email == mailCredentials.Email
                                                                                  && x.EmailProvider == mailCredentials.EmailProvider.ToString());
             if (account != null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK
+                };
 
             account = new AccountMailCredentials
             {
@@ -102,13 +71,12 @@ namespace planner_mailbox_service.Infrastructure.Service
 
             await context.MailCredentials.AddAsync(account);
             await context.SaveChangesAsync();
-        }
 
-        public override void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
     }
 }

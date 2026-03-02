@@ -12,6 +12,8 @@ using planner_node_service.Core.IService;
 using planner_node_service.Infrastructure.Data;
 using planner_node_service.Infrastructure.Repository;
 using planner_node_service.Infrastructure.Service;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -111,13 +113,16 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IWebSocketService, WebSocketService>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
-        new RabbitMqNotifyService(
+    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
+        new RabbitMQPublisher(
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
-            contentNodesExchange,
-            chatNodesExchange
+            new Dictionary<PublishEvent, string> {
+                { PublishEvent.ContentNodes, contentNodesExchange },
+                { PublishEvent.ChatNodes, chatNodesExchange },
+            },
+            sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
     services.AddScoped<INodeService, NodeService>();
@@ -131,13 +136,14 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INotificationRepository, NotificationRepository>();
 
     services.AddHostedService(sp => new RabbitMqService(
-        sp.GetRequiredService<IWebSocketService>(),
-        sp.GetRequiredService<INotifyService>(),
-        sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<IServiceScopeFactory>(),
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
+        "_node",
+        sp.GetRequiredService<IPublisherService>(),
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
+        sp.GetRequiredService<IWebSocketService>(),
         messageSentToChatQueue,
         createPersonalChatQueue,
         createBoardExchange,

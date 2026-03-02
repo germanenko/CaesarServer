@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_file_service.Core;
-using planner_file_service.Core.Enums;
 using planner_file_service.Core.IService;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace planner_file_service.Api.Controllers
@@ -12,7 +13,7 @@ namespace planner_file_service.Api.Controllers
     public class ProfileController : ControllerBase
     {
         private readonly IFileUploaderService _fileUploaderService;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly IJwtService _jwtService;
         private readonly string[] _supportedImageExtensions = new string[]
         {
@@ -26,11 +27,11 @@ namespace planner_file_service.Api.Controllers
 
         public ProfileController(
             IFileUploaderService fileUploaderService,
-            INotifyService notifyService,
+            IPublisherService notifyService,
             IJwtService jwtService)
         {
             _fileUploaderService = fileUploaderService;
-            _notifyService = notifyService;
+            _publisherService = notifyService;
             _jwtService = jwtService;
         }
 
@@ -54,7 +55,7 @@ namespace planner_file_service.Api.Controllers
                 tokenPayload.AccountId,
                 FileName = uploadResult.Body
             };
-            _notifyService.Publish(body, ContentUploaded.ProfileImage);
+            await _publisherService.Publish(body, PublishEvent.UpdateProfileImage);
             return Ok();
         }
 

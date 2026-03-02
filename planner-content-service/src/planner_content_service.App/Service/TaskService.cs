@@ -6,6 +6,7 @@ using planner_content_service.Core.IService;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -14,15 +15,15 @@ namespace planner_content_service.App.Service
     public class TaskService : ITaskService
     {
         private readonly ITaskRepository _taskRepository;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
-            INotifyService notifyService)
+            IPublisherService publisherService)
         {
             _taskRepository = taskRepository;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
         }
 
         public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, TaskBody taskBody)
@@ -45,7 +46,7 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _notifyService.Publish(taskEvent, PublishEvent.CreateTask);
+            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateTask);
 
             if (!nodeComplete.IsSuccess)
             {

@@ -8,6 +8,7 @@ using planner_content_service.Infrastructure.Data;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Text.Json;
 
 namespace planner_content_service.Infrastructure.Repository
@@ -15,12 +16,12 @@ namespace planner_content_service.Infrastructure.Repository
     public class TaskRepository : ITaskRepository
     {
         private readonly ContentDbContext _context;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
 
-        public TaskRepository(ContentDbContext context, INotifyService notifyService)
+        public TaskRepository(ContentDbContext context, IPublisherService publisherService)
         {
             _context = context;
-            _notifyService = notifyService;
+            _publisherService = publisherService;
         }
 
         public async Task<TaskBody?> AddAsync

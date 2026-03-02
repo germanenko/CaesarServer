@@ -1,13 +1,14 @@
-using System.Net;
 using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Logging;
 using MimeKit;
+using planner_client_package.Entities;
 using planner_mailbox_service.Core.Entities.Response;
 using planner_mailbox_service.Core.Enums;
 using planner_mailbox_service.Core.IService;
+using System.Net;
 
 namespace planner_mailbox_service.App.Service
 {

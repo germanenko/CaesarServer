@@ -9,6 +9,7 @@ using planner_common_package.Enums;
 using planner_server_package.Entities;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Net.Mime;
 using System.Text.RegularExpressions;
@@ -20,7 +21,7 @@ namespace planner_auth_service.App.Service
         private readonly IAccountRepository _accountRepository;
         private readonly IJwtService _jwtService;
         private readonly IHashPasswordService _hashPasswordService;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly ILogger<AuthService> _logger;
 
         public AuthService
@@ -28,14 +29,14 @@ namespace planner_auth_service.App.Service
             IAccountRepository accountRepository,
             IJwtService jwtService,
             IHashPasswordService hashPasswordService,
-            INotifyService notifyService,
+            IPublisherService notifyService,
             ILogger<AuthService> logger
         )
         {
             _accountRepository = accountRepository;
             _jwtService = jwtService;
             _hashPasswordService = hashPasswordService;
-            _notifyService = notifyService;
+            _publisherService = notifyService;
             _logger = logger;
         }
 
@@ -150,7 +151,7 @@ namespace planner_auth_service.App.Service
                 AccountId = account.Id,
                 EmailProvider = provider
             };
-            _notifyService.Publish(body, PublishEvent.CreateAccountMailCredentials);
+            _publisherService.Publish(body, PublishEvent.CreateAccountMailCredentials);
             return HttpStatusCode.OK;
         }
 

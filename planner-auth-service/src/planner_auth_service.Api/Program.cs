@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_auth_service.Api;
@@ -14,6 +15,8 @@ using planner_auth_service.Core.IService;
 using planner_auth_service.Infrastructure.Data;
 using planner_auth_service.Infrastructure.Repository;
 using planner_auth_service.Infrastructure.Service;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -179,20 +182,22 @@ void ConfigureServices(IServiceCollection services)
                 rabbitMqHostname,
                 rabbitMqUserName,
                 rabbitMqPassword,
+                "_auth",
+                provider.GetRequiredService<IPublisherService>(),
+                provider.GetRequiredService<ILogger<RabbitMqService>>(),
                 profileImageQueueName,
                 createChatQueueName,
-                getGoogleTokenExchange,
-                provider.GetRequiredService<INotifyService>(),
-                provider.GetRequiredService<ILogger<RabbitMqService>>()
+                getGoogleTokenExchange
             );
         });
     services.AddScoped<IUserService, UserService>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp => new RabbitMqNotifyService(
+    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp => new RabbitMQPublisher(
         rabbitMqHostname,
         rabbitMqUserName,
         rabbitMqPassword,
-        mailCredentialsQueueName
+        new Dictionary<PublishEvent, string> { { PublishEvent.CreateAccountMailCredentials, mailCredentialsQueueName } },
+        sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
     ));
 
     services.AddSingleton<IMailRuTokenService, MailRuTokenService>(sp => new MailRuTokenService(

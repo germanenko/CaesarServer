@@ -9,6 +9,7 @@ using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.Interface;
+using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Net.Mime;
 using System.Text.Json;
@@ -22,14 +23,14 @@ namespace planner_node_service.App.Service
     {
         private readonly INodeRepository _nodeRepository;
         private readonly IHistoryRepository _historyRepository;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, INotifyService notifyService, IHistoryRepository historyRepository, ILogger<NodeService> logger)
+            INodeRepository nodeRepository, IPublisherService notifyService, IHistoryRepository historyRepository, ILogger<NodeService> logger)
         {
             _nodeRepository = nodeRepository;
-            _notifyService = notifyService;
+            _publisherService = notifyService;
             _historyRepository = historyRepository;
             _logger = logger;
         }
@@ -162,8 +163,8 @@ namespace planner_node_service.App.Service
                 Bodies = contentBodies
             };
 
-            _notifyService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
-            _notifyService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
+            _publisherService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
+            _publisherService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
 
             return new ServiceResponse<List<NodeBody>>()
             {

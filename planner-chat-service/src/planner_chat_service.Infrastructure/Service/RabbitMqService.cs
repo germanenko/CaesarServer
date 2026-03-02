@@ -18,12 +18,12 @@ namespace planner_chat_service.Infrastructure.Service
 {
     public class RabbitMqService : RabbitMQServiceBase
     {
-        private readonly IServiceScopeFactory _serviceFactory;
+        private readonly IServiceScopeFactory _scopeFactory;
         private readonly IPublisherService _publisherService;
         private readonly IChatConnectionService _chatConnectionService;
 
         public RabbitMqService(
-            IServiceScopeFactory serviceFactory,
+            IServiceScopeFactory scopeFactory,
             string hostname,
             string userName,
             string password,
@@ -34,7 +34,7 @@ namespace planner_chat_service.Infrastructure.Service
             string chatNodesExchange)
             : base(hostname, userName, password, prefix, logger)
         {
-            _serviceFactory = serviceFactory;
+            _scopeFactory = scopeFactory;
 
             _publisherService = publisherService;
 
@@ -47,7 +47,7 @@ namespace planner_chat_service.Infrastructure.Service
 
         private async Task<ServiceResponse<object>> HandleAddAccountToTaskChatMessageAsync(string message)
         {
-            using var scope = _serviceFactory.CreateScope();
+            using var scope = _scopeFactory.CreateScope();
             var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
 
             var addAccountToTaskChatBody = JsonSerializer.Deserialize<AddAccountsToTaskChatsEvent>(message);
@@ -79,7 +79,7 @@ namespace planner_chat_service.Infrastructure.Service
 
         private async Task<ServiceResponse<object>> HandleChatNodes(string message)
         {
-            using var scope = _serviceFactory.CreateScope();
+            using var scope = _scopeFactory.CreateScope();
             var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
             var nodes = JsonSerializer.Deserialize<SyncEntitiesEvent>(message);
             if (nodes == null)

@@ -121,12 +121,13 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddHostedService<TokenCleanupService>();
     services.AddHostedService(sp => new RabbitMqService(
-        sp.GetRequiredService<INotificationService>(),
-        sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<IServiceScopeFactory>(),
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
+        "_notify",
+        sp.GetRequiredService<ILogger<RabbitMqService>>(),
+        sp.GetRequiredService<INotificationService>(),
         messageSentToChatExchange,
         sendNotificationExchange
     ));

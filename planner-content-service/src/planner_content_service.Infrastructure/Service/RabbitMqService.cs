@@ -1,10 +1,12 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using planner_common_package.Enums;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package.Entities;
 using planner_server_package.Events;
+using planner_server_package.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
@@ -12,108 +14,44 @@ using System.Text.Json;
 
 namespace planner_content_service.Infrastructure.Service
 {
-    public class RabbitMqService : BackgroundService
+    public class RabbitMqService : RabbitMQServiceBase
     {
-        private IConnection _connection;
-        private IModel _channel;
         private readonly IServiceScopeFactory _serviceFactory;
-        private readonly INotifyService _notifyService;
-        private readonly string _hostname;
-        private readonly string _userName;
-        private readonly string _password;
-
-        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
+        private readonly IPublisherService _publisherService;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
-            INotifyService notifyService,
             string hostname,
             string userName,
             string password,
+            string prefix,
+            IPublisherService publisherService,
+            ILogger<RabbitMQServiceBase> logger,
             string contentNodes)
+            : base(hostname, userName, password, prefix, logger)
         {
-            _hostname = hostname;
-            _userName = userName;
-            _password = password;
-
-            _notifyService = notifyService;
-
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
-            {
-                { contentNodes, (QueueName: GetQueueName(contentNodes), Handler: HandleContentNodes) }
-            };
-
             _serviceFactory = serviceFactory;
+
+            _publisherService = publisherService;
+
+            AddQueue(contentNodes, HandleContentNodes);
 
             InitializeRabbitMQ();
         }
 
-        private void InitializeRabbitMQ()
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = _hostname,
-                UserName = _userName,
-                Password = _password,
-                DispatchConsumersAsync = true
-            };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
-
-            foreach (var queue in _queues)
-            {
-                DeclareQueue(queue.Key, queue.Value.QueueName);
-            }
-        }
-
-        private void DeclareQueue(string exchange, string queue)
-        {
-            _channel.QueueDeclare(
-                queue: queue,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            _channel.QueueBind(
-                queue: queue,
-                exchange: exchange,
-                routingKey: "");
-        }
-
-        private void ConsumeQueue(string queueName, Func<string, Task> handler)
-        {
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                await handler(message);
-            };
-            _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            foreach (var func in _queues)
-            {
-                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
-            }
-
-            //ConsumeQueue(_createTaskChatResponseQueue, HandleCreateTaskChatResponseMessageAsync);
-            await Task.CompletedTask;
-        }
-
-        private async Task HandleContentNodes(string message)
+        private async Task<ServiceResponse<object>> HandleContentNodes(string message)
         {
             using var scope = _serviceFactory.CreateScope();
             var taskService = scope.ServiceProvider.GetRequiredService<ITaskService>();
             var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
             var response = JsonSerializer.Deserialize<SyncEntitiesEvent>(message);
             if (response == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
 
             var boards = response.Bodies.OfType<BoardBody>().ToList();
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
@@ -162,18 +100,12 @@ namespace planner_content_service.Infrastructure.Service
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
             await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);
             await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
-        }
 
-        private string GetQueueName(string exchange)
-        {
-            return exchange + "_content";
-        }
-
-        public override void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
     }
 }
