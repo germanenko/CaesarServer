@@ -83,19 +83,25 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
-        new RabbitMQPublisher(
+    services.AddSingleton<IPublisherService>(sp =>
+    {
+        var publisher = new RabbitMQPublisher(
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
             new Dictionary<PublishEvent, string>
             {
-                { PublishEvent.UpdateProfileImage, rabbitMqProfileImageQueue },
-                { PublishEvent.UpdateChatImage, rabbitMqChatImageQueue },
-                { PublishEvent.SentFileToChat, rabbitMqChatAttachmentQueue },
+            { PublishEvent.UpdateProfileImage, rabbitMqProfileImageQueue },
+            { PublishEvent.UpdateChatImage, rabbitMqChatImageQueue },
+            { PublishEvent.SentFileToChat, rabbitMqChatAttachmentQueue },
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
-        ));
+        );
+
+        publisher.ExchangeDeclare();
+
+        return publisher;
+    });
 
     services.AddSingleton<IFileUploaderService, LocalFileUploaderService>();
     services.AddSingleton<IJwtService, JwtService>();
