@@ -8,6 +8,7 @@ using planner_common_package.Enums;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Net.WebSockets;
 
@@ -18,7 +19,7 @@ namespace planner_chat_service.App.Service
         private readonly IChatRepository _chatRepository;
         private readonly IChatConnectionService _chatConnectionService;
         private readonly IChatConnector _chatConnector;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _notifyService;
         private readonly IUserService _userService;
         private readonly ILogger<ChatService> _logger;
 
@@ -26,7 +27,7 @@ namespace planner_chat_service.App.Service
             IChatRepository chatRepository,
             IChatConnectionService chatConnectionService,
             IChatConnector chatConnector,
-            INotifyService notifyService,
+            IPublisherService notifyService,
             IUserService userService,
             ILogger<ChatService> logger)
         {

@@ -13,6 +13,8 @@ using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
 using planner_content_service.App.Service;
 using planner_content_service.Infrastructure.Repository;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -108,29 +110,32 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IChatConnector, ChatConnector>();
 
-    services.AddSingleton<INotifyService, RabbitMqNotifyService>(sp =>
-        new RabbitMqNotifyService(
+    services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
+        new RabbitMQPublisher(
             rabbitMqHostname,
             rabbitMqUsername,
             rabbitMqPassword,
-            createChatQueue,
-            messageSentToChatQueue,
-            createPersonalChatQueue,
-            getUsersWithEnabledNotifications,
-            checkAccessExchange,
-            sendNotificationExchange,
-            getGoogleTokenExchange,
-            sp.GetRequiredService<ILogger<RabbitMqNotifyService>>()
+            new Dictionary<PublishEvent, string>() {
+                { PublishEvent.AddAccountToChat, createChatQueue },
+                { PublishEvent.MessageSentToChat, messageSentToChatQueue },
+                { PublishEvent.CreatePersonalChat, createPersonalChatQueue },
+                { PublishEvent.GetNotificationSettings, getUsersWithEnabledNotifications },
+                { PublishEvent.CheckAccess, checkAccessExchange },
+                { PublishEvent.SendNotification, sendNotificationExchange },
+                { PublishEvent.GetGoogleToken, getGoogleTokenExchange },
+            },
+            sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
     services.AddHostedService<GmailReaderService>();
     services.AddHostedService(e => new RabbitMqService(
         e.GetRequiredService<IServiceScopeFactory>(),
-        e.GetRequiredService<INotifyService>(),
-        e.GetRequiredService<IChatConnectionService>(),
         rabbitMqHostname,
         rabbitMqUsername,
         rabbitMqPassword,
+        "_chat",
+        e.GetRequiredService<IPublisherService>(),
+        e.GetRequiredService<ILogger<RabbitMqService>>(),
         addAccountsToTaskChatsQueue,
         chatNodesExchange
     ));

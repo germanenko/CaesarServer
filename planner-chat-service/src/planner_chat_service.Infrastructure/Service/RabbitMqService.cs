@@ -1,11 +1,13 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_common_package.Enums;
 using planner_server_package.Entities;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Net.WebSockets;
@@ -14,127 +16,79 @@ using System.Text.Json;
 
 namespace planner_chat_service.Infrastructure.Service
 {
-    public class RabbitMqService : BackgroundService
+    public class RabbitMqService : RabbitMQServiceBase
     {
-        private IConnection _connection;
-        private IModel _channel;
         private readonly IServiceScopeFactory _serviceFactory;
-        private readonly INotifyService _notifyService;
+        private readonly IPublisherService _publisherService;
         private readonly IChatConnectionService _chatConnectionService;
-        private readonly string _hostname;
-        private readonly string _userName;
-        private readonly string _password;
-
-        private readonly Dictionary<string, (string QueueName, Func<string, Task> Handler)> _queues;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
-            INotifyService notifyService,
-            IChatConnectionService chatConnectionService,
             string hostname,
             string userName,
             string password,
+            string prefix,
+            IPublisherService publisherService,
+            ILogger<RabbitMQServiceBase> logger,
             string chatAddAccountsToTaskChats,
             string chatNodesExchange)
+            : base(hostname, userName, password, prefix, logger)
         {
-            _hostname = hostname;
-            _userName = userName;
-            _password = password;
-
-            _queues = new Dictionary<string, (string QueueName, Func<string, Task> Handler)>
-            {
-                { chatAddAccountsToTaskChats, (QueueName: GetQueueName(chatAddAccountsToTaskChats), Handler: HandleAddAccountToTaskChatMessageAsync) },
-                { chatNodesExchange, (QueueName: GetQueueName(chatNodesExchange), Handler: HandleChatNodes) },
-            };
-
             _serviceFactory = serviceFactory;
-            _notifyService = notifyService;
-            _chatConnectionService = chatConnectionService;
 
+            _publisherService = publisherService;
+
+            AddQueue(chatAddAccountsToTaskChats, HandleAddAccountToTaskChatMessageAsync);
+            AddQueue(chatNodesExchange, HandleChatNodes);
 
             InitializeRabbitMQ();
         }
 
-        private void InitializeRabbitMQ()
-        {
-            var factory = new ConnectionFactory()
-            {
-                HostName = _hostname,
-                UserName = _userName,
-                Password = _password,
-                DispatchConsumersAsync = true
-            };
-            _connection = factory.CreateConnection();
-            _channel = _connection.CreateModel();
 
-            foreach (var queue in _queues)
-            {
-                DeclareQueue(queue.Key, queue.Value.QueueName);
-            }
-        }
-
-        private void DeclareQueue(string exchange, string queue)
-        {
-            _channel.QueueDeclare(
-                queue: queue,
-                durable: true,
-                exclusive: false,
-                autoDelete: false,
-                arguments: null);
-
-            _channel.QueueBind(
-                queue: queue,
-                exchange: exchange,
-                routingKey: "");
-        }
-
-        private void ConsumeQueue(string queueName, Func<string, Task> handler)
-        {
-            var consumer = new AsyncEventingBasicConsumer(_channel);
-            consumer.Received += async (model, ea) =>
-            {
-                var body = ea.Body.ToArray();
-                var message = Encoding.UTF8.GetString(body);
-                await handler(message);
-            };
-            _channel.BasicConsume(queue: queueName, autoAck: true, consumer: consumer);
-        }
-
-        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
-        {
-            stoppingToken.ThrowIfCancellationRequested();
-
-            foreach (var func in _queues)
-            {
-                ConsumeQueue(func.Value.QueueName, func.Value.Handler);
-            }
-
-            await Task.CompletedTask;
-        }
-
-        private async Task HandleAddAccountToTaskChatMessageAsync(string message)
+        private async Task<ServiceResponse<object>> HandleAddAccountToTaskChatMessageAsync(string message)
         {
             using var scope = _serviceFactory.CreateScope();
             var chatRepository = scope.ServiceProvider.GetRequiredService<IChatRepository>();
 
             var addAccountToTaskChatBody = JsonSerializer.Deserialize<AddAccountsToTaskChatsEvent>(message);
             if (addAccountToTaskChatBody == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
 
             if (addAccountToTaskChatBody.AccountIds.Count == 0 || addAccountToTaskChatBody.TaskIds.Count == 0)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Нет аккаунтов или задач" }
+                };
 
             foreach (var taskId in addAccountToTaskChatBody.TaskIds)
                 await chatRepository.CreateChatSettingsAsync(taskId, addAccountToTaskChatBody.AccountIds);
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
 
-        private async Task HandleChatNodes(string message)
+        private async Task<ServiceResponse<object>> HandleChatNodes(string message)
         {
             using var scope = _serviceFactory.CreateScope();
             var chatService = scope.ServiceProvider.GetRequiredService<IChatService>();
             var nodes = JsonSerializer.Deserialize<SyncEntitiesEvent>(message);
             if (nodes == null)
-                return;
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Нет аккаунтов или задач" }
+                };
 
             var chats = nodes.Bodies.OfType<ChatBody>().ToList();
             var messages = nodes.Bodies.OfType<MessageBody>().ToList();
@@ -148,6 +102,12 @@ namespace planner_chat_service.Infrastructure.Service
             {
                 await chatService.SendMessageToChat(chatMessage.SenderId, chatMessage.SenderDeviceId, chatMessage.ChatId, chatMessage.Content);
             }
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
         }
 
 
@@ -222,17 +182,5 @@ namespace planner_chat_service.Infrastructure.Service
 
         //    _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
         //}
-
-        private string GetQueueName(string exchange)
-        {
-            return exchange + "_chat";
-        }
-
-        public override void Dispose()
-        {
-            _channel.Close();
-            _connection.Close();
-            base.Dispose();
-        }
     }
 }

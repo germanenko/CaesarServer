@@ -12,6 +12,7 @@ using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.IService;
 using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Text.Json;
 
 namespace planner_chat_service.App.Service
@@ -98,7 +99,7 @@ namespace planner_chat_service.App.Service
 
                 using (var scope = _scopeFactory.CreateScope())
                 {
-                    var notifyService = scope.ServiceProvider.GetRequiredService<INotifyService>();
+                    var notifyService = scope.ServiceProvider.GetRequiredService<IPublisherService>();
 
                     googleToken = await notifyService.Publish(emailAddress, PublishEvent.GetGoogleToken);
                 }

@@ -1,59 +1,40 @@
-using Microsoft.Extensions.Logging;
-using planner_chat_service.Core.IService;
+Ôªøusing Microsoft.Extensions.Logging;
 using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
+using System;
+using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading.Tasks;
 
-namespace planner_chat_service.Infrastructure.Service
+namespace planner_server_package.RabbitMQ
 {
-    public class RabbitMqNotifyService : INotifyService
+    public class RabbitMQPublisher : IPublisherService
     {
         private readonly string _hostname;
         private readonly string _username;
         private readonly string _password;
 
-        private readonly ILogger<RabbitMqNotifyService> _logger;
+        private readonly ILogger<RabbitMQPublisher> _logger;
 
-        private readonly string _createChatQueueName;
-        private readonly string _messageSentToChatQueueName;
-        private readonly string _createPersonalChatQueueName;
-        private readonly string _getNotificationSettings;
-        private readonly string _checkAccess;
-        private readonly string _sendNotification;
-        private readonly string _getGoogleToken;
+        private readonly Dictionary<PublishEvent, string> _exchanges = new Dictionary<PublishEvent, string>();
 
-        private readonly List<string> _exchanges = new List<string>();
-
-        public RabbitMqNotifyService(
+        public RabbitMQPublisher(
             string hostname,
             string username,
             string password,
-            string createChatQueueName,
-            string messageSentToChatQueueName,
-            string createPersonalChatQueueName,
-            string getUsersWithEnabledNotifications,
-            string checkAccess,
-            string sendNotification,
-            string getGoogleToken,
-            ILogger<RabbitMqNotifyService> logger)
+            Dictionary<PublishEvent, string> exchanges,
+            ILogger<RabbitMQPublisher> logger)
         {
             _logger = logger;
 
             _hostname = hostname;
             _username = username;
             _password = password;
-            _createChatQueueName = createChatQueueName;
-            _messageSentToChatQueueName = messageSentToChatQueueName;
-            _createPersonalChatQueueName = createPersonalChatQueueName;
-            _getNotificationSettings = getUsersWithEnabledNotifications;
-            _checkAccess = checkAccess;
-            _sendNotification = sendNotification;
-            _getGoogleToken = getGoogleToken;
 
-            _exchanges.AddRange(new[] { _createChatQueueName, _messageSentToChatQueueName, _createPersonalChatQueueName, _getNotificationSettings, _checkAccess, _sendNotification, _getGoogleToken });
+            _exchanges = exchanges;
 
             ExchangeDeclare();
         }
@@ -73,7 +54,7 @@ namespace planner_chat_service.Infrastructure.Service
             foreach (var exchange in _exchanges)
             {
                 channel.ExchangeDeclare(
-                    exchange: exchange,
+                    exchange: exchange.Value,
                     type: ExchangeType.Fanout,
                     durable: true,
                     autoDelete: false,
@@ -174,53 +155,17 @@ namespace planner_chat_service.Infrastructure.Service
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
-                    Errors = new[] { "Œ¯Ë·Í‡ ÒÂ‚Â‡" }
+                    Errors = new[] { "–û—à–∏–±–∫–∞ —Å–µ—Ä–≤–µ—Ä–∞" }
                 };
             }
 
             return await tcs.Task;
         }
 
-        //public void Publish<T>(T message, PublishEvent eventType)
-        //{
-        //    var factory = new ConnectionFactory()
-        //    {
-        //        HostName = _hostname,
-        //        UserName = _username,
-        //        Password = _password
-        //    };
-        //    using var connection = factory.CreateConnection();
-        //    using var channel = connection.CreateModel();
-
-        //    var queue = GetExchangeName(eventType);
-
-        //    channel.ExchangeDeclare(exchange: queue,
-        //                         type: ExchangeType.Fanout,
-        //                         durable: true,
-        //                         autoDelete: false,
-        //                         arguments: null);
-
-        //    var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
-
-        //    channel.BasicPublish(exchange: queue,
-        //                         routingKey: "",
-        //                         basicProperties: null,
-        //                         body: body);
-        //}
-
-        private string GetExchangeName(PublishEvent eventType)
+        protected string GetExchangeName(PublishEvent eventType)
         {
-            return eventType switch
-            {
-                PublishEvent.AddAccountToChat => _createChatQueueName,
-                PublishEvent.MessageSentToChat => _messageSentToChatQueueName,
-                PublishEvent.CreatePersonalChat => _createPersonalChatQueueName,
-                PublishEvent.GetNotificationSettings => _getNotificationSettings,
-                PublishEvent.CheckAccess => _checkAccess,
-                PublishEvent.SendNotification => _sendNotification,
-                PublishEvent.GetGoogleToken => _getGoogleToken,
-                _ => throw new ArgumentException("Invalid event type")
-            };
+            if (_exchanges.ContainsKey(eventType)) return _exchanges[eventType];
+            else throw new ArgumentException("Invalid event type");
         }
     }
 }
