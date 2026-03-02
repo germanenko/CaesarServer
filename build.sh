@@ -87,7 +87,7 @@ build_service() {
     # и родительская директория (..) содержит NuGet.config и nuget-local
     cd ..
     
-    docker build -f "$service/dockerfile" -t "$service:latest" .
+    docker build -f "$service/dockerfile" -t "$service" ..
     
     local build_result=$?
     
