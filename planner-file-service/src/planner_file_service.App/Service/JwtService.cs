@@ -8,6 +8,13 @@ namespace planner_file_service.App.Service
 {
     public class JwtService : IJwtService
     {
+        private readonly IPublisherService _publisherService;
+
+        public JwtService(IPublisherService publisherService)
+        {
+            _publisherService = publisherService;
+        }
+
         private List<Claim> GetClaims(string token) =>
             new JwtSecurityTokenHandler()
                 .ReadJwtToken(token.Replace("Bearer ", ""))
