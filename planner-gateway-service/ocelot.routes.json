@@ -1083,6 +1083,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/swagger/{everything}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8094
+                }
+            ],
+            "UpstreamPathTemplate": "/analytics/swagger/{everything}",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/addAnalyticsAction",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
