@@ -8,6 +8,6 @@ services:
       - POSTGRES_PASSWORD=${ANALYTICS_DB_PASSWORD}
       - POSTGRES_DB=${ANALYTICS_DB_DATABASE}
     ports:
-      - "5435:5432"
+      - "5440:5432"
     volumes:
       - planner-analytics-data:/var/lib/postgresql      
