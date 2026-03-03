@@ -87,7 +87,7 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(notifyDbConnectionString, builder =>
         {
             builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-            builder.MigrationsAssembly("planner_notify_service.Api");
+            builder.MigrationsAssembly("planner_analytics_service.Api");
         });
     });
 
@@ -115,7 +115,7 @@ WebApplication ConfigureApplication(WebApplication app)
     app.UseAuthorization();
     app.MapControllers();
 
-    app.MapGet("/", () => "Notify service work");
+    app.MapGet("/", () => "Analytics service work");
 
     return app;
 }
@@ -127,7 +127,7 @@ void ConfigureSwagger(IServiceCollection services)
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
-            Title = "Planer notify service api",
+            Title = "Planner analytics service api",
             Description = "Api",
         });
 
