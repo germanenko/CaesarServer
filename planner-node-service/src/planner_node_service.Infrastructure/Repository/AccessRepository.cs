@@ -142,7 +142,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var currentNodeId = nodeId;
 
-            while (currentNodeId != null)
+            while (currentNodeId != Guid.Empty)
             {
                 var rules = await _context.AccessRights
                     .Where(ar => ar.NodeId == currentNodeId)
