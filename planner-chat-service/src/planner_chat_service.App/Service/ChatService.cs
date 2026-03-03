@@ -237,7 +237,11 @@ namespace planner_chat_service.App.Service
                 lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
             }
 
-            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+            var messageBody = message.ToNodeBody();
+
+            messageBody.ChatId = chat.ChatId;
+
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, messageBody, WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
 
             _chatConnectionService.RemoveLobby(chat.ChatId);
 
