@@ -5,7 +5,7 @@ namespace planner_client_package.Entities
 {
     public class AnalyticsActionBody
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; }
         public Level Level { get; set; }
         public string AppVersion { get; set; }
         public string Platform { get; set; }

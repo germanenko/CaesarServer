@@ -8,11 +8,23 @@ namespace planner_analytics_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<AnalyticsAction> builder)
         {
-            builder.ToTable("ChatMessages");
+            builder.ToTable("AnalyticsActions");
 
             builder.Property(cm => cm.Level)
                 .HasConversion<int>()
                 .IsRequired();
+
+            builder.Property(cm => cm.Description)
+                .HasMaxLength(128);
+
+            builder.Property(cm => cm.Window)
+                .HasMaxLength(64);
+
+            builder.Property(cm => cm.AppVersion)
+                .HasMaxLength(64);
+
+            builder.Property(cm => cm.Platform)
+                .HasMaxLength(64);
 
             builder.Property(cm => cm.Date)
                 .IsRequired()
