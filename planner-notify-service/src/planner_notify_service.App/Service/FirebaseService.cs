@@ -50,11 +50,6 @@ namespace planner_notify_service.Infrastructure.Service
                 var message = new Message()
                 {
                     Token = "",
-                    //Notification = new Notification()
-                    //{
-                    //    Title = title,
-                    //    Body = body
-                    //},
                     Data = data
                 };
 
@@ -70,7 +65,7 @@ namespace planner_notify_service.Infrastructure.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Ошибка при отправке уведомлений");
-                throw;
+                return "Уведомления не отправлены";
             }
         }
 
