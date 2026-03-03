@@ -80,7 +80,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (!can)
             {
-                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.c}");
+                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.ChatId}");
 
                 return new ServiceResponse<object>()
                 {
