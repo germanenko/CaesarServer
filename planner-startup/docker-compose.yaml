@@ -87,6 +87,16 @@ services:
       file: services/node-db.yaml
       service: planner-node-db
 
+  planner-analytics-service:
+    extends:
+      file: services/analytics-service.yaml
+      service: planner-analytics-service
+
+  planner-analytics-db:
+    extends:
+      file: services/analytics-db.yaml
+      service: planner-analytics-db
+
 volumes:
   planner-auth-data:
   planner-content-data:
@@ -94,6 +104,7 @@ volumes:
   planner-chat-data:
   planner-notify-data:
   planner-node-data:
+  planner-analytics-data:
 
 
   planner-file-server-data:
