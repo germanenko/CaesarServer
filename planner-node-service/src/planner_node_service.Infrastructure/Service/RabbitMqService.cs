@@ -8,6 +8,7 @@ using planner_server_package.Entities;
 using planner_server_package.Events;
 using planner_server_package.RabbitMQ;
 using System.Text.Json;
+using ClientNodeLinkBody = planner_client_package.Entities.NodeLinkBody;
 
 namespace planner_node_service.Infrastructure.Service
 {
@@ -79,7 +80,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (!can)
             {
-                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.ChatId}");
+                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.c}");
 
                 return new ServiceResponse<object>()
                 {
@@ -99,7 +100,9 @@ namespace planner_node_service.Infrastructure.Service
                 BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage)
             });
 
-            await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(chatMessage.Link));
+            ClientNodeLinkBody link = chatMessage.Link == null ? new ClientNodeLinkBody() { Id = Guid.NewGuid(), ParentId = chatMessage.ChatId, ChildId = chatMessage.Id, RelationType = RelationType.Attach } : BodyConverter.ServerToClientBody(chatMessage.Link);
+
+            await nodeService.AddOrUpdateNodeLink(link);
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
