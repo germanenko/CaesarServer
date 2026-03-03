@@ -60,6 +60,7 @@ namespace planner_node_service.Infrastructure.Service
 
             if (result == null)
             {
+                _logger.LogInformation($"Error while deserializing");
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
@@ -78,6 +79,8 @@ namespace planner_node_service.Infrastructure.Service
 
             if (!can)
             {
+                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.ChatId}");
+
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = can,
