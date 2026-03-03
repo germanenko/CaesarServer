@@ -56,7 +56,7 @@ namespace planner_node_service.Infrastructure.Service
         {
             var result = JsonSerializer.Deserialize<MessageSentToChatEvent>(message);
 
-            _logger.LogInformation($"NodeService received message: {JsonSerializer.Deserialize<MessageBody>(result.Message)}");
+            _logger.LogInformation($"NodeService received message: {message}");
 
             if (result == null)
             {
@@ -86,6 +86,8 @@ namespace planner_node_service.Infrastructure.Service
                 };
             }
 
+            _logger.LogInformation($"Insert message: {message}");
+
             await nodeService.AddOrUpdateNode(new Node()
             {
                 Id = chatMessage.Id,
@@ -101,6 +103,8 @@ namespace planner_node_service.Infrastructure.Service
 
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
+
+            _logger.LogInformation($"Message inserted completely");
 
             return new ServiceResponse<object>()
             {
