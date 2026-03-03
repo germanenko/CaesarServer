@@ -1,0 +1,16 @@
+version: '3.8'
+
+services:
+  planner-analytics-service:
+    image: planner-analytics-service
+    restart: always
+    ports:
+      - "8094:80"
+    environment:
+      - ANALYTICS_DB_CONNECTION_STRING=Host=${ANALYTICS_DB_HOST};Port=5432;Database=${ANALYTICS_DB_DATABASE};Username=${ANALYTICS_DB_USERNAME};Password=${ANALYTICS_DB_PASSWORD}
+      - ASPNETCORE_ENVIRONMENT=${ASPNETCORE_ENVIRONMENT}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
+      - JWT_AUTH_SECRET=${JWT_AUTH_SECRET}
+      - JWT_AUTH_ISSUER=${JWT_AUTH_ISSUER}
+      - JWT_AUTH_AUDIENCE=${JWT_AUTH_AUDIENCE}
+      
