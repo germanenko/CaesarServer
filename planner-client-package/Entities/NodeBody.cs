@@ -2,6 +2,7 @@
 using planner_common_package;
 using planner_common_package.Enums;
 using System;
+using System.Collections.Generic;
 using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities
@@ -22,5 +23,6 @@ namespace planner_client_package.Entities
         public DateTime? UpdatedAt { get; set; }
         public NodeLinkBody Link { get; set; }
         public AccessRightBody AccessRight { get; set; }
+        public IEnumerable<NodeBody> Childs { get; set; }
     }
 }

@@ -62,7 +62,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<ColumnBody>> CreateBaseColumns(Guid accountId, Guid boardId)
+        public async Task<ServiceResponse<List<ColumnBody>>> CreateBaseColumns(Guid accountId, Guid boardId)
         {
             var columnId = Guid.NewGuid();
 
@@ -88,36 +88,44 @@ namespace planner_content_service.App.Service
                 }
             };
 
-            CreateColumnEvent columnEvent = new CreateColumnEvent()
-            {
-                Column = BodyConverter.ClientToServerBody(reminderColumn),
-                CreatorId = accountId
-            };
+            List<ColumnBody> columns = new List<ColumnBody>();
 
-            var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+            columns.Add(reminderColumn);
 
-            if (!request.IsSuccess)
+            foreach (var column in columns)
             {
-                return new ServiceResponse<ColumnBody>
+                CreateColumnEvent columnEvent = new CreateColumnEvent()
                 {
-                    IsSuccess = request.IsSuccess,
-                    StatusCode = request.StatusCode,
-                    Errors = request.Errors
+                    Column = BodyConverter.ClientToServerBody(reminderColumn),
+                    CreatorId = accountId
                 };
+
+                var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+
+                if (!request.IsSuccess)
+                {
+                    return new ServiceResponse<List<ColumnBody>>
+                    {
+                        IsSuccess = request.IsSuccess,
+                        StatusCode = request.StatusCode,
+                        Errors = request.Errors
+                    };
+                }
             }
 
-            var result = await _boardRepository.CreateOrUpdateColumn(reminderColumn, accountId);
+
+            var result = await _boardRepository.CreateOtUpdateColumns(columns, accountId);
 
             if (result == null)
             {
-                return new ServiceResponse<ColumnBody>
+                return new ServiceResponse<List<ColumnBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
 
-            return new ServiceResponse<ColumnBody>
+            return new ServiceResponse<List<ColumnBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -195,7 +203,9 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            await CreateBaseColumns(accountId, body.Id);
+            var columns = await CreateBaseColumns(accountId, body.Id);
+
+            result.Childs = columns.Body;
 
             return new ServiceResponse<BoardBody>
             {
