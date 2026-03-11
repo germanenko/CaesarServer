@@ -248,9 +248,9 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Column.Link != null)
                 {
-                    var can = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
+                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
 
-                    if (!can)
+                    if (!hasAccess)
                     {
                         return new ServiceResponse<object>()
                         {

@@ -80,6 +80,7 @@ void ConfigureServices(IServiceCollection services)
     var profileImageQueueName = GetEnvVar("RABBITMQ_PROFILE_IMAGE_QUEUE_NAME");
     var createChatQueueName = GetEnvVar("RABBITMQ_CREATE_CHAT_QUEUE_NAME");
     var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
+    var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
 
     services.AddControllers(e =>
     {

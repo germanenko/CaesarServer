@@ -2,6 +2,7 @@ namespace planner_server_package.Events.Enums
 {
     public enum PublishEvent
     {
+        AccountCreated,
         UpdateProfileImage,
         UpdateChatImage,
         SentFileToChat,

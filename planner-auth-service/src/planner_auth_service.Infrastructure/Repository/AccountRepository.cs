@@ -1,9 +1,9 @@
-using planner_server_package.Entities;
-using planner_common_package.Enums;
 using Microsoft.EntityFrameworkCore;
 using planner_auth_service.Core.Entities.Models;
 using planner_auth_service.Core.IRepository;
 using planner_auth_service.Infrastructure.Data;
+using planner_common_package.Enums;
+using planner_server_package.Entities;
 
 namespace planner_auth_service.Infrastructure.Repository
 {
@@ -93,6 +93,14 @@ namespace planner_auth_service.Infrastructure.Repository
             .FirstOrDefaultAsync(e => e.Token == refreshTokenHash);
 
         public async Task<List<Account>> GetAccountsByPatternIdentifier(string identifier)
+        {
+            return await _context.Accounts
+                .Where(e => EF.Functions.Like(e.Identifier, $"%{identifier}%"))
+                .ToListAsync();
+        }
+
+
+        public async Task<List<Account>> GetAccountByIdentifier(string identifier)
         {
             return await _context.Accounts
                 .Where(e => EF.Functions.Like(e.Identifier, $"%{identifier}%"))

@@ -27,7 +27,8 @@ namespace planner_content_service.Infrastructure.Service
             string prefix,
             IPublisherService publisherService,
             ILogger<RabbitMQServiceBase> logger,
-            string contentNodes)
+            string contentNodes,
+            string accountCreated)
             : base(hostname, userName, password, prefix, logger)
         {
             _serviceFactory = serviceFactory;
@@ -35,6 +36,7 @@ namespace planner_content_service.Infrastructure.Service
             _publisherService = publisherService;
 
             AddQueue(contentNodes, HandleContentNodes);
+            AddQueue(accountCreated, HandleAccountCreated);
 
             InitializeRabbitMQ();
         }
@@ -100,6 +102,48 @@ namespace planner_content_service.Infrastructure.Service
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
             await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);
             await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
+        private async Task<ServiceResponse<object>> HandleAccountCreated(string message)
+        {
+            using var scope = _serviceFactory.CreateScope();
+            var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
+            var response = JsonSerializer.Deserialize<AccountCreatedEvent>(message);
+            if (response == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            var profile = response.ProfileBody;
+
+            Guid boardId = Guid.NewGuid();
+
+            var boardBody = new planner_client_package.Entities.BoardBody()
+            {
+                Id = boardId,
+                Name = "Personal Board",
+                PublicationStatus = PublicationStatus.Active,
+                Type = NodeType.Board,
+                AccessRight = new planner_client_package.Entities.AccessRightBody()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = profile.Id,
+                    NodeId = boardId,
+                    Permission = Permission.Creator
+                },
+                UpdatedAt = DateTime.UtcNow
+            };
+
+            await boardService.CreateOrUpdateBoardAsync(boardBody, profile.Id);
 
             return new ServiceResponse<object>()
             {

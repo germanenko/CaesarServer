@@ -1,5 +1,7 @@
 using planner_client_package.Entities;
+using planner_client_package.Interface;
 using planner_common_package.Enums;
+using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package.Converters;
@@ -29,19 +31,82 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+            var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
 
-            if (!nodeComplete.IsSuccess)
+            if (!request.IsSuccess)
             {
                 return new ServiceResponse<ColumnBody>
                 {
-                    IsSuccess = nodeComplete.IsSuccess,
-                    StatusCode = nodeComplete.StatusCode,
-                    Errors = nodeComplete.Errors
+                    IsSuccess = request.IsSuccess,
+                    StatusCode = request.StatusCode,
+                    Errors = request.Errors
                 };
             }
 
             var result = await _boardRepository.CreateOrUpdateColumn(column, accountId);
+
+            if (result == null)
+            {
+                return new ServiceResponse<ColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            return new ServiceResponse<ColumnBody>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
+        public async Task<ServiceResponse<ColumnBody>> CreateBaseColumns(Guid accountId, Guid boardId)
+        {
+            var columnId = Guid.NewGuid();
+
+            ColumnBody reminderColumn = new ColumnBody()
+            {
+                Id = columnId,
+                Name = "Reminders",
+                PublicationStatus = PublicationStatus.Active,
+                UpdatedAt = DateTime.UtcNow,
+                Link = new NodeLinkBody()
+                {
+                    Id = Guid.NewGuid(),
+                    ChildId = columnId,
+                    ParentId = boardId,
+                    RelationType = RelationType.Contains
+                },
+                AccessRight = new AccessRightBody()
+                {
+                    Id = Guid.NewGuid(),
+                    AccountId = accountId,
+                    NodeId = columnId,
+                    Permission = Permission.Creator
+                }
+            };
+
+            CreateColumnEvent columnEvent = new CreateColumnEvent()
+            {
+                Column = BodyConverter.ClientToServerBody(reminderColumn),
+                CreatorId = accountId
+            };
+
+            var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+
+            if (!request.IsSuccess)
+            {
+                return new ServiceResponse<ColumnBody>
+                {
+                    IsSuccess = request.IsSuccess,
+                    StatusCode = request.StatusCode,
+                    Errors = request.Errors
+                };
+            }
+
+            var result = await _boardRepository.CreateOrUpdateColumn(reminderColumn, accountId);
 
             if (result == null)
             {
@@ -130,6 +195,8 @@ namespace planner_content_service.App.Service
                 };
             }
 
+            await CreateBaseColumns(accountId, body.Id);
+
             return new ServiceResponse<BoardBody>
             {
                 IsSuccess = true,
@@ -149,6 +216,11 @@ namespace planner_content_service.App.Service
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
                 };
+            }
+
+            foreach (var board in result)
+            {
+                await CreateBaseColumns(accountId, board.Id);
             }
 
             return new ServiceResponse<List<BoardBody>>
