@@ -197,7 +197,11 @@ void ConfigureServices(IServiceCollection services)
         rabbitMqHostname,
         rabbitMqUserName,
         rabbitMqPassword,
-        new Dictionary<PublishEvent, string> { { PublishEvent.CreateAccountMailCredentials, mailCredentialsQueueName } },
+        new Dictionary<PublishEvent, string>
+        {
+            { PublishEvent.CreateAccountMailCredentials, mailCredentialsQueueName },
+            { PublishEvent.AccountCreated, accountCreatedExchange }
+        },
         sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
     ));
 

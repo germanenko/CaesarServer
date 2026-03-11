@@ -127,8 +127,7 @@ void ConfigureServices(IServiceCollection services)
                 { PublishEvent.CreateBoard, createBoardExchange },
                 { PublishEvent.CreateColumn, createColumnExchange },
                 { PublishEvent.CreateTask, createTaskExchange },
-                { PublishEvent.CheckAccess, checkAccessExchange },
-                { PublishEvent.AccountCreated, accountCreatedExchange }
+                { PublishEvent.CheckAccess, checkAccessExchange }
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
