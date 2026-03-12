@@ -154,6 +154,11 @@ namespace planner_node_service.App.Service
                 }
             }
 
+            foreach (var item in logs)
+            {
+                _logger.LogInformation($"Log: {item.EntityId} - {item.Version}");
+            }
+
             return new ServiceResponse<List<EntityVersionBody>>()
             {
                 IsSuccess = true,
