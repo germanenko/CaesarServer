@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class StatusHistory : ModelBase
+    public class StatusHistory
     {
+        public Guid Id { get; set; }
         public Status OldStatus { get; set; }
         public Guid OldStatusId { get; set; }
         public Status NewStatus { get; set; }

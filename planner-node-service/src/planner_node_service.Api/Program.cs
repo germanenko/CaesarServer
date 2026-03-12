@@ -128,11 +128,11 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<IAccessService, AccessService>();
-    services.AddScoped<IHistoryService, HistoryService>();
+    services.AddScoped<ILogService, LogService>();
     services.AddScoped<INotificationService, NotificationService>();
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IAccessRepository, AccessRepository>();
-    services.AddScoped<IHistoryRepository, HistoryRepository>();
+    services.AddScoped<ILogRepository, LogRepository>();
     services.AddScoped<INotificationRepository, NotificationRepository>();
 
     services.AddHostedService(sp => new RabbitMqService(

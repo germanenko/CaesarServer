@@ -20,6 +20,7 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<StatusHistory> StatusHistory { get; set; }
         public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
+        public DbSet<ContentLog> ContentLogs { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

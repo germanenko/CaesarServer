@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_node_service.Core.Entities.Models
+namespace planner_client_package.Entities
 {
-    public class StatusDetails : ModelBase
+    public class EntityVersionBody
     {
+        public Guid EntityId;
+        public long Version;
     }
 }

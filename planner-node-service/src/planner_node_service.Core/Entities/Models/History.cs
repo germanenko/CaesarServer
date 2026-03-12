@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class History : ModelBase
+    public class History
     {
+        public Guid Id { get; set; }
         public Guid TrackableId { get; set; }
         public TrackableEntity Trackable { get; set; }
         public string? OldVersion { get; set; }

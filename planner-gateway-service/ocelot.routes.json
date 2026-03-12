@@ -614,6 +614,20 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/getManifest",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getManifest",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+
+	{
             "DownstreamPathTemplate": "/api/getNodeLinks",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

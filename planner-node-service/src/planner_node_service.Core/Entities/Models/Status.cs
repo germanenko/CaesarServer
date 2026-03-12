@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class Status : ModelBase
+    public class Status
     {
+        public Guid Id { get; set; }
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
         public StatusKind Kind { get; set; }

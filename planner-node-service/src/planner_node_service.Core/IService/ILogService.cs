@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.IService
 {
-    public interface IHistoryService
+    public interface ILogService
     {
         public Task<ServiceResponse<History>> GetCreateHistory(Guid nodeId);
         public Task<ServiceResponse<History>> AddHistory(History history);

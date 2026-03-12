@@ -6,18 +6,18 @@ using System.Net;
 
 namespace planner_node_service.App.Service
 {
-    public class HistoryService : IHistoryService
+    public class LogService : ILogService
     {
-        private readonly IHistoryRepository _historyRepository;
+        private readonly ILogRepository _logRepository;
 
-        public HistoryService(IHistoryRepository historyRepository)
+        public LogService(ILogRepository historyRepository)
         {
-            _historyRepository = historyRepository;
+            _logRepository = historyRepository;
         }
 
         public async Task<ServiceResponse<History>> AddHistory(History history)
         {
-            var result = await _historyRepository.AddHistory(history);
+            var result = await _logRepository.AddHistory(history);
 
             if (result == null)
             {
@@ -39,7 +39,7 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<History>> GetCreateHistory(Guid nodeId)
         {
-            var history = await _historyRepository.GetCreateHistory(nodeId);
+            var history = await _logRepository.GetCreateHistory(nodeId);
 
             if (history == null)
             {

@@ -11,27 +11,26 @@ using planner_server_package.Events.Enums;
 using planner_server_package.Interface;
 using planner_server_package.RabbitMQ;
 using System.Net;
-using System.Net.Mime;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Text.Json.Serialization.Metadata;
-using static Npgsql.Replication.PgOutput.Messages.RelationMessage;
+using System.Xml.Linq;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.App.Service
 {
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
-        private readonly IHistoryRepository _historyRepository;
+        private readonly ILogRepository _logRepository;
         private readonly IPublisherService _publisherService;
         private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, IPublisherService notifyService, IHistoryRepository historyRepository, ILogger<NodeService> logger)
+            INodeRepository nodeRepository, IPublisherService notifyService, ILogRepository historyRepository, ILogger<NodeService> logger)
         {
             _nodeRepository = nodeRepository;
             _publisherService = notifyService;
-            _historyRepository = historyRepository;
+            _logRepository = historyRepository;
             _logger = logger;
         }
 
@@ -48,7 +47,7 @@ namespace planner_node_service.App.Service
 
             foreach (var body in bodies)
             {
-                var history = await _historyRepository.GetLastHistory(body.Id);
+                var history = await _logRepository.GetLastHistory(body.Id);
                 body.UpdatedBy = history?.UpdatedById;
                 body.UpdatedAt = history?.UpdatedAt;
             }
@@ -120,6 +119,46 @@ namespace planner_node_service.App.Service
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = nodeLink
+            };
+        }
+
+
+        public async Task<ServiceResponse<List<EntityVersionBody>>> GetManifest(Guid accountId)
+        {
+            var nodes = await GetNodes(accountId);
+
+            if (nodes.Body.IsNullOrEmpty())
+            {
+                return new ServiceResponse<List<EntityVersionBody>>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.NotFound,
+                    Errors = new[] { "Ноды отсутствуют" }
+                };
+            }
+
+            List<EntityVersionBody> logs = new List<EntityVersionBody>();
+            foreach (var item in nodes.Body)
+            {
+                var log = await _logRepository.GetLastLogForEntity(item.Id);
+
+                if (log != null)
+                {
+                    var entityVersion = new EntityVersionBody()
+                    {
+                        EntityId = log.EntityId,
+                        Version = log.Version
+                    };
+
+                    logs.Add(entityVersion);
+                }
+            }
+
+            return new ServiceResponse<List<EntityVersionBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = logs
             };
         }
 

@@ -7,6 +7,7 @@ namespace planner_node_service.Core.IService
     public interface INodeService
     {
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId);
+        public Task<ServiceResponse<List<EntityVersionBody>>> GetManifest(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Node node);
         public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node);

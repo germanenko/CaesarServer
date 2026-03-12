@@ -192,7 +192,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
@@ -244,7 +244,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
 
                 if (result.Column.Link != null)
                 {
@@ -312,7 +312,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<IHistoryService>();
+                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
 
                 await nodeService.AddOrUpdateNode(new Node()
                 {

@@ -2,8 +2,9 @@
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class NotificationSettings : ModelBase
+    public class NotificationSettings
     {
+        public Guid Id { get; set; }
         public Guid AccountId { get; set; }
         public Guid NodeId { get; set; }
         public Node Node { get; set; }

@@ -6,7 +6,8 @@ using System.Threading.Tasks;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class TrackableEntity : ModelBase
+    public class TrackableEntity
     {
+        public Guid Id { get; set; }
     }
 }
