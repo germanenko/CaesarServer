@@ -112,18 +112,13 @@ namespace planner_node_service.Infrastructure.Repository
             IEnumerable<Node>? links = await GetNodesTree(accountId);
 
             return links;
+        }
 
-            //if (links == null || !links.Any())
-            //    return Enumerable.Empty<Node>();
+        public async Task<Node?> GetNode(Guid nodeId)
+        {
+            var node = await _context.Nodes.Include(x => x.Cursor).FirstOrDefaultAsync(x => x.Id == nodeId);
 
-            //var nodeIds = links
-            //    .SelectMany(x => new[] { x.ParentId, x.ChildId })
-            //    .Distinct()
-            //    .ToList();
-
-            //return await _context.Nodes
-            //    .Where(x => nodeIds.Contains(x.Id))
-            //    .ToListAsync();
+            return node;
         }
 
 
@@ -143,6 +138,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var rootNodes = await _context.Nodes
                 .Where(x => rootIds.Contains(x.Id))
+                .Include(x => x.Cursor)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -153,7 +149,9 @@ namespace planner_node_service.Infrastructure.Repository
                 var links = await _context.NodeLinks
                     .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
                     .Include(x => x.ParentNode)
+                        .ThenInclude(x => x.Cursor)
                     .Include(x => x.ChildNode)
+                        .ThenInclude(x => x.Cursor)
                     .AsNoTracking()
                     .ToListAsync();
 

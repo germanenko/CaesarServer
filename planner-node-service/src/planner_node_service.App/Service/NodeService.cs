@@ -21,14 +21,16 @@ namespace planner_node_service.App.Service
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
+        private readonly IAccessRepository _accessRepository;
         private readonly ILogRepository _logRepository;
         private readonly IPublisherService _publisherService;
         private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, IPublisherService notifyService, ILogRepository historyRepository, ILogger<NodeService> logger)
+            INodeRepository nodeRepository, IAccessRepository accessRepository, IPublisherService notifyService, ILogRepository historyRepository, ILogger<NodeService> logger)
         {
             _nodeRepository = nodeRepository;
+            _accessRepository = accessRepository;
             _publisherService = notifyService;
             _logRepository = historyRepository;
             _logger = logger;
@@ -46,6 +48,37 @@ namespace planner_node_service.App.Service
             result.AddRange(await GetChatNodesByIdAsync(bodies));
 
             foreach (var body in bodies)
+            {
+                var history = await _logRepository.GetLastHistory(body.Id);
+                body.UpdatedBy = history?.UpdatedById;
+                body.UpdatedAt = history?.UpdatedAt;
+            }
+
+            return new ServiceResponse<IEnumerable<NodeBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
+        {
+            var nodes = new List<NodeBody>();
+            foreach (var id in nodeIds)
+            {
+                if (await _accessRepository.CheckAccess(accountId, id))
+                {
+                    nodes.Add((await _nodeRepository.GetNode(id)).ToNodeBody());
+                }
+            }
+
+            var result = new List<NodeBody>();
+
+            result.AddRange(await GetContentNodesByIdAsync(nodes));
+            result.AddRange(await GetChatNodesByIdAsync(nodes));
+
+            foreach (var body in nodes)
             {
                 var history = await _logRepository.GetLastHistory(body.Id);
                 body.UpdatedBy = history?.UpdatedById;

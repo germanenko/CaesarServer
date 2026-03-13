@@ -14,5 +14,6 @@ namespace planner_node_service.Core.IRepository
         Task<IEnumerable<Node>?> GetNodesTree(Guid accountId);
         Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId);
+        Task<Node?> GetNode(Guid accountId);
     }
 }

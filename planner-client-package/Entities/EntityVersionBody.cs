@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities
 {
-    public class EntityVersionBody
+    public record EntityVersionBody
     {
         public Guid EntityId { get; set; }
         public long Version { get; set; }

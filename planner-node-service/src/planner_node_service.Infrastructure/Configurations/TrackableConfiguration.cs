@@ -9,6 +9,11 @@ namespace planner_node_service.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<TrackableEntity> builder)
         {
             builder.HasKey(e => e.Id);
+
+            builder.HasOne(e => e.Cursor)
+                .WithMany()
+                .HasForeignKey(e => e.CursorId)
+                .OnDelete(DeleteBehavior.NoAction);
         }
     }
 }

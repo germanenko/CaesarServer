@@ -41,6 +41,8 @@ namespace planner_node_service.Infrastructure.Repository
 
             var result = (await _context.ContentLogs.AddAsync(log)).Entity;
 
+            (_context.ContentLogs.FirstOrDefault(x => x.EntityId == log.EntityId)).Entity.CursorId = result.Id;
+
             await _context.SaveChangesAsync();
 
             return result;
