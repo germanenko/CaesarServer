@@ -92,13 +92,7 @@ namespace planner_node_service.Infrastructure.Service
 
             _logger.LogInformation($"Insert message: {message}");
 
-            await nodeService.AddOrUpdateNode(new Node()
-            {
-                Id = chatMessage.Id,
-                Name = "Message",
-                Type = NodeType.Message,
-                BodyJson = JsonSerializer.Serialize<NodeBody>(chatMessage)
-            });
+            await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
 
             ClientNodeLinkBody link = chatMessage.Link == null ? new ClientNodeLinkBody() { Id = Guid.NewGuid(), ParentId = chatMessage.ChatId, ChildId = chatMessage.Id, RelationType = RelationType.Attach } : BodyConverter.ServerToClientBody(chatMessage.Link);
 
@@ -143,13 +137,7 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddOrUpdateNode(new Node()
-                {
-                    Id = result.Chat.Id,
-                    Name = result.Chat.Name,
-                    Type = NodeType.Chat,
-                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Chat)
-                });
+                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Chat));
 
                 foreach (var participant in result.Participants)
                 {
@@ -192,20 +180,11 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddOrUpdateNode(new Node()
-                {
-                    Id = result.Board.Id,
-                    Name = result.Board.Name,
-                    Type = NodeType.Board,
-                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Board)
-                });
+                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Board));
 
                 await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
-
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Board.Id, UpdatedAt = result.Board.UpdatedAt.Value });
 
                 //await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = result.CreatorId, NodeId = result.Board.Id, NotificationsEnabled = true });
 
@@ -244,7 +223,6 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
 
                 if (result.Column.Link != null)
                 {
@@ -260,13 +238,7 @@ namespace planner_node_service.Infrastructure.Service
                         };
                     }
 
-                    await nodeService.AddOrUpdateNode(new Node()
-                    {
-                        Id = result.Column.Id,
-                        Name = result.Column.Name,
-                        Type = NodeType.Column,
-                        BodyJson = JsonSerializer.Serialize<NodeBody>(result.Column)
-                    });
+                    await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Column));
 
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
@@ -274,8 +246,6 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Column.AccessRight));
                 }
-
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Column.Id, UpdatedAt = result.Column.UpdatedAt.Value });
 
                 return new ServiceResponse<object>()
                 {
@@ -312,15 +282,8 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var historyService = scope.ServiceProvider.GetRequiredService<ILogService>();
 
-                await nodeService.AddOrUpdateNode(new Node()
-                {
-                    Id = result.Task.Id,
-                    Name = result.Task.Name ?? "Task",
-                    Type = NodeType.Task,
-                    BodyJson = JsonSerializer.Serialize<NodeBody>(result.Task)
-                });
+                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Task));
 
                 if (result.Task.Link != null)
                 {
@@ -342,8 +305,6 @@ namespace planner_node_service.Infrastructure.Service
                 {
                     await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Task.AccessRight));
                 }
-
-                await historyService.AddHistory(new History() { Id = Guid.NewGuid(), UpdatedById = result.CreatorId, Action = ActionType.Create, TrackableId = result.Task.Id, UpdatedAt = result.Task.UpdatedAt.Value });
 
                 return new ServiceResponse<object>()
                 {

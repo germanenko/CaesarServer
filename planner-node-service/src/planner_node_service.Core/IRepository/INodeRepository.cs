@@ -7,13 +7,13 @@ namespace planner_node_service.Core.IRepository
     public interface INodeRepository
     {
         Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody node);
-        Task<List<Node>> AddOrUpdateNodes(List<Node> node);
+        Task<List<Node>> AddOrUpdateNodes(List<NodeBody> node);
         Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);
-        Task<Node> AddOrUpdateNode(Node node);
+        Task<Node> AddOrUpdateNode(NodeBody node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<Node>?> GetNodesTree(Guid accountId);
         Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId);
-        Task<Node?> GetNode(Guid accountId);
+        Task<Node?> GetNode(Guid nodeId);
     }
 }

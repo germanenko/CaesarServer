@@ -4,6 +4,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using System.Text.Json;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -16,7 +17,7 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<List<Node>> AddOrUpdateNodes(List<Node> nodes)
+        public async Task<List<Node>> AddOrUpdateNodes(List<NodeBody> nodes)
         {
             List<Node> newNodes = new List<Node>();
             foreach (var node in nodes)
@@ -26,20 +27,36 @@ namespace planner_node_service.Infrastructure.Repository
             return newNodes;
         }
 
-        public async Task<Node> AddOrUpdateNode(Node newNode)
+        public async Task<Node> AddOrUpdateNode(NodeBody nodeBody)
         {
             var existingNode = await _context.Nodes
-                .Where(x => x.Id == newNode.Id)
+                .Where(x => x.Id == nodeBody.Id)
                 .FirstOrDefaultAsync();
+
+            var action = existingNode != null ? ActionType.Update : ActionType.Create;
+
+            await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy.Value, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt.Value });
+            var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, action))).Entity;
+
+            var node = new Node()
+            {
+                Id = nodeBody.Id,
+                Name = nodeBody.Name,
+                Type = NodeType.Chat,
+                BodyJson = JsonSerializer.Serialize(nodeBody),
+                CursorId = cursor.Id
+            };
 
             if (existingNode == null)
             {
-                var result = await _context.Nodes.AddAsync(newNode);
+
+
+                var result = await _context.Nodes.AddAsync(node);
 
                 await AddOrUpdateNodeLink(new NodeLinkBody()
                 {
-                    ParentId = newNode.Id,
-                    ChildId = newNode.Id,
+                    ParentId = nodeBody.Id,
+                    ChildId = nodeBody.Id,
                     RelationType = RelationType.Me
                 });
 
@@ -48,7 +65,7 @@ namespace planner_node_service.Infrastructure.Repository
             }
             else
             {
-                _context.Entry(existingNode).CurrentValues.SetValues(newNode);
+                _context.Entry(existingNode).CurrentValues.SetValues(node);
                 await _context.SaveChangesAsync();
                 return existingNode;
             }

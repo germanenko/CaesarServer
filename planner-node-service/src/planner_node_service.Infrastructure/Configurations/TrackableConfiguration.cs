@@ -14,6 +14,10 @@ namespace planner_node_service.Infrastructure.Configurations
                 .WithMany()
                 .HasForeignKey(e => e.CursorId)
                 .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(e => e.Version)
+                .IsRequired()
+                .HasConversion<long>();
         }
     }
 }

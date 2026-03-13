@@ -82,7 +82,7 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> AddOrUpdateNode(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] Node node
+            [FromBody] NodeBody node
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

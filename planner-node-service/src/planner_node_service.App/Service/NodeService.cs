@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
 using planner_common_package.Entities;
+using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
@@ -109,9 +110,9 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Node node)
+        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody nodeBody)
         {
-            if (node.Name.IsNullOrEmpty())
+            if (nodeBody.Name.IsNullOrEmpty())
             {
                 return new ServiceResponse<NodeBody>()
                 {
@@ -121,7 +122,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            var newNode = await _nodeRepository.AddOrUpdateNode(node);
+            var newNode = await _nodeRepository.AddOrUpdateNode(nodeBody);
 
             return new ServiceResponse<NodeBody>()
             {
@@ -202,19 +203,7 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies, TokenPayload tokenPayload)
         {
-            List<Node> nodes = new List<Node>();
-            foreach (NodeBody nodeBody in nodeBodies)
-            {
-                nodes.Add(new Node()
-                {
-                    Id = nodeBody.Id,
-                    Name = nodeBody.Name,
-                    Type = nodeBody.Type,
-                    BodyJson = JsonSerializer.Serialize(nodeBody)
-                });
-            }
-
-            var newNodes = await _nodeRepository.AddOrUpdateNodes(nodes);
+            var newNodes = await _nodeRepository.AddOrUpdateNodes(nodeBodies);
 
             var bodies = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList();
             List<ISyncable> contentBodies = new List<ISyncable>();

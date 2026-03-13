@@ -14,5 +14,6 @@ namespace planner_node_service.Core.IService
     {
         public Task<ServiceResponse<History>> GetCreateHistory(Guid nodeId);
         public Task<ServiceResponse<History>> AddHistory(History history);
+        public Task<ServiceResponse<ContentLog>> AddContentLog(ContentLog log);
     }
 }

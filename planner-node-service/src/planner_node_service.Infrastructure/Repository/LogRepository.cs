@@ -28,8 +28,6 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.SaveChangesAsync();
 
-            await AddContentLog(log);
-
             return result;
         }
 

@@ -37,6 +37,28 @@ namespace planner_node_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<ContentLog>> AddContentLog(ContentLog log)
+        {
+            var result = await _logRepository.AddContentLog(log);
+
+            if (result == null)
+            {
+                return new ServiceResponse<ContentLog>()
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Ошибка добавления лога" }
+                };
+            }
+
+            return new ServiceResponse<ContentLog>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
         public async Task<ServiceResponse<History>> GetCreateHistory(Guid nodeId)
         {
             var history = await _logRepository.GetCreateHistory(nodeId);
