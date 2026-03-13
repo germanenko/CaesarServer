@@ -22,6 +22,7 @@ namespace planner_server_package.Entities
         public DateTime CreatedAt { get; set; }
         public Guid? UpdatedBy { get; set; }
         public DateTime? UpdatedAt { get; set; }
+        public long Version { get; set; }
         public NodeLinkBody Link { get; set; }
         public AccessRightBody AccessRight { get; set; }
     }
