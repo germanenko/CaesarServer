@@ -50,19 +50,20 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (existingNode == null)
             {
-                var result = await _context.Nodes.AddAsync(node);
+                var result = (await _context.Nodes.AddAsync(node)).Entity;
 
-                await AddOrUpdateNodeLink(new NodeLinkBody()
+                var nodeLink = new NodeLink
                 {
-                    ParentId = nodeBody.Id,
-                    ChildId = nodeBody.Id,
+                    Id = Guid.NewGuid(),
+                    ParentId = node.Id,
+                    ChildId = node.Id,
                     RelationType = RelationType.Me
-                });
+                };
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy.Value, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt.Value });
 
                 await _context.SaveChangesAsync();
-                return result.Entity;
+                return result;
             }
             else
             {
