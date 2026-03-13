@@ -26,11 +26,6 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.EntityId)
                 .IsRequired();
 
-            builder.HasOne(e => e.Entity)
-                .WithMany()
-                .HasForeignKey(e => e.EntityId)
-                .OnDelete(DeleteBehavior.Cascade);
-
             builder.HasIndex(e => new { e.EntityId, e.Version })
                 .IsUnique();
 

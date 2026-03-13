@@ -10,7 +10,7 @@ namespace planner_node_service.Core.Entities.Models
     {
         public Guid Id { get; set; }
         public Guid CursorId { get; set; }
-        public long Version { get; set; }
         public ContentLog Cursor { get; set; }
+        public long Version { get; set; }
     }
 }

@@ -11,7 +11,6 @@ namespace planner_node_service.Core.Entities.Models
     {
         public Guid Id { get; set; }
         public Guid ScopeId { get; set; }
-        public TrackableEntity Entity { get; set; }
         public Guid EntityId { get; set; }
         public long Version { get; set; }
         public ActionType Action { get; set; }
