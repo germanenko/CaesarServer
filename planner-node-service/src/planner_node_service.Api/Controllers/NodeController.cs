@@ -33,7 +33,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.GetNodes(tokenPayload.AccountId);
+            var result = await _nodeService.GetNodesByIds(tokenPayload.AccountId, nodeIds);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
