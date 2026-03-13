@@ -35,8 +35,6 @@ namespace planner_node_service.Infrastructure.Repository
 
             var action = existingNode != null ? ActionType.Update : ActionType.Create;
 
-            await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy.Value, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt.Value });
-
             var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, action))).Entity;
 
             await _context.SaveChangesAsync();
@@ -60,6 +58,8 @@ namespace planner_node_service.Infrastructure.Repository
                     ChildId = nodeBody.Id,
                     RelationType = RelationType.Me
                 });
+
+                await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy.Value, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt.Value });
 
                 await _context.SaveChangesAsync();
                 return result.Entity;
