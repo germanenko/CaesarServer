@@ -138,7 +138,7 @@ namespace planner_content_service.Infrastructure.Service
                     Id = Guid.NewGuid(),
                     AccountId = profile.Id,
                     NodeId = boardId,
-                    Permission = Permission.Creator
+                    Permission = Permission.Write
                 },
                 UpdatedAt = DateTime.UtcNow
             };

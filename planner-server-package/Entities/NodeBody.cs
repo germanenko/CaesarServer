@@ -20,8 +20,8 @@ namespace planner_server_package.Entities
         public string Props { get; set; }
         public Guid CreatedBy { get; set; }
         public DateTime CreatedAt { get; set; }
-        public Guid? UpdatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public Guid UpdatedBy { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public long Version { get; set; }
         public NodeLinkBody Link { get; set; }
         public AccessRightBody AccessRight { get; set; }

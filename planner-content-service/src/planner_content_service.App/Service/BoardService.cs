@@ -84,7 +84,7 @@ namespace planner_content_service.App.Service
                     Id = Guid.NewGuid(),
                     AccountId = accountId,
                     NodeId = columnId,
-                    Permission = Permission.Creator
+                    Permission = Permission.Write
                 }
             };
 
