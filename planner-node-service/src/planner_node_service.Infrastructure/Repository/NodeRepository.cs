@@ -119,6 +119,9 @@ namespace planner_node_service.Infrastructure.Repository
             else
             {
                 _context.Entry(existingNode).CurrentValues.SetValues(node);
+
+                existingNode.Version++;
+
                 await _context.SaveChangesAsync();
                 return existingNode;
             }
@@ -148,6 +151,7 @@ namespace planner_node_service.Infrastructure.Repository
                 existingNode.ParentId = newNodeLink.ParentId;
                 existingNode.ChildId = newNodeLink.ChildId;
                 existingNode.RelationType = newNodeLink.RelationType;
+
                 await _context.SaveChangesAsync();
                 return existingNode;
             }

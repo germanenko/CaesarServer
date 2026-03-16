@@ -19,7 +19,7 @@ namespace planner_node_service.Core.Entities.Models
                 Name = Name,
                 Props = Props,
                 Type = Type,
-                Version = Cursor.Version
+                Version = Version
             };
         }
     }
