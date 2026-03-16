@@ -31,6 +31,7 @@ namespace planner_content_service.Infrastructure.Repository
         {
             try
             {
+                _logger.LogInformation($"Props: {createBoardBody.Props}");
                 var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == createBoardBody.Id);
 
                 if (board != null)
