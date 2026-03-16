@@ -12,8 +12,8 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    [Migration("20260312090320_versionAutoincTrigger")]
-    partial class versionAutoincTrigger
+    [Migration("20260316114031_FKforSyncScope")]
+    partial class FKforSyncScope
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,23 +25,76 @@ namespace planner_node_service.Api.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroupMember", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<long>("GraphRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("RulesRevision")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("NodeId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.ToTable("AccessLogs", (string)null);
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AccessGroupId")
+                    b.Property<Guid>("NodeId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid>("AccountId")
+                    b.Property<int>("Permission")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SubjectId")
                         .HasColumnType("uuid");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("AccessGroupId");
+                    b.HasIndex("NodeId");
 
-                    b.ToTable("AccessGroupMembers");
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("SubjectId", "NodeId", "Permission")
+                        .IsUnique();
+
+                    b.ToTable("AccessRules");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessSubject", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AccessSubjects");
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.ContentLog", b =>
@@ -59,7 +112,7 @@ namespace planner_node_service.Api.Migrations
                     b.Property<Guid>("ScopeId")
                         .HasColumnType("uuid");
 
-                    b.Property<long>("Version")
+                    b.Property<long>("ScopeVersion")
                         .HasColumnType("bigint");
 
                     b.HasKey("Id");
@@ -67,10 +120,30 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("EntityId")
                         .HasDatabaseName("IX_ContentLogs_EntityId");
 
-                    b.HasIndex("EntityId", "Version")
+                    b.HasIndex("EntityId", "ScopeVersion")
                         .IsUnique();
 
                     b.ToTable("ContentLogs", (string)null);
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupMember", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("GroupId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GroupId", "AccountId")
+                        .IsUnique();
+
+                    b.ToTable("AccessGroupMembers");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
@@ -108,6 +181,35 @@ namespace planner_node_service.Api.Migrations
                         .HasDatabaseName("IX_Histories_UpdatedById");
 
                     b.ToTable("History", (string)null);
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("RelationType")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ChildId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RelationType");
+
+                    b.HasIndex("ParentId", "ChildId", "RelationType")
+                        .IsUnique();
+
+                    b.ToTable("NodeLinks", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NotificationSettings", b =>
@@ -183,65 +285,85 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("StatusHistory");
                 });
 
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.SyncScopeAccess", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("integer");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+
+                    b.Property<Guid>("AccountId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("GraphRevisionUsed")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("RulesRevisionUsed")
+                        .HasColumnType("bigint");
+
+                    b.Property<Guid>("ScopeId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ScopeId", "AccountId")
+                        .IsUnique();
+
+                    b.ToTable("SyncScopeAccess");
+                });
+
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<Guid>("CursorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("Id");
+
+                    b.HasIndex("CursorId");
 
                     b.ToTable("Trackables");
 
                     b.UseTptMappingStrategy();
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroup", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
                 {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
+                    b.HasBaseType("planner_node_service.Core.Entities.Models.AccessSubject");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.ToTable("AccessGroups");
+                    b.ToTable("GroupAccessSubjects");
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRight", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.UserAccessSubject", b =>
                 {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
+                    b.HasBaseType("planner_node_service.Core.Entities.Models.AccessSubject");
 
-                    b.Property<Guid?>("AccessGroupId")
+                    b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
-                    b.Property<Guid?>("AccountId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("NodeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Permission")
-                        .HasColumnType("integer");
-
-                    b.HasIndex("AccessGroupId");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("NodeId");
-
-                    b.HasIndex("AccountId", "NodeId", "Permission")
+                    b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("AccessRights");
+                    b.ToTable("UserAccessSubjects");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
                 {
                     b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
-
-                    b.Property<string>("BodyJson")
-                        .IsRequired()
-                        .HasColumnType("text");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -250,6 +372,9 @@ namespace planner_node_service.Api.Migrations
 
                     b.Property<string>("Props")
                         .HasColumnType("jsonb");
+
+                    b.Property<int>("SyncKind")
+                        .HasColumnType("integer");
 
                     b.Property<int>("Type")
                         .HasColumnType("integer");
@@ -261,51 +386,53 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("Nodes", (string)null);
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
                 {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
-
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("RelationType")
-                        .HasColumnType("integer");
-
-                    b.HasIndex("ChildId");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("RelationType");
-
-                    b.HasIndex("ParentId", "ChildId", "RelationType")
-                        .IsUnique();
-
-                    b.ToTable("NodeLinks", (string)null);
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroupMember", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.AccessGroup", "AccessGroup")
-                        .WithMany("Members")
-                        .HasForeignKey("AccessGroupId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AccessGroup");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.ContentLog", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", "Entity")
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
                         .WithMany()
-                        .HasForeignKey("EntityId")
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Node");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Entity");
+                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Node");
+
+                    b.Navigation("Subject");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupMember", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.GroupAccessSubject", "Group")
+                        .WithMany("Members")
+                        .HasForeignKey("GroupId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Group");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
@@ -317,6 +444,25 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Trackable");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ChildNode")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ParentNode")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildNode");
+
+                    b.Navigation("ParentNode");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NotificationSettings", b =>
@@ -360,36 +506,44 @@ namespace planner_node_service.Api.Migrations
                     b.Navigation("OldStatus");
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroup", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.SyncScopeAccess", b =>
                 {
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Scope")
+                        .WithMany()
+                        .HasForeignKey("ScopeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scope");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.ContentLog", "Cursor")
+                        .WithMany()
+                        .HasForeignKey("CursorId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
+                    b.Navigation("Cursor");
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", null)
                         .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.AccessGroup", "Id")
+                        .HasForeignKey("planner_node_service.Core.Entities.Models.GroupAccessSubject", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRight", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.UserAccessSubject", b =>
                 {
-                    b.HasOne("planner_node_service.Core.Entities.Models.AccessGroup", "AccessGroup")
-                        .WithMany()
-                        .HasForeignKey("AccessGroupId");
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
+                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", null)
                         .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.AccessRight", "Id")
+                        .HasForeignKey("planner_node_service.Core.Entities.Models.UserAccessSubject", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
-                        .WithMany()
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AccessGroup");
-
-                    b.Navigation("Node");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
@@ -401,32 +555,7 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ChildNode")
-                        .WithMany()
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
-                        .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.NodeLink", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ParentNode")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChildNode");
-
-                    b.Navigation("ParentNode");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessGroup", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
                 {
                     b.Navigation("Members");
                 });

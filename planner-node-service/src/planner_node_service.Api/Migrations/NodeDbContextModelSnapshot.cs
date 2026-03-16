@@ -503,6 +503,17 @@ namespace planner_node_service.Api.Migrations
                     b.Navigation("OldStatus");
                 });
 
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.SyncScopeAccess", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Scope")
+                        .WithMany()
+                        .HasForeignKey("ScopeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Scope");
+                });
+
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
                 {
                     b.HasOne("planner_node_service.Core.Entities.Models.ContentLog", "Cursor")

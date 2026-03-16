@@ -10,6 +10,11 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.HasIndex(e => new { e.ScopeId, e.AccountId })
                 .IsUnique();
+
+            builder.HasOne(e => e.Scope)
+                .WithMany()
+                .HasForeignKey(e => e.ScopeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

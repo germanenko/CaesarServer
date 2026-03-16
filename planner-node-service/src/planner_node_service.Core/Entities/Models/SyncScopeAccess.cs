@@ -11,6 +11,7 @@ namespace planner_node_service.Core.Entities.Models
     {
         public int Id { get; set; }
         public Guid ScopeId { get; set; }
+        public Node Scope { get; set; }
         public Guid AccountId { get; set; }
         public Permission Permission { get; set; }
         public long RulesRevisionUsed { get; set; }
