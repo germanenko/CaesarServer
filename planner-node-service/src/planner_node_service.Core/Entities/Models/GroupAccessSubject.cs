@@ -2,10 +2,10 @@
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class AccessGroup : TrackableEntity
+    public class GroupAccessSubject : AccessSubject
     {
         public string Name { get; set; }
-        public List<AccessGroupMember> Members { get; set; } = new();
+        public List<GroupMember> Members { get; set; } = new();
 
         public AccessGroupBody ToAccessGroupBody()
         {

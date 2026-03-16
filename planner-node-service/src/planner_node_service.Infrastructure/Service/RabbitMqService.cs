@@ -137,11 +137,11 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Chat));
+                await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Chat));
 
                 foreach (var participant in result.Participants)
                 {
-                    await accessService.CreateAccessRight(participant.AccountId, result.Chat.Id, Permission.Admin);
+                    await accessService.CreateAccessRule(participant.AccountId, result.Chat.Id, Permission.Write);
                     await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant.AccountId, NodeId = result.Chat.Id, NotificationsEnabled = true });
                 }
 
@@ -182,9 +182,7 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Board));
-
-                await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Board.AccessRight));
+                await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Board));
 
                 //await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = result.CreatorId, NodeId = result.Board.Id, NotificationsEnabled = true });
 
@@ -242,10 +240,6 @@ namespace planner_node_service.Infrastructure.Service
 
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
-                if (result.Column.AccessRight != null)
-                {
-                    await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Column.AccessRight));
-                }
 
                 return new ServiceResponse<object>()
                 {
@@ -300,10 +294,6 @@ namespace planner_node_service.Infrastructure.Service
                     }
 
                     await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
-                }
-                if (result.Task.AccessRight != null)
-                {
-                    await accessService.CreateAccessRight(BodyConverter.ServerToClientBody(result.Task.AccessRight));
                 }
 
                 return new ServiceResponse<object>()

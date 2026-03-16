@@ -7,12 +7,14 @@ namespace planner_node_service.Core.IRepository
     public interface IAccessRepository
     {
 
-        Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission permission);
-        Task<AccessRight?> CreateAccessRight(AccessRightBody accessRightBody);
-        Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
-        Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
-        Task<AccessGroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
-        Task<AccessBody?> GetAccessRights(Guid accountId);
+        Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId);
+        Task<SyncScopeAccess?> CreateSyncScopeAccess(Guid granteeId, Guid scopeId, Permission permission);
+        Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
+        Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId);
+        Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
+        Task<GroupMember?> AddUserToGroup(Guid granterId, Guid granteeId, Guid groupId);
+        Task<GroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
+        Task<AccessBody?> GetAccessRules(Guid accountId);
         Task<bool> CheckAccess(Guid accountId, Guid nodeId);
     }
 }

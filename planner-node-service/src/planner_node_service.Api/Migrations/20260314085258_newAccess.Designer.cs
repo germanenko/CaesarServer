@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260314085258_newAccess")]
+    partial class newAccess
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -52,33 +55,6 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("SubjectId");
 
                     b.ToTable("AccessLogs", (string)null);
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("NodeId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("Permission")
-                        .HasColumnType("integer");
-
-                    b.Property<Guid>("SubjectId")
-                        .HasColumnType("uuid");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NodeId");
-
-                    b.HasIndex("SubjectId");
-
-                    b.HasIndex("SubjectId", "NodeId", "Permission")
-                        .IsUnique();
-
-                    b.ToTable("AccessRules");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessSubject", b =>
@@ -178,35 +154,6 @@ namespace planner_node_service.Api.Migrations
                         .HasDatabaseName("IX_Histories_UpdatedById");
 
                     b.ToTable("History", (string)null);
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ChildId")
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("ParentId")
-                        .HasColumnType("uuid");
-
-                    b.Property<int>("RelationType")
-                        .HasColumnType("integer");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ChildId");
-
-                    b.HasIndex("ParentId");
-
-                    b.HasIndex("RelationType");
-
-                    b.HasIndex("ParentId", "ChildId", "RelationType")
-                        .IsUnique();
-
-                    b.ToTable("NodeLinks", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NotificationSettings", b =>
@@ -358,6 +305,29 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("UserAccessSubjects");
                 });
 
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
+                {
+                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
+
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Permission")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("SubjectId")
+                        .HasColumnType("uuid");
+
+                    b.HasIndex("NodeId");
+
+                    b.HasIndex("SubjectId");
+
+                    b.HasIndex("SubjectId", "NodeId", "Permission")
+                        .IsUnique();
+
+                    b.ToTable("AccessRules");
+                });
+
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
                 {
                     b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
@@ -384,33 +354,32 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("Nodes", (string)null);
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Scope", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
                 {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.Node");
+                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
 
-                    b.ToTable("Scopes");
+                    b.Property<Guid>("ChildId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("ParentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("RelationType")
+                        .HasColumnType("integer");
+
+                    b.HasIndex("ChildId");
+
+                    b.HasIndex("ParentId");
+
+                    b.HasIndex("RelationType");
+
+                    b.HasIndex("ParentId", "ChildId", "RelationType")
+                        .IsUnique();
+
+                    b.ToTable("NodeLinks", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
-                        .WithMany()
-                        .HasForeignKey("NodeId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", "Subject")
-                        .WithMany()
-                        .HasForeignKey("SubjectId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Node");
-
-                    b.Navigation("Subject");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
                 {
                     b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
                         .WithMany()
@@ -449,25 +418,6 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Trackable");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ChildNode")
-                        .WithMany()
-                        .HasForeignKey("ChildId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ParentNode")
-                        .WithMany()
-                        .HasForeignKey("ParentId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("ChildNode");
-
-                    b.Navigation("ParentNode");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NotificationSettings", b =>
@@ -540,6 +490,31 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
+                {
+                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
+                        .WithOne()
+                        .HasForeignKey("planner_node_service.Core.Entities.Models.AccessRule", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
+                        .WithMany()
+                        .HasForeignKey("NodeId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", "Subject")
+                        .WithMany()
+                        .HasForeignKey("SubjectId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Node");
+
+                    b.Navigation("Subject");
+                });
+
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
                 {
                     b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
@@ -549,13 +524,29 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Scope", b =>
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
                 {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", null)
-                        .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.Scope", "Id")
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ChildNode")
+                        .WithMany()
+                        .HasForeignKey("ChildId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
+                        .WithOne()
+                        .HasForeignKey("planner_node_service.Core.Entities.Models.NodeLink", "Id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "ParentNode")
+                        .WithMany()
+                        .HasForeignKey("ParentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ChildNode");
+
+                    b.Navigation("ParentNode");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>

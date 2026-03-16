@@ -11,6 +11,8 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.ToTable("NodeLinks");
 
+            builder.HasKey(x => x.Id);
+
             builder.HasOne(e => e.ParentNode)
                 .WithMany()
                 .HasForeignKey(e => e.ParentId)

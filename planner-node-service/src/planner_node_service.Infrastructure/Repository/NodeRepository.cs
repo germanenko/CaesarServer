@@ -4,7 +4,9 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using System.Security;
 using System.Text.Json;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -27,6 +29,51 @@ namespace planner_node_service.Infrastructure.Repository
             return newNodes;
         }
 
+        public async Task<Node> AddScope(NodeBody nodeBody)
+        {
+            var existingScope = await _context.Scopes
+                .Where(x => x.Id == nodeBody.Id)
+                .FirstOrDefaultAsync();
+
+            if (existingScope != null)
+            {
+                return existingScope;
+            }
+
+            var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, ActionType.Create))).Entity;
+
+            await _context.SaveChangesAsync();
+
+            var node = new Scope()
+            {
+                Id = nodeBody.Id,
+                Name = nodeBody.Name,
+                Type = nodeBody.Type,
+                BodyJson = JsonSerializer.Serialize(nodeBody),
+                CursorId = cursor.Id
+            };
+
+            var result = (await _context.Scopes.AddAsync(node)).Entity;
+
+            var nodeLink = new NodeLink
+            {
+                Id = Guid.NewGuid(),
+                ParentId = node.Id,
+                ChildId = node.Id,
+                RelationType = RelationType.Me
+            };
+
+            await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
+
+            var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = nodeBody.Id, SubjectId = nodeBody.UpdatedBy, Permission = Permission.Write })).Entity;
+            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = nodeBody.Id, AccountId = nodeBody.UpdatedBy, Permission = Permission.Write });
+
+            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = nodeBody.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
+
+            await _context.SaveChangesAsync();
+            return result;
+        }
+
         public async Task<Node> AddOrUpdateNode(NodeBody nodeBody)
         {
             var existingNode = await _context.Nodes
@@ -37,13 +84,11 @@ namespace planner_node_service.Infrastructure.Repository
 
             var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, action))).Entity;
 
-            await _context.SaveChangesAsync();
-
             var node = new Node()
             {
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
-                Type = NodeType.Chat,
+                Type = nodeBody.Type,
                 BodyJson = JsonSerializer.Serialize(nodeBody),
                 CursorId = cursor.Id
             };
@@ -60,7 +105,7 @@ namespace planner_node_service.Infrastructure.Repository
                     RelationType = RelationType.Me
                 };
 
-                await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy.Value, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt.Value });
+                await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
                 await _context.SaveChangesAsync();
                 return result;
@@ -143,8 +188,10 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId)
         {
-            var rootIds = await _context.AccessRights
-                .Where(x => x.AccountId == accountId)
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            var rootIds = await _context.AccessRules
+                .Where(x => x.SubjectId == userSubject.Id)
                 .Select(x => x.NodeId)
                 .ToListAsync();
 
@@ -197,8 +244,11 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId)
         {
-            var rootIds = await _context.AccessRights
-                .Where(x => x.AccountId == accountId)
+            var userSubject = await _context.Set<UserAccessSubject>()
+                .FirstOrDefaultAsync(u => u.AccountId == accountId);
+
+            var rootIds = await _context.AccessRules
+                .Where(x => x.SubjectId == userSubject.Id)
                 .Select(x => x.NodeId)
                 .ToListAsync();
 

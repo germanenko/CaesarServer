@@ -19,8 +19,8 @@ namespace planner_client_package.Entities
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string Props { get; set; }
-        public Guid? UpdatedBy { get; set; }
-        public DateTime? UpdatedAt { get; set; }
+        public Guid UpdatedBy { get; set; }
+        public DateTime UpdatedAt { get; set; }
         public long Version { get; set; }
         public NodeLinkBody Link { get; set; }
         public AccessRightBody AccessRight { get; set; }

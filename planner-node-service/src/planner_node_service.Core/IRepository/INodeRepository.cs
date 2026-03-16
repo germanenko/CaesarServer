@@ -9,6 +9,7 @@ namespace planner_node_service.Core.IRepository
         Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody node);
         Task<List<Node>> AddOrUpdateNodes(List<NodeBody> node);
         Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);
+        Task<Node> AddScope(NodeBody node);
         Task<Node> AddOrUpdateNode(NodeBody node);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
         Task<IEnumerable<Node>?> GetNodesTree(Guid accountId);

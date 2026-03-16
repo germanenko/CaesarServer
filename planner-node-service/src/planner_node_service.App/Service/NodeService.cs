@@ -51,8 +51,8 @@ namespace planner_node_service.App.Service
             foreach (var body in bodies)
             {
                 var history = await _logRepository.GetLastHistory(body.Id);
-                body.UpdatedBy = history?.UpdatedById;
-                body.UpdatedAt = history?.UpdatedAt;
+                body.UpdatedBy = history.UpdatedById;
+                body.UpdatedAt = history.UpdatedAt;
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
@@ -82,8 +82,8 @@ namespace planner_node_service.App.Service
             foreach (var body in nodes)
             {
                 var history = await _logRepository.GetLastHistory(body.Id);
-                body.UpdatedBy = history?.UpdatedById;
-                body.UpdatedAt = history?.UpdatedAt;
+                body.UpdatedBy = history.UpdatedById;
+                body.UpdatedAt = history.UpdatedAt;
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
@@ -107,6 +107,28 @@ namespace planner_node_service.App.Service
                   .Select(x => x.ToBody())
                   .ToList()!
                ?? new List<NodeLinkBody>()
+            };
+        }
+
+        public async Task<ServiceResponse<NodeBody>> AddScope(NodeBody nodeBody)
+        {
+            if (nodeBody.Name.IsNullOrEmpty())
+            {
+                return new ServiceResponse<NodeBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Errors = new[] { "Name field is reqiured" }
+                };
+            }
+
+            var newNode = await _nodeRepository.AddScope(nodeBody);
+
+            return new ServiceResponse<NodeBody>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = newNode.ToNodeBody()
             };
         }
 

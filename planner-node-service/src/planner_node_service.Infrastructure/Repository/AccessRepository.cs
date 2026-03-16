@@ -17,38 +17,39 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<AccessRight?> CreateAccessRight(AccessRightBody accessRightBody)
+        public async Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId)
         {
-            var existing = await _context.AccessRights
-                .FirstOrDefaultAsync(x =>
-                    x.AccountId == accessRightBody.AccountId &&
-                    x.NodeId == accessRightBody.NodeId &&
-                    x.Permission == accessRightBody.Permission);
-
-            if (existing != null)
-            {
-                return existing;
-            }
-
-            var accessRight = new AccessRight
-            {
-                Id = accessRightBody.Id,
-                AccountId = accessRightBody.AccountId,
-                NodeId = accessRightBody.NodeId,
-                Permission = accessRightBody.Permission
-            };
-
-            _context.AccessRights.Add(accessRight);
-            await _context.SaveChangesAsync();
-
-            return accessRight;
+            return await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scopeId && x.AccountId == accountId);
         }
 
-        public async Task<AccessRight?> CreateAccessRight(Guid accountId, Guid nodeId, Permission permission)
+        public async Task<SyncScopeAccess?> CreateSyncScopeAccess(Guid accountId, Guid scopeId, Permission permission)
         {
-            var existing = await _context.AccessRights
+            var scope = await GetSyncScopeAccess(accountId, scopeId);
+
+            if (scope != null)
+            {
+                return scope;
+            }
+
+            var newScope = (await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = accountId, ScopeId = scopeId, Permission = permission })).Entity;
+
+            await _context.SaveChangesAsync();
+
+            return newScope;
+        }
+
+        public async Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == granteeId);
+
+            if (userSubject == null)
+            {
+                userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = granteeId })).Entity;
+            }
+
+            var existing = await _context.AccessRules
                 .FirstOrDefaultAsync(x =>
-                    x.AccountId == accountId &&
+                    x.SubjectId == userSubject.Id &&
                     x.NodeId == nodeId &&
                     x.Permission == permission);
 
@@ -57,48 +58,81 @@ namespace planner_node_service.Infrastructure.Repository
                 return existing;
             }
 
-            var accessRight = new AccessRight
+            var accessRight = new AccessRule
             {
                 Id = Guid.NewGuid(),
-                AccountId = accountId,
+                SubjectId = userSubject.Id,
                 NodeId = nodeId,
                 Permission = permission
             };
 
-            _context.AccessRights.Add(accessRight);
+            _context.AccessRules.Add(accessRight);
+
+            var scope = await _context.Scopes.FirstOrDefaultAsync(x => x.Id == nodeId);
+            if (scope != null)
+            {
+                await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });
+            }
+
             await _context.SaveChangesAsync();
 
             return accessRight;
         }
 
-        public async Task<AccessGroup?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
+        public async Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == granteeId);
+
+            if (userSubject == null)
+            {
+                return false;
+            }
+
+            var existing = await _context.AccessRules
+                .FirstOrDefaultAsync(x =>
+                    x.SubjectId == userSubject.Id &&
+                    x.NodeId == nodeId);
+
+            if (existing != null)
+            {
+                _context.AccessRules.Remove(existing);
+
+                await _context.SaveChangesAsync();
+
+                return true;
+            }
+
+            return false;
+        }
+
+        public async Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
         {
             var hasAccess = await CheckAccess(accountId, body.BoardId);
             if (!hasAccess)
                 return null;
 
-            var group = new AccessGroup()
+            var group = new GroupAccessSubject()
             {
                 Id = Guid.NewGuid(),
                 Name = body.Name
             };
 
-            await _context.AccessGroups.AddAsync(group);
+            await _context.GroupAccessSubjects.AddAsync(group);
 
-            var members = body.UserIds.Select(userId => new AccessGroupMember()
+            var members = body.UserIds.Select(userId => new GroupMember()
             {
-                AccessGroupId = group.Id,
+                GroupId = group.Id,
                 AccountId = userId
             }).ToList();
 
             await _context.AccessGroupMembers.AddRangeAsync(members);
 
-            var accessRight = new AccessRight()
+            var accessRight = new AccessRule()
             {
                 NodeId = body.BoardId,
-                AccessGroupId = group.Id
+                SubjectId = group.Id
             };
-            await _context.AccessRights.AddAsync(accessRight);
+            await _context.AccessRules.AddAsync(accessRight);
 
             await _context.SaveChangesAsync();
 
@@ -106,10 +140,10 @@ namespace planner_node_service.Infrastructure.Repository
             return group;
         }
 
-        public async Task<AccessGroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
+        public async Task<GroupMember?> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
         {
-            var accessRight = await _context.AccessRights
-                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId);
+            var accessRight = await _context.AccessRules
+                .FirstOrDefaultAsync(x => x.SubjectId == groupId);
 
             if (accessRight == null)
                 return null;
@@ -119,14 +153,14 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
 
             var existingMember = await _context.AccessGroupMembers
-                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId && x.AccountId == userToAdd);
+                .FirstOrDefaultAsync(x => x.GroupId == groupId && x.AccountId == userToAdd);
 
             if (existingMember != null)
                 return existingMember;
 
-            var member = new AccessGroupMember()
+            var member = new GroupMember()
             {
-                AccessGroupId = groupId,
+                GroupId = groupId,
                 AccountId = userToAdd
             };
 
@@ -142,26 +176,27 @@ namespace planner_node_service.Infrastructure.Repository
 
             var currentNodeId = nodeId;
 
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
             while (currentNodeId != Guid.Empty)
             {
-                var rules = await _context.AccessRights
+                var hasAccess = await _context.AccessRules
                     .Where(ar => ar.NodeId == currentNodeId)
                     .Select(ar => new
                     {
-                        ar.AccountId,
-                        ar.AccessGroupId,
-                        HasGroupMember = ar.AccessGroupId != null &&
-                            ar.AccessGroup.Members.Any(m => m.AccountId == accountId)
-                    })
-                    .ToListAsync();
+                        ar.Permission,
+                        DirectAccess = _context.Set<UserAccessSubject>()
+                            .Any(u => u.Id == ar.SubjectId && u.AccountId == accountId),
 
-                if (rules.Any())
-                {
-                    return rules.Any(r =>
-                        r.AccountId == accountId ||
-                        r.HasGroupMember
-                    );
-                }
+                        GroupAccess = _context.Set<GroupAccessSubject>()
+                            .Where(g => g.Id == ar.SubjectId)
+                            .SelectMany(g => g.Members)
+                            .Any(m => m.AccountId == accountId)
+                    })
+                    .AnyAsync(x => (x.DirectAccess || x.GroupAccess) &&
+                        x.Permission != Permission.None);
+
+                if (hasAccess) return true;
 
                 currentNodeId = await _context.NodeLinks
                     .Where(x => x.ChildId == currentNodeId && x.ParentId != x.ChildId)
@@ -173,10 +208,10 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
 
-        public async Task<AccessGroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
+        public async Task<GroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
         {
-            var accessRight = await _context.AccessRights
-                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId);
+            var accessRight = await _context.AccessRules
+                .FirstOrDefaultAsync(x => x.SubjectId == groupId);
 
             if (accessRight == null)
                 return null;
@@ -186,7 +221,7 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
 
             var groupMember = await _context.AccessGroupMembers
-                .FirstOrDefaultAsync(x => x.AccessGroupId == groupId && x.AccountId == userToRemove);
+                .FirstOrDefaultAsync(x => x.GroupId == groupId && x.AccountId == userToRemove);
 
             if (groupMember == null)
                 return null;
@@ -197,38 +232,35 @@ namespace planner_node_service.Infrastructure.Repository
             return groupMember;
         }
 
-        public async Task<AccessBody?> GetAccessRights(Guid accountId)
+        public async Task<AccessBody?> GetAccessRules(Guid accountId)
         {
-            var userAccessRights = await _context.AccessRights
-                .Include(x => x.AccessGroup)
-                    .ThenInclude(x => x.Members)
+            var userRules = _context.AccessRules
                 .Where(ar =>
-                    (ar.AccessGroupId == null && ar.AccountId == accountId) ||
-                    ar.AccessGroupId != null &&
-                     ar.AccessGroup.Members.Any(m => m.AccountId == accountId)
-                )
+                    ar.Subject is UserAccessSubject &&
+                    ((UserAccessSubject)ar.Subject).AccountId == accountId);
+
+            var groupRules = _context.AccessRules
+                .Where(ar =>
+                    ar.Subject is GroupAccessSubject &&
+                    ((GroupAccessSubject)ar.Subject)
+                        .Members.Any(m => m.AccountId == accountId));
+
+            var accessRights = await userRules
+                .Union(groupRules)
                 .ToListAsync();
 
 
-            var allRights = new List<AccessRight>();
-
-            foreach (var access in userAccessRights)
-            {
-                var nodeAccess = _context.AccessRights.Where(a => a.NodeId == access.NodeId).ToList();
-                allRights.AddRange(nodeAccess);
-            }
-
-            if (!allRights.Any())
+            if (!accessRights.Any())
                 return null;
 
             var accessBody = new AccessBody();
 
-            allRights = allRights.DistinctBy(x => x.Id).ToList();
+            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
 
-            accessBody.AccessRights = allRights.Select(x => x.ToAccessRightBody()).ToList();
+            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRuleBody()).ToList();
 
-            var accessGroups = allRights
-                .Select(x => x.AccessGroup)
+            var accessGroups = groupRules
+                .Select(x => x.Subject as GroupAccessSubject)
                 .Where(x => x != null)
                 .Distinct()
                 .ToList();

@@ -9,17 +9,39 @@ namespace planner_node_service.App.Service
     public class AccessService : IAccessService
     {
         private readonly IAccessRepository _accessRepository;
+        private readonly INodeRepository _nodeRepository;
         private readonly IUserService _userService;
 
-        public AccessService(IAccessRepository accessRepository, IUserService userService)
+        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository, IUserService userService)
         {
             _accessRepository = accessRepository;
+            _nodeRepository = nodeRepository;
             _userService = userService;
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(AccessRightBody accessRightBody)
+        public async Task<ServiceResponse<AccessRightBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
-            var access = await _accessRepository.CreateAccessRight(accessRightBody);
+            if (_nodeRepository.GetNode(nodeId) == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Ноды не существует" }
+                };
+            }
+
+            if (!await _accessRepository.CheckAccess(granterId, nodeId))
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Отказано в выдаче доступа" }
+                };
+            }
+
+            var access = await _accessRepository.GrantAccess(granterId, granteeId, nodeId, permission);
 
             if (access == null)
             {
@@ -27,7 +49,7 @@ namespace planner_node_service.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new[] { "Нет доступа к доске" }
+                    Errors = new[] { "Доступ не выдан" }
                 };
             }
 
@@ -35,13 +57,55 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRightBody()
+                Body = access.ToAccessRuleBody()
             };
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRight(Guid accountId, Guid nodeId, Permission permission)
+        public async Task<ServiceResponse<AccessRightBody>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
-            var access = await _accessRepository.CreateAccessRight(accountId, nodeId, permission);
+            if (_nodeRepository.GetNode(nodeId) == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Ноды не существует" }
+                };
+            }
+
+            if (!await _accessRepository.CheckAccess(granterId, nodeId))
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Отказано в отзыве доступа" }
+                };
+            }
+
+            var access = await _accessRepository.GrantAccess(granterId, granteeId, nodeId, permission);
+
+            if (access == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Доступ не выдан" }
+                };
+            }
+
+            return new ServiceResponse<AccessRightBody>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access.ToAccessRuleBody()
+            };
+        }
+
+        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRule(Guid accountId, Guid nodeId, Permission permission)
+        {
+            var access = await _accessRepository.GrantAccess(accountId, accountId, nodeId, permission);
 
             if (access == null)
             {
@@ -57,7 +121,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRightBody()
+                Body = access.ToAccessRuleBody()
             };
         }
 
@@ -127,9 +191,9 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessBody>> GetAccessRights(Guid accountId)
+        public async Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId)
         {
-            var access = await _accessRepository.GetAccessRights(accountId);
+            var access = await _accessRepository.GetAccessRules(accountId);
 
             if (access == null)
             {

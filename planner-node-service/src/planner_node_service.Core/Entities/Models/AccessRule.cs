@@ -3,23 +3,22 @@ using planner_common_package.Enums;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class AccessRight : TrackableEntity
+    public class AccessRule
     {
-        public Guid? AccountId { get; set; }
-        public Guid? AccessGroupId { get; set; }
-        public AccessGroup AccessGroup { get; set; }
+        public Guid Id { get; set; }
+        public Guid SubjectId { get; set; }
+        public AccessSubject Subject { get; set; }
         public Guid NodeId { get; set; }
         public Node Node { get; set; }
         public Permission Permission { get; set; }
 
-        public AccessRightBody ToAccessRightBody()
+        public AccessRightBody ToAccessRuleBody()
         {
             return new AccessRightBody
             {
                 Id = Id,
-                AccountId = AccountId,
+                AccountId = SubjectId,
                 NodeId = NodeId,
-                AccessGroupId = AccessGroupId,
                 Permission = Permission
             };
         }

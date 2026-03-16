@@ -11,16 +11,21 @@ namespace planner_node_service.Infrastructure.Data
         {
         }
 
+        public DbSet<Scope> Scopes { get; set; }
         public DbSet<Node> Nodes { get; set; }
         public DbSet<NodeLink> NodeLinks { get; set; }
-        public DbSet<AccessRight> AccessRights { get; set; }
-        public DbSet<AccessGroup> AccessGroups { get; set; }
-        public DbSet<AccessGroupMember> AccessGroupMembers { get; set; }
+        public DbSet<SyncScopeAccess> SyncScopeAccess { get; set; }
+        public DbSet<AccessRule> AccessRules { get; set; }
+        public DbSet<AccessSubject> AccessSubjects { get; set; }
+        public DbSet<GroupAccessSubject> GroupAccessSubjects { get; set; }
+        public DbSet<UserAccessSubject> UserAccessSubjects { get; set; }
+        public DbSet<GroupMember> AccessGroupMembers { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<StatusHistory> StatusHistory { get; set; }
         public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<ContentLog> ContentLogs { get; set; }
+        public DbSet<AccessLog> AccessLogs { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -31,9 +36,10 @@ namespace planner_node_service.Infrastructure.Data
 
             modelBuilder.Entity<TrackableEntity>().UseTptMappingStrategy();
             modelBuilder.Entity<Node>().HasBaseType<TrackableEntity>();
-            modelBuilder.Entity<AccessRight>().HasBaseType<TrackableEntity>();
-            modelBuilder.Entity<AccessGroup>().HasBaseType<TrackableEntity>();
-            modelBuilder.Entity<NodeLink>().HasBaseType<TrackableEntity>();
+
+            modelBuilder.Entity<AccessSubject>().UseTptMappingStrategy();
+            modelBuilder.Entity<UserAccessSubject>().HasBaseType<AccessSubject>();
+            modelBuilder.Entity<GroupAccessSubject>().HasBaseType<AccessSubject>();
         }
     }
 }

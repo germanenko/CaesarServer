@@ -10,6 +10,7 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds);
         public Task<ServiceResponse<List<EntityVersionBody>>> GetManifest(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
+        public Task<ServiceResponse<NodeBody>> AddScope(NodeBody node);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody node);
         public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node);
         public Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);

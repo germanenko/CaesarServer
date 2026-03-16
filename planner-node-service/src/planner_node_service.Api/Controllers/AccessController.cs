@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -22,6 +23,35 @@ namespace planner_node_service.Api.Controllers
         {
             _accessService = accessService;
             _jwtService = jwtService;
+        }
+
+        [HttpPost("grantAccess"), Authorize]
+        [SwaggerOperation("Выдать доступ")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GrantAccess(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid accountId,
+            [FromQuery] Guid nodeId,
+            [FromQuery] Permission permission
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId, permission);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("revokeAccess"), Authorize]
+        [SwaggerOperation("Отозвать доступ")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GrantAccess(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid accountId,
+            [FromQuery] Guid nodeId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
 
         [HttpPost("createOrUpdateAccessGroup"), Authorize]
@@ -74,7 +104,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.GetAccessRights(tokenPayload.AccountId);
+            var result = await _accessService.GetAccessRules(tokenPayload.AccountId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

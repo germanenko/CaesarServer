@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260314090019_removeTrackLinksAndRules")]
+    partial class removeTrackLinksAndRules
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -384,13 +387,6 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("Nodes", (string)null);
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Scope", b =>
-                {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.Node");
-
-                    b.ToTable("Scopes");
-                });
-
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
                 {
                     b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
@@ -545,15 +541,6 @@ namespace planner_node_service.Api.Migrations
                     b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
                         .WithOne()
                         .HasForeignKey("planner_node_service.Core.Entities.Models.Node", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Scope", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", null)
-                        .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.Scope", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });

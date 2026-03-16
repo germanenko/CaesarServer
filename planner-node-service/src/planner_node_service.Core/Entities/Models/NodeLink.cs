@@ -3,8 +3,9 @@ using planner_common_package.Enums;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class NodeLink : TrackableEntity
+    public class NodeLink
     {
+        public Guid Id { get; set; }
         public Guid ParentId { get; set; }
         public Node ParentNode { get; set; }
         public Guid ChildId { get; set; }

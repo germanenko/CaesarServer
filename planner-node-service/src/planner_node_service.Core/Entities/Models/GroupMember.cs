@@ -2,11 +2,11 @@
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class AccessGroupMember
+    public class GroupMember
     {
         public Guid Id { get; set; }
-        public Guid AccessGroupId { get; set; }
-        public AccessGroup AccessGroup { get; set; }
+        public Guid GroupId { get; set; }
+        public GroupAccessSubject Group { get; set; }
         public Guid AccountId { get; set; }
 
         public AccessGroupMemberBody ToAccessGroupMemberBody()
@@ -15,7 +15,7 @@ namespace planner_node_service.Core.Entities.Models
             {
                 Id = Id,
                 AccountId = AccountId,
-                GroupId = AccessGroupId
+                GroupId = GroupId
             };
         }
     }

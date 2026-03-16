@@ -2,9 +2,9 @@
 {
     public enum Permission
     {
-        Viewer,
-        Editor,
-        Admin,
-        Creator,
+        None,
+        Meta,
+        Read,
+        Write
     }
 }
