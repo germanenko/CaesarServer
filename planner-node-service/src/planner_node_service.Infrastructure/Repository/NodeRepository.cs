@@ -4,9 +4,6 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
-using System.Security;
-using System.Text.Json;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -42,8 +39,6 @@ namespace planner_node_service.Infrastructure.Repository
 
             var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, ActionType.Create))).Entity;
 
-            await _context.SaveChangesAsync();
-
             var node = new Scope()
             {
                 Id = nodeBody.Id,
@@ -64,13 +59,24 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-            var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = nodeBody.Id, SubjectId = nodeBody.UpdatedBy, Permission = Permission.Write })).Entity;
-            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = nodeBody.Id, AccountId = nodeBody.UpdatedBy, Permission = Permission.Write });
-
-            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = nodeBody.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
+            await AddAccessRule(nodeBody);
 
             await _context.SaveChangesAsync();
             return result;
+        }
+
+        public async Task AddAccessRule(NodeBody nodeBody)
+        {
+            var subject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == nodeBody.UpdatedBy);
+            if (subject == null)
+            {
+                subject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = nodeBody.UpdatedBy })).Entity;
+            }
+
+            var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = nodeBody.Id, SubjectId = subject.Id, Permission = Permission.Write })).Entity;
+            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = nodeBody.Id, AccountId = nodeBody.UpdatedBy, Permission = Permission.Write });
+
+            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = nodeBody.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
         }
 
         public async Task<Node> AddOrUpdateNode(NodeBody nodeBody)
@@ -104,6 +110,8 @@ namespace planner_node_service.Infrastructure.Repository
                 };
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
+
+                await AddAccessRule(nodeBody);
 
                 await _context.SaveChangesAsync();
                 return result;
