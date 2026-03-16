@@ -187,7 +187,7 @@ void ConfigureSwagger(IServiceCollection services)
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
-            Title = "Planner Task Board Api",
+            Title = "Planner Content Api",
             Description = "Api",
         });
 

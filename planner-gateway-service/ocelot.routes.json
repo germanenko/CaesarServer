@@ -858,7 +858,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/task/swagger/{everything}",
+            "UpstreamPathTemplate": "/content/swagger/{everything}",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
