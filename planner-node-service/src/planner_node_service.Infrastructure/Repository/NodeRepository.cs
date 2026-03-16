@@ -118,11 +118,14 @@ namespace planner_node_service.Infrastructure.Repository
             }
             else
             {
+                if (existingNode.Equals(node)) return existingNode;
+
                 _context.Entry(existingNode).CurrentValues.SetValues(node);
 
                 existingNode.Version++;
 
                 await _context.SaveChangesAsync();
+
                 return existingNode;
             }
         }

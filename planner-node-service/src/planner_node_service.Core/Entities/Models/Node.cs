@@ -11,6 +11,24 @@ namespace planner_node_service.Core.Entities.Models
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
+
+        public override bool Equals(object? obj)
+        {
+            if (obj.GetType() != typeof(Node))
+            {
+                return false;
+            }
+
+            var node = obj as Node;
+
+            if (node.Name != Name || node.Props != Props)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
         public NodeBody ToNodeBody()
         {
             return new NodeBody()
