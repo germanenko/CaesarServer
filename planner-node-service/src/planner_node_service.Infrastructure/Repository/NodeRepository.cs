@@ -28,8 +28,8 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<Node> AddScope(NodeBody nodeBody)
         {
-            var existingScope = await _context.Scopes
-                .Where(x => x.Id == nodeBody.Id)
+            var existingScope = await _context.Nodes
+                .Where(x => x.Id == nodeBody.Id && x.SyncKind == SyncKind.Scope)
                 .FirstOrDefaultAsync();
 
             if (existingScope != null)
@@ -39,15 +39,16 @@ namespace planner_node_service.Infrastructure.Repository
 
             var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, ActionType.Create))).Entity;
 
-            var node = new Scope()
+            var node = new Node()
             {
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                CursorId = cursor.Id
+                CursorId = cursor.Id,
+                SyncKind = SyncKind.Scope
             };
 
-            var result = (await _context.Scopes.AddAsync(node)).Entity;
+            var result = (await _context.Nodes.AddAsync(node)).Entity;
 
             var nodeLink = new NodeLink
             {

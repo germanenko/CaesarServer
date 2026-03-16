@@ -68,7 +68,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             _context.AccessRules.Add(accessRight);
 
-            var scope = await _context.Scopes.FirstOrDefaultAsync(x => x.Id == nodeId);
+            var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
             if (scope != null)
             {
                 await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });

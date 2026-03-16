@@ -62,7 +62,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<ContentLog?> GetLastLogForEntity(Guid entityId)
         {
-            var log = await _context.ContentLogs.Where(x => x.EntityId == entityId).OrderByDescending(x => x.Version).FirstOrDefaultAsync();
+            var log = await _context.ContentLogs.Where(x => x.EntityId == entityId).OrderByDescending(x => x.ScopeVersion).FirstOrDefaultAsync();
 
             return log;
         }

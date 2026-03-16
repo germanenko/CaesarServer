@@ -11,7 +11,6 @@ namespace planner_node_service.Infrastructure.Data
         {
         }
 
-        public DbSet<Scope> Scopes { get; set; }
         public DbSet<Node> Nodes { get; set; }
         public DbSet<NodeLink> NodeLinks { get; set; }
         public DbSet<SyncScopeAccess> SyncScopeAccess { get; set; }

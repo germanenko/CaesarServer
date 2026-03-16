@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_node_service.Core.Entities.Models
+namespace planner_common_package.Enums
 {
-    public class Scope : Node
+    public enum SyncKind
     {
+        None,
+        Scope
     }
 }

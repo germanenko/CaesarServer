@@ -15,7 +15,7 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.Id)
                 .ValueGeneratedOnAdd();
 
-            builder.Property(e => e.Version)
+            builder.Property(e => e.ScopeVersion)
                 .IsRequired()
                 .HasConversion<long>();
 
@@ -26,7 +26,7 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.EntityId)
                 .IsRequired();
 
-            builder.HasIndex(e => new { e.EntityId, e.Version })
+            builder.HasIndex(e => new { e.EntityId, e.ScopeVersion })
                 .IsUnique();
 
             builder.HasIndex(e => e.EntityId)

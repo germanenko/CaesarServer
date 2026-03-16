@@ -12,7 +12,7 @@ namespace planner_node_service.Core.Entities.Models
         public Guid Id { get; set; }
         public Guid ScopeId { get; set; }
         public Guid EntityId { get; set; }
-        public long Version { get; set; }
+        public long ScopeVersion { get; set; }
         public ActionType Action { get; set; }
 
         public ContentLog(Guid scopeId, Guid entityId, ActionType action)

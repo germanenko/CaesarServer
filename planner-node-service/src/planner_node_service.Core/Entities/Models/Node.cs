@@ -12,6 +12,8 @@ namespace planner_node_service.Core.Entities.Models
         public string Name { get; set; }
         public string? Props { get; set; }
 
+        public SyncKind SyncKind { get; set; }
+
         public override bool Equals(object? obj)
         {
             if (obj.GetType() != typeof(Node))

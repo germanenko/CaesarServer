@@ -14,12 +14,21 @@ namespace planner_node_service.Infrastructure.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
+            builder.Property(e => e.SyncKind)
+                .IsRequired()
+                .HasConversion<int>();
+
             builder.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(255);
 
             builder.Property(e => e.Props)
                 .HasColumnType("jsonb");
+
+            builder.HasOne(e => e.Cursor)
+                .WithMany()
+                .HasForeignKey(e => e.CursorId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);
