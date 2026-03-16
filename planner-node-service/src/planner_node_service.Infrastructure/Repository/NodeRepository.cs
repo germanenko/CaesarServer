@@ -49,7 +49,6 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                BodyJson = JsonSerializer.Serialize(nodeBody),
                 CursorId = cursor.Id
             };
 
@@ -89,7 +88,6 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                BodyJson = JsonSerializer.Serialize(nodeBody),
                 CursorId = cursor.Id
             };
 

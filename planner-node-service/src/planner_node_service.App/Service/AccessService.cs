@@ -61,11 +61,11 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
+        public async Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
             if (_nodeRepository.GetNode(nodeId) == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<bool>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
@@ -75,7 +75,7 @@ namespace planner_node_service.App.Service
 
             if (!await _accessRepository.CheckAccess(granterId, nodeId))
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<bool>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -83,23 +83,23 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            var access = await _accessRepository.GrantAccess(granterId, granteeId, nodeId, permission);
+            var access = await _accessRepository.RevokeAccess(granterId, granteeId, nodeId);
 
-            if (access == null)
+            if (access == false)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<bool>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new[] { "Доступ не выдан" }
+                    Errors = new[] { "Доступ не отозван" }
                 };
             }
 
-            return new ServiceResponse<AccessRightBody>()
+            return new ServiceResponse<bool>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRuleBody()
+                Body = access
             };
         }
 

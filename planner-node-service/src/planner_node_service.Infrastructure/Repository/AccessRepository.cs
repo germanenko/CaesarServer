@@ -97,6 +97,8 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 _context.AccessRules.Remove(existing);
 
+                await _context.AccessLogs.AddAsync(new AccessLog() { SubjectId = userSubject.Id, Permission = Permission.None, NodeId = nodeId });
+
                 await _context.SaveChangesAsync();
 
                 return true;

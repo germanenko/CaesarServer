@@ -227,17 +227,16 @@ namespace planner_node_service.App.Service
         {
             var newNodes = await _nodeRepository.AddOrUpdateNodes(nodeBodies);
 
-            var bodies = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList();
             List<ISyncable> contentBodies = new List<ISyncable>();
             List<ISyncable> chatBodies = new List<ISyncable>();
 
-            contentBodies.AddRange(bodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            contentBodies.AddRange(bodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            contentBodies.AddRange(bodies.OfType<TaskBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(nodeBodies.OfType<TaskBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
-            chatBodies.AddRange(bodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            chatBodies.AddRange(bodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            chatBodies.AddRange(bodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
             SyncEntitiesEvent contentNodesEvent = new SyncEntitiesEvent()
             {
@@ -258,7 +257,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = newNodes.Select(x => x.ToNodeBodyFromJson()).ToList()
+                Body = nodeBodies
             };
         }
 

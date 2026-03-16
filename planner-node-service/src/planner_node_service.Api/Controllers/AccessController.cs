@@ -50,7 +50,7 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId);
+            var result = await _accessService.RevokeAccess(tokenPayload.AccountId, accountId, nodeId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 

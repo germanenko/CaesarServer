@@ -11,7 +11,6 @@ namespace planner_node_service.Core.Entities.Models
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
-        public string BodyJson { get; set; }
         public NodeBody ToNodeBody()
         {
             return new NodeBody()
@@ -22,17 +21,6 @@ namespace planner_node_service.Core.Entities.Models
                 Type = Type,
                 Version = Cursor.Version
             };
-        }
-
-        public NodeBody ToNodeBodyFromJson()
-        {
-            var options = new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
-            };
-
-            return JsonSerializer.Deserialize<NodeBody>(BodyJson, options) ?? new NodeBody();
         }
     }
 }
