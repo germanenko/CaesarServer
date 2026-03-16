@@ -29,7 +29,7 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<Node> AddScope(NodeBody nodeBody)
         {
             var existingScope = await _context.Nodes
-                .FirstOrDefaultAsync(x => x.Id == nodeBody.Id && x.SyncKind == SyncKind.Scope);
+                .FirstOrDefaultAsync(x => x.Id == nodeBody.Id);
 
             if (existingScope != null)
             {
