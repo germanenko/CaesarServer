@@ -12,9 +12,7 @@ namespace planner_node_service.Core.Entities.Models
     {
         public int Id { get; set; }
         public Guid SubjectId { get; set; }
-        public AccessSubject Subject { get; set; }
         public Guid NodeId { get; set; }
-        public Node Node { get; set; }
         public Permission Permission { get; set; }
         public long RulesRevision { get; set; }
         public long GraphRevision { get; set; }
