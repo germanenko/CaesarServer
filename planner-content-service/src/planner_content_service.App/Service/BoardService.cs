@@ -195,13 +195,7 @@ namespace planner_content_service.App.Service
             {
                 if (response.Body is JsonElement jsonElement)
                 {
-                    _logger.LogInformation("Body: " + JsonSerializer.Serialize(response));
-                    _logger.LogInformation("Json: " + JsonSerializer.Serialize(jsonElement));
                     responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
-                }
-                else
-                {
-                    _logger.LogInformation("Body is: " + response.Body);
                 }
             }
 

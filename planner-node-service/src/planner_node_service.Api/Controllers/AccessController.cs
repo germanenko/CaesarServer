@@ -4,8 +4,6 @@ using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
-using System.Net;
 using System.Net.Http.Headers;
 
 namespace planner_node_service.Api.Controllers

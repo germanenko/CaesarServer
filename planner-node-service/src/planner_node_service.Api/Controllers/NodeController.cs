@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
-using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Http.Headers;
@@ -24,7 +23,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpGet("getNodesByIds"), Authorize]
-        [SwaggerOperation("Получить ноды по Id")]
+        [SwaggerOperation("РџРѕР»СѓС‡РёС‚СЊ РЅРѕРґС‹ РїРѕ Id")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetNodesByIds(
@@ -38,7 +37,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpGet("getNodes"), Authorize]
-        [SwaggerOperation("Получить ноды")]
+        [SwaggerOperation("РџРѕР»СѓС‡РёС‚СЊ РЅРѕРґС‹")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetNodes(
@@ -51,7 +50,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpGet("getManifest"), Authorize]
-        [SwaggerOperation("Получить манифест")]
+        [SwaggerOperation("РџРѕР»СѓС‡РёС‚СЊ РјР°РЅРёС„РµСЃС‚")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetManifest(
@@ -64,7 +63,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpGet("getNodeLinks"), Authorize]
-        [SwaggerOperation("Получить связи")]
+        [SwaggerOperation("РџРѕР»СѓС‡РёС‚СЊ СЃСЃС‹Р»РєРё")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetNodeLinks(
@@ -77,7 +76,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpPost("createOrUpdateNode"), Authorize]
-        [SwaggerOperation("Создать или обновить ноду")]
+        [SwaggerOperation("РЎРѕР·РґР°С‚СЊ РёР»Рё РѕР±РЅРѕРІРёС‚СЊ РЅРѕРґСѓ")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> AddOrUpdateNode(
@@ -91,7 +90,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpPost("createOrUpdateNodeLink"), Authorize]
-        [SwaggerOperation("Создать или обновить связь")]
+        [SwaggerOperation("РЎРѕР·РґР°С‚СЊ РёР»Рё РѕР±РЅРѕРІРёС‚СЊ СЃСЃС‹Р»РєСѓ")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> AddOrUpdateNodeLink(
@@ -105,7 +104,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpPost("createOrUpdateNodeLinks"), Authorize]
-        [SwaggerOperation("Создать или обновить связи")]
+        [SwaggerOperation("РЎРѕР·РґР°С‚СЊ РёР»Рё РѕР±РЅРѕРІРёС‚СЊ СЃСЃС‹Р»РєРё")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> AddOrUpdateNodeLinks(
@@ -119,7 +118,7 @@ namespace planner_node_service.Api.Controllers
         }
 
         [HttpPost("sendLocalNodes"), Authorize]
-        [SwaggerOperation("Загрузить локальные ноды")]
+        [SwaggerOperation("РћС‚РїСЂР°РІРёС‚СЊ Р»РѕРєР°Р»СЊРЅС‹Рµ РЅРѕРґС‹")]
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> SendLocalNodes(
