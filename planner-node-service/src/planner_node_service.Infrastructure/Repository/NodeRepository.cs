@@ -16,9 +16,9 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<List<Node>> AddOrUpdateNodes(List<NodeBody> nodes)
+        public async Task<List<NodeBody>> AddOrUpdateNodes(List<NodeBody> nodes)
         {
-            List<Node> newNodes = new List<Node>();
+            List<NodeBody> newNodes = new List<NodeBody>();
             foreach (var node in nodes)
             {
                 newNodes.Add(await AddOrUpdateNode(node));
@@ -26,14 +26,14 @@ namespace planner_node_service.Infrastructure.Repository
             return newNodes;
         }
 
-        public async Task<Node> AddScope(NodeBody nodeBody)
+        public async Task<NodeBody> AddScope(NodeBody nodeBody)
         {
             var existingScope = await _context.Nodes
                 .FirstOrDefaultAsync(x => x.Id == nodeBody.Id);
 
             if (existingScope != null)
             {
-                return existingScope;
+                return existingScope.ToNodeBody();
             }
 
             var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, ActionType.Create))).Entity;
@@ -59,13 +59,17 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-            await AddAccessRule(nodeBody);
+            var rule = await AddAccessRule(nodeBody);
 
             await _context.SaveChangesAsync();
-            return result;
+
+            var body = result.ToNodeBody();
+            body.AccessRight = rule.ToAccessRuleBody();
+
+            return body;
         }
 
-        public async Task AddAccessRule(NodeBody nodeBody)
+        public async Task<AccessRule> AddAccessRule(NodeBody nodeBody)
         {
             var subject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == nodeBody.UpdatedBy);
             if (subject == null)
@@ -77,9 +81,11 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = nodeBody.Id, AccountId = nodeBody.UpdatedBy, Permission = Permission.Write });
 
             await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = nodeBody.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
+
+            return rule;
         }
 
-        public async Task<Node> AddOrUpdateNode(NodeBody nodeBody)
+        public async Task<NodeBody> AddOrUpdateNode(NodeBody nodeBody)
         {
             var existingNode = await _context.Nodes
                 .Where(x => x.Id == nodeBody.Id)
@@ -111,14 +117,20 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-                if (nodeBody.Link == null) await AddAccessRule(nodeBody);
+                AccessRightBody rule = null;
+
+                if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody)).ToAccessRuleBody();
 
                 await _context.SaveChangesAsync();
-                return result;
+
+                var body = result.ToNodeBody();
+                body.AccessRight = rule;
+
+                return body;
             }
             else
             {
-                if (existingNode.Equals(node)) return existingNode;
+                if (existingNode.Equals(node)) return existingNode.ToNodeBody();
 
                 _context.Entry(existingNode).CurrentValues.SetValues(node);
 
@@ -126,7 +138,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                return existingNode;
+                return existingNode.ToNodeBody();
             }
         }
 

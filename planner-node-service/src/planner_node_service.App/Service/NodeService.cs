@@ -128,7 +128,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = newNode.ToNodeBody()
+                Body = newNode
             };
         }
 
@@ -150,7 +150,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
-                Body = newNode.ToNodeBody()
+                Body = newNode
             };
         }
 
