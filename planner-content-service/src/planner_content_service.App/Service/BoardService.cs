@@ -72,6 +72,7 @@ namespace planner_content_service.App.Service
                 Name = "Reminders",
                 PublicationStatus = PublicationStatus.Active,
                 UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId,
                 Link = new NodeLinkBody()
                 {
                     Id = Guid.NewGuid(),
@@ -192,6 +193,8 @@ namespace planner_content_service.App.Service
                 };
             }
 
+            var hasBoard = await _boardRepository.GetBoardById(body.Id);
+
             var result = await _boardRepository.CreateOrUpdateBoardAsync(body, accountId);
 
             if (result is null)
@@ -203,9 +206,12 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var columns = await CreateBaseColumns(accountId, body.Id);
+            if (hasBoard == null)
+            {
+                var columns = await CreateBaseColumns(accountId, body.Id);
 
-            result.Childs = columns.Body;
+                result.Childs = columns.Body;
+            }
 
             return new ServiceResponse<BoardBody>
             {

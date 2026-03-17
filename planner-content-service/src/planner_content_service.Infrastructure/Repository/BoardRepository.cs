@@ -11,6 +11,7 @@ using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -25,6 +26,11 @@ namespace planner_content_service.Infrastructure.Repository
             _context = context;
             _publisherService = publisherService;
             _logger = logger;
+        }
+
+        public async Task<BoardBody?> GetBoardById(Guid boardId)
+        {
+            return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId)).ToBoardBody();
         }
 
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
