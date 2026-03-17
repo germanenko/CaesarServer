@@ -182,13 +182,16 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Board));
+                var board = await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Board));
+
+                _logger.LogInformation(JsonSerializer.Serialize(board));
 
                 //await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = result.CreatorId, NodeId = result.Board.Id, NotificationsEnabled = true });
 
                 return new ServiceResponse<object>()
                 {
-                    IsSuccess = true
+                    IsSuccess = true,
+                    Body = board
                 };
             }
             catch (Exception ex)

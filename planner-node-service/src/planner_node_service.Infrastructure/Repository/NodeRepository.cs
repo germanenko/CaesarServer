@@ -111,7 +111,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-                await AddAccessRule(nodeBody);
+                if (nodeBody.Link == null) await AddAccessRule(nodeBody);
 
                 await _context.SaveChangesAsync();
                 return result;

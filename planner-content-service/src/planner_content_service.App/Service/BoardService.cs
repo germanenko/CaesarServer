@@ -9,6 +9,7 @@ using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using System.Net;
+using System.Text.Json;
 
 namespace planner_content_service.App.Service
 {
@@ -79,13 +80,6 @@ namespace planner_content_service.App.Service
                     ChildId = columnId,
                     ParentId = boardId,
                     RelationType = RelationType.Contains
-                },
-                AccessRight = new AccessRightBody()
-                {
-                    Id = Guid.NewGuid(),
-                    AccountId = accountId,
-                    NodeId = columnId,
-                    Permission = Permission.Write
                 }
             };
 
@@ -181,16 +175,25 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _publisherService.Publish(boardEvent, PublishEvent.CreateBoard);
+            var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateBoard);
 
-            if (!nodeComplete.IsSuccess)
+            if (!response.IsSuccess)
             {
                 return new ServiceResponse<BoardBody>
                 {
-                    IsSuccess = nodeComplete.IsSuccess,
-                    StatusCode = nodeComplete.StatusCode,
-                    Errors = nodeComplete.Errors
+                    IsSuccess = response.IsSuccess,
+                    StatusCode = response.StatusCode,
+                    Errors = response.Errors
                 };
+            }
+
+            NodeBody responseBody = new NodeBody();
+            if (response.Body != null)
+            {
+                if (response.Body is JsonElement jsonElement)
+                {
+                    responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
+                }
             }
 
             var hasBoard = await _boardRepository.GetBoardById(body.Id);
@@ -212,6 +215,8 @@ namespace planner_content_service.App.Service
 
                 result.Childs = columns.Body;
             }
+
+            result.AccessRight = responseBody?.AccessRight;
 
             return new ServiceResponse<BoardBody>
             {
