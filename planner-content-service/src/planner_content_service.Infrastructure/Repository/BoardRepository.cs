@@ -30,7 +30,7 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<BoardBody?> GetBoardById(Guid boardId)
         {
-            return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId)).ToBoardBody();
+            return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId))?.ToBoardBody();
         }
 
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
