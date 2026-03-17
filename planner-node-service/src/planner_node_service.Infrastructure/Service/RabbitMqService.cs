@@ -76,7 +76,7 @@ namespace planner_node_service.Infrastructure.Service
             var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
             var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-            var can = (await accessService.CheckAccess(chatMessage.SenderId, chatMessage.ChatId)).Body;
+            var can = (await accessService.CheckAccess(chatMessage.SenderId, chatMessage.ChatId, Permission.Write)).Body;
 
             if (!can)
             {
@@ -227,7 +227,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Column.Link != null)
                 {
-                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId)).Body;
+                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId, Permission.Write)).Body;
 
                     if (!hasAccess)
                     {
@@ -284,7 +284,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 if (result.Task.Link != null)
                 {
-                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Link.ParentId)).Body;
+                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Link.ParentId, Permission.Write)).Body;
 
                     if (!can)
                     {
@@ -373,7 +373,7 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-                var access = await accessService.CheckAccess(result.AccountId, result.NodeId);
+                var access = await accessService.CheckAccess(result.AccountId, result.NodeId, Permission.Write);
 
                 return new ServiceResponse<object>()
                 {

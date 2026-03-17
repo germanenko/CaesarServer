@@ -137,11 +137,7 @@ namespace planner_content_service.App.Service
             List<ColumnBody> columnsToStore = new List<ColumnBody>();
             foreach (var column in columns)
             {
-                var checkAccess = new CheckAccessRequest()
-                {
-                    AccountId = accountId,
-                    NodeId = column.Id
-                };
+                var checkAccess = new CheckAccessRequest(accountId, column.Id, Permission.Write);
 
                 var hasAccess = await _publisherService.Publish(checkAccess, PublishEvent.CheckAccess);
 

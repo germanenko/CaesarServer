@@ -109,7 +109,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
         {
-            var hasAccess = await CheckAccess(accountId, body.BoardId);
+            var hasAccess = await CheckAccess(accountId, body.BoardId, Permission.Write);
             if (!hasAccess)
                 return null;
 
@@ -150,7 +150,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (accessRight == null)
                 return null;
 
-            var hasAccess = await CheckAccess(accountId, accessRight.NodeId);
+            var hasAccess = await CheckAccess(accountId, accessRight.NodeId, Permission.Write);
             if (!hasAccess)
                 return null;
 
@@ -172,7 +172,7 @@ namespace planner_node_service.Infrastructure.Repository
             return member;
         }
 
-        public async Task<bool> CheckAccess(Guid accountId, Guid nodeId)
+        public async Task<bool> CheckAccess(Guid accountId, Guid nodeId, Permission minRequiredPermission)
         {
             bool access = false;
 
@@ -182,23 +182,29 @@ namespace planner_node_service.Infrastructure.Repository
 
             while (currentNodeId != Guid.Empty)
             {
-                var hasAccess = await _context.AccessRules
-                    .Where(ar => ar.NodeId == currentNodeId)
-                    .Select(ar => new
-                    {
-                        ar.Permission,
-                        DirectAccess = _context.Set<UserAccessSubject>()
-                            .Any(u => u.Id == ar.SubjectId && u.AccountId == accountId),
+                var subjectIds = await _context.AccessRules
+                    .Where(ar => ar.NodeId == currentNodeId && ar.Permission >= minRequiredPermission)
+                    .Select(x => x.SubjectId)
+                    .ToListAsync();
 
-                        GroupAccess = _context.Set<GroupAccessSubject>()
-                            .Where(g => g.Id == ar.SubjectId)
-                            .SelectMany(g => g.Members)
-                            .Any(m => m.AccountId == accountId)
-                    })
-                    .AnyAsync(x => (x.DirectAccess || x.GroupAccess) &&
-                        x.Permission != Permission.None);
+                var directAccessSubjects = await _context.UserAccessSubjects
+                    .Where(u => subjectIds.Contains(u.Id) && u.AccountId == accountId)
+                    .Select(u => u.Id)
+                    .ToListAsync();
 
-                if (hasAccess) return true;
+                var groupAccessSubjects = await _context.GroupAccessSubjects
+                    .Where(g => subjectIds.Contains(g.Id))
+                    .SelectMany(g => g.Members)
+                    .Where(m => m.AccountId == accountId)
+                    .Select(m => m.GroupId)
+                    .ToListAsync();
+
+                var allAccessSubjectIds = directAccessSubjects
+                    .Concat(groupAccessSubjects)
+                    .Distinct()
+                    .ToList();
+
+                if (allAccessSubjectIds.Any()) return true;
 
                 currentNodeId = await _context.NodeLinks
                     .Where(x => x.ChildId == currentNodeId && x.ParentId != x.ChildId)
@@ -218,7 +224,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (accessRight == null)
                 return null;
 
-            var hasAccess = await CheckAccess(accountId, accessRight.NodeId);
+            var hasAccess = await CheckAccess(accountId, accessRight.NodeId, Permission.Write);
             if (!hasAccess)
                 return null;
 

@@ -31,7 +31,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            if (!await _accessRepository.CheckAccess(granterId, nodeId))
+            if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
                 return new ServiceResponse<AccessRightBody>()
                 {
@@ -73,7 +73,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            if (!await _accessRepository.CheckAccess(granterId, nodeId))
+            if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
                 return new ServiceResponse<bool>()
                 {
@@ -239,9 +239,9 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId)
+        public async Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId, Permission requiredPermission)
         {
-            var access = await _accessRepository.CheckAccess(accountId, nodeId);
+            var access = await _accessRepository.CheckAccess(accountId, nodeId, requiredPermission);
 
             return new ServiceResponse<bool>()
             {

@@ -26,7 +26,7 @@ namespace planner_chat_service.Core.Entities.Models
                 Type = NodeType.Message,
                 MessageType = MessageType,
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
-                Date = SentAt,
+                SentAt = SentAt,
                 SenderId = SenderId,
                 SenderDeviceId = SenderDeviceId,
                 HasBeenRead = HasBeenRead

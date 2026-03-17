@@ -145,7 +145,7 @@ namespace planner_chat_service.App.Service
             //lastMessage = await _chatRepository.SetMessageIsRead(lastMessage);
             await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
 
-            return sentMessage?.Date;
+            return sentMessage?.SentAt;
         }
 
 

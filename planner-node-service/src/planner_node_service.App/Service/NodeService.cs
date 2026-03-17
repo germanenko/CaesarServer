@@ -68,7 +68,7 @@ namespace planner_node_service.App.Service
             var nodes = new List<NodeBody>();
             foreach (var id in nodeIds)
             {
-                if (await _accessRepository.CheckAccess(accountId, id))
+                if (await _accessRepository.CheckAccess(accountId, id, Permission.Read))
                 {
                     nodes.Add((await _nodeRepository.GetNode(id)).ToNodeBody());
                 }

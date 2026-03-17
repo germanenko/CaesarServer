@@ -54,11 +54,7 @@ namespace planner_chat_service.App.Service
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
-            var checkAccess = new CheckAccessRequest()
-            {
-                AccountId = accountId,
-                NodeId = chatId
-            };
+            var checkAccess = new CheckAccessRequest(accountId, chatId, Permission.Read);
 
             var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 

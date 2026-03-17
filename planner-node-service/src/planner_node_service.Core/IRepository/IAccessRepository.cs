@@ -15,6 +15,6 @@ namespace planner_node_service.Core.IRepository
         Task<GroupMember?> AddUserToGroup(Guid granterId, Guid granteeId, Guid groupId);
         Task<GroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
         Task<AccessBody?> GetAccessRules(Guid accountId);
-        Task<bool> CheckAccess(Guid accountId, Guid nodeId);
+        Task<bool> CheckAccess(Guid accountId, Guid nodeId, Permission minRequiredPermission);
     }
 }

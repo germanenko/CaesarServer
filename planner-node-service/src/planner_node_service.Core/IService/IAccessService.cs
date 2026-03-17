@@ -13,6 +13,6 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<AccessGroupMemberBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
         public Task<ServiceResponse<HttpStatusCode>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
         public Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId);
-        public Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId);
+        public Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId, Permission minRequiredPermission);
     }
 }
