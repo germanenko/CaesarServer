@@ -191,7 +191,7 @@ namespace planner_node_service.Infrastructure.Service
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = true,
-                    Body = board
+                    Body = board.Body
                 };
             }
             catch (Exception ex)
