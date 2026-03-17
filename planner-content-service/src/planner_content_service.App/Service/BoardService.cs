@@ -199,6 +199,10 @@ namespace planner_content_service.App.Service
                     _logger.LogInformation("Json: " + JsonSerializer.Serialize(jsonElement));
                     responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
                 }
+                else
+                {
+                    _logger.LogInformation("Body is: " + response.Body);
+                }
             }
 
             var hasBoard = await _boardRepository.GetBoardById(body.Id);
