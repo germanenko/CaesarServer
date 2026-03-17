@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
 using planner_client_package.Interface;
 using planner_common_package.Enums;
@@ -17,11 +18,13 @@ namespace planner_content_service.App.Service
     {
         private readonly IBoardRepository _boardRepository;
         private readonly IPublisherService _publisherService;
+        private readonly ILogger<BoardService> _logger;
 
-        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService)
+        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger)
         {
             _boardRepository = boardRepository;
             _publisherService = publisherService;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
@@ -192,6 +195,8 @@ namespace planner_content_service.App.Service
             {
                 if (response.Body is JsonElement jsonElement)
                 {
+                    _logger.LogInformation("Body: " + JsonSerializer.Serialize(response));
+                    _logger.LogInformation("Json: " + JsonSerializer.Serialize(jsonElement));
                     responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
                 }
             }
