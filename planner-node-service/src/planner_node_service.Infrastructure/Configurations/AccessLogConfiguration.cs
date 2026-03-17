@@ -26,6 +26,11 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.Permission)
                 .IsRequired()
                 .HasConversion<int>();
+
+            builder.HasOne(e => e.Node)
+                .WithMany()
+                .HasForeignKey(e => e.NodeId)
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

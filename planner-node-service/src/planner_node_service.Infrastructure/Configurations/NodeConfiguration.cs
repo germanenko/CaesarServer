@@ -28,7 +28,7 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.HasOne(e => e.Cursor)
                 .WithMany()
                 .HasForeignKey(e => e.CursorId)
-                .OnDelete(DeleteBehavior.NoAction);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);
