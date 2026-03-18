@@ -98,6 +98,32 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });
             }
+            else
+            {
+                var currentNodeId = nodeId;
+
+                while (currentNodeId != Guid.Empty)
+                {
+                    var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
+
+                    if (parent == null)
+                        break;
+
+                    if (parent.SyncKind == SyncKind.Scope)
+                    {
+                        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                        {
+                            AccountId = granteeId,
+                            ScopeId = scope.Id,
+                            Permission = Permission.Meta
+                        });
+
+                        break;
+                    }
+
+                    currentNodeId = parent.Id;
+                }
+            }
 
             await _context.SaveChangesAsync();
 
