@@ -208,7 +208,7 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<IEnumerable<Node>?> GetScopes(Guid accountId)
         {
             var syncScopesAccess = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId && x.Permission > Permission.None).ToListAsync();
-            var syncScopesAccessIds = syncScopesAccess.Select(x => x.ScopeId);
+            var syncScopesAccessIds = syncScopesAccess.Select(x => x.ScopeId).ToList();
 
             var excessScopeIds = new List<Guid>();
 
