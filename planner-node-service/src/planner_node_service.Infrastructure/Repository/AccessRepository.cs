@@ -55,6 +55,15 @@ namespace planner_node_service.Infrastructure.Repository
 
             existing.Permission = permission;
 
+            var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
+            if (scope != null)
+            {
+                var syncScopeAsync = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scope.Id);
+
+                if (syncScopeAsync != null)
+                    syncScopeAsync.Permission = permission;
+            }
+
             await _context.SaveChangesAsync();
 
             return existing;
