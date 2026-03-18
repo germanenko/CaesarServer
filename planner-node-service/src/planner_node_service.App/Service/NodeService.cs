@@ -63,6 +63,22 @@ namespace planner_node_service.App.Service
             };
         }
 
+
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetScopes(Guid accountId)
+        {
+            var nodes = await _nodeRepository.GetScopes(accountId);
+
+            var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
+
+            return new ServiceResponse<IEnumerable<NodeBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = bodies
+            };
+        }
+
+
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
         {
             var nodes = new List<NodeBody>();
@@ -190,6 +206,51 @@ namespace planner_node_service.App.Service
                     IsSuccess = true,
                     StatusCode = System.Net.HttpStatusCode.NotFound,
                     Errors = new[] { "Ноды отсутствуют" }
+                };
+            }
+
+            List<EntityVersionBody> logs = new List<EntityVersionBody>();
+            foreach (var item in nodes.Body)
+            {
+                var log = await _logRepository.GetLastLogForEntity(item.Id);
+
+                if (log != null)
+                {
+                    var entityVersion = new EntityVersionBody()
+                    {
+                        EntityId = log.EntityId,
+                        Version = item.Version
+                    };
+
+                    logs.Add(entityVersion);
+                }
+            }
+
+            foreach (var item in logs)
+            {
+                _logger.LogInformation($"Log: {item.EntityId} - {item.Version}");
+            }
+
+            return new ServiceResponse<List<EntityVersionBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = logs
+            };
+        }
+
+
+        public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId)
+        {
+            var nodes = await GetScopes(accountId);
+
+            if (nodes.Body.IsNullOrEmpty())
+            {
+                return new ServiceResponse<List<EntityVersionBody>>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.NotFound,
+                    Errors = new[] { "Scopes отсутствуют" }
                 };
             }
 

@@ -198,10 +198,36 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
         {
-            IEnumerable<Node>? links = await GetNodesTree(accountId);
+            IEnumerable<Node>? nodes = await GetNodesTree(accountId);
 
-            return links;
+            return nodes;
         }
+
+
+        public async Task<IEnumerable<Node>?> GetScopes(Guid accountId)
+        {
+            IEnumerable<Node>? nodes = await GetNodesTree(accountId);
+
+            var scopes = nodes?.Where(x => x.SyncKind == SyncKind.Scope);
+
+            if (scopes != null)
+                await ClearExcessSyncScopeAccess(accountId, scopes.Select(x => x.Id).ToList());
+
+            return scopes;
+        }
+
+
+        public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> availableScopeIds)
+        {
+            var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
+
+            var excessScopesAccess = currentCache.Where(x => !availableScopeIds.Contains(x.ScopeId)).ToList();
+
+            _context.RemoveRange(excessScopesAccess);
+
+            await _context.SaveChangesAsync();
+        }
+
 
         public async Task<Node?> GetNode(Guid nodeId)
         {
@@ -214,6 +240,11 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                return null;
+            }
 
             var rootIds = await _context.AccessRules
                 .Where(x => x.SubjectId == userSubject.Id)

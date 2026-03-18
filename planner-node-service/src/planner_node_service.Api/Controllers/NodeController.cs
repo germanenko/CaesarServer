@@ -62,6 +62,19 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
+        [HttpGet("getScopesManifest"), Authorize]
+        [SwaggerOperation("Получить Scopes манифест")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> GetScopesManifest(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.GetScopesManifest(tokenPayload.AccountId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpGet("getNodeLinks"), Authorize]
         [SwaggerOperation("Получить ссылки")]
         [SwaggerResponse(200)]
