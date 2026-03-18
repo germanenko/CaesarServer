@@ -90,8 +90,8 @@ namespace planner_node_service.App.Service
                 return new ServiceResponse<AccessRightBody>()
                 {
                     IsSuccess = true,
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new[] { "Доступ не выдан" }
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Уровень доступа не изменен" }
                 };
             }
 
