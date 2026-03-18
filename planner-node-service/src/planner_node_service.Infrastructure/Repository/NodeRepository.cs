@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
@@ -11,10 +12,12 @@ namespace planner_node_service.Infrastructure.Repository
     public class NodeRepository : INodeRepository
     {
         private readonly NodeDbContext _context;
+        private readonly ILogger<NodeRepository> _logger;
 
-        public NodeRepository(NodeDbContext context)
+        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<List<NodeBody>> AddOrUpdateNodes(List<NodeBody> nodes)
@@ -219,6 +222,8 @@ namespace planner_node_service.Infrastructure.Repository
                     excessScopeIds.Add(scopeId);
 
                     var excessScope = syncScopesAccess.First(x => x.ScopeId == scopeId);
+
+                    _logger.LogInformation($"Excess: {scopeId}");
 
                     syncScopesAccess.Remove(excessScope);
                 }
