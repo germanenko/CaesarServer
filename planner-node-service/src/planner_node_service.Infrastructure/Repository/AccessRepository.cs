@@ -104,17 +104,6 @@ namespace planner_node_service.Infrastructure.Repository
             return accessRight;
         }
 
-        public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
-        {
-            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
-
-            if (userSubject == null)
-            {
-                userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = accountId })).Entity;
-            }
-
-            return userSubject;
-        }
 
         public async Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
@@ -134,6 +123,13 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 _context.AccessRules.Remove(existing);
 
+                var scope = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == nodeId && x.AccountId == granteeId);
+
+                if (scope != null)
+                {
+                    _context.SyncScopeAccess.Remove(scope);
+                }
+
                 await _context.AccessLogs.AddAsync(new AccessLog() { SubjectId = userSubject.Id, Permission = Permission.None, NodeId = nodeId });
 
                 await _context.SaveChangesAsync();
@@ -142,6 +138,18 @@ namespace planner_node_service.Infrastructure.Repository
             }
 
             return false;
+        }
+
+        public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = accountId })).Entity;
+            }
+
+            return userSubject;
         }
 
         public async Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body)
