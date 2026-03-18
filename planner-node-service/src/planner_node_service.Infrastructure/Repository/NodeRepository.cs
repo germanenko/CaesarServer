@@ -218,7 +218,7 @@ namespace planner_node_service.Infrastructure.Repository
                 {
                     excessScopeIds.Add(scopeId);
 
-                    var excessScope = syncScopesAccess.FirstOrDefault(x => x.ScopeId == scopeId);
+                    var excessScope = syncScopesAccess.First(x => x.ScopeId == scopeId);
 
                     syncScopesAccess.Remove(excessScope);
                 }
