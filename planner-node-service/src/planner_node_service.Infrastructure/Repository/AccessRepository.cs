@@ -114,7 +114,7 @@ namespace planner_node_service.Infrastructure.Repository
                         await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
                         {
                             AccountId = granteeId,
-                            ScopeId = scope.Id,
+                            ScopeId = parent.Id,
                             Permission = Permission.Meta
                         });
 
