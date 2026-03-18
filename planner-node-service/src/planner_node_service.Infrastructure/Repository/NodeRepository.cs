@@ -334,14 +334,17 @@ namespace planner_node_service.Infrastructure.Repository
 
             while (currentNodeId != Guid.Empty)
             {
-                var child = (await _context.NodeLinks.Include(x => x.ChildNode).FirstOrDefaultAsync(x => x.ParentId == currentNodeId))?.ChildNode;
-
                 var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == currentNodeId && x.SubjectId == userSubject.Id && x.Permission > Permission.None);
 
                 if (access != null)
                 {
+                    _logger.LogInformation($"Access: {access}");
                     return true;
                 }
+
+                var child = (await _context.NodeLinks.Include(x => x.ChildNode).FirstOrDefaultAsync(x => x.ParentId == currentNodeId))?.ChildNode;
+
+                _logger.LogInformation($"Child: {child}");
 
                 if (child == null)
                     break;
