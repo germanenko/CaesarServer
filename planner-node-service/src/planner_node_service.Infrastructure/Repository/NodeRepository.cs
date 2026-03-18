@@ -240,11 +240,11 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
 
-        public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> availableScopeIds)
+        public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> excessScopeIds)
         {
             var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
 
-            var excessScopesAccess = currentCache.Where(x => !availableScopeIds.Contains(x.ScopeId)).ToList();
+            var excessScopesAccess = currentCache.Where(x => excessScopeIds.Contains(x.ScopeId)).ToList();
 
             _context.RemoveRange(excessScopesAccess);
 
