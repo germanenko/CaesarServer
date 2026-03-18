@@ -332,24 +332,32 @@ namespace planner_node_service.Infrastructure.Repository
 
             var currentNodeId = scopeId;
 
-            while (currentNodeId != Guid.Empty)
-            {
-                var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == currentNodeId && x.SubjectId == userSubject.Id && x.Permission > Permission.None);
+            var currentLevelIds = new HashSet<Guid> { scopeId };
 
-                if (access != null)
+            for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
+            {
+                var links = await _context.NodeLinks
+                    .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
+                    .Include(x => x.ParentNode)
+                        .ThenInclude(x => x.Cursor)
+                    .Include(x => x.ChildNode)
+                        .ThenInclude(x => x.Cursor)
+                    .AsNoTracking()
+                    .ToListAsync();
+
+                var nextLevelIds = new HashSet<Guid>();
+                foreach (var link in links)
                 {
-                    _logger.LogInformation($"Access: {access}");
-                    return true;
+                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == link.ChildId && x.SubjectId == userSubject.Id && x.Permission > Permission.None);
+                    if (access != null)
+                    {
+                        return true;
+                    }
+
+                    nextLevelIds.Add(link.ChildId);
                 }
 
-                var childId = (await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == currentNodeId)).ChildId;
-
-                _logger.LogInformation($"Child: {childId}");
-
-                if (childId == Guid.Empty)
-                    break;
-
-                currentNodeId = childId;
+                currentLevelIds = nextLevelIds;
             }
 
             return false;
