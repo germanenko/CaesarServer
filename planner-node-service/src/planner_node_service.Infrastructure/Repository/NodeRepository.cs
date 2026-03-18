@@ -342,14 +342,14 @@ namespace planner_node_service.Infrastructure.Repository
                     return true;
                 }
 
-                var child = (await _context.NodeLinks.Include(x => x.ChildNode).FirstOrDefaultAsync(x => x.ParentId == currentNodeId))?.ChildNode;
+                var childId = (await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == currentNodeId)).ChildId;
 
-                _logger.LogInformation($"Child: {child}");
+                _logger.LogInformation($"Child: {childId}");
 
-                if (child == null)
+                if (childId == Guid.Empty)
                     break;
 
-                currentNodeId = child.Id;
+                currentNodeId = childId;
             }
 
             return false;
