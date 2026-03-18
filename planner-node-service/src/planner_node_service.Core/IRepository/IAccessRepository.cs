@@ -10,6 +10,7 @@ namespace planner_node_service.Core.IRepository
         Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId);
         Task<SyncScopeAccess?> CreateSyncScopeAccess(Guid granteeId, Guid scopeId, Permission permission);
         Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
+        Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
         Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId);
         Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
         Task<GroupMember?> AddUserToGroup(Guid granterId, Guid granteeId, Guid groupId);

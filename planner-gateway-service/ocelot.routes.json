@@ -757,6 +757,19 @@
             "UpstreamPathTemplate": "/api/grantAccess",
             "UpstreamHttpMethod": [ "POST" ]
         },
+	
+	{
+            "DownstreamPathTemplate": "/api/changePermission",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/changePermission",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
 
 	{
             "DownstreamPathTemplate": "/api/revokeAccess",

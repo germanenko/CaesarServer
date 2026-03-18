@@ -38,10 +38,25 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
+        [HttpPost("changePermission"), Authorize]
+        [SwaggerOperation("Изменить уровень доступа")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> ChangePermission(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid accountId,
+            [FromQuery] Guid nodeId,
+            [FromQuery] Permission permission
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _accessService.ChangePermission(tokenPayload.AccountId, accountId, nodeId, permission);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpPost("revokeAccess"), Authorize]
         [SwaggerOperation("Отозвать доступ")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GrantAccess(
+        public async Task<IActionResult> RevokeAccess(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery] Guid accountId,
             [FromQuery] Guid nodeId

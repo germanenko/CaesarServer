@@ -61,6 +61,48 @@ namespace planner_node_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<AccessRightBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        {
+            if (_nodeRepository.GetNode(nodeId) == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Ноды не существует" }
+                };
+            }
+
+            if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Отказано в изменении разрешения" }
+                };
+            }
+
+            var access = await _accessRepository.ChangePermission(granterId, granteeId, nodeId, permission);
+
+            if (access == null)
+            {
+                return new ServiceResponse<AccessRightBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Доступ не выдан" }
+                };
+            }
+
+            return new ServiceResponse<AccessRightBody>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access.ToAccessRuleBody()
+            };
+        }
+
         public async Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
             if (_nodeRepository.GetNode(nodeId) == null)

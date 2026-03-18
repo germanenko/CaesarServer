@@ -7,6 +7,7 @@ namespace planner_node_service.Core.IService
     public interface IAccessService
     {
         public Task<ServiceResponse<AccessRightBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
+        public Task<ServiceResponse<AccessRightBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
         public Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId);
         public Task<ServiceResponse<AccessRightBody>> CreateAccessRule(Guid accountId, Guid nodeId, Permission permission);
         public Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body);

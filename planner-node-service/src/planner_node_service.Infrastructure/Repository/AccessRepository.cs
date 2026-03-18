@@ -38,14 +38,31 @@ namespace planner_node_service.Infrastructure.Repository
             return newScope;
         }
 
+        public async Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        {
+            var userSubject = await CreateOrGetUserSubject(granteeId);
+
+            var existing = await _context.AccessRules
+                .FirstOrDefaultAsync(x =>
+                    x.SubjectId == userSubject.Id &&
+                    x.NodeId == nodeId &&
+                    x.Permission == permission);
+
+            if (existing == null)
+            {
+                return null;
+            }
+
+            existing.Permission = permission;
+
+            await _context.SaveChangesAsync();
+
+            return existing;
+        }
+
         public async Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
-            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == granteeId);
-
-            if (userSubject == null)
-            {
-                userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = granteeId })).Entity;
-            }
+            var userSubject = await CreateOrGetUserSubject(granteeId);
 
             var existing = await _context.AccessRules
                 .FirstOrDefaultAsync(x =>
@@ -77,6 +94,18 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             return accessRight;
+        }
+
+        public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = accountId })).Entity;
+            }
+
+            return userSubject;
         }
 
         public async Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
@@ -177,8 +206,6 @@ namespace planner_node_service.Infrastructure.Repository
             bool access = false;
 
             var currentNodeId = nodeId;
-
-            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
             while (currentNodeId != Guid.Empty)
             {
