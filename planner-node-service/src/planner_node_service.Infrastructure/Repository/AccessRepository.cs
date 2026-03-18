@@ -75,8 +75,7 @@ namespace planner_node_service.Infrastructure.Repository
             var existing = await _context.AccessRules
                 .FirstOrDefaultAsync(x =>
                     x.SubjectId == userSubject.Id &&
-                    x.NodeId == nodeId &&
-                    x.Permission == permission);
+                    x.NodeId == nodeId);
 
             if (existing != null)
             {

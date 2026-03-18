@@ -4,6 +4,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -206,12 +207,25 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetScopes(Guid accountId)
         {
-            IEnumerable<Node>? nodes = await GetNodesTree(accountId);
+            var syncScopesAccess = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId && x.Permission > Permission.None).ToListAsync();
 
-            var scopes = nodes?.Where(x => x.SyncKind == SyncKind.Scope);
+            var excessScopeIds = new List<Guid>();
 
-            if (scopes != null)
-                await ClearExcessSyncScopeAccess(accountId, scopes.Select(x => x.Id).ToList());
+            foreach (var scope in syncScopesAccess)
+            {
+                if (await CheckScopeAccess(accountId, scope.ScopeId) == false)
+                {
+                    excessScopeIds.Add(scope.ScopeId);
+                    syncScopesAccess.Remove(scope);
+                }
+            }
+
+            if (excessScopeIds.Count > 0)
+                await ClearExcessSyncScopeAccess(accountId, excessScopeIds);
+
+            var scopeIds = syncScopesAccess.Select(x => x.ScopeId).ToList();
+
+            var scopes = await _context.Nodes.Where(x => scopeIds.Contains(x.Id)).ToListAsync();
 
             return scopes;
         }
@@ -296,6 +310,37 @@ namespace planner_node_service.Infrastructure.Repository
             }
 
             return allNodes.DistinctBy(x => x.Id).ToList();
+        }
+
+        public async Task<bool> CheckScopeAccess(Guid accountId, Guid scopeId)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                return false;
+            }
+
+            var currentNodeId = scopeId;
+
+            while (currentNodeId != Guid.Empty)
+            {
+                var child = (await _context.NodeLinks.Include(x => x.ChildNode).FirstOrDefaultAsync(x => x.ParentId == currentNodeId))?.ChildNode;
+
+                var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == currentNodeId && x.SubjectId == userSubject.Id && x.Permission > Permission.None);
+
+                if (access != null)
+                {
+                    return true;
+                }
+
+                if (child == null)
+                    break;
+
+                currentNodeId = child.Id;
+            }
+
+            return false;
         }
 
         public async Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId)
