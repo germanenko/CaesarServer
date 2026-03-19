@@ -175,11 +175,9 @@ namespace planner_node_service.Infrastructure.Repository
         {
             var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
-            if (lastLog != null)
-            {
-                var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = lastLog.RulesRevision++ };
-                await _context.AccessLogs.AddAsync(newLog);
-            }
+            var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = lastLog == null ? 0 : lastLog.RulesRevision++ };
+
+            await _context.AccessLogs.AddAsync(newLog);
         }
 
         public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
