@@ -132,7 +132,7 @@ namespace planner_node_service.App.Service
                 return new ServiceResponse<bool>()
                 {
                     IsSuccess = true,
-                    StatusCode = HttpStatusCode.Forbidden,
+                    StatusCode = HttpStatusCode.BadRequest,
                     Errors = new[] { "Доступ не отозван" }
                 };
             }

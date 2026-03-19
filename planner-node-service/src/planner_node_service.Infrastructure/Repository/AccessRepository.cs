@@ -5,6 +5,8 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using System.Data;
+using System.Security;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -62,6 +64,8 @@ namespace planner_node_service.Infrastructure.Repository
                 if (syncScopeAsync != null)
                     syncScopeAsync.Permission = permission;
             }
+
+            await AddAccessLog(userSubject.Id, nodeId, permission);
 
             await _context.SaveChangesAsync();
 
@@ -124,6 +128,8 @@ namespace planner_node_service.Infrastructure.Repository
                 }
             }
 
+            await AddAccessLog(userSubject.Id, nodeId, permission);
+
             await _context.SaveChangesAsync();
 
             return accessRight;
@@ -155,7 +161,7 @@ namespace planner_node_service.Infrastructure.Repository
                     _context.SyncScopeAccess.Remove(scope);
                 }
 
-                await _context.AccessLogs.AddAsync(new AccessLog() { SubjectId = userSubject.Id, Permission = Permission.None, NodeId = nodeId });
+                await AddAccessLog(userSubject.Id, nodeId, Permission.None);
 
                 await _context.SaveChangesAsync();
 
@@ -163,6 +169,17 @@ namespace planner_node_service.Infrastructure.Repository
             }
 
             return false;
+        }
+
+        public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
+        {
+            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId && x.SubjectId == subjectId);
+
+            if (lastLog != null)
+            {
+                var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = lastLog.RulesRevision++ };
+                await _context.AccessLogs.AddAsync(newLog);
+            }
         }
 
         public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)

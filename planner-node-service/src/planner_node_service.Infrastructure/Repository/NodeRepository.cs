@@ -6,6 +6,7 @@ using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
 using static NpgsqlTypes.NpgsqlTsQuery;
+using static System.Formats.Asn1.AsnWriter;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -210,27 +211,9 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<IEnumerable<Node>?> GetScopes(Guid accountId)
         {
+            await ClearExcessSyncScopeAccess(accountId);
+
             var syncScopesAccess = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId && x.Permission > Permission.None).ToListAsync();
-            var syncScopesAccessIds = syncScopesAccess.Select(x => x.ScopeId).ToList();
-
-            var excessScopeIds = new List<Guid>();
-
-            foreach (var scopeId in syncScopesAccessIds)
-            {
-                if (await CheckScopeAccess(accountId, scopeId) == false)
-                {
-                    excessScopeIds.Add(scopeId);
-
-                    var excessScope = syncScopesAccess.First(x => x.ScopeId == scopeId);
-
-                    _logger.LogInformation($"Excess: {scopeId}");
-
-                    syncScopesAccess.Remove(excessScope);
-                }
-            }
-
-            if (excessScopeIds.Count > 0)
-                await ClearExcessSyncScopeAccess(accountId, excessScopeIds);
 
             var scopeIds = syncScopesAccess.Select(x => x.ScopeId).ToList();
 
@@ -239,6 +222,45 @@ namespace planner_node_service.Infrastructure.Repository
             return scopes;
         }
 
+        public async Task ClearExcessSyncScopeAccess(Guid accountId)
+        {
+            var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
+
+            var scopeIds = currentCache.Select(x => x.ScopeId).ToList();
+
+            var lastLogs = await _context.AccessLogs
+                .Where(x => scopeIds.Contains(x.NodeId))
+                .GroupBy(x => x.NodeId)
+                .Select(g => g.OrderByDescending(x => x.Id).FirstOrDefault())
+                .ToDictionaryAsync(x => x.NodeId, x => x);
+
+            var excessSyncScopeAccess = new List<SyncScopeAccess>();
+
+            foreach (var cache in currentCache)
+            {
+                if (lastLogs.TryGetValue(cache.ScopeId, out var lastLog))
+                {
+                    if (cache.GraphRevisionUsed < lastLog.GraphRevision ||
+                        cache.RulesRevisionUsed < lastLog.RulesRevision)
+                    {
+                        if (await CheckScopeAccess(cache.AccountId, cache.ScopeId) == false)
+                        {
+                            excessSyncScopeAccess.Add(cache);
+                        }
+                        else
+                        {
+                            cache.RulesRevisionUsed = lastLog.RulesRevision;
+                            cache.GraphRevisionUsed = lastLog.GraphRevision;
+                            cache.Permission = lastLog.Permission;
+                        }
+                    }
+                }
+            }
+
+            _context.SyncScopeAccess.RemoveRange(excessSyncScopeAccess);
+
+            await _context.SaveChangesAsync();
+        }
 
         public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> excessScopeIds)
         {
@@ -348,7 +370,7 @@ namespace planner_node_service.Infrastructure.Repository
                 var nextLevelIds = new HashSet<Guid>();
                 foreach (var link in links)
                 {
-                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == link.ChildId && x.SubjectId == userSubject.Id && x.Permission > Permission.None);
+                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == link.ChildId && x.SubjectId == userSubject.Id);
                     if (access != null)
                     {
                         return true;
