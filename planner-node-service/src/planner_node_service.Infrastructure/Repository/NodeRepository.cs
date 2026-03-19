@@ -258,7 +258,7 @@ namespace planner_node_service.Infrastructure.Repository
             var lastLogs = await _context.AccessLogs
                 .Where(x => scopeIds.Contains(x.NodeId))
                 .GroupBy(x => x.NodeId)
-                .Select(g => g.OrderByDescending(x => x.Id).FirstOrDefault())
+                .Select(g => g.OrderByDescending(x => x.Id).First())
                 .ToDictionaryAsync(x => x.NodeId, x => x);
 
             var excessSyncScopeAccess = new List<SyncScopeAccess>();
