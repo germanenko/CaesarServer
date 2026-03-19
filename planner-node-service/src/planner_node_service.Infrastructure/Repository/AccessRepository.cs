@@ -173,7 +173,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
         {
-            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId && x.SubjectId == subjectId);
+            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
             if (lastLog != null)
             {
