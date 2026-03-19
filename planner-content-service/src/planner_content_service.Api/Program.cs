@@ -48,6 +48,7 @@ void ConfigureServices(IServiceCollection services)
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
+    var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
 
     builder.Logging.AddConsole();
     builder.Logging.AddDebug();
@@ -127,7 +128,8 @@ void ConfigureServices(IServiceCollection services)
                 { PublishEvent.CreateBoard, createBoardExchange },
                 { PublishEvent.CreateColumn, createColumnExchange },
                 { PublishEvent.CreateTask, createTaskExchange },
-                { PublishEvent.CheckAccess, checkAccessExchange }
+                { PublishEvent.CheckAccess, checkAccessExchange },
+                { PublishEvent.DeleteNode, deleteNodeExchange }
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));

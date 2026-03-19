@@ -6,8 +6,12 @@ using System.Text.Json;
 
 namespace planner_node_service.Core.Entities.Models
 {
-    public class Node : TrackableEntity
+    public class Node
     {
+        public Guid Id { get; set; }
+        public Guid CursorId { get; set; }
+        public ContentLog Cursor { get; set; }
+        public long Version { get; set; }
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }
@@ -16,12 +20,16 @@ namespace planner_node_service.Core.Entities.Models
 
         public override bool Equals(object? obj)
         {
+            if (obj == null) return false;
+
             if (obj.GetType() != typeof(Node))
             {
                 return false;
             }
 
             var node = obj as Node;
+
+            if (node == null) return false;
 
             if (node.Name != Name || node.Props != Props)
             {

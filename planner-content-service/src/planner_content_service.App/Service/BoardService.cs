@@ -66,6 +66,46 @@ namespace planner_content_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId)
+        {
+            DeleteNodeEvent deleteEvent = new DeleteNodeEvent()
+            {
+                NodeId = columnId,
+                AccountId = accountId
+            };
+
+            var request = await _publisherService.Publish(deleteEvent, PublishEvent.DeleteNode);
+
+            if (!request.IsSuccess)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = request.IsSuccess,
+                    StatusCode = request.StatusCode,
+                    Errors = request.Errors
+                };
+            }
+
+            var result = await _boardRepository.DeleteNode(columnId, accountId);
+
+            if (!result)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Нода не удалена" }
+                };
+            }
+
+            return new ServiceResponse<bool>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
         public async Task<ServiceResponse<List<ColumnBody>>> CreateBaseColumns(Guid accountId, Guid boardId)
         {
             var columnId = Guid.NewGuid();

@@ -14,6 +14,7 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddScope(NodeBody node);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody node);
+        public Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid nodeId);
         public Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node);
         public Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);
         public Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodes, TokenPayload tokenPayload);

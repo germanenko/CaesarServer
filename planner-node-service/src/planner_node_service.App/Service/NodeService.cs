@@ -170,6 +170,38 @@ namespace planner_node_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid nodeId)
+        {
+            if (await _nodeRepository.GetNode(nodeId) == null)
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Errors = new[] { "Нет ноды" }
+                };
+            }
+
+            if (await _accessRepository.CheckAccess(accountId, nodeId, Permission.Write) == false)
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступа" }
+                };
+            }
+
+            var newNode = await _nodeRepository.DeleteNode(accountId, nodeId);
+
+            return new ServiceResponse<bool>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = newNode
+            };
+        }
+
         public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node)
         {
             var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(node);

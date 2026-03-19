@@ -126,6 +126,19 @@ namespace planner_content_service.Infrastructure.Repository
 
         }
 
+        public async Task<bool> DeleteNode(Guid nodeId, Guid accountId)
+        {
+            var column = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId);
+
+            if (column == null) return false;
+
+            _context.Nodes.Remove(column);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
         public async Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId)
         {
             var columnNodes = new List<ColumnBody>();

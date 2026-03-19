@@ -33,7 +33,8 @@ namespace planner_node_service.Infrastructure.Service
             string createColumn,
             string createTask,
             string getUsersWithEnabledNotifications,
-            string checkAccess)
+            string checkAccess,
+            string deleteNode)
             : base(hostname, userName, password, prefix, logger)
         {
             _scopeFactory = serviceFactory;
@@ -49,6 +50,7 @@ namespace planner_node_service.Infrastructure.Service
             AddQueue(createTask, HandleNewTask);
             AddQueue(getUsersWithEnabledNotifications, HandleGetNotificationSettings);
             AddQueue(checkAccess, CheckAccess);
+            AddQueue(deleteNode, DeleteNode);
 
             InitializeRabbitMQ();
         }
@@ -384,10 +386,48 @@ namespace planner_node_service.Infrastructure.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while return enabled notification settings");
+                _logger.LogError(ex, "Error while checking access");
                 throw;
             }
         }
+
+        private async Task<ServiceResponse<object>> DeleteNode(string message)
+        {
+            var result = JsonSerializer.Deserialize<DeleteNodeEvent>(message);
+
+            _logger.LogInformation($"NodeService received request: {message}");
+
+            if (result == null)
+            {
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+            }
+
+            try
+            {
+                using var scope = _scopeFactory.CreateScope();
+                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
+
+                var delete = await nodeService.DeleteNode(result.AccountId, result.NodeId);
+
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Body = delete.Body
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while deleting node");
+                throw;
+            }
+        }
+
 
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
         {

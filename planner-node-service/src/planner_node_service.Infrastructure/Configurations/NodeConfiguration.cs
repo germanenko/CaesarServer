@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using planner_node_service.Core.Entities.Models;
+using System.Reflection.Emit;
 
 namespace planner_node_service.Infrastructure.Configurations
 {
@@ -9,6 +10,15 @@ namespace planner_node_service.Infrastructure.Configurations
         public void Configure(EntityTypeBuilder<Node> builder)
         {
             builder.ToTable("Nodes");
+
+            builder.HasOne(e => e.Cursor)
+                .WithMany()
+                .HasForeignKey(e => e.CursorId)
+                .OnDelete(DeleteBehavior.NoAction);
+
+            builder.Property(e => e.Version)
+                .IsRequired()
+                .HasConversion<long>();
 
             builder.Property(e => e.Type)
                 .IsRequired()
@@ -24,11 +34,6 @@ namespace planner_node_service.Infrastructure.Configurations
 
             builder.Property(e => e.Props)
                 .HasColumnType("jsonb");
-
-            builder.HasOne(e => e.Cursor)
-                .WithMany()
-                .HasForeignKey(e => e.CursorId)
-                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);

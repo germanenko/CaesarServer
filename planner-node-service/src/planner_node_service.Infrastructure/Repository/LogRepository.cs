@@ -17,12 +17,12 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<History?> AddHistory(History history)
         {
-            var hasHistory = _context.History.FirstOrDefault(x => x.TrackableId == history.TrackableId);
-            var hasLog = _context.ContentLogs.FirstOrDefault(x => x.EntityId == history.TrackableId);
+            var hasHistory = _context.History.FirstOrDefault(x => x.NodeId == history.NodeId);
+            var hasLog = _context.ContentLogs.FirstOrDefault(x => x.EntityId == history.NodeId);
 
             history.Action = hasHistory == null ? ActionType.Create : ActionType.Update;
 
-            var log = new ContentLog(history.TrackableId, history.TrackableId, hasHistory == null ? ActionType.Create : ActionType.Update);
+            var log = new ContentLog(history.NodeId, history.NodeId, hasHistory == null ? ActionType.Create : ActionType.Update);
 
             var result = (await _context.History.AddAsync(history)).Entity;
 
@@ -39,7 +39,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var result = (await _context.ContentLogs.AddAsync(log)).Entity;
 
-            _context.Trackables.FirstOrDefault(x => x.Id == log.EntityId).CursorId = result.Id;
+            _context.Nodes.FirstOrDefault(x => x.Id == log.EntityId).CursorId = result.Id;
 
             await _context.SaveChangesAsync();
 
@@ -48,14 +48,14 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<History?> GetCreateHistory(Guid nodeId)
         {
-            var history = await _context.History.SingleOrDefaultAsync(x => x.TrackableId == nodeId && x.Action == ActionType.Create);
+            var history = await _context.History.SingleOrDefaultAsync(x => x.NodeId == nodeId && x.Action == ActionType.Create);
 
             return history;
         }
 
         public async Task<History?> GetLastHistory(Guid nodeId)
         {
-            var history = await _context.History.Where(x => x.TrackableId == nodeId).OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
+            var history = await _context.History.Where(x => x.NodeId == nodeId).OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
 
             return history;
         }

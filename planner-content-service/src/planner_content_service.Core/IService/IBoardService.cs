@@ -9,6 +9,7 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(BoardBody body, Guid accountId);
         Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<BoardBody> bodies, Guid accountId);
         Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column);
+        Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId);
         Task<ServiceResponse<List<ColumnBody>>> CreateOrUpdateColumns(Guid accountId, List<ColumnBody> columns);
     }
 }

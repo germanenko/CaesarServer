@@ -11,5 +11,6 @@ namespace planner_content_service.Core.IRepository
         Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId);
         Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId);
         Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId);
+        Task<bool> DeleteNode(Guid nodeId, Guid accountId);
     }
 }

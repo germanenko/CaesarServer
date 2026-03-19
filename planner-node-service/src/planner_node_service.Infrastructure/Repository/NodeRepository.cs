@@ -5,6 +5,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using System.Security;
 using static NpgsqlTypes.NpgsqlTsQuery;
 using static System.Formats.Asn1.AsnWriter;
 
@@ -62,7 +63,7 @@ namespace planner_node_service.Infrastructure.Repository
                 RelationType = RelationType.Me
             };
 
-            await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
+            await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
             var rule = await AddAccessRule(nodeBody);
 
@@ -120,7 +121,7 @@ namespace planner_node_service.Infrastructure.Repository
                     RelationType = RelationType.Me
                 };
 
-                await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, TrackableId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
+                await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
                 AccessRightBody rule = null;
 
@@ -144,6 +145,32 @@ namespace planner_node_service.Infrastructure.Repository
                 await _context.SaveChangesAsync();
 
                 return existingNode.ToNodeBody();
+            }
+        }
+
+        public async Task<bool> DeleteNode(Guid accountId, Guid nodeId)
+        {
+            var node = await _context.Nodes.FirstOrDefaultAsync(n => n.Id == nodeId);
+
+            if (node == null) return false;
+
+            await _context.ContentLogs.AddAsync(new ContentLog(nodeId, nodeId, ActionType.Delete));
+
+            _context.Remove(node);
+
+            await _context.SaveChangesAsync();
+
+            return true;
+        }
+
+        public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
+        {
+            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId && x.SubjectId == subjectId);
+
+            if (lastLog != null)
+            {
+                var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, GraphRevision = lastLog.GraphRevision++ };
+                await _context.AccessLogs.AddAsync(newLog);
             }
         }
 

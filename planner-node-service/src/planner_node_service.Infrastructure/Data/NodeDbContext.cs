@@ -1,5 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using planner_node_service.Core.Entities.Models;
+using planner_node_service.Infrastructure.Configurations;
 using System;
 using System.Reflection;
 
@@ -21,7 +22,6 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<GroupMember> AccessGroupMembers { get; set; }
         public DbSet<Status> Statuses { get; set; }
         public DbSet<StatusHistory> StatusHistory { get; set; }
-        public DbSet<TrackableEntity> Trackables { get; set; }
         public DbSet<History> History { get; set; }
         public DbSet<ContentLog> ContentLogs { get; set; }
         public DbSet<AccessLog> AccessLogs { get; set; }
@@ -33,8 +33,7 @@ namespace planner_node_service.Infrastructure.Data
 
             modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
-            modelBuilder.Entity<TrackableEntity>().UseTptMappingStrategy();
-            modelBuilder.Entity<Node>().HasBaseType<TrackableEntity>();
+            modelBuilder.Entity<Node>().UseTptMappingStrategy();
 
             modelBuilder.Entity<AccessSubject>().UseTptMappingStrategy();
             modelBuilder.Entity<UserAccessSubject>().HasBaseType<AccessSubject>();

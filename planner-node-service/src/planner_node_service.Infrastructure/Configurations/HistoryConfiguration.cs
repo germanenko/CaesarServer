@@ -19,7 +19,7 @@ namespace planner_node_service.Infrastructure.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
-            builder.Property(e => e.TrackableId)
+            builder.Property(e => e.NodeId)
                 .IsRequired();
 
             builder.Property(e => e.UpdatedAt)
@@ -30,13 +30,13 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.UpdatedById)
                 .IsRequired();
 
-            builder.HasOne(e => e.Trackable)
+            builder.HasOne(e => e.Node)
                 .WithMany()
-                .HasForeignKey(e => e.TrackableId)
-                .OnDelete(DeleteBehavior.Cascade);
+                .HasForeignKey(e => e.NodeId)
+                .OnDelete(DeleteBehavior.NoAction);
 
-            builder.HasIndex(e => e.TrackableId)
-                .HasDatabaseName("IX_Histories_TrackableId");
+            builder.HasIndex(e => e.NodeId)
+                .HasDatabaseName("IX_Histories_NodeId");
 
             builder.HasIndex(e => e.UpdatedById)
                 .HasDatabaseName("IX_Histories_UpdatedById");

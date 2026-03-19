@@ -10,8 +10,8 @@ namespace planner_node_service.Core.Entities.Models
     public class History
     {
         public Guid Id { get; set; }
-        public Guid TrackableId { get; set; }
-        public TrackableEntity Trackable { get; set; }
+        public Guid NodeId { get; set; }
+        public Node? Node { get; set; }
         public string? OldVersion { get; set; }
         public string? NewVersion { get; set; }
         public DateTime UpdatedAt { get; set; }
