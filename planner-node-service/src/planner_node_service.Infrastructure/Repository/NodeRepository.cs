@@ -85,8 +85,8 @@ namespace planner_node_service.Infrastructure.Repository
 
             var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = node.Id, SubjectId = subject.Id, Permission = Permission.Write })).Entity;
 
-            if (node.SyncKind == SyncKind.Scope)
-                await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = node.Id, AccountId = accountId, Permission = Permission.Write });
+            //if (node.SyncKind == SyncKind.Scope)
+            //    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = node.Id, AccountId = accountId, Permission = Permission.Write });
 
             await _context.AccessLogs.AddAsync(new AccessLog() { ScopeId = node.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
 
