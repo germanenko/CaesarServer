@@ -78,15 +78,15 @@ namespace planner_content_service.Api.Controllers
         }
 
         [HttpDelete("deleteNode"), Authorize]
-        [SwaggerOperation("Удалить колонку")]
+        [SwaggerOperation("Удалить ноду")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> DeleteColumn(
+        public async Task<IActionResult> DeleteNode(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            Guid columnId
+            Guid nodeId
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.DeleteNode(tokenPayload.AccountId, columnId);
+            var result = await _boardService.DeleteNode(tokenPayload.AccountId, nodeId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
