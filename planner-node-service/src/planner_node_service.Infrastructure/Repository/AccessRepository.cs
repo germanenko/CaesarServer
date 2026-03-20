@@ -24,22 +24,6 @@ namespace planner_node_service.Infrastructure.Repository
             return await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scopeId && x.AccountId == accountId);
         }
 
-        public async Task<SyncScopeAccess?> CreateSyncScopeAccess(Guid accountId, Guid scopeId, Permission permission)
-        {
-            var scope = await GetSyncScopeAccess(accountId, scopeId);
-
-            if (scope != null)
-            {
-                return scope;
-            }
-
-            var newScope = (await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = accountId, ScopeId = scopeId, Permission = permission })).Entity;
-
-            await _context.SaveChangesAsync();
-
-            return newScope;
-        }
-
         public async Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
             var userSubject = await CreateOrGetUserSubject(granteeId);
@@ -93,7 +77,7 @@ namespace planner_node_service.Infrastructure.Repository
             var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
             if (scope != null)
             {
-                await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });
+                //await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });
                 await AddAccessLog(userSubject.Id, scope.Id, permission);
             }
             else
@@ -102,12 +86,12 @@ namespace planner_node_service.Infrastructure.Repository
 
                 if (parentScope != null)
                 {
-                    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
-                    {
-                        AccountId = granteeId,
-                        ScopeId = parentScope.Id,
-                        Permission = Permission.Meta
-                    });
+                    //await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                    //{
+                    //    AccountId = granteeId,
+                    //    ScopeId = parentScope.Id,
+                    //    Permission = Permission.Meta
+                    //});
 
                     await AddAccessLog(userSubject.Id, parentScope.Id, permission);
                 }
@@ -152,7 +136,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
         {
-            var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
+            var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
             var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = (lastLog?.RulesRevision ?? -1) + 1 };
 

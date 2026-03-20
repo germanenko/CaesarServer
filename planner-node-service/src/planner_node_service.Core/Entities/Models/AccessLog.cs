@@ -10,7 +10,7 @@ namespace planner_node_service.Core.Entities.Models
 {
     public class AccessLog
     {
-        public int Id { get; set; }
+        public int Seq { get; set; }
         public Guid SubjectId { get; set; }
         public Node Node { get; set; }
         public Guid NodeId { get; set; }

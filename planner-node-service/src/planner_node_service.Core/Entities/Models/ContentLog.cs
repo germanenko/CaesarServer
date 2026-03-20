@@ -9,7 +9,7 @@ namespace planner_node_service.Core.Entities.Models
 {
     public class ContentLog
     {
-        public Guid Id { get; set; }
+        public long Seq { get; set; }
         public Guid ScopeId { get; set; }
         public Guid EntityId { get; set; }
         public long ScopeVersion { get; set; }

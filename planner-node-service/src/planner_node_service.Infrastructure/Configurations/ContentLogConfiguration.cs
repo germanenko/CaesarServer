@@ -10,9 +10,9 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.ToTable("ContentLogs");
 
-            builder.HasKey(e => e.Id);
+            builder.HasKey(e => e.Seq);
 
-            builder.Property(e => e.Id)
+            builder.Property(e => e.Seq)
                 .ValueGeneratedOnAdd();
 
             builder.Property(e => e.ScopeVersion)

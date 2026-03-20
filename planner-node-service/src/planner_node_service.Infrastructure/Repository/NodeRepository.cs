@@ -49,7 +49,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                CursorId = cursor.Id,
+                CursorId = cursor.Seq,
                 SyncKind = SyncKind.Scope
             };
 
@@ -65,7 +65,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-            var rule = await AddAccessRule(nodeBody);
+            var rule = await AddAccessRule(nodeBody.UpdatedBy, node);
 
             await _context.SaveChangesAsync();
 
@@ -75,18 +75,20 @@ namespace planner_node_service.Infrastructure.Repository
             return body;
         }
 
-        public async Task<AccessRule> AddAccessRule(NodeBody nodeBody)
+        public async Task<AccessRule> AddAccessRule(Guid accountId, Node node)
         {
-            var subject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == nodeBody.UpdatedBy);
+            var subject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
             if (subject == null)
             {
-                subject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = nodeBody.UpdatedBy })).Entity;
+                subject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = accountId })).Entity;
             }
 
-            var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = nodeBody.Id, SubjectId = subject.Id, Permission = Permission.Write })).Entity;
-            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = nodeBody.Id, AccountId = nodeBody.UpdatedBy, Permission = Permission.Write });
+            var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = node.Id, SubjectId = subject.Id, Permission = Permission.Write })).Entity;
 
-            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = nodeBody.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
+            if (node.SyncKind == SyncKind.Scope)
+                await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = node.Id, AccountId = accountId, Permission = Permission.Write });
+
+            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = node.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
 
             return rule;
         }
@@ -106,7 +108,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                CursorId = cursor.Id
+                CursorId = cursor.Seq
             };
 
             if (existingNode == null)
@@ -125,7 +127,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 AccessRightBody rule = null;
 
-                if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody)).ToAccessRuleBody();
+                if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody.UpdatedBy, node)).ToAccessRuleBody();
 
                 await _context.SaveChangesAsync();
 
@@ -165,7 +167,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
         {
-            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
+            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
             if (lastLog != null)
             {
@@ -251,6 +253,44 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task ClearExcessSyncScopeAccess(Guid accountId)
         {
+            //var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            //if (userSubject == null)
+            //{
+            //    return;
+            //}
+
+            //var rules = await _context.AccessRules.Include(x => x.Node).Where(x => x.SubjectId == userSubject.Id).ToListAsync();
+
+            //foreach (var rule in rules)
+            //{
+            //    if (rule.Node.SyncKind == SyncKind.Scope)
+            //    {
+            //        var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == rule.Id);
+
+            //        var log = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.NodeId == rule.NodeId && x.SubjectId == userSubject.Id);
+
+            //        if (cache != null)
+            //        {
+            //            cache.Permission = rule.Permission;
+            //            cache.RulesRevisionUsed
+            //        }
+            //        else
+            //        {
+            //            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+            //            {
+            //                AccountId = accountId,
+            //                ScopeId = rule.NodeId,
+            //                Permission = rule.Permission
+            //            });
+            //        }
+            //    }
+            //    else
+            //    {
+
+            //    }
+            //}
+
             var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
 
             var scopeIds = currentCache.Select(x => x.ScopeId).ToList();
@@ -258,7 +298,7 @@ namespace planner_node_service.Infrastructure.Repository
             var lastLogs = await _context.AccessLogs
                 .Where(x => scopeIds.Contains(x.NodeId))
                 .GroupBy(x => x.NodeId)
-                .Select(g => g.OrderByDescending(x => x.Id).First())
+                .Select(g => g.OrderByDescending(x => x.Seq).First())
                 .ToDictionaryAsync(x => x.NodeId, x => x);
 
             var excessSyncScopeAccess = new List<SyncScopeAccess>();
