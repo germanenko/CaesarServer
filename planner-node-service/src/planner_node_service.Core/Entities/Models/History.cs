@@ -11,7 +11,6 @@ namespace planner_node_service.Core.Entities.Models
     {
         public Guid Id { get; set; }
         public Guid NodeId { get; set; }
-        public Node? Node { get; set; }
         public string? OldVersion { get; set; }
         public string? NewVersion { get; set; }
         public DateTime UpdatedAt { get; set; }

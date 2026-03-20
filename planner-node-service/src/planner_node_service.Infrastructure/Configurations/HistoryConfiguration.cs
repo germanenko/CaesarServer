@@ -30,11 +30,6 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.UpdatedById)
                 .IsRequired();
 
-            builder.HasOne(e => e.Node)
-                .WithMany()
-                .HasForeignKey(e => e.NodeId)
-                .OnDelete(DeleteBehavior.NoAction);
-
             builder.HasIndex(e => e.NodeId)
                 .HasDatabaseName("IX_Histories_NodeId");
 

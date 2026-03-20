@@ -121,6 +121,8 @@ namespace planner_node_service.Infrastructure.Repository
                             Permission = Permission.Meta
                         });
 
+                        await AddAccessLog(userSubject.Id, parent.Id, permission);
+
                         break;
                     }
 

@@ -26,9 +26,6 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.EntityId)
                 .IsRequired();
 
-            builder.HasIndex(e => new { e.EntityId, e.ScopeVersion })
-                .IsUnique();
-
             builder.HasIndex(e => e.EntityId)
                 .HasDatabaseName("IX_ContentLogs_EntityId");
         }
