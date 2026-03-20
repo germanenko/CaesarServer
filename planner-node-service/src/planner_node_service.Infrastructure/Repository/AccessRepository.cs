@@ -56,14 +56,10 @@ namespace planner_node_service.Infrastructure.Repository
 
             existing.Permission = permission;
 
-            var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
-            if (scope != null)
-            {
-                var syncScopeAsync = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scope.Id);
+            var scope = await GetNodeScope(nodeId);
 
-                if (syncScopeAsync != null)
-                    syncScopeAsync.Permission = permission;
-            }
+            if (scope != null)
+                await AddAccessLog(userSubject.Id, scope.Id, permission);
 
             await AddAccessLog(userSubject.Id, nodeId, permission);
 
@@ -103,30 +99,18 @@ namespace planner_node_service.Infrastructure.Repository
             }
             else
             {
-                var currentNodeId = nodeId;
+                var parentScope = await GetNodeScope(nodeId);
 
-                while (currentNodeId != Guid.Empty)
+                if (parentScope != null)
                 {
-                    var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
-
-                    if (parent == null)
-                        break;
-
-                    if (parent.SyncKind == SyncKind.Scope)
+                    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
                     {
-                        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
-                        {
-                            AccountId = granteeId,
-                            ScopeId = parent.Id,
-                            Permission = Permission.Meta
-                        });
+                        AccountId = granteeId,
+                        ScopeId = parentScope.Id,
+                        Permission = Permission.Meta
+                    });
 
-                        await AddAccessLog(userSubject.Id, parent.Id, permission);
-
-                        break;
-                    }
-
-                    currentNodeId = parent.Id;
+                    await AddAccessLog(userSubject.Id, parentScope.Id, permission);
                 }
             }
 
@@ -156,11 +140,10 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 _context.AccessRules.Remove(existing);
 
-                var scope = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == nodeId && x.AccountId == granteeId);
-
-                if (scope != null)
+                var parentScope = await GetNodeScope(nodeId);
+                if (parentScope != null)
                 {
-                    _context.SyncScopeAccess.Remove(scope);
+                    await AddAccessLog(userSubject.Id, parentScope.Id, Permission.None);
                 }
 
                 await AddAccessLog(userSubject.Id, nodeId, Permission.None);
@@ -180,6 +163,33 @@ namespace planner_node_service.Infrastructure.Repository
             var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = (lastLog?.RulesRevision ?? -1) + 1 };
 
             await _context.AccessLogs.AddAsync(newLog);
+        }
+
+        public async Task<Node?> GetNodeScope(Guid nodeId)
+        {
+            var currentNodeId = nodeId;
+
+            var currentNode = await _context.Nodes.FirstAsync(x => x.Id == nodeId);
+
+            if (currentNode.SyncKind == SyncKind.Scope)
+                return currentNode;
+
+            while (currentNodeId != Guid.Empty)
+            {
+                var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
+
+                if (parent == null)
+                    break;
+
+                if (parent.SyncKind == SyncKind.Scope)
+                {
+                    return parent;
+                }
+
+                currentNodeId = parent.Id;
+            }
+
+            return null;
         }
 
         public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
