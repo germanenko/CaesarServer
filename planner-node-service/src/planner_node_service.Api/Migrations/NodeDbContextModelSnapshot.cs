@@ -76,7 +76,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("SubjectId", "NodeId", "Permission")
                         .IsUnique();
 
-                    b.ToTable("AccessRules");
+                    b.ToTable("AccessRules", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessSubject", b =>
@@ -87,7 +87,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AccessSubjects");
+                    b.ToTable("AccessSubjects", (string)null);
 
                     b.UseTptMappingStrategy();
                 });
@@ -137,7 +137,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("GroupId", "AccountId")
                         .IsUnique();
 
-                    b.ToTable("AccessGroupMembers");
+                    b.ToTable("AccessGroupMembers", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
@@ -264,7 +264,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.ToTable("NotificationSettings");
+                    b.ToTable("NotificationSettings", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Status", b =>
@@ -288,7 +288,7 @@ namespace planner_node_service.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Status_NodeId_Kind");
 
-                    b.ToTable("Statuses");
+                    b.ToTable("Statuses", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusHistory", b =>
@@ -315,7 +315,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("OldStatusId");
 
-                    b.ToTable("StatusHistory");
+                    b.ToTable("StatusHistory", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.SyncScopeAccess", b =>
@@ -346,7 +346,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("ScopeId", "AccountId")
                         .IsUnique();
 
-                    b.ToTable("SyncScopeAccess");
+                    b.ToTable("SyncScopeAccess", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
@@ -357,7 +357,7 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.ToTable("GroupAccessSubjects");
+                    b.ToTable("GroupAccessSubjects", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.UserAccessSubject", b =>
@@ -370,7 +370,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("UserAccessSubjects");
+                    b.ToTable("UserAccessSubjects", (string)null);
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>

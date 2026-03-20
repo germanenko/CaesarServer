@@ -49,7 +49,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                CursorId = cursor.Seq,
+                Cursor = cursor,
                 SyncKind = SyncKind.Scope
             };
 
