@@ -114,6 +114,7 @@ namespace planner_content_service.App.Service
             {
                 Id = columnId,
                 Name = "Reminders",
+                Type = NodeType.Column,
                 PublicationStatus = PublicationStatus.Active,
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = accountId,
