@@ -278,7 +278,6 @@ namespace planner_node_service.Infrastructure.Repository
                         {
                             cache.RulesRevisionUsed = lastLog.RulesRevision;
                             cache.GraphRevisionUsed = lastLog.GraphRevision;
-                            cache.Permission = lastLog.Permission;
                         }
                     }
                 }
@@ -377,6 +376,12 @@ namespace planner_node_service.Infrastructure.Repository
             if (userSubject == null)
             {
                 return false;
+            }
+
+            var scopeAccess = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scopeId && x.SubjectId == userSubject.Id);
+            if (scopeAccess != null)
+            {
+                return true;
             }
 
             var currentNodeId = scopeId;
