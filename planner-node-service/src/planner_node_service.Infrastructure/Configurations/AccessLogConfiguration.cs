@@ -27,9 +27,9 @@ namespace planner_node_service.Infrastructure.Configurations
                 .IsRequired()
                 .HasConversion<int>();
 
-            builder.HasOne(e => e.Node)
+            builder.HasOne(e => e.Scope)
                 .WithMany()
-                .HasForeignKey(e => e.NodeId)
+                .HasForeignKey(e => e.ScopeId)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

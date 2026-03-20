@@ -88,7 +88,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (node.SyncKind == SyncKind.Scope)
                 await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = node.Id, AccountId = accountId, Permission = Permission.Write });
 
-            await _context.AccessLogs.AddAsync(new AccessLog() { NodeId = node.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
+            await _context.AccessLogs.AddAsync(new AccessLog() { ScopeId = node.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
 
             return rule;
         }
@@ -167,11 +167,11 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
         {
-            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.NodeId == nodeId);
+            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
 
             if (lastLog != null)
             {
-                var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, GraphRevision = lastLog.GraphRevision++ };
+                var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = permission, GraphRevision = lastLog.GraphRevision++ };
                 await _context.AccessLogs.AddAsync(newLog);
             }
         }
@@ -253,83 +253,132 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task ClearExcessSyncScopeAccess(Guid accountId)
         {
-            //var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
-            //if (userSubject == null)
-            //{
-            //    return;
-            //}
+            if (userSubject == null)
+            {
+                return;
+            }
 
-            //var rules = await _context.AccessRules.Include(x => x.Node).Where(x => x.SubjectId == userSubject.Id).ToListAsync();
+            var rules = await _context.AccessRules.Include(x => x.Node).Where(x => x.SubjectId == userSubject.Id).ToListAsync();
 
-            //foreach (var rule in rules)
-            //{
-            //    if (rule.Node.SyncKind == SyncKind.Scope)
-            //    {
-            //        var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == rule.Id);
+            var ruleNodes = rules.Select(x => x.Node).ToList();
 
-            //        var log = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.NodeId == rule.NodeId && x.SubjectId == userSubject.Id);
+            var scopes = new List<Node>();
 
-            //        if (cache != null)
-            //        {
-            //            cache.Permission = rule.Permission;
-            //            cache.RulesRevisionUsed
-            //        }
-            //        else
-            //        {
-            //            await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
-            //            {
-            //                AccountId = accountId,
-            //                ScopeId = rule.NodeId,
-            //                Permission = rule.Permission
-            //            });
-            //        }
-            //    }
-            //    else
-            //    {
+            foreach (var node in ruleNodes)
+            {
+                var scope = await GetNodeScope(node.Id);
 
-            //    }
-            //}
+                if (scope != null)
+                    scopes.Add(scope);
+            }
 
-            var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
-
-            var scopeIds = currentCache.Select(x => x.ScopeId).ToList();
+            var scopeIds = scopes.Select(x => x.Id).ToList();
 
             var lastLogs = await _context.AccessLogs
-                .Where(x => scopeIds.Contains(x.NodeId))
-                .GroupBy(x => x.NodeId)
+                .Where(x => scopeIds.Contains(x.ScopeId))
+                .GroupBy(x => x.ScopeId)
                 .Select(g => g.OrderByDescending(x => x.Seq).First())
-                .ToDictionaryAsync(x => x.NodeId, x => x);
+                .ToListAsync();
 
-            var excessSyncScopeAccess = new List<SyncScopeAccess>();
+            var excessSyncScopes = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId && !scopeIds.Contains(x.ScopeId)).ToListAsync();
 
-            foreach (var cache in currentCache)
+            _context.SyncScopeAccess.RemoveRange(excessSyncScopes);
+
+            foreach (var log in lastLogs)
             {
-                if (lastLogs.TryGetValue(cache.ScopeId, out var lastLog))
-                {
-                    if (cache.GraphRevisionUsed < lastLog.GraphRevision ||
-                        cache.RulesRevisionUsed < lastLog.RulesRevision)
-                    {
-                        var access = await CheckScopeAccess(cache.AccountId, cache.ScopeId);
-                        if (access == null)
-                        {
-                            excessSyncScopeAccess.Add(cache);
-                        }
-                        else
-                        {
-                            cache.RulesRevisionUsed = lastLog.RulesRevision;
-                            cache.GraphRevisionUsed = lastLog.GraphRevision;
+                var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
 
-                            if (cache.ScopeId == access.NodeId)
-                                cache.Permission = access.Permission;
-                        }
+                if (cache != null)
+                {
+                    if (cache.GraphRevisionUsed < log.GraphRevision ||
+                        cache.RulesRevisionUsed < log.RulesRevision)
+                    {
+                        cache.Permission = log.Permission;
+                        cache.RulesRevisionUsed = log.RulesRevision;
+                        cache.GraphRevisionUsed = log.GraphRevision;
                     }
+                }
+                else
+                {
+                    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                    {
+                        AccountId = accountId,
+                        ScopeId = log.ScopeId,
+                        Permission = log.Permission,
+                        GraphRevisionUsed = log.GraphRevision,
+                        RulesRevisionUsed = log.RulesRevision
+                    });
                 }
             }
 
-            _context.SyncScopeAccess.RemoveRange(excessSyncScopeAccess);
+            //var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
+
+            //var scopeIds = currentCache.Select(x => x.ScopeId).ToList();
+
+            //var lastLogs = await _context.AccessLogs
+            //    .Where(x => scopeIds.Contains(x.ScopeId))
+            //    .GroupBy(x => x.ScopeId)
+            //    .Select(g => g.OrderByDescending(x => x.Seq).First())
+            //    .ToDictionaryAsync(x => x.ScopeId, x => x);
+
+            //var excessSyncScopeAccess = new List<SyncScopeAccess>();
+
+            //foreach (var cache in currentCache)
+            //{
+            //    if (lastLogs.TryGetValue(cache.ScopeId, out var lastLog))
+            //    {
+            //        if (cache.GraphRevisionUsed < lastLog.GraphRevision ||
+            //            cache.RulesRevisionUsed < lastLog.RulesRevision)
+            //        {
+            //            var access = await CheckScopeAccess(cache.AccountId, cache.ScopeId);
+            //            if (access == null)
+            //            {
+            //                excessSyncScopeAccess.Add(cache);
+            //            }
+            //            else
+            //            {
+            //                cache.RulesRevisionUsed = lastLog.RulesRevision;
+            //                cache.GraphRevisionUsed = lastLog.GraphRevision;
+
+            //                if (cache.ScopeId == access.NodeId)
+            //                    cache.Permission = access.Permission;
+            //            }
+            //        }
+            //    }
+            //}
+
+            //_context.SyncScopeAccess.RemoveRange(excessSyncScopeAccess);
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<Node?> GetNodeScope(Guid nodeId)
+        {
+            var currentNodeId = nodeId;
+
+            var currentNode = await _context.Nodes.FirstAsync(x => x.Id == nodeId);
+
+            if (currentNode.SyncKind == SyncKind.Scope)
+                return currentNode;
+
+            while (currentNodeId != Guid.Empty)
+            {
+                var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
+
+                if (parent == null)
+                    break;
+
+                if (parent.SyncKind == SyncKind.Scope)
+                {
+                    return parent;
+                }
+
+                currentNodeId = parent.Id;
+            }
+
+            return null;
         }
 
         public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> excessScopeIds)
