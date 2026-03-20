@@ -270,7 +270,8 @@ namespace planner_node_service.Infrastructure.Repository
                     if (cache.GraphRevisionUsed < lastLog.GraphRevision ||
                         cache.RulesRevisionUsed < lastLog.RulesRevision)
                     {
-                        if (await CheckScopeAccess(cache.AccountId, cache.ScopeId) == false)
+                        var access = await CheckScopeAccess(cache.AccountId, cache.ScopeId);
+                        if (access == null)
                         {
                             excessSyncScopeAccess.Add(cache);
                         }
@@ -278,6 +279,9 @@ namespace planner_node_service.Infrastructure.Repository
                         {
                             cache.RulesRevisionUsed = lastLog.RulesRevision;
                             cache.GraphRevisionUsed = lastLog.GraphRevision;
+
+                            if (cache.ScopeId == access.NodeId)
+                                cache.Permission = access.Permission;
                         }
                     }
                 }
@@ -369,19 +373,19 @@ namespace planner_node_service.Infrastructure.Repository
             return allNodes.DistinctBy(x => x.Id).ToList();
         }
 
-        public async Task<bool> CheckScopeAccess(Guid accountId, Guid scopeId)
+        public async Task<AccessRule?> CheckScopeAccess(Guid accountId, Guid scopeId)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
             if (userSubject == null)
             {
-                return false;
+                return null;
             }
 
             var scopeAccess = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scopeId && x.SubjectId == userSubject.Id);
             if (scopeAccess != null)
             {
-                return true;
+                return scopeAccess;
             }
 
             var currentNodeId = scopeId;
@@ -405,7 +409,7 @@ namespace planner_node_service.Infrastructure.Repository
                     var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == link.ChildId && x.SubjectId == userSubject.Id);
                     if (access != null)
                     {
-                        return true;
+                        return access;
                     }
 
                     nextLevelIds.Add(link.ChildId);
@@ -414,7 +418,7 @@ namespace planner_node_service.Infrastructure.Repository
                 currentLevelIds = nextLevelIds;
             }
 
-            return false;
+            return null;
         }
 
         public async Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId)

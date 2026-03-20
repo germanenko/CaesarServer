@@ -94,6 +94,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (scope != null)
             {
                 await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { AccountId = granteeId, ScopeId = scope.Id, Permission = permission });
+                await AddAccessLog(userSubject.Id, scope.Id, permission);
             }
             else
             {
