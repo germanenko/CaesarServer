@@ -177,7 +177,7 @@ namespace planner_node_service.Infrastructure.Repository
         {
             var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
-            var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = lastLog == null ? 0 : lastLog.RulesRevision++ };
+            var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = (lastLog?.RulesRevision ?? -1) + 1 };
 
             await _context.AccessLogs.AddAsync(newLog);
         }
