@@ -175,7 +175,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
         {
-            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
+            var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Id).FirstOrDefaultAsync(x => x.NodeId == nodeId);
 
             var newLog = new AccessLog() { SubjectId = subjectId, NodeId = nodeId, Permission = permission, RulesRevision = lastLog == null ? 0 : lastLog.RulesRevision++ };
 
