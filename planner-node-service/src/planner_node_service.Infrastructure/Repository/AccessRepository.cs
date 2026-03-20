@@ -61,8 +61,6 @@ namespace planner_node_service.Infrastructure.Repository
             if (scope != null)
                 await AddAccessLog(userSubject.Id, scope.Id, permission);
 
-            await AddAccessLog(userSubject.Id, nodeId, permission);
-
             await _context.SaveChangesAsync();
 
             return existing;
@@ -114,8 +112,6 @@ namespace planner_node_service.Infrastructure.Repository
                 }
             }
 
-            await AddAccessLog(userSubject.Id, nodeId, permission);
-
             await _context.SaveChangesAsync();
 
             return accessRight;
@@ -141,12 +137,9 @@ namespace planner_node_service.Infrastructure.Repository
                 _context.AccessRules.Remove(existing);
 
                 var parentScope = await GetNodeScope(nodeId);
-                if (parentScope != null)
-                {
-                    await AddAccessLog(userSubject.Id, parentScope.Id, Permission.None);
-                }
 
-                await AddAccessLog(userSubject.Id, nodeId, Permission.None);
+                if (parentScope != null)
+                    await AddAccessLog(userSubject.Id, parentScope.Id, Permission.None);
 
                 await _context.SaveChangesAsync();
 
