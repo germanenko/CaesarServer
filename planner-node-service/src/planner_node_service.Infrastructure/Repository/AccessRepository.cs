@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
@@ -13,10 +14,12 @@ namespace planner_node_service.Infrastructure.Repository
     public class AccessRepository : IAccessRepository
     {
         private readonly NodeDbContext _context;
+        private readonly ILogger<AccessRepository> _logger;
 
-        public AccessRepository(NodeDbContext context)
+        public AccessRepository(NodeDbContext context, ILogger<AccessRepository> logger)
         {
             _context = context;
+            _logger = logger;
         }
 
         public async Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId)
@@ -124,6 +127,8 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 _context.AccessRules.Remove(existing);
 
+                await _context.SaveChangesAsync();
+
                 var scope = await GetNodeScope(nodeId);
 
                 if (scope != null)
@@ -138,8 +143,6 @@ namespace planner_node_service.Infrastructure.Repository
                         await AddAccessLog(userSubject.Id, scope.Id, Permission.None);
                     }
                 }
-
-                await _context.SaveChangesAsync();
 
                 return true;
             }
