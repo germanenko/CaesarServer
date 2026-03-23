@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_node_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    partial class NodeDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260323085846_removeCursor")]
+    partial class removeCursor
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -76,7 +79,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("SubjectId", "NodeId", "Permission")
                         .IsUnique();
 
-                    b.ToTable("AccessRules", (string)null);
+                    b.ToTable("AccessRules");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessSubject", b =>
@@ -87,7 +90,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("AccessSubjects", (string)null);
+                    b.ToTable("AccessSubjects");
 
                     b.UseTptMappingStrategy();
                 });
@@ -137,7 +140,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("GroupId", "AccountId")
                         .IsUnique();
 
-                    b.ToTable("AccessGroupMembers", (string)null);
+                    b.ToTable("AccessGroupMembers");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
@@ -259,7 +262,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("NodeId");
 
-                    b.ToTable("NotificationSettings", (string)null);
+                    b.ToTable("NotificationSettings");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.Status", b =>
@@ -283,7 +286,7 @@ namespace planner_node_service.Api.Migrations
                         .IsUnique()
                         .HasDatabaseName("IX_Status_NodeId_Kind");
 
-                    b.ToTable("Statuses", (string)null);
+                    b.ToTable("Statuses");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.StatusHistory", b =>
@@ -310,7 +313,7 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasIndex("OldStatusId");
 
-                    b.ToTable("StatusHistory", (string)null);
+                    b.ToTable("StatusHistory");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.SyncScopeAccess", b =>
@@ -341,7 +344,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("ScopeId", "AccountId")
                         .IsUnique();
 
-                    b.ToTable("SyncScopeAccess", (string)null);
+                    b.ToTable("SyncScopeAccess");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
@@ -352,7 +355,7 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.ToTable("GroupAccessSubjects", (string)null);
+                    b.ToTable("GroupAccessSubjects");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.UserAccessSubject", b =>
@@ -365,7 +368,7 @@ namespace planner_node_service.Api.Migrations
                     b.HasIndex("AccountId")
                         .IsUnique();
 
-                    b.ToTable("UserAccessSubjects", (string)null);
+                    b.ToTable("UserAccessSubjects");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>

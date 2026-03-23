@@ -11,10 +11,10 @@ namespace planner_node_service.Infrastructure.Configurations
         {
             builder.ToTable("Nodes");
 
-            builder.HasOne(e => e.Cursor)
-                .WithMany()
-                .HasForeignKey(e => e.CursorId)
-                .OnDelete(DeleteBehavior.NoAction);
+            //builder.HasOne(e => e.Cursor)
+            //    .WithMany()
+            //    .HasForeignKey(e => e.CursorId)
+            //    .OnDelete(DeleteBehavior.NoAction);
 
             builder.Property(e => e.Version)
                 .IsRequired()

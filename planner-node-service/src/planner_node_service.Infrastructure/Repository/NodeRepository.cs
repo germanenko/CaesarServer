@@ -49,7 +49,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                Cursor = cursor,
+                //Cursor = cursor,
                 SyncKind = SyncKind.Scope
             };
 
@@ -85,11 +85,6 @@ namespace planner_node_service.Infrastructure.Repository
 
             var rule = (await _context.AccessRules.AddAsync(new AccessRule() { NodeId = node.Id, SubjectId = subject.Id, Permission = Permission.Write })).Entity;
 
-            //if (node.SyncKind == SyncKind.Scope)
-            //    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess() { ScopeId = node.Id, AccountId = accountId, Permission = Permission.Write });
-
-            await _context.AccessLogs.AddAsync(new AccessLog() { ScopeId = node.Id, Permission = rule.Permission, SubjectId = rule.SubjectId });
-
             return rule;
         }
 
@@ -108,7 +103,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                Cursor = cursor
+                //Cursor = cursor
             };
 
             if (existingNode == null)
@@ -163,17 +158,6 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             return true;
-        }
-
-        public async Task AddAccessLog(Guid subjectId, Guid nodeId, Permission permission)
-        {
-            var lastLog = await _context.AccessLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
-
-            if (lastLog != null)
-            {
-                var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = permission, GraphRevision = lastLog.GraphRevision++ };
-                await _context.AccessLogs.AddAsync(newLog);
-            }
         }
 
         public async Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody newNodeLink)
@@ -322,44 +306,6 @@ namespace planner_node_service.Infrastructure.Repository
                 }
             }
 
-            //var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
-
-            //var scopeIds = currentCache.Select(x => x.ScopeId).ToList();
-
-            //var lastLogs = await _context.AccessLogs
-            //    .Where(x => scopeIds.Contains(x.ScopeId))
-            //    .GroupBy(x => x.ScopeId)
-            //    .Select(g => g.OrderByDescending(x => x.Seq).First())
-            //    .ToDictionaryAsync(x => x.ScopeId, x => x);
-
-            //var excessSyncScopeAccess = new List<SyncScopeAccess>();
-
-            //foreach (var cache in currentCache)
-            //{
-            //    if (lastLogs.TryGetValue(cache.ScopeId, out var lastLog))
-            //    {
-            //        if (cache.GraphRevisionUsed < lastLog.GraphRevision ||
-            //            cache.RulesRevisionUsed < lastLog.RulesRevision)
-            //        {
-            //            var access = await CheckScopeAccess(cache.AccountId, cache.ScopeId);
-            //            if (access == null)
-            //            {
-            //                excessSyncScopeAccess.Add(cache);
-            //            }
-            //            else
-            //            {
-            //                cache.RulesRevisionUsed = lastLog.RulesRevision;
-            //                cache.GraphRevisionUsed = lastLog.GraphRevision;
-
-            //                if (cache.ScopeId == access.NodeId)
-            //                    cache.Permission = access.Permission;
-            //            }
-            //        }
-            //    }
-            //}
-
-            //_context.SyncScopeAccess.RemoveRange(excessSyncScopeAccess);
-
             await _context.SaveChangesAsync();
         }
 
@@ -390,21 +336,10 @@ namespace planner_node_service.Infrastructure.Repository
             return null;
         }
 
-        public async Task ClearExcessSyncScopeAccess(Guid accountId, List<Guid> excessScopeIds)
-        {
-            var currentCache = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId).ToListAsync();
-
-            var excessScopesAccess = currentCache.Where(x => excessScopeIds.Contains(x.ScopeId)).ToList();
-
-            _context.RemoveRange(excessScopesAccess);
-
-            await _context.SaveChangesAsync();
-        }
-
 
         public async Task<Node?> GetNode(Guid nodeId)
         {
-            var node = await _context.Nodes.Include(x => x.Cursor).FirstOrDefaultAsync(x => x.Id == nodeId);
+            var node = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId);
 
             return node;
         }
@@ -433,7 +368,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var rootNodes = await _context.Nodes
                 .Where(x => rootIds.Contains(x.Id))
-                .Include(x => x.Cursor)
+                //.Include(x => x.Cursor)
                 .AsNoTracking()
                 .ToListAsync();
 
@@ -444,9 +379,9 @@ namespace planner_node_service.Infrastructure.Repository
                 var links = await _context.NodeLinks
                     .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
                     .Include(x => x.ParentNode)
-                        .ThenInclude(x => x.Cursor)
+                    //.ThenInclude(x => x.Cursor)
                     .Include(x => x.ChildNode)
-                        .ThenInclude(x => x.Cursor)
+                    //.ThenInclude(x => x.Cursor)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -495,9 +430,9 @@ namespace planner_node_service.Infrastructure.Repository
                 var links = await _context.NodeLinks
                     .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
                     .Include(x => x.ParentNode)
-                        .ThenInclude(x => x.Cursor)
+                    //.ThenInclude(x => x.Cursor)
                     .Include(x => x.ChildNode)
-                        .ThenInclude(x => x.Cursor)
+                    //.ThenInclude(x => x.Cursor)
                     .AsNoTracking()
                     .ToListAsync();
 
