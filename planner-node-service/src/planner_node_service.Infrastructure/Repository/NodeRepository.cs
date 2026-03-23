@@ -290,12 +290,21 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
 
+                var access = await CheckScopeAccess(accountId, log.ScopeId);
+                Permission permission = Permission.Meta;
+
+                if (log.ScopeId == access!.NodeId)
+                    permission = access.Permission;
+                else
+                    permission = Permission.Meta;
+
                 if (cache != null)
                 {
+
                     if (cache.GraphRevisionUsed < log.GraphRevision ||
                         cache.RulesRevisionUsed < log.RulesRevision)
                     {
-                        cache.Permission = log.Permission;
+                        cache.Permission = permission;
                         cache.RulesRevisionUsed = log.RulesRevision;
                         cache.GraphRevisionUsed = log.GraphRevision;
                     }
@@ -306,7 +315,7 @@ namespace planner_node_service.Infrastructure.Repository
                     {
                         AccountId = accountId,
                         ScopeId = log.ScopeId,
-                        Permission = log.Permission,
+                        Permission = permission,
                         GraphRevisionUsed = log.GraphRevision,
                         RulesRevisionUsed = log.RulesRevision
                     });
