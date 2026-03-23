@@ -15,16 +15,13 @@ namespace planner_node_service.Infrastructure.Repository
     {
         private readonly NodeDbContext _context;
         private readonly ILogger<AccessRepository> _logger;
+        private readonly IScopeRepository _scopeRepository;
 
-        public AccessRepository(NodeDbContext context, ILogger<AccessRepository> logger)
+        public AccessRepository(NodeDbContext context, ILogger<AccessRepository> logger, IScopeRepository scopeRepository)
         {
             _context = context;
             _logger = logger;
-        }
-
-        public async Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId)
-        {
-            return await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scopeId && x.AccountId == accountId);
+            _scopeRepository = scopeRepository;
         }
 
         public async Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
@@ -43,7 +40,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             existing.Permission = permission;
 
-            var scope = await GetNodeScope(nodeId);
+            var scope = await _scopeRepository.GetNodeScope(nodeId);
 
             if (scope != null)
             {
@@ -88,7 +85,7 @@ namespace planner_node_service.Infrastructure.Repository
             }
             else
             {
-                var parentScope = await GetNodeScope(nodeId);
+                var parentScope = await _scopeRepository.GetNodeScope(nodeId);
 
                 if (parentScope != null)
                 {
@@ -129,11 +126,11 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                var scope = await GetNodeScope(nodeId);
+                var scope = await _scopeRepository.GetNodeScope(nodeId);
 
                 if (scope != null)
                 {
-                    var access = await CheckScopeAccess(granteeId, scope.Id);
+                    var access = await _scopeRepository.CheckScopeAccess(granteeId, scope.Id);
                     if (access != null)
                     {
                         await AddAccessLog(userSubject.Id, scope.Id, Permission.Meta);
@@ -142,6 +139,9 @@ namespace planner_node_service.Infrastructure.Repository
                     {
                         await AddAccessLog(userSubject.Id, scope.Id, Permission.None);
                     }
+
+                    await _context.SaveChangesAsync();
+
                 }
 
                 return true;
@@ -157,33 +157,6 @@ namespace planner_node_service.Infrastructure.Repository
             var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = permission, RulesRevision = (lastLog?.RulesRevision ?? -1) + 1 };
 
             await _context.AccessLogs.AddAsync(newLog);
-        }
-
-        public async Task<Node?> GetNodeScope(Guid nodeId)
-        {
-            var currentNodeId = nodeId;
-
-            var currentNode = await _context.Nodes.FirstAsync(x => x.Id == nodeId);
-
-            if (currentNode.SyncKind == SyncKind.Scope)
-                return currentNode;
-
-            while (currentNodeId != Guid.Empty)
-            {
-                var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
-
-                if (parent == null)
-                    break;
-
-                if (parent.SyncKind == SyncKind.Scope)
-                {
-                    return parent;
-                }
-
-                currentNodeId = parent.Id;
-            }
-
-            return null;
         }
 
         public async Task<UserAccessSubject> CreateOrGetUserSubject(Guid accountId)
@@ -304,53 +277,6 @@ namespace planner_node_service.Infrastructure.Repository
             return access;
         }
 
-        public async Task<AccessRule?> CheckScopeAccess(Guid accountId, Guid scopeId)
-        {
-            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
-
-            if (userSubject == null)
-            {
-                return null;
-            }
-
-            var scopeAccess = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scopeId && x.SubjectId == userSubject.Id);
-            if (scopeAccess != null)
-            {
-                return scopeAccess;
-            }
-
-            var currentNodeId = scopeId;
-
-            var currentLevelIds = new HashSet<Guid> { scopeId };
-
-            for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
-            {
-                var links = await _context.NodeLinks
-                    .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
-                    .Include(x => x.ParentNode)
-                    //.ThenInclude(x => x.Cursor)
-                    .Include(x => x.ChildNode)
-                    //.ThenInclude(x => x.Cursor)
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                var nextLevelIds = new HashSet<Guid>();
-                foreach (var link in links)
-                {
-                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == link.ChildId && x.SubjectId == userSubject.Id);
-                    if (access != null)
-                    {
-                        return access;
-                    }
-
-                    nextLevelIds.Add(link.ChildId);
-                }
-
-                currentLevelIds = nextLevelIds;
-            }
-
-            return null;
-        }
 
         public async Task<GroupMember?> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
         {

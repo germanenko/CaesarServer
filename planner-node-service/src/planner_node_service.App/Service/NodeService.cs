@@ -22,6 +22,7 @@ namespace planner_node_service.App.Service
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
+        private readonly IScopeRepository _scopeRepository;
         private readonly IAccessRepository _accessRepository;
         private readonly ILogRepository _logRepository;
         private readonly IPublisherService _publisherService;
@@ -66,7 +67,7 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetScopes(Guid accountId)
         {
-            var nodes = await _nodeRepository.GetScopes(accountId);
+            var nodes = await _scopeRepository.GetScopes(accountId);
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
