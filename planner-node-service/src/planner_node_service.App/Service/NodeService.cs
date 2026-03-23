@@ -29,12 +29,13 @@ namespace planner_node_service.App.Service
         private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, IAccessRepository accessRepository, IPublisherService notifyService, ILogRepository historyRepository, ILogger<NodeService> logger)
+            INodeRepository nodeRepository, IAccessRepository accessRepository, IPublisherService notifyService, ILogRepository historyRepository, ILogger<NodeService> logger, IScopeRepository scopeRepository)
         {
             _nodeRepository = nodeRepository;
             _accessRepository = accessRepository;
             _publisherService = notifyService;
             _logRepository = historyRepository;
+            _scopeRepository = scopeRepository;
             _logger = logger;
         }
 
