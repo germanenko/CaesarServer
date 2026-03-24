@@ -85,14 +85,14 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await AddAccessLog(userSubject.Id, scope.Id, permission);
 
-                if (scope.Id == nodeId)
-                {
-                    await AddAccessLog(userSubject.Id, scope.Id, permission);
-                }
-                else
-                {
-                    await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
-                }
+                //if (scope.Id == nodeId)
+                //{
+                //    await AddAccessLog(userSubject.Id, scope.Id, permission);
+                //}
+                //else
+                //{
+                //    await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
+                //}
             }
 
             //var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
