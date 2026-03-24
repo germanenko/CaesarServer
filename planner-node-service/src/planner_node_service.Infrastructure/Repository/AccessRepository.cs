@@ -81,16 +81,17 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (scope != null)
             {
+                var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
+
+                await AddAccessLog(userSubject.Id, scope.Id, permission);
+
                 if (scope.Id == nodeId)
                 {
                     await AddAccessLog(userSubject.Id, scope.Id, permission);
                 }
                 else
                 {
-                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
-
-                    if (access != null)
-                        await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
+                    await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
                 }
             }
 
