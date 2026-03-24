@@ -55,7 +55,7 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> GetManifest(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            List<Guid> scopeIds
+            [FromQuery] List<Guid> scopeIds
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);

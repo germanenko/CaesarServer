@@ -114,10 +114,25 @@ namespace planner_node_service.App.Service
                 }
             }
 
+            var requestBodies = new List<NodeBody>();
+
             var result = new List<NodeBody>();
 
-            result.AddRange(await GetContentNodesByIdAsync(nodes));
-            result.AddRange(await GetChatNodesByIdAsync(nodes));
+            foreach (var body in nodes)
+            {
+                var hasAccess = await _accessRepository.CheckAccess(accountId, body.Id, Permission.Read);
+                if (!hasAccess)
+                {
+                    result.Add(body);
+                }
+                else
+                {
+                    requestBodies.Add(body);
+                }
+            }
+
+            result.AddRange(await GetContentNodesByIdAsync(requestBodies));
+            result.AddRange(await GetChatNodesByIdAsync(requestBodies));
 
             foreach (var body in nodes)
             {
