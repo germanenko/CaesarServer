@@ -38,6 +38,11 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
             }
 
+            if (existing.Permission == permission)
+            {
+                return existing;
+            }
+
             existing.Permission = permission;
 
             var scope = await _scopeRepository.GetNodeScope(nodeId);
