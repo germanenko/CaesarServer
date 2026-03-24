@@ -379,7 +379,7 @@ namespace planner_node_service.App.Service
             List<EntityVersionBody> logs = new List<EntityVersionBody>();
             foreach (var item in nodes.Body)
             {
-                var log = await _logRepository.GetLastLogForEntity(item.Id);
+                var log = await _logRepository.GetLastLogForScope(item.Id);
 
                 if (log != null)
                 {

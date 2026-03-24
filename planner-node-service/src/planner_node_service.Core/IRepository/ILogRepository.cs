@@ -13,5 +13,6 @@ namespace planner_node_service.Core.IRepository
         Task<History?> GetCreateHistory(Guid nodeId);
         Task<History?> GetLastHistory(Guid nodeId);
         Task<ContentLog?> GetLastLogForEntity(Guid entityId);
+        Task<ContentLog?> GetLastLogForScope(Guid scopeId);
     }
 }

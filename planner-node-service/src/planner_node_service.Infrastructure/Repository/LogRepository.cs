@@ -35,5 +35,12 @@ namespace planner_node_service.Infrastructure.Repository
 
             return log;
         }
+
+        public async Task<ContentLog?> GetLastLogForScope(Guid scopeId)
+        {
+            var log = await _context.ContentLogs.Where(x => x.ScopeId == scopeId).OrderByDescending(x => x.Seq).FirstOrDefaultAsync();
+
+            return log;
+        }
     }
 }
