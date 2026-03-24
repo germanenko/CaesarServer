@@ -108,7 +108,7 @@ namespace planner_node_service.App.Service
             var nodes = new List<NodeBody>();
             foreach (var id in nodeIds)
             {
-                if (await _accessRepository.CheckAccess(accountId, id, Permission.Read))
+                if (await _accessRepository.CheckAccess(accountId, id, Permission.Meta))
                 {
                     nodes.Add((await _nodeRepository.GetNode(id)).ToNodeBody());
                 }
@@ -134,7 +134,7 @@ namespace planner_node_service.App.Service
             result.AddRange(await GetContentNodesByIdAsync(requestBodies));
             result.AddRange(await GetChatNodesByIdAsync(requestBodies));
 
-            foreach (var body in nodes)
+            foreach (var body in result)
             {
                 var history = await _logRepository.GetLastHistory(body.Id);
                 body.UpdatedBy = history.UpdatedById;
