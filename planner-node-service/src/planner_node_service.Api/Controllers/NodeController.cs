@@ -102,6 +102,21 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
+        [HttpPost("changeNodeParent"), Authorize]
+        [SwaggerOperation("Изменить родителя ноды")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> ChangeNodeParent(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid nodeId,
+            [FromQuery] Guid newParentId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.ChangeNodeParent(tokenPayload.AccountId, nodeId, newParentId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpPost("createOrUpdateNodeLink"), Authorize]
         [SwaggerOperation("Создать или обновить ссылку")]
         [SwaggerResponse(200)]

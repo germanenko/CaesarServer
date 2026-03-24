@@ -133,7 +133,7 @@ namespace planner_node_service.Infrastructure.Repository
                     var access = await _scopeRepository.CheckScopeAccess(granteeId, scope.Id);
                     if (access != null)
                     {
-                        await AddAccessLog(userSubject.Id, scope.Id, Permission.Meta);
+                        await AddAccessLog(userSubject.Id, scope.Id, access.NodeId == scope.Id ? access.Permission : Permission.Meta);
                     }
                     else
                     {

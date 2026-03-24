@@ -204,6 +204,47 @@ namespace planner_node_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
+        {
+            var nodeAccess = _accessRepository.CheckAccess(accountId, nodeId, Permission.Write);
+            var newParentAccess = _accessRepository.CheckAccess(accountId, newParentId, Permission.Write);
+
+            if (nodeAccess == null || newParentAccess == null)
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступа" }
+                };
+            }
+
+            var currentParent = await _nodeRepository.GetNodeParent(nodeId);
+
+            var nodeLink = new NodeLinkBody();
+
+            if (currentParent != null)
+            {
+                nodeLink = await _nodeRepository.ChangeNodeParent(accountId, nodeId, newParentId);
+            }
+            else
+            {
+                nodeLink = (await _nodeRepository.AddOrUpdateNodeLink(new NodeLinkBody()
+                {
+                    ChildId = nodeId,
+                    ParentId = newParentId,
+                    RelationType = RelationType.Contains
+                })).ToBody();
+            }
+
+            return new ServiceResponse<NodeLinkBody>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = nodeLink
+            };
+        }
+
         public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node)
         {
             var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(node);

@@ -653,6 +653,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/changeNodeParent",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/changeNodeParent",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/getNodeLinks",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

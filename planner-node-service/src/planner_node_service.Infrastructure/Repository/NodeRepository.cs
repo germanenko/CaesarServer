@@ -15,11 +15,13 @@ namespace planner_node_service.Infrastructure.Repository
     {
         private readonly NodeDbContext _context;
         private readonly ILogger<NodeRepository> _logger;
+        private readonly IScopeRepository _scopeRepository;
 
-        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger)
+        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger, IScopeRepository scopeRepository)
         {
             _context = context;
             _logger = logger;
+            _scopeRepository = scopeRepository;
         }
 
         public async Task<List<NodeBody>> AddOrUpdateNodes(List<NodeBody> nodes)
@@ -221,6 +223,61 @@ namespace planner_node_service.Infrastructure.Repository
             return nodes;
         }
 
+        public async Task<NodeBody?> GetNodeParent(Guid nodeId)
+        {
+            var nodeParent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == nodeId))?.ParentNode;
+
+            return nodeParent?.ToNodeBody();
+        }
+
+        public async Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                return null;
+            }
+
+            var nodeLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ChildId == nodeId);
+
+            if (nodeLink == null)
+            {
+                return null;
+            }
+
+            var oldScope = await _scopeRepository.GetNodeScope(nodeId);
+            var newScope = await _scopeRepository.GetNodeScope(newParentId);
+
+            nodeLink.ParentId = newParentId;
+
+            await AddAccessLog(userSubject.Id, oldScope.Id);
+            await AddAccessLog(userSubject.Id, newScope.Id);
+            await AddContentLog(newScope.Id, nodeId);
+            await AddContentLog(oldScope.Id, nodeId);
+
+            await _context.SaveChangesAsync();
+
+            return nodeLink?.ToBody();
+        }
+
+        public async Task AddAccessLog(Guid subjectId, Guid nodeId)
+        {
+            var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
+
+            var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = lastLog.Permission, GraphRevision = (lastLog?.GraphRevision ?? -1) + 1 };
+
+            await _context.AccessLogs.AddAsync(newLog);
+        }
+
+        public async Task AddContentLog(Guid scopeId, Guid nodeId)
+        {
+            var lastLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
+
+            var newLog = new ContentLog(scopeId, nodeId, lastLog == null ? ActionType.Create : ActionType.Update, (lastLog?.ScopeVersion ?? -1) + 1);
+
+            await _context.ContentLogs.AddAsync(newLog);
+        }
 
         public async Task<Node?> GetNode(Guid nodeId)
         {

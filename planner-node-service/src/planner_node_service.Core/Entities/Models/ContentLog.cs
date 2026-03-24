@@ -15,11 +15,12 @@ namespace planner_node_service.Core.Entities.Models
         public long ScopeVersion { get; set; }
         public ActionType Action { get; set; }
 
-        public ContentLog(Guid scopeId, Guid entityId, ActionType action)
+        public ContentLog(Guid scopeId, Guid entityId, ActionType action, long scopeVersion)
         {
             ScopeId = scopeId;
             EntityId = entityId;
             Action = action;
+            ScopeVersion = scopeVersion;
         }
     }
 }
