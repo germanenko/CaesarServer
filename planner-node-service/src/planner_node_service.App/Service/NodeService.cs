@@ -335,18 +335,13 @@ namespace planner_node_service.App.Service
             List<EntityVersionBody> logs = new List<EntityVersionBody>();
             foreach (var item in nodes.Body)
             {
-                var log = await _logRepository.GetLastLogForEntity(item.Id);
-
-                if (log != null)
+                var entityVersion = new EntityVersionBody()
                 {
-                    var entityVersion = new EntityVersionBody()
-                    {
-                        EntityId = log.EntityId,
-                        Version = item.Version
-                    };
+                    EntityId = item.Id,
+                    Version = item.Version
+                };
 
-                    logs.Add(entityVersion);
-                }
+                logs.Add(entityVersion);
             }
 
             foreach (var item in logs)
