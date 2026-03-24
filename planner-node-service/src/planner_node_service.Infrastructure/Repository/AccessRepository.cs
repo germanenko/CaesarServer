@@ -81,36 +81,22 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (scope != null)
             {
-                var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
+                Permission scopePermission;
 
-                await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
+                if (scope.Id == nodeId)
+                {
+                    scopePermission = permission;
+                }
+                else
+                {
+                    var scopeAccess = await _context.AccessRules
+                        .FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
 
-                //if (scope.Id == nodeId)
-                //{
-                //    await AddAccessLog(userSubject.Id, scope.Id, permission);
-                //}
-                //else
-                //{
-                //    await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
-                //}
+                    scopePermission = scopeAccess?.Permission ?? Permission.Meta;
+                }
+
+                await AddAccessLog(userSubject.Id, scope.Id, scopePermission);
             }
-
-            //var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
-            //if (scope != null)
-            //{
-            //    var logPermission = scope.Id == nodeId ? permission : Permission.Meta;
-            //    await AddAccessLog(userSubject.Id, scope.Id, logPermission);
-            //}
-            //else
-            //{
-            //    var parentScope = await _scopeRepository.GetNodeScope(nodeId);
-
-            //    if (parentScope != null)
-            //    {
-            //        var logPermission = parentScope.Id == nodeId ? permission : Permission.Meta;
-            //        await AddAccessLog(userSubject.Id, parentScope.Id, logPermission);
-            //    }
-            //}
 
             await _context.SaveChangesAsync();
 
