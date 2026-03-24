@@ -15,35 +15,6 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<History?> AddHistory(History history)
-        {
-            var hasHistory = _context.History.FirstOrDefault(x => x.NodeId == history.NodeId);
-            var hasLog = _context.ContentLogs.FirstOrDefault(x => x.EntityId == history.NodeId);
-
-            history.Action = hasHistory == null ? ActionType.Create : ActionType.Update;
-
-            var result = (await _context.History.AddAsync(history)).Entity;
-
-            await _context.SaveChangesAsync();
-
-            return result;
-        }
-
-        public async Task<ContentLog?> AddContentLog(ContentLog log)
-        {
-            var hasLog = _context.ContentLogs.FirstOrDefault(x => x.EntityId == log.EntityId);
-
-            log.Action = hasLog == null ? ActionType.Create : ActionType.Update;
-
-            var result = (await _context.ContentLogs.AddAsync(log)).Entity;
-
-            //_context.Nodes.FirstOrDefault(x => x.Id == log.EntityId).CursorId = result.Seq;
-
-            await _context.SaveChangesAsync();
-
-            return result;
-        }
-
         public async Task<History?> GetCreateHistory(Guid nodeId)
         {
             var history = await _context.History.SingleOrDefaultAsync(x => x.NodeId == nodeId && x.Action == ActionType.Create);
