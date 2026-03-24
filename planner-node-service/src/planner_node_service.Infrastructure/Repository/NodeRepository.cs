@@ -282,20 +282,21 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task AddContentLog(Guid scopeId, Guid nodeId, ActionType? action = null)
         {
-            var lastLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.EntityId == nodeId);
+            var lastEntityLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.EntityId == nodeId);
+            var lastScopeLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == scopeId);
 
             ActionType actionType;
 
             if (action == null)
             {
-                actionType = lastLog == null ? ActionType.Create : ActionType.Update;
+                actionType = lastEntityLog == null ? ActionType.Create : ActionType.Update;
             }
             else
             {
                 actionType = action.Value;
             }
 
-            var newLog = new ContentLog(scopeId, nodeId, actionType, (lastLog?.ScopeVersion ?? -1) + 1);
+            var newLog = new ContentLog(scopeId, nodeId, actionType, (lastScopeLog?.ScopeVersion ?? -1) + 1);
 
             await _context.ContentLogs.AddAsync(newLog);
         }
