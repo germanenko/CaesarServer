@@ -22,8 +22,6 @@ namespace planner_node_service.Infrastructure.Repository
 
             history.Action = hasHistory == null ? ActionType.Create : ActionType.Update;
 
-            var log = new ContentLog(history.NodeId, history.NodeId, hasHistory == null ? ActionType.Create : ActionType.Update);
-
             var result = (await _context.History.AddAsync(history)).Entity;
 
             await _context.SaveChangesAsync();

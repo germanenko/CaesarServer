@@ -5,9 +5,6 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
-using System.Security;
-using static NpgsqlTypes.NpgsqlTsQuery;
-using static System.Formats.Asn1.AsnWriter;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -44,7 +41,7 @@ namespace planner_node_service.Infrastructure.Repository
                 return existingScope.ToNodeBody();
             }
 
-            var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, ActionType.Create))).Entity;
+            await AddContentLog(nodeBody.Id, nodeBody.Id);
 
             var node = new Node()
             {
@@ -98,7 +95,15 @@ namespace planner_node_service.Infrastructure.Repository
 
             var action = existingNode != null ? ActionType.Update : ActionType.Create;
 
-            var cursor = (await _context.ContentLogs.AddAsync(new ContentLog(nodeBody.Id, nodeBody.Id, action))).Entity;
+            if (nodeBody.Link != null)
+            {
+                var scope = await _scopeRepository.GetNodeScope(nodeBody.Link.ParentId);
+
+                if (scope != null)
+                {
+                    await AddContentLog(scope.Id, nodeBody.Id);
+                }
+            }
 
             var node = new Node()
             {
@@ -153,7 +158,12 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (node == null) return false;
 
-            await _context.ContentLogs.AddAsync(new ContentLog(nodeId, nodeId, ActionType.Delete));
+            var scope = await _scopeRepository.GetNodeScope(node.Id);
+
+            if (scope != null)
+            {
+                await AddContentLog(scope.Id, nodeId, ActionType.Delete);
+            }
 
             _context.Remove(node);
 
@@ -270,11 +280,22 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.AccessLogs.AddAsync(newLog);
         }
 
-        public async Task AddContentLog(Guid scopeId, Guid nodeId)
+        public async Task AddContentLog(Guid scopeId, Guid nodeId, ActionType? action = null)
         {
             var lastLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
 
-            var newLog = new ContentLog(scopeId, nodeId, lastLog == null ? ActionType.Create : ActionType.Update, (lastLog?.ScopeVersion ?? -1) + 1);
+            ActionType actionType;
+
+            if (action == null)
+            {
+                actionType = lastLog == null ? ActionType.Create : ActionType.Update;
+            }
+            else
+            {
+                actionType = action.Value;
+            }
+
+            var newLog = new ContentLog(scopeId, nodeId, actionType, (lastLog?.ScopeVersion ?? -1) + 1);
 
             await _context.ContentLogs.AddAsync(newLog);
         }
