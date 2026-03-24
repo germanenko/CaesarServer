@@ -6,10 +6,10 @@ namespace planner_node_service.Core.IService
 {
     public interface INodeService
     {
-        public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId);
+        public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId, List<Guid>? rootIds = null);
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetScopes(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds);
-        public Task<ServiceResponse<List<EntityVersionBody>>> GetManifest(Guid accountId);
+        public Task<ServiceResponse<List<EntityVersionBody>>> GetManifests(Guid accountId, List<Guid> scopeIds);
         public Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
         public Task<ServiceResponse<NodeBody>> AddScope(NodeBody node);

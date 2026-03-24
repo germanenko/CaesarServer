@@ -39,9 +39,17 @@ namespace planner_node_service.App.Service
             _logger = logger;
         }
 
-        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId, List<Guid>? rootIds = null)
         {
-            var nodes = await _nodeRepository.GetNodes(accountId);
+            var nodes = await _nodeRepository.GetNodes(accountId, rootIds);
+
+            if (nodes == null)
+                return new ServiceResponse<IEnumerable<NodeBody>>()
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    Errors = new[] { "Ноды не найдены" }
+                };
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
@@ -64,7 +72,6 @@ namespace planner_node_service.App.Service
                 Body = result
             };
         }
-
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetScopes(Guid accountId)
         {
@@ -270,9 +277,9 @@ namespace planner_node_service.App.Service
         }
 
 
-        public async Task<ServiceResponse<List<EntityVersionBody>>> GetManifest(Guid accountId)
+        public async Task<ServiceResponse<List<EntityVersionBody>>> GetManifests(Guid accountId, List<Guid> scopeIds)
         {
-            var nodes = await GetNodes(accountId);
+            var nodes = await GetNodes(accountId, scopeIds);
 
             if (nodes.Body.IsNullOrEmpty())
             {
@@ -313,7 +320,6 @@ namespace planner_node_service.App.Service
                 Body = logs
             };
         }
-
 
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId)
         {

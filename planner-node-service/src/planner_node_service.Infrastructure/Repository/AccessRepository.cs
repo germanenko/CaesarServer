@@ -83,7 +83,7 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
 
-                await AddAccessLog(userSubject.Id, scope.Id, permission);
+                await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
 
                 //if (scope.Id == nodeId)
                 //{

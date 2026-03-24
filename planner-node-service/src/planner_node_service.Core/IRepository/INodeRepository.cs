@@ -13,11 +13,11 @@ namespace planner_node_service.Core.IRepository
         Task<NodeBody> AddOrUpdateNode(NodeBody node);
         Task<bool> DeleteNode(Guid accountId, Guid nodeId);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);
-        Task<IEnumerable<Node>?> GetNodesTree(Guid accountId);
+        Task<IEnumerable<Node>?> GetNodesTree(Guid accountId, List<Guid>? rootIds = null);
         Task<NodeBody?> GetNodeParent(Guid nodeId);
         Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId);
         Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId);
-        Task<IEnumerable<Node>?> GetNodes(Guid accountId);
+        Task<IEnumerable<Node>?> GetNodes(Guid accountId, List<Guid>? rootIds = null);
         Task<Node?> GetNode(Guid nodeId);
     }
 }

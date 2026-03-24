@@ -54,11 +54,12 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetManifest(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            List<Guid> scopeIds
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.GetManifest(tokenPayload.AccountId);
+            var result = await _nodeService.GetManifests(tokenPayload.AccountId, scopeIds);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 

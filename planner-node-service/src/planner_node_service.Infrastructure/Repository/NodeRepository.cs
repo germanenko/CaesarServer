@@ -226,9 +226,9 @@ namespace planner_node_service.Infrastructure.Repository
             return await query.Select(x => x.ChildId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Node>?> GetNodes(Guid accountId)
+        public async Task<IEnumerable<Node>?> GetNodes(Guid accountId, List<Guid>? rootIds = null)
         {
-            IEnumerable<Node>? nodes = await GetNodesTree(accountId);
+            IEnumerable<Node>? nodes = await GetNodesTree(accountId, rootIds);
 
             return nodes;
         }
@@ -309,7 +309,7 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
 
-        public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId)
+        public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId, List<Guid>? rootNodeIds = null)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
@@ -318,8 +318,13 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
             }
 
-            var rootIds = await _context.AccessRules
-                .Where(x => x.SubjectId == userSubject.Id)
+            var query = _context.AccessRules
+                .Where(x => x.SubjectId == userSubject.Id);
+
+            if (rootNodeIds != null && rootNodeIds.Any())
+                query = query.Where(x => rootNodeIds.Contains(x.NodeId));
+
+            var rootIds = await query
                 .Select(x => x.NodeId)
                 .ToListAsync();
 
