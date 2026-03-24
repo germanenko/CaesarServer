@@ -279,7 +279,7 @@ namespace planner_node_service.Infrastructure.Repository
         {
             var lastLog = await _context.AccessLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == nodeId);
 
-            var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = lastLog.Permission, GraphRevision = (lastLog?.GraphRevision ?? -1) + 1 };
+            var newLog = new AccessLog() { SubjectId = subjectId, ScopeId = nodeId, Permission = lastLog.Permission, RulesRevision = lastLog?.RulesRevision ?? 0, GraphRevision = (lastLog?.GraphRevision ?? -1) + 1 };
 
             await _context.AccessLogs.AddAsync(newLog);
         }
