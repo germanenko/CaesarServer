@@ -261,10 +261,14 @@ namespace planner_node_service.Infrastructure.Repository
 
             nodeLink.ParentId = newParentId;
 
-            await AddAccessLog(userSubject.Id, oldScope.Id);
             await AddAccessLog(userSubject.Id, newScope.Id);
             await AddContentLog(newScope.Id, nodeId);
-            await AddContentLog(oldScope.Id, nodeId);
+
+            if (oldScope.Id != newScope.Id)
+            {
+                await AddAccessLog(userSubject.Id, oldScope.Id);
+                await AddContentLog(oldScope.Id, nodeId);
+            }
 
             await _context.SaveChangesAsync();
 
