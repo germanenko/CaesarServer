@@ -21,8 +21,6 @@ namespace planner_client_package.Entities
         [RegularExpression("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$")]
         public string HexColor { get; set; }
 
-        public Guid MessageId { get; set; } = new();
-
         [Required] public PublicationStatus PublicationStatus { get; set; }
     }
 }
