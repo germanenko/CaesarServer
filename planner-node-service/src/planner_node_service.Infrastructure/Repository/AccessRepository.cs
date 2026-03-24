@@ -77,28 +77,39 @@ namespace planner_node_service.Infrastructure.Repository
 
             _context.AccessRules.Add(accessRight);
 
-            var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
+            var scope = await _scopeRepository.GetNodeScope(nodeId);
+
             if (scope != null)
             {
-                var logPermission = scope.Id == nodeId ? permission : Permission.Meta;
-                await AddAccessLog(userSubject.Id, scope.Id, logPermission);
-            }
-            else
-            {
-                var parentScope = await _scopeRepository.GetNodeScope(nodeId);
-
-                if (parentScope != null)
+                if (scope.Id == nodeId)
                 {
-                    //await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
-                    //{
-                    //    AccountId = granteeId,
-                    //    ScopeId = parentScope.Id,
-                    //    Permission = Permission.Meta
-                    //});
-                    var logPermission = parentScope.Id == nodeId ? permission : Permission.Meta;
-                    await AddAccessLog(userSubject.Id, parentScope.Id, logPermission);
+                    await AddAccessLog(userSubject.Id, scope.Id, permission);
+                }
+                else
+                {
+                    var access = await _context.AccessRules.FirstOrDefaultAsync(x => x.NodeId == scope.Id && x.SubjectId == userSubject.Id);
+
+                    if (access != null)
+                        await AddAccessLog(userSubject.Id, scope.Id, access != null ? access.Permission : Permission.Meta);
                 }
             }
+
+            //var scope = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId && x.SyncKind == SyncKind.Scope);
+            //if (scope != null)
+            //{
+            //    var logPermission = scope.Id == nodeId ? permission : Permission.Meta;
+            //    await AddAccessLog(userSubject.Id, scope.Id, logPermission);
+            //}
+            //else
+            //{
+            //    var parentScope = await _scopeRepository.GetNodeScope(nodeId);
+
+            //    if (parentScope != null)
+            //    {
+            //        var logPermission = parentScope.Id == nodeId ? permission : Permission.Meta;
+            //        await AddAccessLog(userSubject.Id, parentScope.Id, logPermission);
+            //    }
+            //}
 
             await _context.SaveChangesAsync();
 
