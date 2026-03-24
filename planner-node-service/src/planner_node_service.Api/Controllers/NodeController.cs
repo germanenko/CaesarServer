@@ -28,7 +28,7 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> GetNodesByIds(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] List<Guid> nodeIds
+            [FromQuery] List<Guid> nodeIds
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
