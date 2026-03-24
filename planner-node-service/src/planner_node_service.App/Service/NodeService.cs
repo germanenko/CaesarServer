@@ -53,10 +53,25 @@ namespace planner_node_service.App.Service
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
+            var requestBodies = new List<NodeBody>();
+
             var result = new List<NodeBody>();
 
-            result.AddRange(await GetContentNodesByIdAsync(bodies));
-            result.AddRange(await GetChatNodesByIdAsync(bodies));
+            foreach (var body in bodies)
+            {
+                var hasAccess = await _accessRepository.CheckAccess(accountId, body.Id, Permission.Read);
+                if (!hasAccess)
+                {
+                    result.Add(body);
+                }
+                else
+                {
+                    requestBodies.Add(body);
+                }
+            }
+
+            result.AddRange(await GetContentNodesByIdAsync(requestBodies));
+            result.AddRange(await GetChatNodesByIdAsync(requestBodies));
 
             foreach (var body in bodies)
             {
@@ -226,7 +241,18 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            var currentParent = await _nodeRepository.GetNodeParent(nodeId);
+            var link = await _nodeRepository.GetNodeLink(nodeId);
+            var currentParent = link?.ParentNode;
+
+            if (currentParent?.Id == newParentId)
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Body = link?.ToBody()
+                };
+            }
 
             var nodeLink = new NodeLinkBody();
 

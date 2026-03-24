@@ -312,6 +312,12 @@ namespace planner_node_service.Infrastructure.Repository
             return node;
         }
 
+        public async Task<NodeLink?> GetNodeLink(Guid childId)
+        {
+            var nodeLink = await _context.NodeLinks.AsNoTracking().Include(x => x.ParentNode).Include(x => x.ChildNode).FirstOrDefaultAsync(x => x.ChildId == childId);
+
+            return nodeLink;
+        }
 
         public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId, List<Guid>? rootNodeIds = null)
         {
@@ -375,6 +381,8 @@ namespace planner_node_service.Infrastructure.Repository
 
                 currentLevelIds = nextLevelIds;
             }
+
+            var nodeBodies = allNodes.Select(x => x.ToNodeBody());
 
             return allNodes.DistinctBy(x => x.Id).ToList();
         }
