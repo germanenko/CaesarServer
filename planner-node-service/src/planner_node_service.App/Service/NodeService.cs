@@ -380,7 +380,7 @@ namespace planner_node_service.App.Service
                 {
                     var entityVersion = new EntityVersionBody()
                     {
-                        EntityId = log.EntityId,
+                        EntityId = log.ScopeId,
                         Version = log.ScopeVersion
                     };
 
