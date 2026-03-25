@@ -115,7 +115,7 @@ namespace planner_chat_service.App.Service
         }
 
         private async Task<DateTime?> ProcessSentMessage(
-            MessageBody sentMessage,
+            SendMessageBody sentMessage,
             IEnumerable<ChatSession> sessions,
             IEnumerable<Guid> allUserIds,
             Chat chat,
@@ -136,14 +136,14 @@ namespace planner_chat_service.App.Service
             else
             {
                 var chatMessage = await _chatRepository.AddMessageAsync(sentMessage.MessageType, sentMessage.Content, chat, accountId, sentMessage.Id, sentMessage.SenderDeviceId);
-                await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
+                await SendMessage(sessions, chatMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
                 return chatMessage.SentAt;
             }
             //}
 
             //var lastMessage = await _chatRepository.GetMessageAsync((Guid)sentMessage.LastMessageReadId);
             //lastMessage = await _chatRepository.SetMessageIsRead(lastMessage);
-            await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
+            //await SendMessage(sessions, sentMessage, WebSocketMessageType.Text, allUserIds, chat);
 
             return sentMessage?.SentAt;
         }
@@ -283,7 +283,7 @@ namespace planner_chat_service.App.Service
 
             _logger.LogInformation("Received message: {Message}", input);
             input = input.Replace("\0", "");
-            var sentMessage = JsonSerializer.Deserialize<MessageBody>(input, options);
+            var sentMessage = JsonSerializer.Deserialize<SendMessageBody>(input, options);
 
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);
         }

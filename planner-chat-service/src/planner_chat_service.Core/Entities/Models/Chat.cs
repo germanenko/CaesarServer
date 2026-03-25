@@ -17,6 +17,7 @@ namespace planner_chat_service.Core.Entities.Models
             return new ChatBody
             {
                 Id = Id,
+                Type = NodeType.Chat,
                 ImageUrl = Image,
                 ChatType = ChatType,
                 Name = Name
