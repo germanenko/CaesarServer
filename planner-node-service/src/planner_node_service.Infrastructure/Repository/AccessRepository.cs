@@ -247,10 +247,28 @@ namespace planner_node_service.Infrastructure.Repository
 
             while (currentNodeId != Guid.Empty)
             {
-                var subjectIds = await _context.AccessRules
+                var rules = await _context.AccessRules
+                    .Include(x => x.Node)
                     .Where(ar => ar.NodeId == currentNodeId && ar.Permission >= minRequiredPermission)
-                    .Select(x => x.SubjectId)
                     .ToListAsync();
+
+                var subjectIds = rules.Select(x => x.SubjectId);
+
+                if (minRequiredPermission == Permission.Meta)
+                {
+                    foreach (var rule in rules)
+                    {
+                        if (rule.Node.SyncKind == SyncKind.Scope)
+                        {
+                            var scopeAccess = await _scopeRepository.CheckScopeAccess(accountId, rule.NodeId);
+
+                            if (scopeAccess != null)
+                            {
+                                return true;
+                            }
+                        }
+                    }
+                }
 
                 var directAccessSubjects = await _context.UserAccessSubjects
                     .Where(u => subjectIds.Contains(u.Id) && u.AccountId == accountId)
