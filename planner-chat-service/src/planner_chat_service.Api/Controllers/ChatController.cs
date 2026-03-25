@@ -103,13 +103,12 @@ namespace planner_chat_service.Api.Controllers
         [SwaggerResponse(409)]
 
         public async Task<IActionResult> CreatePersonalChat(
-            [FromBody, Required] ChatBody chatBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromHeader, Required] Guid addedAccountId
+            [FromBody, Required] CreateChatBody createChatBody,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, chatBody, addedAccountId);
+            var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, createChatBody);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

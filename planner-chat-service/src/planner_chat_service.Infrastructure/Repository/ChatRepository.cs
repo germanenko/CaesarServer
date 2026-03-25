@@ -65,7 +65,7 @@ namespace planner_chat_service.Infrastructure.Repository
             return message;
         }
 
-        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, ChatBody createChatBody, DateTime date)
+        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date)
         {
             if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
                 return null;
@@ -73,7 +73,7 @@ namespace planner_chat_service.Infrastructure.Repository
             var chat = new Chat
             {
                 Id = createChatBody.Id,
-                Name = createChatBody.Name,
+                Name = "Chat",
                 ChatType = ChatType.Personal,
                 Type = NodeType.Chat
             };

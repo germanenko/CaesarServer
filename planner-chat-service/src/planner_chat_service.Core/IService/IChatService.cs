@@ -11,7 +11,7 @@ namespace planner_chat_service.Core.IService
         Task ConnectToChat(Guid accountId, Guid chatId, WebSocket socket, Guid sessionId);
         Task<ServiceResponse<IEnumerable<ChatBody>>> GetChats(Guid accountId, Guid sessionId, ChatType chatType);
         Task<ServiceResponse<ChatBody>> GetChat(Guid accountId, Guid userSessionId, Guid chatId);
-        Task<ServiceResponse<ChatBody>> CreatePersonalChat(Guid accountId, Guid sessionId, ChatBody createChatBody, Guid addedAccountId);
+        Task<ServiceResponse<ChatBody>> CreatePersonalChat(Guid accountId, Guid sessionId, CreateChatBody createChatBody);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options);
         Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage);
         Task<ServiceResponse<MessageBody>> SendMessage(Guid senderId, Guid? senderDeviceId, Guid receiverid, string content);

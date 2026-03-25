@@ -89,13 +89,12 @@ namespace planner_chat_service.App.Service
         public async Task<ServiceResponse<ChatBody>> CreatePersonalChat(
             Guid accountId,
             Guid sessionId,
-            ChatBody createChatBody,
-            Guid addedAccountId)
+            CreateChatBody createChatBody)
         {
             var participants = new List<Guid>
             {
                 accountId,
-                addedAccountId
+                createChatBody.CompanionId
             };
 
             var currentDate = DateTime.UtcNow;
@@ -126,7 +125,7 @@ namespace planner_chat_service.App.Service
                 Participants = chatMemberships
             };
 
-            var partner = await _userService.GetUserData(createChatBody.Profile.Id);
+            var companion = await _userService.GetUserData(createChatBody.CompanionId);
 
             _notifyService.Publish(createChatEvent, PublishEvent.CreatePersonalChat);
             _notifyService.Publish(createChatEvent, PublishEvent.AddAccountToChat);
@@ -143,7 +142,7 @@ namespace planner_chat_service.App.Service
                     LastMessage = null,
                     IsSyncedReadStatus = false,
                     CountOfUnreadMessages = 0,
-                    Profile = partner
+                    Profile = companion
                 }
             };
         }
