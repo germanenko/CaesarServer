@@ -186,44 +186,9 @@ namespace planner_chat_service.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpPost("api/createOrUpdateMessageDrafts"), Authorize]
-        [SwaggerOperation("Создать/обновить список черновиков")]
-        [SwaggerResponse(200, Type = typeof(bool))]
-        [SwaggerResponse(404)]
-
-        public async Task<IActionResult> CreateOrUpdateMessageDrafts(
-            [FromBody, Required] List<MessageDraftBody> drafts,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.CreateOrUpdateMessageDrafts(tokenPayload.AccountId, drafts);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
-        }
-
-        [HttpGet("api/getMessageDraft")]
-        [SwaggerOperation("Получить черновик сообщения")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
-        [SwaggerResponse(403)]
-        public async Task<IActionResult> GetMessageDraft(
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromBody, Required] Guid chatId
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.GetMessageDraft(tokenPayload.AccountId, chatId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
-        }
-
         [HttpGet("api/getChatsSettings"), Authorize]
         [SwaggerOperation("Получить настройки чатов")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageDraftBody>))]
+        [SwaggerResponse(200, Type = typeof(ChatSettingsBody))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> GetChatsSettings(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token

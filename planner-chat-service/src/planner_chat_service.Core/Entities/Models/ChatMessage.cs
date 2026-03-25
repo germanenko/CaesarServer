@@ -15,6 +15,7 @@ namespace planner_chat_service.Core.Entities.Models
         public Guid SenderId { get; set; }
         public Guid? SenderDeviceId { get; set; }
         public bool HasBeenRead { get; set; }
+        public bool IsDeleted { get; set; }
 
         public override MessageBody ToNodeBody()
         {
