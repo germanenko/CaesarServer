@@ -94,7 +94,7 @@ namespace planner_node_service.Infrastructure.Service
 
             _logger.LogInformation($"Insert message: {message}");
 
-            await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
+            var chat = await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
@@ -102,7 +102,8 @@ namespace planner_node_service.Infrastructure.Service
             foreach (var accountSession in result.AccountSessions)
                 await NotifySessions(result.Message, accountSession);
 
-            _logger.LogInformation($"Message inserted completely");
+            if (chat.Body != null) _logger.LogInformation($"Message inserted completely");
+            else _logger.LogInformation($"{JsonSerializer.Serialize(chat)}");
 
             return new ServiceResponse<object>()
             {
