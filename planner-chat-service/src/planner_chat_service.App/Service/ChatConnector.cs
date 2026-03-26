@@ -290,7 +290,7 @@ namespace planner_chat_service.App.Service
 
             var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-            if (hasAccess.StatusCode == System.Net.HttpStatusCode.OK)
+            if (hasAccess.StatusCode != System.Net.HttpStatusCode.OK)
                 return null;
 
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);

@@ -59,7 +59,7 @@ namespace planner_chat_service.App.Service
 
             var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-            if (chatMembership == null || hasAccess.StatusCode == HttpStatusCode.OK)
+            if (chatMembership == null || hasAccess.StatusCode != HttpStatusCode.OK)
                 return;
 
             var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
