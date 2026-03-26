@@ -30,7 +30,8 @@ namespace planner_chat_service.Core.Entities.Models
                 SentAt = SentAt,
                 SenderId = SenderId,
                 SenderDeviceId = SenderDeviceId,
-                HasBeenRead = HasBeenRead
+                HasBeenRead = HasBeenRead,
+                Link = new NodeLinkBody() { ChildId = Id, ParentId = ChatId.Value }
             };
         }
     }

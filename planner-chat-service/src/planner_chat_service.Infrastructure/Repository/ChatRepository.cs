@@ -47,6 +47,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 MessageType = messageType,
                 Content = content,
                 SenderId = senderId,
+                ChatId = chat.Id,
                 SenderDeviceId = senderDeviceId,
                 Type = NodeType.Message
             };
