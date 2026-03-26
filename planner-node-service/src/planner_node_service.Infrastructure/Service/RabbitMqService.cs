@@ -96,10 +96,6 @@ namespace planner_node_service.Infrastructure.Service
 
             await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
 
-            ClientNodeLinkBody link = BodyConverter.ServerToClientBody(chatMessage.Link);
-
-            await nodeService.AddOrUpdateNodeLink(link);
-
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
 

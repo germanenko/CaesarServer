@@ -117,13 +117,28 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var result = (await _context.Nodes.AddAsync(node)).Entity;
 
-                var nodeLink = new NodeLink
+                var nodeLink = new NodeLink();
+
+                if (nodeBody.Link != null)
                 {
-                    Id = Guid.NewGuid(),
-                    ParentId = node.Id,
-                    ChildId = node.Id,
-                    RelationType = RelationType.Me
-                };
+                    nodeLink = new NodeLink()
+                    {
+                        Id = nodeBody.Link.Id,
+                        ChildId = nodeBody.Link.ChildId,
+                        ParentId = nodeBody.Link.ParentId,
+                        RelationType = nodeBody.Link.RelationType
+                    };
+                }
+                else
+                {
+                    nodeLink = new NodeLink
+                    {
+                        Id = Guid.NewGuid(),
+                        ParentId = node.Id,
+                        ChildId = node.Id,
+                        RelationType = RelationType.Me
+                    };
+                }
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
