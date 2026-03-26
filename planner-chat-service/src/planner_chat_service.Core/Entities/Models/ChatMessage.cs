@@ -24,6 +24,7 @@ namespace planner_chat_service.Core.Entities.Models
             return new MessageBody
             {
                 Id = Id,
+                Name = Name,
                 Type = NodeType.Message,
                 MessageType = MessageType,
                 Content = messageType == MessageType.File ? $"{Constants.WebUrlToChatAttachment}/{Content}" : Content,
