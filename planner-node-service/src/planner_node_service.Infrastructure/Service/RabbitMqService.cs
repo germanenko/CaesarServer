@@ -372,12 +372,12 @@ namespace planner_node_service.Infrastructure.Service
                 using var scope = _scopeFactory.CreateScope();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-                var access = await accessService.CheckAccess(result.AccountId, result.NodeId, Permission.Write);
+                var access = await accessService.CheckAccess(result.AccountId, result.NodeId, result.MinRequiredPermission);
 
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = true,
-                    StatusCode = System.Net.HttpStatusCode.OK,
+                    StatusCode = access.StatusCode,
                     Body = access.Body
                 };
             }

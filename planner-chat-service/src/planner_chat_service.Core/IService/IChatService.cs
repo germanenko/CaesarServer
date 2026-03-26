@@ -1,6 +1,7 @@
 using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.Entities.Request;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using System.Net.WebSockets;
 
@@ -13,7 +14,9 @@ namespace planner_chat_service.Core.IService
         Task<ServiceResponse<ChatBody>> GetChat(Guid accountId, Guid userSessionId, Guid chatId);
         Task<ServiceResponse<ChatBody>> CreatePersonalChat(Guid accountId, Guid sessionId, CreateChatBody createChatBody);
         Task<ServiceResponse<IEnumerable<MessageBody>>> GetMessages(Guid accountId, Guid chatId, DynamicDataLoadingOptions options);
-        Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage);
+        Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, EditMessageBody updatedMessage);
+        Task<ServiceResponse<MessageBody>> DeleteMessage(Guid accountId, Guid messageId);
+        Task<ServiceResponse<MessageBody>> DeleteMessageForMe(Guid accountId, Guid messageId);
         Task<ServiceResponse<MessageBody>> SendMessage(Guid senderId, Guid? senderDeviceId, Guid receiverid, string content);
         Task<ServiceResponse<MessageBody>> SendMessageToChat(Guid senderId, Guid? senderDeviceId, Guid chatId, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content);

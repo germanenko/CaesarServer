@@ -4,6 +4,7 @@ using planner_chat_service.Api.CustomAttributes;
 using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -139,7 +140,7 @@ namespace planner_chat_service.Api.Controllers
         [SwaggerResponse(403)]
         public async Task<IActionResult> EditMessage(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromBody, Required] MessageBody updatedMessage
+            [FromBody, Required] EditMessageBody updatedMessage
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -150,21 +151,39 @@ namespace planner_chat_service.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        //[HttpGet("api/chat/allMessages")]
-        //[SwaggerOperation("Получить все сообщения")]
-        //[SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
-        //[SwaggerResponse(403)]
-        //public async Task<IActionResult> GetAllMessages(
-        //    [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        //)
-        //{
-        //    var tokenPayload = _jwtService.GetTokenPayload(token);
-        //    var result = await _chatService.GetAllMessages(tokenPayload.AccountId);
-        //    if (result.IsSuccess)
-        //        return StatusCode((int)result.StatusCode, result.Body);
+        [HttpPut("api/chat/deleteMessageForMe")]
+        [SwaggerOperation("Удалить сообщение у меня")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> DeleteMessageForMe(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromQuery] Guid messageId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.DeleteMessageForMe(tokenPayload.AccountId, messageId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
 
-        //    return StatusCode((int)result.StatusCode);
-        //}
+            return StatusCode((int)result.StatusCode);
+        }
+
+        [HttpPut("api/chat/deleteMessage")]
+        [SwaggerOperation("Удалить сообщение у всех")]
+        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(403)]
+        public async Task<IActionResult> DeleteMessage(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromQuery] Guid messageId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _chatService.DeleteMessage(tokenPayload.AccountId, messageId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
+        }
 
         [HttpPost("api/createOrUpdateMessageDraft"), Authorize]
         [SwaggerOperation("Создать/обновить черновик сообщения")]

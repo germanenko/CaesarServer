@@ -30,6 +30,7 @@ namespace planner_chat_service.Infrastructure.Data
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }
         public DbSet<ChatEdit> ChatEdits { get; set; }
+        public DbSet<UserHiddenMessage> UserHiddenMessages { get; set; }
         public DbSet<Node> Nodes { get; set; }
     }
 }

@@ -1146,6 +1146,32 @@
             "UpstreamPathTemplate": "/api/chat/editMessage",
             "UpstreamHttpMethod": [ "PUT" ]
         },
+	
+	{
+            "DownstreamPathTemplate": "/api/chat/deleteMessageForMe",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/chat/deleteMessageForMe",
+            "UpstreamHttpMethod": [ "PUT" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/chat/deleteMessage",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8090
+                }
+            ],
+            "UpstreamPathTemplate": "/api/chat/deleteMessage",
+            "UpstreamHttpMethod": [ "PUT" ]
+        },
 
         {
             "DownstreamPathTemplate": "/api/chat/allMessages",

@@ -5,6 +5,7 @@ using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Infrastructure.Data;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 
 namespace planner_chat_service.Infrastructure.Repository
@@ -459,7 +460,7 @@ namespace planner_chat_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody updatedMessage)
+        public async Task<ChatMessage?> UpdateMessage(Guid accountId, EditMessageBody updatedMessage)
         {
             var query = _context.ChatSettings
                 .Include(e => e.Chat)
@@ -470,8 +471,8 @@ namespace planner_chat_service.Infrastructure.Repository
                 return null;
             }
 
-            var message = _context.ChatMessages
-                .Where(m => m.Id == updatedMessage.Id).FirstOrDefault();
+            var message = await _context.ChatMessages
+                .FirstOrDefaultAsync(m => m.Id == updatedMessage.MessageId);
 
             if (message == null)
             {
@@ -480,9 +481,80 @@ namespace planner_chat_service.Infrastructure.Repository
 
             message.Content = updatedMessage.Content;
 
+            if (message.ChatId != null)
+                await InsertChatEditLog(message.ChatId.Value, message.Id, MessageAction.Edit);
+
             await _context.SaveChangesAsync();
 
             return message;
+        }
+
+        public async Task<ChatMessage?> DeleteMessage(Guid accountId, Guid messageId)
+        {
+            var query = _context.ChatSettings
+                .Include(e => e.Chat)
+                .Where(user => user.AccountId == accountId);
+
+            if (query.Count() == 0)
+            {
+                return null;
+            }
+
+            var message = await _context.ChatMessages
+                .FirstOrDefaultAsync(m => m.Id == messageId);
+
+            if (message == null)
+            {
+                return null;
+            }
+
+            message.IsDeleted = true;
+
+            if (message.ChatId != null)
+                await InsertChatEditLog(message.ChatId.Value, message.Id, MessageAction.Delete);
+
+            await _context.SaveChangesAsync();
+
+            return message;
+        }
+
+        public async Task<ChatMessage?> DeleteMessageForMe(Guid accountId, Guid messageId)
+        {
+            var query = _context.ChatSettings
+                .Include(e => e.Chat)
+                .Where(user => user.AccountId == accountId);
+
+            if (query.Count() == 0)
+            {
+                return null;
+            }
+
+            var message = await _context.ChatMessages
+                .FirstOrDefaultAsync(m => m.Id == messageId);
+
+            if (message == null)
+            {
+                return null;
+            }
+
+            var hiddenMessage = (await _context.UserHiddenMessages.AddAsync(new UserHiddenMessage(messageId, accountId))).Entity;
+
+            if (hiddenMessage == null) return null;
+
+            await _context.SaveChangesAsync();
+
+            return message;
+        }
+
+        public async Task<ChatEdit> InsertChatEditLog(Guid chatId, Guid messageId, MessageAction messageAction)
+        {
+            var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+            var log = new ChatEdit() { Action = messageAction, ChatId = chatId, MessageId = messageId, ChatVersion = (lastChatLog?.ChatVersion ?? -1) + 1 };
+
+            var edit = (await _context.AddAsync(log)).Entity;
+
+            return edit;
         }
 
         public async Task<ChatMessage?> SetMessageIsRead(ChatMessage readMessage)

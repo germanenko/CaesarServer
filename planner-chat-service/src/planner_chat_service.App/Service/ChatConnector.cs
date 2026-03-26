@@ -3,6 +3,7 @@ using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_server_package.Converters;
 using planner_server_package.Events;
@@ -289,7 +290,7 @@ namespace planner_chat_service.App.Service
 
             var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-            if (hasAccess.IsSuccess == false)
+            if (hasAccess.StatusCode == System.Net.HttpStatusCode.OK)
                 return null;
 
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);

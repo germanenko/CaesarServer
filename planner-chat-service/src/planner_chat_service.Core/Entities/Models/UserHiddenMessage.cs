@@ -9,6 +9,13 @@ namespace planner_chat_service.Core.Entities.Models
     public class UserHiddenMessage
     {
         public Guid MessageId { get; set; }
-        public Guid UserId { get; set; }
+        public ChatMessage Message { get; set; }
+        public Guid AccountId { get; set; }
+
+        public UserHiddenMessage(Guid messageId, Guid accountId)
+        {
+            MessageId = messageId;
+            AccountId = accountId;
+        }
     }
 }

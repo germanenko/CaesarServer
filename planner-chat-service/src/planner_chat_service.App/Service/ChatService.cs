@@ -4,6 +4,7 @@ using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_server_package.Converters;
 using planner_server_package.Events;
@@ -58,7 +59,7 @@ namespace planner_chat_service.App.Service
 
             var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
 
-            if (chatMembership == null || hasAccess.IsSuccess == false)
+            if (chatMembership == null || hasAccess.StatusCode == HttpStatusCode.OK)
                 return;
 
             var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
@@ -195,14 +196,147 @@ namespace planner_chat_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, MessageBody updatedMessage)
+        public async Task<ServiceResponse<MessageBody>> EditMessage(Guid accountId, EditMessageBody updatedMessage)
         {
-            var message = await _chatRepository.UpdateMessage(accountId, updatedMessage);
+            var existingMessage = await _chatRepository.GetMessageAsync(updatedMessage.MessageId);
+
+            if (existingMessage == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    IsSuccess = false,
+                    Errors = new[] { "Сообщения не существует" }
+                };
+            }
+
+            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+
+            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+
+            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            {
+                var message = await _chatRepository.UpdateMessage(accountId, updatedMessage);
+
+                if (message == null)
+                {
+                    return new ServiceResponse<MessageBody>
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Errors = new[] { "Не удалось обновить сообщение" }
+                    };
+                }
+
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Body = message.ToNodeBody()
+                };
+            }
+
             return new ServiceResponse<MessageBody>
             {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = message.ToNodeBody()
+                StatusCode = HttpStatusCode.Forbidden,
+                IsSuccess = false,
+                Errors = new[] { "Нет доступа" }
+            };
+        }
+
+        public async Task<ServiceResponse<MessageBody>> DeleteMessage(Guid accountId, Guid messageId)
+        {
+            var existingMessage = await _chatRepository.GetMessageAsync(messageId);
+
+            if (existingMessage == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    IsSuccess = false,
+                    Errors = new[] { "Сообщения не существует" }
+                };
+            }
+
+            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+
+            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+
+            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            {
+                var message = await _chatRepository.DeleteMessage(accountId, messageId);
+
+                if (message == null)
+                {
+                    return new ServiceResponse<MessageBody>
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Errors = new[] { "Не удалось удалить сообщение" }
+                    };
+                }
+
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Body = message.ToNodeBody()
+                };
+            }
+
+            return new ServiceResponse<MessageBody>
+            {
+                StatusCode = HttpStatusCode.Forbidden,
+                IsSuccess = false,
+                Errors = new[] { "Нет доступа" }
+            };
+        }
+
+        public async Task<ServiceResponse<MessageBody>> DeleteMessageForMe(Guid accountId, Guid messageId)
+        {
+            var existingMessage = await _chatRepository.GetMessageAsync(messageId);
+
+            if (existingMessage == null)
+            {
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    IsSuccess = false,
+                    Errors = new[] { "Сообщения не существует" }
+                };
+            }
+
+            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+
+            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+
+            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            {
+                var message = await _chatRepository.DeleteMessageForMe(accountId, messageId);
+
+                if (message == null)
+                {
+                    return new ServiceResponse<MessageBody>
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Errors = new[] { "Не удалось удалить сообщение" }
+                    };
+                }
+
+                return new ServiceResponse<MessageBody>
+                {
+                    StatusCode = HttpStatusCode.OK,
+                    IsSuccess = true,
+                    Body = message.ToNodeBody()
+                };
+            }
+
+            return new ServiceResponse<MessageBody>
+            {
+                StatusCode = HttpStatusCode.Forbidden,
+                IsSuccess = false,
+                Errors = new[] { "Нет доступа" }
             };
         }
 

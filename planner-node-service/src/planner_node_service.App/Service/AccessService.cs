@@ -285,12 +285,24 @@ namespace planner_node_service.App.Service
         {
             var access = await _accessRepository.CheckAccess(accountId, nodeId, requiredPermission);
 
-            return new ServiceResponse<bool>()
+            if (access == true)
             {
-                IsSuccess = true,
-                Body = access,
-                StatusCode = HttpStatusCode.OK
-            };
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true,
+                    Body = access,
+                    StatusCode = HttpStatusCode.OK
+                };
+            }
+            else
+            {
+                return new ServiceResponse<bool>()
+                {
+                    IsSuccess = true,
+                    Body = access,
+                    StatusCode = HttpStatusCode.Forbidden
+                };
+            }
         }
     }
 }

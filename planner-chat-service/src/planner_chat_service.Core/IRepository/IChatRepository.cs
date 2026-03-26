@@ -1,5 +1,6 @@
 using planner_chat_service.Core.Entities.Models;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 
 namespace planner_chat_service.Core.IRepository
@@ -30,7 +31,9 @@ namespace planner_chat_service.Core.IRepository
         Task<ChatSettings?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId);
         Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date);
         Task<Chat?> GetByTaskIdAsync(Guid taskId);
-        Task<ChatMessage?> UpdateMessage(Guid accountId, MessageBody message);
+        Task<ChatMessage?> UpdateMessage(Guid accountId, EditMessageBody message);
+        Task<ChatMessage?> DeleteMessage(Guid accountId, Guid messageId);
+        Task<ChatMessage?> DeleteMessageForMe(Guid accountId, Guid messageId);
         Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
         Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content);
     }
