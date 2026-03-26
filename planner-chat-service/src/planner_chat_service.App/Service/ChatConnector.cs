@@ -285,6 +285,13 @@ namespace planner_chat_service.App.Service
             input = input.Replace("\0", "");
             var sentMessage = JsonSerializer.Deserialize<SendMessageBody>(input, options);
 
+            var checkAccess = new CheckAccessRequest(accountId, sentMessage.Link.ParentId, Permission.Read);
+
+            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
+
+            if (hasAccess.IsSuccess == false)
+                return null;
+
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);
         }
 
