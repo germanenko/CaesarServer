@@ -135,7 +135,7 @@ namespace planner_chat_service.Api.Controllers
         }
 
         [HttpPut("api/chat/editMessage")]
-        [SwaggerOperation("Редактировать сообщение")]
+        [SwaggerOperation("Редактировать сообщение"), Authorize]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> EditMessage(
@@ -151,13 +151,13 @@ namespace planner_chat_service.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpPut("api/chat/deleteMessageForMe")]
+        [HttpPut("api/chat/deleteMessageForMe"), Authorize]
         [SwaggerOperation("Удалить сообщение у меня")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> DeleteMessageForMe(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Guid messageId
+            [FromQuery, Required] Guid messageId
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -168,13 +168,13 @@ namespace planner_chat_service.Api.Controllers
             return StatusCode((int)result.StatusCode);
         }
 
-        [HttpPut("api/chat/deleteMessage")]
+        [HttpPut("api/chat/deleteMessage"), Authorize]
         [SwaggerOperation("Удалить сообщение у всех")]
         [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> DeleteMessage(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromQuery] Guid messageId
+            [FromQuery, Required] Guid messageId
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
