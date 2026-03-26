@@ -78,11 +78,11 @@ namespace planner_node_service.Infrastructure.Service
             var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
             var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-            var can = (await accessService.CheckAccess(chatMessage.SenderId, chatMessage.ChatId, Permission.Write)).Body;
+            var can = (await accessService.CheckAccess(chatMessage.SenderId, chatMessage.Link.ParentId, Permission.Write)).Body;
 
             if (!can)
             {
-                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.ChatId}");
+                _logger.LogInformation($"Access denied for {chatMessage.SenderId} : {chatMessage.Link.ParentId}");
 
                 return new ServiceResponse<object>()
                 {
@@ -96,7 +96,7 @@ namespace planner_node_service.Infrastructure.Service
 
             await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
 
-            ClientNodeLinkBody link = chatMessage.Link == null ? new ClientNodeLinkBody() { Id = Guid.NewGuid(), ParentId = chatMessage.ChatId, ChildId = chatMessage.Id, RelationType = RelationType.Attach } : BodyConverter.ServerToClientBody(chatMessage.Link);
+            ClientNodeLinkBody link = BodyConverter.ServerToClientBody(chatMessage.Link);
 
             await nodeService.AddOrUpdateNodeLink(link);
 

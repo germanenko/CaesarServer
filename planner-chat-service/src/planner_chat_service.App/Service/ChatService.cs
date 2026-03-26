@@ -234,8 +234,6 @@ namespace planner_chat_service.App.Service
 
             var messageBody = message.ToNodeBody();
 
-            messageBody.ChatId = chat.ChatId;
-
             await _chatConnector.SendMessage(lobby.ActiveSessions.Values, messageBody, WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
 
             _chatConnectionService.RemoveLobby(chat.ChatId);
