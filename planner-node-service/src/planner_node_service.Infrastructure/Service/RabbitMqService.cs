@@ -240,7 +240,7 @@ namespace planner_node_service.Infrastructure.Service
 
                     await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Column));
 
-                    await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
+                    //await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
 
                 return new ServiceResponse<object>()
@@ -295,7 +295,7 @@ namespace planner_node_service.Infrastructure.Service
                         };
                     }
 
-                    await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
+                    //await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
                 }
 
                 return new ServiceResponse<object>()

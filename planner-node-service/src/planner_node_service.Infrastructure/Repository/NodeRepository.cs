@@ -110,6 +110,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
+                Props = nodeBody.Props
                 //Cursor = cursor
             };
 
@@ -124,7 +125,7 @@ namespace planner_node_service.Infrastructure.Repository
                     nodeLink = new NodeLink()
                     {
                         Id = nodeBody.Link.Id,
-                        ChildId = nodeBody.Link.ChildId,
+                        ChildNode = result,
                         ParentId = nodeBody.Link.ParentId,
                         RelationType = nodeBody.Link.RelationType
                     };
@@ -134,12 +135,13 @@ namespace planner_node_service.Infrastructure.Repository
                     nodeLink = new NodeLink
                     {
                         Id = Guid.NewGuid(),
-                        ParentId = node.Id,
-                        ChildId = node.Id,
+                        ParentNode = node,
+                        ChildNode = result,
                         RelationType = RelationType.Me
                     };
                 }
 
+                await _context.NodeLinks.AddAsync(nodeLink);
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
                 AccessRightBody rule = null;
