@@ -86,7 +86,6 @@ void ConfigureServices(IServiceCollection services)
         {
             options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
             options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-            options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         })
         .AddJwtBearer(options => options.TokenValidationParameters = new TokenValidationParameters
         {
@@ -166,6 +165,8 @@ void ConfigureServices(IServiceCollection services)
 
 WebApplication ConfigureApplication(WebApplication app)
 {
+    app.UseRouting();
+
     if (app.Environment.IsDevelopment())
     {
         app.UseDeveloperExceptionPage();
@@ -173,7 +174,6 @@ WebApplication ConfigureApplication(WebApplication app)
         app.UseSwaggerUI();
     }
 
-    app.UseRouting();
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
@@ -211,10 +211,12 @@ void ConfigureSwagger(IServiceCollection services)
 
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
-            Description = "Bearer auth scheme",
-            In = ParameterLocation.Header,
             Name = "Authorization",
-            Type = SecuritySchemeType.ApiKey
+            Type = SecuritySchemeType.Http,
+            Scheme = "bearer",
+            BearerFormat = "JWT",
+            In = ParameterLocation.Header,
+            Description = "Enter 'Bearer {token}'"
         });
 
         options.OperationFilter<SecurityRequirementsOperationFilter>();
