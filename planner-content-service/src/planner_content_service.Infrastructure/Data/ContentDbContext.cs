@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using planner_content_service.Core.Entities.Models;
+using planner_server_package.Idempotency;
 
 namespace planner_content_service.Infrastructure.Data
 {

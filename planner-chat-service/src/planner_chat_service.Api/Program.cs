@@ -13,9 +13,13 @@ using planner_chat_service.Infrastructure.Data;
 using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -84,6 +88,17 @@ void ConfigureServices(IServiceCollection services)
         options.UseNpgsql(chatConnectionString, sp => sp.MigrationsAssembly("planner_chat_service.Api"));
     });
 
+
+    services.AddDbContext<IdempotencyContext>(options =>
+    {
+        options.UseNpgsql(chatConnectionString, builder =>
+        {
+            builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_chat_service.Api");
+        });
+    });
+
+
     services.AddWebSockets(options =>
     {
         options.KeepAliveInterval = TimeSpan.FromSeconds(120);
@@ -101,6 +116,8 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddScoped<IChatRepository, ChatRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
+    services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
+    services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IChatService, ChatService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IChatConnector, ChatConnector>();

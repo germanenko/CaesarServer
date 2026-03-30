@@ -4,11 +4,16 @@ using planner_chat_service.Api.CustomAttributes;
 using planner_chat_service.Core.Entities.Request;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using System.Text.Json;
+using OperationStatus = planner_server_package.Idempotency.Status;
 
 namespace planner_chat_service.Api.Controllers
 {
@@ -18,12 +23,15 @@ namespace planner_chat_service.Api.Controllers
     {
         private readonly IJwtService _jwtService;
         private readonly IChatService _chatService;
+        private readonly IIdempotencyService _idempotencyService;
 
         public ChatController(IJwtService jwtService,
-                              IChatService chatService)
+                              IChatService chatService,
+                              IIdempotencyService idempotencyService)
         {
             _jwtService = jwtService;
             _chatService = chatService;
+            _idempotencyService = idempotencyService;
         }
 
         [HttpGet("chat"), Authorize]
@@ -104,12 +112,24 @@ namespace planner_chat_service.Api.Controllers
         [SwaggerResponse(409)]
 
         public async Task<IActionResult> CreatePersonalChat(
-            [FromBody, Required] CreateChatBody createChatBody,
+            [FromBody, Required] Request<CreateChatBody> createChatBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, createChatBody);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                createChatBody.Id,
+                tokenPayload.AccountId,
+                OperationName.CreateChat,
+                JsonSerializer.Serialize(createChatBody.Body),
+                async () => await _chatService.CreatePersonalChat(
+                    tokenPayload.AccountId,
+                    tokenPayload.SessionId,
+                    createChatBody.Body)
+                );
+
+            //var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, createChatBody.Body);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

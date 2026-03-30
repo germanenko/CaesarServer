@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
@@ -12,9 +13,13 @@ using planner_content_service.Infrastructure.Data;
 using planner_content_service.Infrastructure.Repository;
 using planner_content_service.Infrastructure.Service;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
@@ -107,11 +112,22 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
+    services.AddDbContext<IdempotencyContext>(options =>
+    {
+        options.UseNpgsql(contentDbConnectionString, builder =>
+        {
+            builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_content_service.Api");
+        });
+    });
+
+    services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
     services.AddScoped<IBoardService, BoardService>();
 
+    services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
     services.AddScoped<IBoardRepository, BoardRepository>();
     services.AddScoped<ITaskRepository, TaskRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();

@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using planner_chat_service.Core.Entities.Models;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 
 namespace planner_chat_service.Infrastructure.Data
 {
@@ -7,7 +9,6 @@ namespace planner_chat_service.Infrastructure.Data
     {
         public ChatDbContext(DbContextOptions<ChatDbContext> options) : base(options)
         {
-
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

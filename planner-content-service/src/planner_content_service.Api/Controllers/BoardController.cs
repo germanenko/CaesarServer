@@ -1,12 +1,17 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Enum;
+using planner_client_package.Entities.Request;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_content_service.Core.IService;
+using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
+using System.Text.Json;
 
 namespace planner_content_service.Api.Controllers
 {
@@ -16,13 +21,16 @@ namespace planner_content_service.Api.Controllers
     {
         private readonly IBoardService _boardService;
         private readonly IJwtService _jwtService;
+        private readonly IIdempotencyService _idempotencyService;
 
         public BoardController(
             IBoardService boardService,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            IIdempotencyService idempotencyService)
         {
             _boardService = boardService;
             _jwtService = jwtService;
+            _idempotencyService = idempotencyService;
         }
 
         [HttpPost("board"), Authorize]
@@ -31,13 +39,20 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> CreateOrUpdateBoard(
-            BoardBody boardBody,
+            Request<BoardBody> boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
-            var result = await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId);
+            var result = await _idempotencyService.ExecuteOperation(
+                boardBody.Id,
+                tokenInfo.AccountId,
+                OperationName.CreateChat,
+                JsonSerializer.Serialize(boardBody.Body),
+                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId));
+
+            //var result = await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 
