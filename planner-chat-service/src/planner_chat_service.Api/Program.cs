@@ -12,8 +12,6 @@ using planner_chat_service.Core.IService;
 using planner_chat_service.Infrastructure.Data;
 using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
-using planner_content_service.App.Service;
-using planner_content_service.Infrastructure.Repository;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;

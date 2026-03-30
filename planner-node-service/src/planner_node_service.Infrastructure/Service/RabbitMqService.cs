@@ -138,10 +138,10 @@ namespace planner_node_service.Infrastructure.Service
 
                 await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Chat));
 
-                foreach (var participant in result.Participants)
+                foreach (var participant in result.ParticipantIds)
                 {
-                    await accessService.CreateAccessRule(participant.AccountId, result.Chat.Id, Permission.Write);
-                    await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant.AccountId, NodeId = result.Chat.Id, NotificationsEnabled = true });
+                    await accessService.CreateAccessRule(participant, result.Chat.Id, Permission.Write);
+                    await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant, NodeId = result.Chat.Id, NotificationsEnabled = true });
                 }
 
                 return new ServiceResponse<object>()

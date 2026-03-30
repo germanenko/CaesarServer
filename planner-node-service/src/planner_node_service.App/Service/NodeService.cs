@@ -71,7 +71,7 @@ namespace planner_node_service.App.Service
             }
 
             result.AddRange(await GetContentNodesByIdAsync(requestBodies));
-            result.AddRange(await GetChatNodesByIdAsync(requestBodies));
+            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies));
 
             foreach (var body in bodies)
             {
@@ -132,7 +132,7 @@ namespace planner_node_service.App.Service
             }
 
             result.AddRange(await GetContentNodesByIdAsync(requestBodies));
-            result.AddRange(await GetChatNodesByIdAsync(requestBodies));
+            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies));
 
             foreach (var body in result)
             {
@@ -476,7 +476,7 @@ namespace planner_node_service.App.Service
             }
         }
 
-        public async Task<List<NodeBody>> GetChatNodesByIdAsync(List<NodeBody> nodes)
+        public async Task<List<NodeBody>> GetChatNodesByIdAsync(Guid accountId, List<NodeBody> nodes)
         {
             var client = new HttpClient()
             {
@@ -485,7 +485,7 @@ namespace planner_node_service.App.Service
 
             var nodeIds = nodes.Select(x => x.Id);
 
-            var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}"));
+            var queryString = string.Join("&", nodeIds.Select(id => $"nodeIds={id}&accountId={accountId}"));
 
             var response = await client.GetAsync($"chat/getNodesByIds?{queryString}");
 

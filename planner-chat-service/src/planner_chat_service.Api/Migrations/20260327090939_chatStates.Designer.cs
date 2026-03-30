@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_chat_service.Infrastructure.Data;
@@ -12,9 +13,11 @@ using planner_chat_service.Infrastructure.Data;
 namespace planner_chat_service.Api.Migrations
 {
     [DbContext(typeof(ChatDbContext))]
-    partial class ChatDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260327090939_chatStates")]
+    partial class chatStates
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -44,7 +47,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("AccountChatSessions", (string)null);
+                    b.ToTable("AccountChatSessions");
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatEdit", b =>
@@ -73,7 +76,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("ChatEdits", (string)null);
+                    b.ToTable("ChatEdits");
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatSettings", b =>
@@ -103,7 +106,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.ToTable("ChatSettings", (string)null);
+                    b.ToTable("ChatSettings");
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatState", b =>
@@ -116,6 +119,9 @@ namespace planner_chat_service.Api.Migrations
 
                     b.Property<long>("LastMessageSeq")
                         .HasColumnType("bigint");
+
+                    b.Property<int>("UnreadCount")
+                        .HasColumnType("integer");
 
                     b.ComplexProperty<Dictionary<string, object>>("LastPreview", "planner_chat_service.Core.Entities.Models.ChatState.LastPreview#MessagePreview", b1 =>
                         {
@@ -151,8 +157,8 @@ namespace planner_chat_service.Api.Migrations
                     b.Property<Guid>("AccountId")
                         .HasColumnType("uuid");
 
-                    b.Property<long>("CachedUnreadCount")
-                        .HasColumnType("bigint");
+                    b.Property<int>("CachedUnreadCount")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("ChatId")
                         .HasColumnType("uuid");
@@ -209,7 +215,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasKey("MessageId", "AccountId");
 
-                    b.ToTable("UserHiddenMessages", (string)null);
+                    b.ToTable("UserHiddenMessages");
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.Chat", b =>
@@ -263,9 +269,6 @@ namespace planner_chat_service.Api.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasDefaultValueSql("NOW()");
-
-                    b.Property<long>("Seq")
-                        .HasColumnType("bigint");
 
                     b.HasIndex("ChatId");
 

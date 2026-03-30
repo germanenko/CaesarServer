@@ -3,7 +3,7 @@ using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Infrastructure.Data;
 
-namespace planner_content_service.Infrastructure.Repository
+namespace planner_chat_service.Infrastructure.Repository
 {
     public class NodeRepository : INodeRepository
     {

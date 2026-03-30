@@ -20,7 +20,6 @@ namespace planner_chat_service.Core.IService
         Task<ServiceResponse<MessageBody>> SendMessage(Guid senderId, Guid? senderDeviceId, Guid receiverid, string content);
         Task<ServiceResponse<MessageBody>> SendMessageToChat(Guid senderId, Guid? senderDeviceId, Guid chatId, string content);
         Task<ServiceResponse<bool>> CreateOrUpdateMessageDraft(Guid accountId, Guid chatId, string content);
-        Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId);
         Task<ServiceResponse<List<ChatSettings>>> GetChatsSettings(Guid accountId);
     }
 }

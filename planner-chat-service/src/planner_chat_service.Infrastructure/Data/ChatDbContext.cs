@@ -26,6 +26,8 @@ namespace planner_chat_service.Infrastructure.Data
         }
 
         public DbSet<ChatSettings> ChatSettings { get; set; }
+        public DbSet<ChatState> ChatStates { get; set; }
+        public DbSet<ChatUserState> ChatUserStates { get; set; }
         public DbSet<AccountChatSession> AccountChatSessions { get; set; }
         public DbSet<Chat> Chats { get; set; }
         public DbSet<ChatMessage> ChatMessages { get; set; }

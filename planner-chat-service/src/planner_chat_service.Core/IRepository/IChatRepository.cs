@@ -8,33 +8,26 @@ namespace planner_chat_service.Core.IRepository
     public interface IChatRepository
     {
         Task<Chat?> GetAsync(Guid id);
-        Task<Chat?> CreateTaskChatAsync(string name, Guid creatorId, Guid taskId);
-        Task<ChatSettings?> AddMembershipAsync(Guid accountId, Chat chat);
         Task<List<ChatSettings>> GetChatSettingsAsync(Guid chatId);
         Task<List<ChatSettings>> GetChatSettingsByAccountIdAsync(Guid accountId);
         Task<ChatSettings?> GetChatSettingsAsync(Guid chatId, Guid accountId);
-        Task<List<ChatMessage>> GetMessages(IEnumerable<Guid> messageIds);
         Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId, Guid? senderDeviceId);
-        Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatSettings chatSettings, DateTime date);
-        Task CreateAccountChatSessionsAsync(Guid session);
         Task<ChatMessage?> GetMessageAsync(Guid id);
-        Task<Chat?> UpdateChatImage(Guid chatId, string filename);
         Task<AccountChatSession> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing);
-        Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatAccessId);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);
         Task<bool> UpdateLastViewingChatMembership(ChatSettings chatSetttings, DateTime lastViewingDate);
-        Task<ChatSettings?> CreateOrGetChatSettingsAsync(Chat chat, Guid accountId);
         Task CreateChatSettingsAsync(Guid taskId, List<Guid> accountIds);
         Task<List<ChatBody>> GetChatBodies(Guid accountId, Guid userSessionId, ChatType chatType);
         Task<ChatBody> GetChat(Guid accountId, Guid userSessionId, Guid chatId);
+        Task<ChatState> GetOrCreateChatState(Guid chatId);
+        Task<ChatUserState> GetOrCreateChatUserState(Guid accountId, Guid chatId);
+        Task<ChatEdit?> GetLastChatEdit(Guid chatId);
         Task<ChatSettings?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId);
-        Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date);
-        Task<Chat?> GetByTaskIdAsync(Guid taskId);
+        Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<Guid> participants, CreateChatBody createChatBody, DateTime date);
         Task<ChatMessage?> UpdateMessage(Guid accountId, EditMessageBody message);
         Task<ChatMessage?> DeleteMessage(Guid accountId, Guid messageId);
         Task<ChatMessage?> DeleteMessageForMe(Guid accountId, Guid messageId);
-        Task<ChatMessage?> SetMessageIsRead(ChatMessage message);
         Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content);
     }
 }

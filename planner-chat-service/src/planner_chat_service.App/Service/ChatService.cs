@@ -99,31 +99,19 @@ namespace planner_chat_service.App.Service
             };
 
             var currentDate = DateTime.UtcNow;
-            var result = await _chatRepository.AddPersonalChatAsync(participants, createChatBody, currentDate);
+            var result = await _chatRepository.AddPersonalChatAsync(accountId, participants, createChatBody, currentDate);
             if (result == null)
                 return new ServiceResponse<ChatBody>
                 {
                     StatusCode = HttpStatusCode.Conflict,
                     IsSuccess = false,
-                    Errors = new string[] { "chat exist" }
+                    Errors = ["chat exist"]
                 };
-
-            var chatMemberships = new List<ChatMembership>();
-            foreach (var chatMembership in result.ChatMemberships)
-            {
-                chatMemberships.Add(new ChatMembership
-                {
-                    AccountId = chatMembership.AccountId,
-                    ChatMembershipId = chatMembership.Id
-                });
-            }
-
-            var chatBody = result.ToNodeBody();
 
             var createChatEvent = new CreatePersonalChatEvent
             {
-                Chat = BodyConverter.ClientToServerBody(chatBody),
-                Participants = chatMemberships
+                Chat = BodyConverter.ClientToServerBody(result),
+                ParticipantIds = [accountId, createChatBody.CompanionId]
             };
 
             var companion = await _userService.GetUserData(createChatBody.CompanionId);
@@ -134,17 +122,7 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = new ChatBody()
-                {
-                    Id = result.Id,
-                    ImageUrl = result.Image,
-                    Name = result.Name,
-                    ParticipantIds = participants,
-                    LastMessage = null,
-                    IsSyncedReadStatus = false,
-                    CountOfUnreadMessages = 0,
-                    Profile = companion
-                }
+                Body = result
             };
         }
 
@@ -449,28 +427,6 @@ namespace planner_chat_service.App.Service
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
                 Body = result
-            };
-        }
-
-        public async Task<ServiceResponse<string>> GetMessageDraft(Guid accountId, Guid chatId)
-        {
-            var chatSettings = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
-
-            if (chatSettings == null)
-            {
-                return new ServiceResponse<string>
-                {
-                    StatusCode = HttpStatusCode.BadRequest,
-                    IsSuccess = true,
-                    Errors = new[] { "Настройки чата не найдены" }
-                };
-            }
-
-            return new ServiceResponse<string>
-            {
-                StatusCode = HttpStatusCode.OK,
-                IsSuccess = true,
-                Body = chatSettings.MessageDraft
             };
         }
 

@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using planner_chat_service.Core.Entities.Models;
-namespace Planer_task_board.Infrastructure.Configurations
+namespace planner_chat_service.Infrastructure.Configurations
 {
     public class UserHiddenMessageConfiguration : IEntityTypeConfiguration<UserHiddenMessage>
     {

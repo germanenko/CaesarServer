@@ -25,10 +25,11 @@ namespace planner_chat_service.Api.Controllers
         [SwaggerResponse(200)]
 
         public async Task<IActionResult> GetNodesByIds(
-            [FromQuery] List<Guid> nodeIds
+            [FromQuery] List<Guid> nodeIds,
+            [FromQuery] Guid accountId
         )
         {
-            var result = await _nodeService.GetNodesByIds(nodeIds);
+            var result = await _nodeService.GetNodesByIds(accountId, nodeIds);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

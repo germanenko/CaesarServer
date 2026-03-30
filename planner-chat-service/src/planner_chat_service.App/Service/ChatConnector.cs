@@ -215,7 +215,9 @@ namespace planner_chat_service.App.Service
                 _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
             }
 
-            var bytes = SerializeObject(message);
+            var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId };
+
+            var bytes = SerializeObject(chatChangedEvent);
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
             DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
         }

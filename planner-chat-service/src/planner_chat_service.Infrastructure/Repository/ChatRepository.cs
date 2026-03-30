@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core;
 using planner_chat_service.Core.Entities.Models;
+using planner_chat_service.Core.Entities.ValueObjects;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Infrastructure.Data;
 using planner_client_package.Entities;
@@ -19,24 +20,6 @@ namespace planner_chat_service.Infrastructure.Repository
         {
             _context = context;
             _logger = logger;
-        }
-
-        public async Task<ChatSettings?> AddMembershipAsync(Guid accountId, Chat chat)
-        {
-            var chatMembership = await GetChatSettingsAsync(chat.Id, accountId);
-            if (chatMembership != null)
-                return null;
-
-            chatMembership = new ChatSettings
-            {
-                AccountId = accountId,
-                Chat = chat,
-            };
-            chatMembership = (await _context.ChatSettings.AddAsync(chatMembership))?.Entity;
-
-            await _context.SaveChangesAsync();
-
-            return chatMembership;
         }
 
         public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId, Guid? senderDeviceId)
@@ -67,7 +50,7 @@ namespace planner_chat_service.Infrastructure.Repository
             return message;
         }
 
-        public async Task<Chat?> AddPersonalChatAsync(List<Guid> participants, CreateChatBody createChatBody, DateTime date)
+        public async Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<Guid> participants, CreateChatBody createChatBody, DateTime date)
         {
             if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
                 return null;
@@ -92,68 +75,30 @@ namespace planner_chat_service.Infrastructure.Repository
             chat.ChatMemberships = memberships;
 
             chat = (await _context.Chats.AddAsync(chat))?.Entity;
-            await _context.SaveChangesAsync();
 
-            return chat;
-        }
+            var chatState = new ChatState()
+            {
+                Chat = chat
+            };
 
-        public async Task<ChatSettings?> CreateOrGetChatSettingsAsync(Chat chat, Guid accountId)
-        {
-            var chatMembership = await GetChatSettingsAsync(chat.Id, accountId);
-            if (chatMembership != null)
-                return chatMembership;
-
-            chatMembership = new ChatSettings
+            var chatUserState = new ChatUserState()
             {
                 Chat = chat,
                 AccountId = accountId
             };
 
-            chatMembership = (await _context.ChatSettings.AddAsync(chatMembership))?.Entity;
+            await _context.ChatStates.AddAsync(chatState);
+            await _context.ChatUserStates.AddAsync(chatUserState);
             await _context.SaveChangesAsync();
-            return chatMembership;
-        }
 
-        public async Task CreateAccountChatSessionAsync(IEnumerable<Guid> sessions, ChatSettings chatMembership, DateTime date)
-        {
-            var existedChatSessions = await _context.AccountChatSessions.Where(e => e.ChatSettingId == chatMembership.Id
-                                                                                 && sessions.Contains(e.SessionId))
-                                                                     .ToListAsync();
+            var chatBody = chat.ToNodeBody();
+            chatBody.State = chatState.ToBody();
+            chatBody.UserState = chatUserState.ToBody();
 
-            var newSessions = sessions.Where(sessionId => !existedChatSessions.Any(e => e.SessionId == sessionId));
-            var chatSessions = newSessions
-                .Select(sessionId => new AccountChatSession
-                {
-                    SessionId = sessionId,
-                    ChatSetting = chatMembership,
-                    DateLastViewing = date
-                })
-                .ToList();
-
-            await _context.AccountChatSessions.AddRangeAsync(chatSessions);
-            await _context.SaveChangesAsync();
-        }
-
-        public async Task CreateAccountChatSessionsAsync(Guid sessionId)
-        {
-            var chatMemberships = await _context.ChatSettings.Where(e => e.AccountId == sessionId)
-                .ToListAsync();
-
-            var userChatSessions = chatMemberships
-                .Select(chatMembership => new AccountChatSession
-                {
-                    SessionId = sessionId,
-                    ChatSetting = chatMembership,
-                    DateLastViewing = chatMembership.DateLastViewing
-                });
-
-            await _context.AccountChatSessions.AddRangeAsync(userChatSessions);
-            await _context.SaveChangesAsync();
+            return chatBody;
         }
 
         public async Task<Chat?> GetAsync(Guid id) => await _context.Chats.FindAsync(id);
-
-        public async Task<Chat?> GetByTaskIdAsync(Guid taskId) => await _context.Chats.FirstOrDefaultAsync(e => e.TaskId == taskId);
 
         public async Task<List<ChatBody>> GetChatBodies(Guid accountId, Guid userSessionId, ChatType chatType)
         {
@@ -246,6 +191,9 @@ namespace planner_chat_service.Infrastructure.Repository
                 .OrderByDescending(x => x.SentAt)
                 .FirstOrDefaultAsync();
 
+            var state = await GetOrCreateChatState(chatId);
+            var userState = await GetOrCreateChatUserState(chatId, accountId);
+
             var chatBody = new ChatBody
             {
                 Id = chat.Id,
@@ -258,10 +206,92 @@ namespace planner_chat_service.Infrastructure.Repository
                 .Where(x => x.ChatId == chatId && x.AccountId != accountId)
                 .Select(e => e.AccountId)
                 .ToList(),
-                LastMessage = lastMessage?.ToNodeBody()
+                State = state.ToBody(),
+                UserState = userState.ToBody()
             };
 
             return chatBody;
+        }
+
+        public async Task<ChatState> GetOrCreateChatState(Guid chatId)
+        {
+            var existingState = await _context.ChatStates.FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+            if (existingState != null)
+            {
+                var lastMessage = await _context.ChatMessages.OrderByDescending(x => x.SentAt).FirstOrDefaultAsync(x => x.ChatId == chatId);
+                var lastEdit = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+                if (lastMessage != null)
+                {
+                    existingState.LastPreview = new MessagePreview()
+                    {
+                        MessageId = lastMessage.Id,
+                        AuthorId = lastMessage.SenderId,
+                        SentAt = lastMessage.SentAt,
+                        Text = lastMessage.Content
+                    };
+                }
+
+                existingState.EditCursor = lastEdit;
+                existingState.LastMessageSeq = lastMessage.Seq;
+
+                await _context.SaveChangesAsync();
+
+                return existingState;
+            }
+
+            var state = new ChatState()
+            {
+                ChatId = chatId
+            };
+
+            state = (await _context.ChatStates.AddAsync(state)).Entity;
+
+            await _context.SaveChangesAsync();
+
+            return state;
+        }
+
+        public async Task<ChatUserState> GetOrCreateChatUserState(Guid chatId, Guid accountId)
+        {
+            var existingState = await _context.ChatUserStates.FirstOrDefaultAsync(x => x.ChatId == chatId && x.AccountId == accountId);
+
+            if (existingState != null)
+            {
+                var lastMessage = await _context.ChatMessages.OrderByDescending(x => x.SentAt).FirstOrDefaultAsync(x => x.ChatId == chatId);
+
+                if (lastMessage != null)
+                {
+                    if (lastMessage.Seq != existingState.LastReadSeq)
+                    {
+                        existingState.CachedUnreadCount = lastMessage.Seq - existingState.LastReadSeq;
+                    }
+                }
+
+                await _context.SaveChangesAsync();
+
+                return existingState;
+            }
+
+            var userState = new ChatUserState()
+            {
+                ChatId = chatId,
+                AccountId = accountId
+            };
+
+            userState = (await _context.ChatUserStates.AddAsync(userState)).Entity;
+
+            await _context.SaveChangesAsync();
+
+            return userState;
+        }
+
+        public async Task<ChatEdit?> GetLastChatEdit(Guid chatId)
+        {
+            return await _context.ChatEdits
+                .OrderByDescending(x => x.Seq)
+                .FirstOrDefaultAsync(e => e.ChatId == chatId);
         }
 
         public async Task<List<ChatSettings>> GetChatSettingsAsync(Guid chatId)
@@ -285,13 +315,6 @@ namespace planner_chat_service.Infrastructure.Repository
         }
 
         public async Task<ChatMessage?> GetMessageAsync(Guid id) => await _context.ChatMessages.FindAsync(id);
-
-        public async Task<List<ChatMessage>> GetMessages(IEnumerable<Guid> messageIds)
-        {
-            return await _context.ChatMessages
-                .Where(e => messageIds.Contains(e.Id))
-                .ToListAsync();
-        }
 
         public async Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true)
         {
@@ -343,21 +366,6 @@ namespace planner_chat_service.Infrastructure.Repository
             return result;
         }
 
-        public async Task<Chat?> UpdateChatImage(Guid chatId, string filename)
-        {
-            if (string.IsNullOrEmpty(filename))
-                return null;
-
-            var chat = await GetAsync(chatId);
-            if (chat == null)
-                return null;
-
-            chat.Image = filename;
-            await _context.SaveChangesAsync();
-
-            return chat;
-        }
-
         public async Task<bool> UpdateLastViewingChatMembership(ChatSettings chatMembership, DateTime lastViewingDate)
         {
             if (chatMembership == null)
@@ -382,36 +390,6 @@ namespace planner_chat_service.Infrastructure.Repository
             userChatSession.DateLastViewing = lastViewingDate;
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<IEnumerable<AccountChatSession>> GetAccountChatSessions(Guid chatMembershipId)
-        {
-            return await _context.AccountChatSessions.Where(e => e.ChatSettingId == chatMembershipId)
-                .ToListAsync();
-        }
-
-        public async Task<Chat?> CreateTaskChatAsync(string name, Guid creatorId, Guid taskId)
-        {
-            var result = await _context.Chats.FirstOrDefaultAsync(e => e.TaskId == taskId);
-            if (result != null)
-                return null;
-
-            var chat = new Chat
-            {
-                Name = name,
-                ChatType = ChatType.Task,
-                TaskId = taskId,
-                Type = NodeType.Chat,
-                ChatMemberships = new List<ChatSettings>
-                {
-                    new ChatSettings { AccountId = creatorId }
-                }
-            };
-
-            chat = (await _context.Chats.AddAsync(chat))?.Entity;
-            await _context.SaveChangesAsync();
-
-            return chat;
         }
 
         public async Task CreateChatSettingsAsync(Guid taskId, List<Guid> accountIds)
@@ -548,30 +526,13 @@ namespace planner_chat_service.Infrastructure.Repository
 
         public async Task<ChatEdit> InsertChatEditLog(Guid chatId, Guid messageId, MessageAction messageAction)
         {
-            var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ChatId == chatId);
+            var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.MessageId == chatId);
 
-            var log = new ChatEdit() { Action = messageAction, ChatId = chatId, MessageId = messageId, ChatVersion = (lastChatLog?.ChatVersion ?? -1) + 1 };
+            var log = new ChatEdit() { Action = messageAction, ChatId = lastChatLog?.ChatId ?? chatId, MessageId = messageId, Version = (lastChatLog?.Version ?? -1) + 1 };
 
             var edit = (await _context.AddAsync(log)).Entity;
 
             return edit;
-        }
-
-        public async Task<ChatMessage?> SetMessageIsRead(ChatMessage readMessage)
-        {
-            var message = _context.ChatMessages
-                .Where(m => m.Id == readMessage.Id).FirstOrDefault();
-
-            if (message == null)
-            {
-                return null;
-            }
-
-            message.HasBeenRead = true;
-
-            await _context.SaveChangesAsync();
-
-            return message;
         }
 
         public async Task<bool> CreateOrUpdateMessageDraft(ChatSettings chatSettings, string content)

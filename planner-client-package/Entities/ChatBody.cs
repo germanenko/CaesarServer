@@ -8,10 +8,12 @@ namespace planner_client_package.Entities
     {
         public string ImageUrl { get; set; }
         public int CountOfUnreadMessages { get; set; }
-        public MessageBody LastMessage { get; set; }
         public bool IsSyncedReadStatus { get; set; }
         public ChatType ChatType { get; set; }
         public List<Guid> ParticipantIds { get; set; } = new();
         public ProfileBody Profile { get; set; }
+        public ChatStateBody State { get; set; }
+        public ChatUserStateBody UserState { get; set; }
+        public ChatEditBody ChatEdit { get; set; }
     }
 }

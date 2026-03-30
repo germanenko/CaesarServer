@@ -1,4 +1,5 @@
-﻿using planner_common_package.Enums;
+﻿using planner_client_package.Entities;
+using planner_common_package.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,6 +16,18 @@ namespace planner_chat_service.Core.Entities.Models
         public Guid MessageId { get; set; }
         public ChatMessage Message { get; set; }
         public MessageAction Action { get; set; }
-        public int ChatVersion { get; set; }
+        public int Version { get; set; }
+
+        public ChatEditBody ToBody()
+        {
+            return new ChatEditBody
+            {
+                Seq = Seq,
+                ChatId = ChatId,
+                MessageId = MessageId,
+                Action = Action,
+                Version = Version
+            };
+        }
     }
 }
