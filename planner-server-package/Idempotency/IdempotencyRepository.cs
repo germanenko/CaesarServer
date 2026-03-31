@@ -120,5 +120,16 @@ namespace planner_server_package.Idempotency
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task DeleteOldRequests()
+        {
+            var threshold = DateTime.UtcNow.AddDays(-7);
+
+            var operations = await _context.ProcessedOperations.Where(x => x.CompletedAtUtc < threshold).ToListAsync();
+
+            _context.ProcessedOperations.RemoveRange(operations);
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

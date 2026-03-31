@@ -148,6 +148,7 @@ void ConfigureServices(IServiceCollection services)
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
+    services.AddHostedService<StuckOperationCleanupService>();
     services.AddHostedService<OperationCleanupService>();
     services.AddHostedService(sp => new RabbitMqService
     (

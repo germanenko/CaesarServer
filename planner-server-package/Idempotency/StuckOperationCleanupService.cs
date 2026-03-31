@@ -12,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace planner_server_package.Idempotency
 {
-    public class OperationCleanupService : BackgroundService
+    public class StuckOperationCleanupService : BackgroundService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly ILogger<OperationCleanupService> _logger;
-        private readonly TimeSpan _checkInterval = TimeSpan.FromDays(1);
-        public OperationCleanupService(IServiceProvider serviceProvider, ILogger<OperationCleanupService> logger)
+        private readonly ILogger<StuckOperationCleanupService> _logger;
+        private readonly TimeSpan _checkInterval = TimeSpan.FromMinutes(5);
+        public StuckOperationCleanupService(IServiceProvider serviceProvider, ILogger<StuckOperationCleanupService> logger)
         {
             _serviceProvider = serviceProvider;
             _logger = logger;
@@ -35,7 +35,7 @@ namespace planner_server_package.Idempotency
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogError(ex, "Произошла ошибка при очистке устаревших запросов.");
+                    _logger.LogError(ex, "Произошла ошибка при очистке зависших запросов.");
                 }
 
                 await Task.Delay(_checkInterval, stoppingToken);
@@ -46,7 +46,7 @@ namespace planner_server_package.Idempotency
         {
             using var scope = _serviceProvider.CreateScope();
             var notifyRepository = scope.ServiceProvider.GetRequiredService<IIdempotencyRepository>();
-            await notifyRepository.DeleteOldRequests();
+            await notifyRepository.DeleteStuckRequests();
         }
     }
 }

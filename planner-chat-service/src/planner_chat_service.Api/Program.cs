@@ -139,6 +139,8 @@ void ConfigureServices(IServiceCollection services)
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
+    services.AddHostedService<StuckOperationCleanupService>();
+    services.AddHostedService<OperationCleanupService>();
     services.AddHostedService<GmailReaderService>();
     services.AddHostedService(e => new RabbitMqService(
         e.GetRequiredService<IServiceScopeFactory>(),
