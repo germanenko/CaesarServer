@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities.Enum;
 using planner_server_package.Idempotency.Interface;
 using System;
@@ -13,6 +14,11 @@ namespace planner_server_package.Idempotency
     public class IdempotencyRepository : IIdempotencyRepository
     {
         private readonly IdempotencyContext _context;
+
+        public IdempotencyRepository(IdempotencyContext context)
+        {
+            _context = context;
+        }
 
         public async Task<ProcessOperation> GetOperation(Guid opId, Guid accountId, OperationName opName)
         {
