@@ -5,7 +5,7 @@ services:
     image: planner-content-service
     restart: always
     ports:
-      - "8889:80"
+      - "8889:8080"
     depends_on:
       planner-content-db:
         condition: service_started

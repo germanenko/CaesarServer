@@ -5,7 +5,7 @@ services:
     image: planner-chat-service
     restart: always
     ports:
-      - "8090:80"
+      - "8090:8080"
     depends_on:
       planner-chat-db:
         condition: service_started
