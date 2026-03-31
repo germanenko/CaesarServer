@@ -13,7 +13,6 @@ using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Text.Json;
-using OperationStatus = planner_server_package.Idempotency.Status;
 
 namespace planner_chat_service.Api.Controllers
 {
