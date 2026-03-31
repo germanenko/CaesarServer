@@ -32,8 +32,7 @@ namespace planner_server_package.Idempotency
         {
             var operation = await GetOperation(opId, accountId, opName);
 
-            //var requestHash = ComputeRequestHash(request);
-            var requestHash = JsonSerializer.Serialize(request);
+            var requestHash = ComputeRequestHash(request);
 
             if (operation != null)
             {
