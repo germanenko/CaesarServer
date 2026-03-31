@@ -48,7 +48,7 @@ namespace planner_content_service.Api.Controllers
             var result = await _idempotencyService.ExecuteOperation(
                 boardBody.Id,
                 tokenInfo.AccountId,
-                OperationName.CreateChat,
+                OperationName.CreateOrUpdateBoard,
                 JsonSerializer.Serialize(boardBody.Body),
                 async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId));
 

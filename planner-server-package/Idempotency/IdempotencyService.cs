@@ -30,9 +30,9 @@ namespace planner_server_package.Idempotency
         {
             var operation = await GetOperation(opId, accountId, opName);
 
-            if (operation != null && operation.Status == Status.Complete)
+            if (operation != null)
             {
-                if (operation.RequestHash == requestHash)
+                if (operation.RequestHash == requestHash && operation.Status == Status.Complete)
                 {
                     return JsonSerializer.Deserialize<ServiceResponse<TResult>>(operation.ResultJson);
                 }
