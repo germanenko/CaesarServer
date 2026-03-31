@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
@@ -33,7 +34,7 @@ namespace planner_content_service.Infrastructure.Repository
             return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId))?.ToBoardBody();
         }
 
-        public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody createBoardBody, Guid accountId)
+        public async Task<BoardBody?> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody createBoardBody, Guid accountId)
         {
             try
             {
@@ -47,7 +48,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                     await _context.SaveChangesAsync();
 
-                    return createBoardBody;
+                    return board.ToBoardBody();
                 }
 
                 var newBoard = new Board
@@ -62,7 +63,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                return createBoardBody;
+                return newBoard.ToBoardBody();
             }
             catch (Exception ex)
             {
@@ -72,7 +73,7 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId)
+        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> boards, Guid accountId)
         {
             List<BoardBody> newBoardNodes = new List<BoardBody>();
 

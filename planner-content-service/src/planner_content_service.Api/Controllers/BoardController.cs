@@ -39,7 +39,7 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> CreateOrUpdateBoard(
-            Request<BoardBody> boardBody,
+            Request<CreateOrUpdateBoardBody> boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -65,7 +65,7 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(400)]
 
         public async Task<IActionResult> CreateOrUpdateBoards(
-            List<BoardBody> boardBodies,
+            List<CreateOrUpdateBoardBody> boardBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {

@@ -1,6 +1,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
@@ -59,15 +60,11 @@ namespace planner_content_service.Infrastructure.Service
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
             var tasks = response.Bodies.OfType<TaskBody>().ToList();
 
-            var boardBodies = boards.Select(x => new planner_client_package.Entities.BoardBody()
+            var boardBodies = boards.Select(x => new CreateOrUpdateBoardBody()
             {
                 Id = x.Id,
                 Name = x.Name,
-                Props = x.Props,
-                PublicationStatus = x.PublicationStatus,
-                Type = NodeType.Board,
-                UpdatedAt = x.UpdatedAt,
-                UpdatedBy = x.UpdatedBy
+                Props = x.Props
             }).ToList();
 
             var columnBodies = columns.Select(x => new planner_client_package.Entities.ColumnBody()
@@ -143,7 +140,7 @@ namespace planner_content_service.Infrastructure.Service
                 UpdatedAt = DateTime.UtcNow
             };
 
-            await boardService.CreateOrUpdateBoardAsync(boardBody, profile.Id);
+            await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id);
 
             return new ServiceResponse<object>()
             {

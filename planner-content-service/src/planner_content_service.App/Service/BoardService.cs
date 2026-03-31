@@ -1,5 +1,6 @@
 using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_client_package.Interface;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
@@ -207,11 +208,11 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(BoardBody body, Guid accountId)
+        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId)
         {
             var boardEvent = new CreateBoardEvent()
             {
-                Board = BodyConverter.ClientToServerBody(body),
+                Board = BodyConverter.ClientToServerBody(new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }),
                 CreatorId = accountId
             };
 
@@ -266,7 +267,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<BoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> bodies, Guid accountId)
         {
             var result = await _boardRepository.CreateOrUpdateBoards(bodies, accountId);
 
