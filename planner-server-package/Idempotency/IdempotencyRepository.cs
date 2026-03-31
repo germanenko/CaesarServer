@@ -97,5 +97,27 @@ namespace planner_server_package.Idempotency
 
             return operation;
         }
+
+        public async Task DeleteStuckRequests()
+        {
+            var threshold = DateTime.UtcNow.AddMinutes(-1);
+
+            var operations = await _context.ProcessedOperations.Where(x => x.Status == Status.InProgress && x.StartAtUtc < threshold).ToListAsync();
+
+            _context.ProcessedOperations.RemoveRange(operations);
+
+            await _context.OperationFailures.AddRangeAsync(
+                operations.Select(x => new OperationFailure()
+                {
+                    AccountId = x.AccountId,
+                    FailedAtUtc = DateTime.UtcNow,
+                    OperationId = x.OperationId,
+                    OperationName = x.OperationName,
+                    HttpStatusCode = HttpStatusCode.GatewayTimeout,
+                    Details = "Зависшая операция"
+                }));
+
+            await _context.SaveChangesAsync();
+        }
     }
 }

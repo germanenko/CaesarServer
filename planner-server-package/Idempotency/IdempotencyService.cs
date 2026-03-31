@@ -49,7 +49,7 @@ namespace planner_server_package.Idempotency
                 }
                 else
                 {
-                    await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result));
+                    //await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result));
                 }
 
                 return result;
