@@ -8,7 +8,7 @@
     <PackageReference Include="FirebaseAdmin" Version="3.4.0" />
     <PackageReference Include="Google.Apis.Gmail.v1" Version="1.73.0.4029" />
     <PackageReference Include="Google.Cloud.PubSub.V1" Version="3.32.0" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="7.0.11" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.11" />
   </ItemGroup>
 
   <PropertyGroup>
