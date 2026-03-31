@@ -458,6 +458,7 @@ namespace planner_chat_service.Infrastructure.Repository
             }
 
             message.Content = updatedMessage.Content;
+            message.EditedAt = DateTime.UtcNow;
 
             if (message.ChatId != null)
                 await InsertChatEditLog(message.ChatId.Value, message.Id, MessageAction.Edit);
@@ -528,7 +529,7 @@ namespace planner_chat_service.Infrastructure.Repository
         {
             var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.MessageId == chatId);
 
-            var log = new ChatEdit() { Action = messageAction, ChatId = lastChatLog?.ChatId ?? chatId, MessageId = messageId, Version = (lastChatLog?.Version ?? -1) + 1 };
+            var log = new ChatEdit() { Action = messageAction, ChatId = lastChatLog?.ChatId ?? chatId, MessageId = messageId, Version = (lastChatLog?.Version ?? -1) + 1, EditedAt = DateTime.UtcNow };
 
             var edit = (await _context.AddAsync(log)).Entity;
 

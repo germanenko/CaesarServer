@@ -17,6 +17,7 @@ namespace planner_chat_service.Core.Entities.Models
         public ChatMessage Message { get; set; }
         public MessageAction Action { get; set; }
         public int Version { get; set; }
+        public DateTime EditedAt { get; set; }
 
         public ChatEditBody ToBody()
         {
