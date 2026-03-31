@@ -14,8 +14,6 @@ using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using System.Xml.Linq;
-using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.App.Service
 {
