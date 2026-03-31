@@ -12,6 +12,6 @@ namespace planner_server_package.Idempotency.Interface
     public interface IIdempotencyService
     {
         public Task<ProcessOperation?> GetOperation(Guid opId, Guid accountId, OperationName opName);
-        public Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, string requestHash, Func<Task<ServiceResponse<TResult>>> handler);
+        public Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, object request, Func<Task<ServiceResponse<TResult>>> handler);
     }
 }

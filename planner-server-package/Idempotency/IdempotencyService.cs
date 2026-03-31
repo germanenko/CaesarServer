@@ -1,9 +1,11 @@
 ﻿using planner_client_package.Entities;
 using planner_client_package.Entities.Enum;
+using planner_server_package.Idempotency.Enum;
 using planner_server_package.Idempotency.Interface;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
@@ -26,9 +28,11 @@ namespace planner_server_package.Idempotency
             return operation;
         }
 
-        public async Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, string requestHash, Func<Task<ServiceResponse<TResult>>> handler)
+        public async Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, object request, Func<Task<ServiceResponse<TResult>>> handler)
         {
             var operation = await GetOperation(opId, accountId, opName);
+
+            var requestHash = ComputeRequestHash(request);
 
             if (operation != null)
             {
@@ -49,13 +53,31 @@ namespace planner_server_package.Idempotency
                 }
                 else
                 {
-                    //await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result));
+                    await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result));
                 }
 
                 return result;
             }
 
             return null;
+        }
+
+        public string ComputeRequestHash(object requestBody)
+        {
+            // 1. Сериализуем в каноническую форму
+            var json = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
+            {
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                // Сортируем ключи для детерминированности
+                DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
+            });
+
+            // 2. Вычисляем SHA256
+            var bytes = Encoding.UTF8.GetBytes(json);
+            var hash = SHA256.HashData(bytes);
+
+            // 3. Конвертируем в строку
+            return Convert.ToHexString(hash).ToLowerInvariant();
         }
     }
 }

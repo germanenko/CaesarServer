@@ -49,7 +49,7 @@ namespace planner_content_service.Api.Controllers
                 boardBody.Id,
                 tokenInfo.AccountId,
                 OperationName.CreateOrUpdateBoard,
-                JsonSerializer.Serialize(boardBody.Body),
+                boardBody.Body,
                 async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId));
 
             //var result = await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId);

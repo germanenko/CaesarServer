@@ -1,6 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using planner_client_package.Entities.Enum;
+using planner_server_package.Idempotency.Enum;
 using planner_server_package.Idempotency.Interface;
 using System;
 using System.Collections.Generic;
@@ -61,7 +62,7 @@ namespace planner_server_package.Idempotency
 
             _context.ProcessedOperations.Remove(operation);
 
-            var kind = Kind.AccessDenied;
+            var kind = Kind.Infrastructure;
 
             switch (httpStatusCode)
             {

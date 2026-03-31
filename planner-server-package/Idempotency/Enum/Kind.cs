@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_server_package.Idempotency
+namespace planner_server_package.Idempotency.Enum
 {
     public enum Kind
     {
