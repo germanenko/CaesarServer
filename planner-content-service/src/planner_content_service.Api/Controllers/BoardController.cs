@@ -37,7 +37,6 @@ namespace planner_content_service.Api.Controllers
         [SwaggerOperation("Создать доску")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
-
         public async Task<IActionResult> CreateOrUpdateBoard(
             Request<CreateOrUpdateBoardBody> boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
@@ -50,9 +49,9 @@ namespace planner_content_service.Api.Controllers
                 tokenInfo.AccountId,
                 OperationName.CreateOrUpdateBoard,
                 boardBody.Body,
-                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId));
+                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId)
+            );
 
-            //var result = await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 

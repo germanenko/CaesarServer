@@ -5,7 +5,7 @@ services:
     image: planner-file-service
     restart: always
     ports:
-      - "8091:80"
+      - "8091:8080"
     depends_on:
       planner-rabbitmq-service:
         condition: service_healthy

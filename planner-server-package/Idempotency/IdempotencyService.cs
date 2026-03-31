@@ -36,9 +36,20 @@ namespace planner_server_package.Idempotency
 
             if (operation != null)
             {
-                if (operation.RequestHash == requestHash && operation.Status == Status.Complete)
+                if (operation.RequestHash == requestHash)
                 {
-                    return JsonSerializer.Deserialize<ServiceResponse<TResult>>(operation.ResultJson);
+                    if (operation.Status == Status.Complete)
+                    {
+                        return JsonSerializer.Deserialize<ServiceResponse<TResult>>(operation.ResultJson);
+                    }
+                    else
+                    {
+                        return new ServiceResponse<TResult>()
+                        {
+                            StatusCode = System.Net.HttpStatusCode.Accepted,
+                            IsSuccess = true
+                        };
+                    }
                 }
             }
             else

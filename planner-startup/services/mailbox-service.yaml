@@ -5,7 +5,7 @@ services:
     image: planner-mailbox-service
     restart: always
     ports:
-      - "5001:80"
+      - "5001:8080"
     depends_on:
       planner-mail-credentials-db:
         condition: service_started
