@@ -5,7 +5,7 @@ services:
     image: planner-node-service
     restart: always
     ports:
-      - "8093:80"
+      - "8093:8080"
     depends_on:
       planner-rabbitmq-service:
         condition: service_healthy
