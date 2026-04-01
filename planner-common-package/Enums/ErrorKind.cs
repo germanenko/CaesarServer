@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_server_package.Idempotency.Enum
 {
-    public enum Kind
+    public enum ErrorKind
     {
         AccessDenied,
         Validation,

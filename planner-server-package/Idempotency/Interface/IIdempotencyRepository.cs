@@ -14,7 +14,7 @@ namespace planner_server_package.Idempotency.Interface
         public Task<ProcessOperation?> GetOperation(Guid opId, Guid accountId, OperationName opName);
         public Task<ProcessOperation?> AddOperation(Guid opId, Guid accountId, OperationName opName, string requestHash);
         public Task<ProcessOperation?> SetOperationCompleted(Guid opId, string responseBody);
-        public Task<ProcessOperation?> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, Kind kind, string[] errors);
+        public Task<ProcessOperation?> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, ErrorKind kind, string[] errors);
         public Task DeleteStuckRequests();
         public Task DeleteOldRequests();
     }

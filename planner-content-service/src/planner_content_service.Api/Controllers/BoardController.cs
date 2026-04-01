@@ -4,14 +4,11 @@ using planner_client_package.Entities;
 using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
 using planner_common_package.Entities;
-using planner_common_package.Enums;
 using planner_content_service.Core.IService;
 using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
 using System.Net.Http.Headers;
-using System.Text.Json;
 
 namespace planner_content_service.Api.Controllers
 {
@@ -53,9 +50,9 @@ namespace planner_content_service.Api.Controllers
             );
 
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+                return StatusCode((int)result.StatusCode, new Response<BoardBody>() { RequestId = boardBody.Id, Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, result.Errors);
+            return StatusCode((int)result.StatusCode, new Response<BoardBody>() { RequestId = boardBody.Id, ErrorKind = result.ErrorKind });
         }
 
         [HttpPost("createBoards"), Authorize]

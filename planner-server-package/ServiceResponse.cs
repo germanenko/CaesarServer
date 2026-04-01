@@ -13,7 +13,7 @@ namespace planner_server_package
         public HttpStatusCode StatusCode { get; set; }
         public bool IsSuccess { get; set; }
         public T? Body { get; set; }
-        public Kind ErrorKind { get; set; }
+        public ErrorKind ErrorKind { get; set; }
         public string[] Errors { get; set; }
     }
 }

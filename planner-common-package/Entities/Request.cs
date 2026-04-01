@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_client_package.Entities.Request
+namespace planner_common_package.Entities
 {
     public class Request<T>
     {
