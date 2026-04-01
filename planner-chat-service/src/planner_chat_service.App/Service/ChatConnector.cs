@@ -217,7 +217,7 @@ namespace planner_chat_service.App.Service
 
             var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId };
 
-            var bytes = SerializeObject(chatChangedEvent);
+            var bytes = SerializeObject(message);
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
             DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
         }

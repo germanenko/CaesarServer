@@ -75,19 +75,15 @@ namespace planner_server_package.Idempotency
 
         public string ComputeRequestHash(object requestBody)
         {
-            // 1. Сериализуем в каноническую форму
             var json = JsonSerializer.Serialize(requestBody, new JsonSerializerOptions
             {
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-                // Сортируем ключи для детерминированности
                 DictionaryKeyPolicy = JsonNamingPolicy.CamelCase
             });
 
-            // 2. Вычисляем SHA256
             var bytes = Encoding.UTF8.GetBytes(json);
             var hash = SHA256.HashData(bytes);
 
-            // 3. Конвертируем в строку
             return Convert.ToHexString(hash).ToLowerInvariant();
         }
     }
