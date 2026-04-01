@@ -3,6 +3,7 @@ using Microsoft.Extensions.Logging;
 using MimeKit;
 using planner_email_service.Core.Entities;
 using planner_email_service.Core.IService;
+using planner_server_package;
 using System.Net;
 
 namespace planner_email_service.App.Service

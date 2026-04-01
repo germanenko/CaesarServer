@@ -1,5 +1,4 @@
 ﻿using Microsoft.Extensions.Logging;
-using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;

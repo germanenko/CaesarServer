@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using planner_chat_service.Core.IService;
+using planner_server_package;
 using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;

@@ -1,4 +1,5 @@
 using planner_email_service.Core.Entities;
+using planner_server_package;
 
 namespace planner_email_service.Core.IService
 {

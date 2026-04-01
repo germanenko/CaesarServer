@@ -14,9 +14,7 @@ namespace planner_server_package.Idempotency
         public Guid OperationId { get; set; }
         public Guid AccountId { get; set; }
         public OperationName OperationName { get; set; }
-        public Guid? ScopeId { get; set; }
         public Kind Kind { get; set; }
-        public int ErrorCode { get; set; }
         public HttpStatusCode HttpStatusCode { get; set; }
         public DateTime FailedAtUtc { get; set; }
         public string Details { get; set; }

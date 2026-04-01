@@ -2,6 +2,7 @@
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
+using planner_server_package;
 using System.Net;
 using ServerNotificationSettings = planner_server_package.Entities.NotificationSettingsBody;
 

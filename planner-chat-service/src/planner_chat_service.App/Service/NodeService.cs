@@ -3,6 +3,7 @@ using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_server_package;
 using System.Collections.Generic;
 
 namespace planner_chat_service.App.Service

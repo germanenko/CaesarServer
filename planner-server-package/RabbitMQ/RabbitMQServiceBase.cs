@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using planner_server_package.Entities;
 using planner_server_package.Events;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;

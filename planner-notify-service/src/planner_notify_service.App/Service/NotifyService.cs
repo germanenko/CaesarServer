@@ -1,8 +1,9 @@
-﻿using planner_server_package.Entities;
-using planner_notify_service.Core.Entities.Models;
+﻿using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.Entities.Response;
 using planner_notify_service.Core.IRepository;
 using planner_notify_service.Core.IService;
+using planner_server_package;
+using planner_server_package.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;

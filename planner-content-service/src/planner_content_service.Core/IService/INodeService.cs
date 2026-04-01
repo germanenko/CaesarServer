@@ -1,5 +1,6 @@
 ﻿using planner_client_package.Entities;
 using planner_content_service.Core.Entities.Models;
+using planner_server_package;
 
 namespace planner_content_service.Core.IService
 {

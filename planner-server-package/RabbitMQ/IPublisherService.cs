@@ -1,5 +1,4 @@
-﻿using planner_server_package.Entities;
-using planner_server_package.Events.Enums;
+﻿using planner_server_package.Events.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;

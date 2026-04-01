@@ -5,6 +5,7 @@ using Microsoft.Extensions.Logging;
 using planner_mailbox_service.Core.Entities.Models;
 using planner_mailbox_service.Core.Entities.Request;
 using planner_mailbox_service.Infrastructure.Data;
+using planner_server_package;
 using planner_server_package.Entities;
 using planner_server_package.RabbitMQ;
 using RabbitMQ.Client;

@@ -1,5 +1,4 @@
-﻿using planner_client_package.Entities;
-using planner_client_package.Entities.Enum;
+﻿using planner_client_package.Entities.Enum;
 using planner_server_package.Idempotency.Enum;
 using planner_server_package.Idempotency.Interface;
 using System;
@@ -60,7 +59,7 @@ namespace planner_server_package.Idempotency
 
                 if (result.IsSuccess == false)
                 {
-                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, result.Errors);
+                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, result.ErrorKind, result.Errors);
                 }
                 else
                 {

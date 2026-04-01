@@ -56,29 +56,11 @@ namespace planner_server_package.Idempotency
             return operation;
         }
 
-        public async Task<ProcessOperation> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, string[] errors)
+        public async Task<ProcessOperation> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, Kind kind, string[] errors)
         {
             var operation = await _context.ProcessedOperations.FirstOrDefaultAsync(x => x.OperationId == opId);
 
             _context.ProcessedOperations.Remove(operation);
-
-            var kind = Kind.Infrastructure;
-
-            switch (httpStatusCode)
-            {
-                case HttpStatusCode.Forbidden:
-                    kind = Kind.AccessDenied;
-                    break;
-                case HttpStatusCode.BadRequest:
-                    kind = Kind.Validation;
-                    break;
-                case HttpStatusCode.InternalServerError:
-                    kind = Kind.Infrastructure;
-                    break;
-                case HttpStatusCode.Conflict:
-                    kind = Kind.Conflict;
-                    break;
-            }
 
 
             await _context.OperationFailures.AddAsync(new OperationFailure()

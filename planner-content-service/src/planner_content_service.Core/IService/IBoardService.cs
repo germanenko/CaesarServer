@@ -1,7 +1,9 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
-using planner_common_package.Enums;
-using System.Net;
+using planner_server_package;
+using planner_server_package.Entities;
+using BoardBody = planner_client_package.Entities.BoardBody;
+using ColumnBody = planner_client_package.Entities.ColumnBody;
 
 namespace planner_content_service.Core.IService
 {
