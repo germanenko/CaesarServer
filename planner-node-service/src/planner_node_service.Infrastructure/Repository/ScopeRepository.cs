@@ -192,7 +192,7 @@ namespace planner_node_service.Infrastructure.Repository
                 }
                 else
                 {
-                    if (cache != null)
+                    if (cache == null)
                     {
                         await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
                         {
