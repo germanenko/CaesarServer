@@ -155,7 +155,7 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var log = lastLogs.FirstOrDefault(x => x.ScopeId == scopeId);
 
-                var access = await CheckScopeAccess(accountId, log.ScopeId);
+                var access = await CheckScopeAccess(accountId, scopeId);
                 Permission permission = Permission.Meta;
 
                 if (log != null)
