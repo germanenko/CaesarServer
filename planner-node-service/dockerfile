@@ -5,15 +5,11 @@ COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
 COPY . .
 
-RUN dotnet restore planner-node-service/planner_node_service.sln \
-    --packages /packs \
-    --verbosity quiet
+RUN dotnet restore planner-node-service/planner_node_service.sln
 
 RUN dotnet publish \
   planner-node-service/src/planner_node_service.Api/planner_node_service.Api.csproj \
-  -c Release \
-  --no-restore \
-  -o /App/out
+  -c Release -o /App/out
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
