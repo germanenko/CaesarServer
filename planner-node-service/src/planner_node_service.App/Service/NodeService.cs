@@ -442,7 +442,7 @@ namespace planner_node_service.App.Service
         {
             var client = new HttpClient()
             {
-                BaseAddress = new Uri("http://planner-content-service:80/api/"),
+                BaseAddress = new Uri("http://planner-content-service:8080/api/"),
             };
 
             var nodeIds = nodes.Select(x => x.Id);
@@ -479,7 +479,7 @@ namespace planner_node_service.App.Service
         {
             var client = new HttpClient()
             {
-                BaseAddress = new Uri("http://planner-chat-service:80/api/"),
+                BaseAddress = new Uri("http://planner-chat-service:8080/api/"),
             };
 
             var nodeIds = nodes.Select(x => x.Id);
