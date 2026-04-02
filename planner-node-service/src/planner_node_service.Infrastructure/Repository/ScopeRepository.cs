@@ -158,11 +158,10 @@ namespace planner_node_service.Infrastructure.Repository
                 var access = await CheckScopeAccess(accountId, scopeId);
                 Permission permission = Permission.Meta;
 
+                var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == scopeId);
+
                 if (log != null)
                 {
-                    var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
-
-
                     if (log.ScopeId == access!.NodeId)
                         permission = access.Permission;
                     else
@@ -193,14 +192,17 @@ namespace planner_node_service.Infrastructure.Repository
                 }
                 else
                 {
-                    await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                    if (cache != null)
                     {
-                        AccountId = accountId,
-                        ScopeId = scopeId,
-                        Permission = permission,
-                        GraphRevisionUsed = 0,
-                        RulesRevisionUsed = 0
-                    });
+                        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                        {
+                            AccountId = accountId,
+                            ScopeId = scopeId,
+                            Permission = permission,
+                            GraphRevisionUsed = 0,
+                            RulesRevisionUsed = 0
+                        });
+                    }
                 }
             }
 
