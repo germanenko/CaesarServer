@@ -16,6 +16,7 @@ namespace planner_server_package.Entities
     {
         public Guid Id { get; set; }
         public NodeType Type { get; set; }
+        public SyncKind SyncKind { get; set; }
         public string Name { get; set; }
         public string Props { get; set; }
         public Guid CreatedBy { get; set; }

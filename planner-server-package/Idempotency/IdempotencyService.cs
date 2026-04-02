@@ -59,7 +59,9 @@ namespace planner_server_package.Idempotency
 
                 if (result.IsSuccess == false)
                 {
-                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, result.ErrorKind, result.Errors);
+                    var primaryErrorCode = result.ErrorCodes.Max();
+
+                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, primaryErrorCode, result.Errors);
                 }
                 else
                 {
@@ -69,7 +71,13 @@ namespace planner_server_package.Idempotency
                 return result;
             }
 
-            return null;
+            return new ServiceResponse<TResult>()
+            {
+                StatusCode = System.Net.HttpStatusCode.Conflict,
+                IsSuccess = false,
+                ErrorCodes = [ErrorCode.Conflict],
+                Errors = ["Запрос с таким Id уже существует"]
+            };
         }
 
         public string ComputeRequestHash(object requestBody)

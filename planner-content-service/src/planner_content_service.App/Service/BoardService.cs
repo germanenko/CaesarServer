@@ -10,6 +10,7 @@ using planner_server_package;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency.Enum;
 using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Text.Json;
@@ -45,7 +46,8 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = request.IsSuccess,
                     StatusCode = request.StatusCode,
-                    Errors = request.Errors
+                    Errors = request.Errors,
+                    ErrorCodes = request.ErrorCodes
                 };
             }
 
@@ -56,7 +58,8 @@ namespace planner_content_service.App.Service
                 return new ServiceResponse<ColumnBody>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
+                    StatusCode = HttpStatusCode.BadRequest,
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 
@@ -96,7 +99,8 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest,
-                    Errors = new[] { "Нода не удалена" }
+                    Errors = new[] { "Нода не удалена" },
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 
@@ -162,7 +166,8 @@ namespace planner_content_service.App.Service
                 return new ServiceResponse<List<ColumnBody>>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
+                    StatusCode = HttpStatusCode.BadRequest,
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 
@@ -197,7 +202,8 @@ namespace planner_content_service.App.Service
                 return new ServiceResponse<List<ColumnBody>>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
+                    StatusCode = HttpStatusCode.BadRequest,
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 
@@ -248,6 +254,7 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 
@@ -278,6 +285,7 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.InternalServerError,
+                    ErrorCodes = [ErrorCode.Infrastructure]
                 };
             }
 

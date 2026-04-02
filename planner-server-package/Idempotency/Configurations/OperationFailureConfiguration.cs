@@ -9,7 +9,7 @@ namespace planner_server_package.Idempotency.Configurations
         {
             builder.HasKey(e => e.OperationId);
 
-            builder.Property(e => e.Kind)
+            builder.Property(e => e.ErrorCode)
                 .IsRequired()
                 .HasConversion<int>();
 

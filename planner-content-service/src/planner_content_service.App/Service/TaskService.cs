@@ -7,6 +7,7 @@ using planner_server_package;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency.Enum;
 using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Threading.Tasks;

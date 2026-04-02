@@ -56,7 +56,7 @@ namespace planner_server_package.Idempotency
             return operation;
         }
 
-        public async Task<ProcessOperation> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, ErrorKind kind, string[] errors)
+        public async Task<ProcessOperation> SetOperationFailed(Guid opId, HttpStatusCode httpStatusCode, ErrorCode errorCode, string[] errors)
         {
             var operation = await _context.ProcessedOperations.FirstOrDefaultAsync(x => x.OperationId == opId);
 
@@ -68,7 +68,7 @@ namespace planner_server_package.Idempotency
                 AccountId = operation.AccountId,
                 FailedAtUtc = DateTime.UtcNow,
                 HttpStatusCode = httpStatusCode,
-                Kind = kind,
+                ErrorCode = errorCode,
                 OperationId = operation.OperationId,
                 OperationName = operation.OperationName,
                 Details = string.Join(", ", errors)

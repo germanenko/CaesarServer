@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 
 namespace planner_server_package.Idempotency.Enum
 {
-    public enum ErrorKind
+    public enum ErrorCode
     {
-        AccessDenied,
-        Validation,
-        Conflict,
-        Infrastructure
+        Validation = 100,
+        Conflict = 200,
+        Infrastructure = 300,
+        AccessDenied = 400,
     }
 }

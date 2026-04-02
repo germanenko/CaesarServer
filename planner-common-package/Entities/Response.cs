@@ -11,6 +11,6 @@ namespace planner_client_package.Entities
     {
         public Guid RequestId { get; set; }
         public T Body { get; set; }
-        public ErrorKind ErrorKind { get; set; }
+        public List<ErrorCode> ErrorCodes { get; set; }
     }
 }
