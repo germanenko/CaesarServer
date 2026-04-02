@@ -4,6 +4,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using System.Security;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -150,27 +151,44 @@ namespace planner_node_service.Infrastructure.Repository
 
             _context.SyncScopeAccess.RemoveRange(excessSyncScopes);
 
-            foreach (var log in lastLogs)
+            foreach (var scopeId in scopeIds)
             {
-                var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
+                var log = lastLogs.FirstOrDefault(x => x.ScopeId == scopeId);
 
                 var access = await CheckScopeAccess(accountId, log.ScopeId);
                 Permission permission = Permission.Meta;
 
-                if (log.ScopeId == access!.NodeId)
-                    permission = access.Permission;
-                else
-                    permission = Permission.Meta;
-
-                if (cache != null)
+                if (log != null)
                 {
+                    var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
 
-                    if (cache.GraphRevisionUsed < log.GraphRevision ||
-                        cache.RulesRevisionUsed < log.RulesRevision)
+
+                    if (log.ScopeId == access!.NodeId)
+                        permission = access.Permission;
+                    else
+                        permission = Permission.Meta;
+
+                    if (cache != null)
                     {
-                        cache.Permission = permission;
-                        cache.RulesRevisionUsed = log.RulesRevision;
-                        cache.GraphRevisionUsed = log.GraphRevision;
+
+                        if (cache.GraphRevisionUsed < log.GraphRevision ||
+                            cache.RulesRevisionUsed < log.RulesRevision)
+                        {
+                            cache.Permission = permission;
+                            cache.RulesRevisionUsed = log.RulesRevision;
+                            cache.GraphRevisionUsed = log.GraphRevision;
+                        }
+                    }
+                    else
+                    {
+                        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+                        {
+                            AccountId = accountId,
+                            ScopeId = log.ScopeId,
+                            Permission = permission,
+                            GraphRevisionUsed = log.GraphRevision,
+                            RulesRevisionUsed = log.RulesRevision
+                        });
                     }
                 }
                 else
@@ -178,13 +196,49 @@ namespace planner_node_service.Infrastructure.Repository
                     await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
                     {
                         AccountId = accountId,
-                        ScopeId = log.ScopeId,
+                        ScopeId = scopeId,
                         Permission = permission,
-                        GraphRevisionUsed = log.GraphRevision,
-                        RulesRevisionUsed = log.RulesRevision
+                        GraphRevisionUsed = 0,
+                        RulesRevisionUsed = 0
                     });
                 }
             }
+
+            //foreach (var log in lastLogs)
+            //{
+            //    var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
+
+            //    var access = await CheckScopeAccess(accountId, log.ScopeId);
+            //    Permission permission = Permission.Meta;
+
+            //    if (log.ScopeId == access!.NodeId)
+            //        permission = access.Permission;
+            //    else
+            //        permission = Permission.Meta;
+
+            //    if (cache != null)
+            //    {
+
+            //        if (cache.GraphRevisionUsed < log.GraphRevision ||
+            //            cache.RulesRevisionUsed < log.RulesRevision)
+            //        {
+            //            cache.Permission = permission;
+            //            cache.RulesRevisionUsed = log.RulesRevision;
+            //            cache.GraphRevisionUsed = log.GraphRevision;
+            //        }
+            //    }
+            //    else
+            //    {
+            //        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
+            //        {
+            //            AccountId = accountId,
+            //            ScopeId = log.ScopeId,
+            //            Permission = permission,
+            //            GraphRevisionUsed = log.GraphRevision,
+            //            RulesRevisionUsed = log.RulesRevision
+            //        });
+            //    }
+            //}
 
             await _context.SaveChangesAsync();
         }
