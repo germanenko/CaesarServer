@@ -69,8 +69,10 @@ namespace planner_node_service.App.Service
                 }
             }
 
-            result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
-            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
+            result.AddRange(await GetNodesFromDomainServices(accountId, requestBodies));
+
+            //result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
+            //result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
 
             foreach (var body in bodies)
             {
@@ -134,8 +136,7 @@ namespace planner_node_service.App.Service
                 }
             }
 
-            result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
-            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
+            result.AddRange(await GetNodesFromDomainServices(accountId, requestBodies));
 
             foreach (var body in result)
             {
@@ -402,6 +403,16 @@ namespace planner_node_service.App.Service
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = logs
             };
+        }
+
+        public async Task<List<NodeBody>> GetNodesFromDomainServices(Guid accountId, List<NodeBody> requestBodies)
+        {
+            var result = new List<NodeBody>();
+
+            result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
+            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
+
+            return result;
         }
 
         public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies, TokenPayload tokenPayload)
