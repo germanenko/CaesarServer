@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
+using planner_client_package.Interface;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
@@ -104,7 +105,7 @@ namespace planner_node_service.App.Service
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, Guid[] nodeIds)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
         {
             var nodes = new List<NodeBody>();
             foreach (var id in nodeIds)
@@ -118,6 +119,8 @@ namespace planner_node_service.App.Service
             var requestBodies = new List<NodeBody>();
 
             var result = new List<NodeBody>();
+
+            nodes = nodes.DistinctBy(x => x.Id).ToList();
 
             foreach (var body in nodes)
             {
