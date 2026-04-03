@@ -79,6 +79,8 @@ namespace planner_node_service.App.Service
                 body.UpdatedAt = history.UpdatedAt;
             }
 
+            result = result.DistinctBy(x => x.Id).ToList();
+
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
