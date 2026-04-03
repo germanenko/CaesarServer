@@ -365,6 +365,8 @@ namespace planner_node_service.App.Service
         {
             //! тестовое возвращение ошибки для проверки Outbox клиента
 
+            await Task.Delay(1000);
+
             return new ServiceResponse<List<EntityVersionBody>>()
             {
                 IsSuccess = false,
