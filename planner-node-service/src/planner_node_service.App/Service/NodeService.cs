@@ -363,15 +363,9 @@ namespace planner_node_service.App.Service
 
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId)
         {
-            //! тестовое возвращение ошибки для проверки Outbox клиента
+            //! тестовое ожидание для проверки Outbox клиента
 
             await Task.Delay(1000);
-
-            return new ServiceResponse<List<EntityVersionBody>>()
-            {
-                IsSuccess = false,
-                StatusCode = System.Net.HttpStatusCode.InternalServerError,
-            };
 
             var nodes = await GetScopes(accountId);
 
