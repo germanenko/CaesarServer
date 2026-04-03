@@ -69,8 +69,8 @@ namespace planner_node_service.App.Service
                 }
             }
 
-            result.AddRange(await GetContentNodesByIdAsync(requestBodies));
-            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies));
+            result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
+            result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
 
             foreach (var body in bodies)
             {
