@@ -1,7 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
-using planner_client_package.Interface;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
