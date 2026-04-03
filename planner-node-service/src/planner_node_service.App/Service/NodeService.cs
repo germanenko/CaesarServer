@@ -365,8 +365,6 @@ namespace planner_node_service.App.Service
         {
             //! тестовое ожидание для проверки Outbox клиента
 
-            await Task.Delay(1000);
-
             var nodes = await GetScopes(accountId);
 
             if (nodes.Body.IsNullOrEmpty())
@@ -415,6 +413,15 @@ namespace planner_node_service.App.Service
 
             result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
             result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
+
+            foreach (var node in result)
+            {
+                var matchingRequest = requestBodies.FirstOrDefault(r => r.Id == node.Id);
+                if (matchingRequest != null)
+                {
+                    node.SyncKind = matchingRequest.SyncKind;
+                }
+            }
 
             return result;
         }
