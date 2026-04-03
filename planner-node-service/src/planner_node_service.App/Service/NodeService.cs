@@ -104,7 +104,7 @@ namespace planner_node_service.App.Service
         }
 
 
-        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, Guid[] nodeIds)
         {
             var nodes = new List<NodeBody>();
             foreach (var id in nodeIds)
