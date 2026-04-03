@@ -143,6 +143,13 @@ namespace planner_node_service.App.Service
                 var history = await _logRepository.GetLastHistory(body.Id);
                 body.UpdatedBy = history.UpdatedById;
                 body.UpdatedAt = history.UpdatedAt;
+
+                if (body.SyncKind == SyncKind.Scope)
+                {
+                    var scopeLog = await _logRepository.GetLastLogForScope(body.Id);
+
+                    body.Version = scopeLog.ScopeVersion;
+                }
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
