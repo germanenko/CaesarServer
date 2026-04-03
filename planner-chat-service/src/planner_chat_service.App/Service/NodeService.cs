@@ -29,7 +29,7 @@ namespace planner_chat_service.App.Service
                 return new ServiceResponse<IEnumerable<NodeBody>>()
                 {
                     IsSuccess = true,
-                    StatusCode = System.Net.HttpStatusCode.NotFound
+                    StatusCode = System.Net.HttpStatusCode.OK
                 };
             }
 
