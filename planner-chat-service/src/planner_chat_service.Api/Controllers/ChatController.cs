@@ -6,6 +6,7 @@ using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
