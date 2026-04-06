@@ -69,7 +69,7 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             var body = result.ToNodeBody();
-            body.AccessRight = rule.ToAccessRuleBody();
+            body.AccessRight = rule.ToBody();
 
             return body;
         }
@@ -146,7 +146,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 AccessRightBody rule = null;
 
-                if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody.UpdatedBy, node)).ToAccessRuleBody();
+                if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody.UpdatedBy, node)).ToBody();
 
                 await _context.SaveChangesAsync();
 

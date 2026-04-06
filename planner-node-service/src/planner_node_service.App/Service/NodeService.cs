@@ -153,9 +153,13 @@ namespace planner_node_service.App.Service
                 }
 
                 var link = await _nodeRepository.GetNodeLink(body.Id);
+                var access = await _accessRepository.GetAccessRuleForNode(accountId, body.Id);
 
                 if (link != null)
                     body.Link = link.ToBody();
+
+                if (access != null)
+                    body.AccessRight = access.ToBody();
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()

@@ -58,7 +58,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRuleBody()
+                Body = access.ToBody()
             };
         }
 
@@ -100,7 +100,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRuleBody()
+                Body = access.ToBody()
             };
         }
 
@@ -164,7 +164,7 @@ namespace planner_node_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = access.ToAccessRuleBody()
+                Body = access.ToBody()
             };
         }
 

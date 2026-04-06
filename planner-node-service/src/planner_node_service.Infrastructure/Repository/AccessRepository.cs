@@ -348,7 +348,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
 
-            accessBody.AccessRights = accessRights.Select(x => x.ToAccessRuleBody()).ToList();
+            accessBody.AccessRights = accessRights.Select(x => x.ToBody()).ToList();
 
             var accessGroups = groupRules
                 .Select(x => x.Subject as GroupAccessSubject)
@@ -368,6 +368,53 @@ namespace planner_node_service.Infrastructure.Repository
             accessBody.AccessGroupMembers?.AddRange(members);
 
             return accessBody;
+        }
+
+        public async Task<AccessRule?> GetAccessRuleForNode(Guid accountId, Guid nodeId)
+        {
+            var userRules = _context.AccessRules
+                .Where(ar =>
+                    ar.Subject is UserAccessSubject &&
+                    ((UserAccessSubject)ar.Subject).AccountId == accountId && ar.NodeId == nodeId);
+
+            var groupRules = _context.AccessRules
+                .Where(ar =>
+                    ar.Subject is GroupAccessSubject &&
+                    ((GroupAccessSubject)ar.Subject)
+                        .Members.Any(m => m.AccountId == accountId && ar.NodeId == nodeId));
+
+            var accessRights = await userRules
+                .Union(groupRules)
+                .ToListAsync();
+
+
+            if (!accessRights.Any())
+                return null;
+
+            var accessBody = new AccessBody();
+
+            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+
+            accessBody.AccessRights = accessRights.Select(x => x.ToBody()).ToList();
+
+            var accessGroups = groupRules
+                .Select(x => x.Subject as GroupAccessSubject)
+                .Where(x => x != null)
+                .Distinct()
+                .ToList();
+
+            accessBody.AccessGroups = accessGroups
+                .Select(x => x.ToAccessGroupBody())
+                .ToList();
+
+            var members = accessGroups
+                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
+                .Distinct()
+                .ToList();
+
+            accessBody.AccessGroupMembers?.AddRange(members);
+
+            return accessRights.FirstOrDefault();
         }
     }
 }

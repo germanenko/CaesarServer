@@ -12,7 +12,7 @@ namespace planner_node_service.Core.Entities.Models
         public Node Node { get; set; }
         public Permission Permission { get; set; }
 
-        public AccessRightBody ToAccessRuleBody()
+        public AccessRightBody ToBody()
         {
             return new AccessRightBody
             {
