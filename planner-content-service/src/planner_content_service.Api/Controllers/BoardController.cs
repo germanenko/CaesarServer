@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
+using planner_common_package;
 using planner_common_package.Entities;
 using planner_content_service.Core.IService;
 using planner_server_package.Idempotency.Interface;
@@ -35,18 +36,19 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
         public async Task<IActionResult> CreateOrUpdateBoard(
-            Request<CreateOrUpdateBoardBody> boardBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+            CreateOrUpdateBoardBody boardBody,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
             var result = await _idempotencyService.ExecuteOperation(
-                boardBody.Id,
+                requestId,
                 tokenInfo.AccountId,
                 OperationName.CreateOrUpdateBoard,
-                boardBody.Body,
-                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody.Body, tokenInfo.AccountId)
+                boardBody,
+                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId)
             );
 
             if (result.IsSuccess)

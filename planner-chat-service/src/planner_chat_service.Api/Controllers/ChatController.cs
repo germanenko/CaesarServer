@@ -6,6 +6,7 @@ using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
+using planner_common_package;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package.Idempotency;
@@ -112,21 +113,22 @@ namespace planner_chat_service.Api.Controllers
         [SwaggerResponse(409)]
 
         public async Task<IActionResult> CreatePersonalChat(
-            [FromBody, Required] Request<CreateChatBody> createChatBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+            [FromBody, Required] CreateChatBody createChatBody,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
 
             var result = await _idempotencyService.ExecuteOperation(
-                createChatBody.Id,
+                requestId,
                 tokenPayload.AccountId,
                 OperationName.CreateChat,
-                JsonSerializer.Serialize(createChatBody.Body),
+                JsonSerializer.Serialize(createChatBody),
                 async () => await _chatService.CreatePersonalChat(
                     tokenPayload.AccountId,
                     tokenPayload.SessionId,
-                    createChatBody.Body)
+                    createChatBody)
                 );
 
             //var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, createChatBody.Body);
