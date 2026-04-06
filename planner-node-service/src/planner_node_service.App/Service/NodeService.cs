@@ -114,6 +114,7 @@ namespace planner_node_service.App.Service
                 if (await _accessRepository.CheckAccess(accountId, id, Permission.Meta))
                 {
                     nodes.Add((await _nodeRepository.GetNode(id)).ToNodeBody());
+                    nodes.Add((await _scopeRepository.GetNodeScope(id)).ToNodeBody());
                 }
             }
 
@@ -148,7 +149,7 @@ namespace planner_node_service.App.Service
                 {
                     var scopeLog = await _logRepository.GetLastLogForScope(body.Id);
 
-                    body.Version = scopeLog.ScopeVersion;
+                    body.ScopeVersion = scopeLog.ScopeVersion;
                 }
             }
 
