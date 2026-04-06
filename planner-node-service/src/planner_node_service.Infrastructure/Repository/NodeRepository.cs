@@ -69,7 +69,7 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             var body = result.ToNodeBody();
-            body.AccessRight = rule.ToBody();
+            body.AccessRule = rule.ToBody();
 
             return body;
         }
@@ -144,14 +144,14 @@ namespace planner_node_service.Infrastructure.Repository
                 await _context.NodeLinks.AddAsync(nodeLink);
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
-                AccessRightBody rule = null;
+                AccessRuleBody rule = null;
 
                 if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody.UpdatedBy, node)).ToBody();
 
                 await _context.SaveChangesAsync();
 
                 var body = result.ToNodeBody();
-                body.AccessRight = rule;
+                body.AccessRule = rule;
 
                 return body;
             }

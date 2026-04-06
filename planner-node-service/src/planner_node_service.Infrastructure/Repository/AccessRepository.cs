@@ -348,7 +348,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
 
-            accessBody.AccessRights = accessRights.Select(x => x.ToBody()).ToList();
+            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
 
             var accessGroups = groupRules
                 .Select(x => x.Subject as GroupAccessSubject)
@@ -395,7 +395,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
 
-            accessBody.AccessRights = accessRights.Select(x => x.ToBody()).ToList();
+            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
 
             var accessGroups = groupRules
                 .Select(x => x.Subject as GroupAccessSubject)

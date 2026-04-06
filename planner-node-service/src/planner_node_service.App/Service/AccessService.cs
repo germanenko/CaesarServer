@@ -20,11 +20,11 @@ namespace planner_node_service.App.Service
             _userService = userService;
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        public async Task<ServiceResponse<AccessRuleBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
             if (_nodeRepository.GetNode(nodeId) == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
@@ -34,7 +34,7 @@ namespace planner_node_service.App.Service
 
             if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -46,7 +46,7 @@ namespace planner_node_service.App.Service
 
             if (access == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -54,7 +54,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            return new ServiceResponse<AccessRightBody>()
+            return new ServiceResponse<AccessRuleBody>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -62,11 +62,11 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        public async Task<ServiceResponse<AccessRuleBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
             if (_nodeRepository.GetNode(nodeId) == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
@@ -76,7 +76,7 @@ namespace planner_node_service.App.Service
 
             if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -88,7 +88,7 @@ namespace planner_node_service.App.Service
 
             if (access == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
@@ -96,7 +96,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            return new ServiceResponse<AccessRightBody>()
+            return new ServiceResponse<AccessRuleBody>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -146,13 +146,13 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessRightBody>> CreateAccessRule(Guid accountId, Guid nodeId, Permission permission)
+        public async Task<ServiceResponse<AccessRuleBody>> CreateAccessRule(Guid accountId, Guid nodeId, Permission permission)
         {
             var access = await _accessRepository.GrantAccess(accountId, accountId, nodeId, permission);
 
             if (access == null)
             {
-                return new ServiceResponse<AccessRightBody>()
+                return new ServiceResponse<AccessRuleBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -160,7 +160,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            return new ServiceResponse<AccessRightBody>()
+            return new ServiceResponse<AccessRuleBody>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -250,9 +250,9 @@ namespace planner_node_service.App.Service
 
             var accountIds = new List<Guid>();
 
-            if (access.AccessRights != null)
+            if (access.AccessRules != null)
             {
-                accountIds.AddRange(access.AccessRights
+                accountIds.AddRange(access.AccessRules
                     .Where(x => x.AccountId.HasValue)
                     .Select(x => x.AccountId.Value));
             }

@@ -159,7 +159,7 @@ namespace planner_node_service.App.Service
                     body.Link = link.ToBody();
 
                 if (access != null)
-                    body.AccessRight = access.ToBody();
+                    body.AccessRule = access.ToBody();
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()

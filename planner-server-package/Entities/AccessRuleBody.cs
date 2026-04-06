@@ -5,7 +5,7 @@ using System.Xml.Linq;
 
 namespace planner_server_package.Entities
 {
-    public class AccessRightBody
+    public class AccessRuleBody
     {
         public Guid Id { get; set; }
         public Guid? AccountId { get; set; }

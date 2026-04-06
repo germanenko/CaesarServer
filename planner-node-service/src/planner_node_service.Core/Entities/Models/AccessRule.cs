@@ -12,9 +12,9 @@ namespace planner_node_service.Core.Entities.Models
         public Node Node { get; set; }
         public Permission Permission { get; set; }
 
-        public AccessRightBody ToBody()
+        public AccessRuleBody ToBody()
         {
-            return new AccessRightBody
+            return new AccessRuleBody
             {
                 Id = Id,
                 AccountId = SubjectId,

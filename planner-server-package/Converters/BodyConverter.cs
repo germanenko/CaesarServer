@@ -1,7 +1,7 @@
 ﻿using AccessGroupClient = planner_client_package.Entities.AccessGroupBody;
 using AccessGroupServer = planner_server_package.Entities.AccessGroupBody;
-using AccessRightClient = planner_client_package.Entities.AccessRightBody;
-using AccessRightServer = planner_server_package.Entities.AccessRightBody;
+using AccessRuleClient = planner_client_package.Entities.AccessRuleBody;
+using AccessRuleServer = planner_server_package.Entities.AccessRuleBody;
 using AccountSessionsClient = planner_client_package.Entities.AccountSessions;
 using AccountSessionsServer = planner_server_package.Entities.AccountSessions;
 using BoardClient = planner_client_package.Entities.BoardBody;
@@ -37,7 +37,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -57,7 +57,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -76,7 +76,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -96,7 +96,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -122,7 +122,7 @@ namespace planner_server_package.Converters
                 PriorityOrder = body.PriorityOrder,
                 TaskType = body.TaskType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -142,7 +142,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Status = body.Status,
                 StartDate = body.StartDate,
                 Description = body.Description,
@@ -172,7 +172,7 @@ namespace planner_server_package.Converters
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 IsSyncedReadStatus = body.IsSyncedReadStatus,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -196,7 +196,7 @@ namespace planner_server_package.Converters
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 ParticipantIds = body.ParticipantIds,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -220,7 +220,7 @@ namespace planner_server_package.Converters
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ServerToClientBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -245,7 +245,7 @@ namespace planner_server_package.Converters
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRight = body.AccessRight != null ? ClientToServerBody(body.AccessRight) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -326,9 +326,9 @@ namespace planner_server_package.Converters
         }
 
 
-        public static AccessRightClient ServerToClientBody(AccessRightServer body)
+        public static AccessRuleClient ServerToClientBody(AccessRuleServer body)
         {
-            return new AccessRightClient()
+            return new AccessRuleClient()
             {
                 Id = body.Id,
                 AccessGroupId = body.AccessGroupId,
@@ -341,9 +341,9 @@ namespace planner_server_package.Converters
 
 
 
-        public static AccessRightServer ClientToServerBody(AccessRightClient body)
+        public static AccessRuleServer ClientToServerBody(AccessRuleClient body)
         {
-            return new AccessRightServer()
+            return new AccessRuleServer()
             {
                 Id = body.Id,
                 AccessGroupId = body.AccessGroupId,
