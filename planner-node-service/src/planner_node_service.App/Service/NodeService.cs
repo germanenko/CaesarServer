@@ -46,8 +46,7 @@ namespace planner_node_service.App.Service
                 return new ServiceResponse<IEnumerable<NodeBody>>()
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.NotFound,
-                    Errors = new[] { "Ноды не найдены" }
+                    StatusCode = HttpStatusCode.OK
                 };
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
@@ -348,8 +347,7 @@ namespace planner_node_service.App.Service
                 return new ServiceResponse<List<EntityVersionBody>>()
                 {
                     IsSuccess = true,
-                    StatusCode = System.Net.HttpStatusCode.NotFound,
-                    Errors = new[] { "Ноды отсутствуют" }
+                    StatusCode = System.Net.HttpStatusCode.OK
                 };
             }
 
@@ -389,8 +387,7 @@ namespace planner_node_service.App.Service
                 return new ServiceResponse<List<EntityVersionBody>>()
                 {
                     IsSuccess = true,
-                    StatusCode = System.Net.HttpStatusCode.NotFound,
-                    Errors = new[] { "Scopes отсутствуют" }
+                    StatusCode = System.Net.HttpStatusCode.OK
                 };
             }
 
