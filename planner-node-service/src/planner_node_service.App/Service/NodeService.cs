@@ -151,6 +151,11 @@ namespace planner_node_service.App.Service
 
                     body.ScopeVersion = scopeLog.ScopeVersion;
                 }
+
+                var link = await _nodeRepository.GetNodeLink(body.Id);
+
+                if (link != null)
+                    body.Link = link.ToBody();
             }
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
