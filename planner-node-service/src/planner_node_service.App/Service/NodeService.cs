@@ -434,6 +434,7 @@ namespace planner_node_service.App.Service
                 if (matchingRequest != null)
                 {
                     node.SyncKind = matchingRequest.SyncKind;
+                    node.Version = matchingRequest.Version;
                 }
             }
 

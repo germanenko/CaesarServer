@@ -9,8 +9,6 @@ namespace planner_node_service.Core.Entities.Models
     public class Node
     {
         public Guid Id { get; set; }
-        //public long CursorId { get; set; }
-        //public ContentLog Cursor { get; set; }
         public long Version { get; set; }
         public NodeType Type { get; set; }
         public string Name { get; set; }
