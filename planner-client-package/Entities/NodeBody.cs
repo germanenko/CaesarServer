@@ -27,5 +27,18 @@ namespace planner_client_package.Entities
         public NodeLinkBody Link { get; set; }
         public AccessRuleBody AccessRule { get; set; }
         public IEnumerable<NodeBody> Childs { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            if (obj.GetType() == typeof(NodeBody))
+            {
+                var other = (NodeBody)obj;
+                return Id == other.Id
+                    && Name == other.Name
+                    && Props == other.Props;
+            }
+
+            return base.Equals(obj);
+        }
     }
 }

@@ -185,7 +185,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> AddScope(NodeBody nodeBody)
+        public async Task<ServiceResponse<NodeBody>> AddOrUpdateScope(NodeBody nodeBody)
         {
             if (nodeBody.Name.IsNullOrEmpty())
             {
@@ -197,7 +197,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            var newNode = await _nodeRepository.AddScope(nodeBody);
+            var newNode = await _nodeRepository.AddOrUpdateScope(nodeBody);
 
             return new ServiceResponse<NodeBody>()
             {

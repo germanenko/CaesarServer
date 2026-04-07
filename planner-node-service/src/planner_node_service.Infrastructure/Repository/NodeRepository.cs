@@ -31,13 +31,28 @@ namespace planner_node_service.Infrastructure.Repository
             return newNodes;
         }
 
-        public async Task<NodeBody> AddScope(NodeBody nodeBody)
+        public async Task<NodeBody> AddOrUpdateScope(NodeBody nodeBody)
         {
             var existingScope = await _context.Nodes
                 .FirstOrDefaultAsync(x => x.Id == nodeBody.Id);
 
             if (existingScope != null)
             {
+                var existingScopeBody = existingScope.ToNodeBody();
+
+                if (!existingScopeBody.Equals(nodeBody))
+                {
+                    existingScope.Name = nodeBody.Name;
+                    existingScope.Props = nodeBody.Props;
+                    existingScope.Version++;
+
+                    await AddContentLog(nodeBody.Id, nodeBody.Id);
+
+                    await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Update, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
+
+                    await _context.SaveChangesAsync();
+                }
+
                 return existingScope.ToNodeBody();
             }
 

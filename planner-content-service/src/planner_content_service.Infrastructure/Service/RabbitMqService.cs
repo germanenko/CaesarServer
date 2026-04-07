@@ -131,7 +131,7 @@ namespace planner_content_service.Infrastructure.Service
                 Name = "Personal Board",
                 PublicationStatus = PublicationStatus.Active,
                 Type = NodeType.Board,
-                AccessRight = new planner_client_package.Entities.AccessRightBody()
+                AccessRule = new planner_client_package.Entities.AccessRuleBody()
                 {
                     Id = Guid.NewGuid(),
                     AccountId = profile.Id,

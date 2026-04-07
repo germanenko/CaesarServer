@@ -137,7 +137,7 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Chat));
+                await nodeService.AddOrUpdateScope(BodyConverter.ServerToClientBody(result.Chat));
 
                 foreach (var participant in result.ParticipantIds)
                 {
@@ -182,7 +182,7 @@ namespace planner_node_service.Infrastructure.Service
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
                 var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
 
-                var board = await nodeService.AddScope(BodyConverter.ServerToClientBody(result.Board));
+                var board = await nodeService.AddOrUpdateScope(BodyConverter.ServerToClientBody(result.Board));
 
                 _logger.LogInformation(JsonSerializer.Serialize(board));
 

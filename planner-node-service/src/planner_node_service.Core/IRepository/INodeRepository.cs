@@ -9,7 +9,7 @@ namespace planner_node_service.Core.IRepository
         Task<NodeLink> AddOrUpdateNodeLink(NodeLinkBody node);
         Task<List<NodeBody>> AddOrUpdateNodes(List<NodeBody> node);
         Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes);
-        Task<NodeBody> AddScope(NodeBody node);
+        Task<NodeBody> AddOrUpdateScope(NodeBody node);
         Task<NodeBody> AddOrUpdateNode(NodeBody node);
         Task<bool> DeleteNode(Guid accountId, Guid nodeId);
         Task<List<Guid>?> GetChildren(Guid parentId, RelationType? relationType = null);

@@ -13,7 +13,7 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<List<EntityVersionBody>>> GetManifests(Guid accountId, List<Guid> scopeIds);
         public Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId);
         public Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId);
-        public Task<ServiceResponse<NodeBody>> AddScope(NodeBody node);
+        public Task<ServiceResponse<NodeBody>> AddOrUpdateScope(NodeBody node);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody node);
         public Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid nodeId);
         public Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId);
