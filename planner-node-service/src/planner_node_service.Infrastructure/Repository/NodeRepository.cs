@@ -75,6 +75,8 @@ namespace planner_node_service.Infrastructure.Repository
                         .Distinct()
                         .ToList();
 
+                    allUserIds.Remove(nodeBody.UpdatedBy);
+
                     var scopeUpdated = new ScopeUpdatedEvent() { ScopeId = nodeBody.Id, AccountIds = allUserIds };
 
                     await _publisherService.Publish(scopeUpdated, PublishEvent.ScopeUpdated);
