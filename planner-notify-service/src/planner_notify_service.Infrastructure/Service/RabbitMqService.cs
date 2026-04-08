@@ -1,6 +1,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
+using planner_client_package.Entities.WebSockets;
 using planner_notify_service.Core.IService;
 using planner_server_package;
 using planner_server_package.Entities;
@@ -19,6 +21,12 @@ namespace planner_notify_service.Infrastructure.Service
 
         private readonly IServiceScopeFactory _scopeFactory;
 
+        private readonly JsonSerializerOptions options = new()
+        {
+            PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true
+        };
+
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
             string hostname,
@@ -28,7 +36,8 @@ namespace planner_notify_service.Infrastructure.Service
             ILogger<RabbitMQServiceBase> logger,
             INotificationService notificationService,
             string messageSentToChatExchange,
-            string sendNotificationExchange)
+            string sendNotificationExchange,
+            string scopeUpdatedExchange)
             : base(hostname, userName, password, prefix, logger)
         {
             _scopeFactory = serviceFactory;
@@ -37,6 +46,7 @@ namespace planner_notify_service.Infrastructure.Service
 
             AddQueue(messageSentToChatExchange, HandleSendMessage);
             AddQueue(sendNotificationExchange, SendNotification);
+            AddQueue(scopeUpdatedExchange, HandleScopeUpdated);
 
             InitializeRabbitMQ();
         }
@@ -88,6 +98,35 @@ namespace planner_notify_service.Infrastructure.Service
             };
         }
 
+        private async Task<ServiceResponse<object>> HandleScopeUpdated(string message)
+        {
+            var result = JsonSerializer.Deserialize<ScopeUpdatedEvent>(message);
+            if (result == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            using var scope = _scopeFactory.CreateScope();
+
+            WebSocketMessage wsMessage = new WebSocketMessage()
+            {
+                MessageType = MessageType.ScopeUpdated,
+                Message = result.ScopeId
+            };
+
+            foreach (var accountId in result.AccountIds)
+                await _notificationService.SendMessageToSessions(accountId, SerializeObject(wsMessage));
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
         {
             var sessionsNotReceiveMessage = await _notificationService.SendMessageToSessions(accountSessions.AccountId, accountSessions.SessionIds.ToList(), bytes);
@@ -96,6 +135,13 @@ namespace planner_notify_service.Infrastructure.Service
                 AccountId = accountSessions.AccountId,
                 SessionIds = sessionsNotReceiveMessage.ToList()
             } : null;
+        }
+
+        private byte[] SerializeObject<T>(T obj)
+        {
+            var serializableString = JsonSerializer.Serialize(obj, options);
+            var bytes = Encoding.UTF8.GetBytes(serializableString);
+            return bytes;
         }
     }
 }

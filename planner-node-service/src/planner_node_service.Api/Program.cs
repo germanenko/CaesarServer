@@ -48,6 +48,7 @@ void ConfigureServices(IServiceCollection services)
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
+    var scopeUpdatedExchange = GetEnvVar("RABBITMQ_SCOPE_UPDATED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -122,6 +123,7 @@ void ConfigureServices(IServiceCollection services)
             new Dictionary<PublishEvent, string> {
                 { PublishEvent.ContentNodes, contentNodesExchange },
                 { PublishEvent.ChatNodes, chatNodesExchange },
+                { PublishEvent.ScopeUpdated, scopeUpdatedExchange },
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));

@@ -5,6 +5,7 @@ namespace planner_server_package.Events.Enums
         AccountCreated,
         UpdateProfileImage,
         UpdateChatImage,
+        ScopeUpdated,
         SentFileToChat,
         CreatePersonalChat,
         GetNotificationSettings,

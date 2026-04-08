@@ -14,7 +14,7 @@ namespace planner_notify_service.Api.Controllers
     [Route("")]
     public class NotifyController : ControllerBase
     {
-        private readonly INotificationConnector _notifyConnector;
+        private readonly INotificationConnector _notificationConnector;
         private readonly IJwtService _jwtService;
         private readonly INotifyService _notifyService;
 
@@ -23,7 +23,7 @@ namespace planner_notify_service.Api.Controllers
             IJwtService jwtService,
             INotifyService notifyService)
         {
-            _notifyConnector = notifyConnector;
+            _notificationConnector = notifyConnector;
             _jwtService = jwtService;
             _notifyService = notifyService;
         }
@@ -36,7 +36,7 @@ namespace planner_notify_service.Api.Controllers
                 return;
 
             var ws = await HttpContext.WebSockets.AcceptWebSocketAsync();
-            await _notifyConnector.ConnectToNotificationService(tokenPayload.AccountId, tokenPayload.SessionId, ws);
+            await _notificationConnector.ConnectToNotificationService(tokenPayload.AccountId, tokenPayload.SessionId, ws);
         }
 
 

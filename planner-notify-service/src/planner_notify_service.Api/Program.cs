@@ -39,6 +39,7 @@ void ConfigureServices(IServiceCollection services)
 
     var messageSentToChatExchange = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
+    var scopeUpdatedExchange = GetEnvVar("RABBITMQ_SCOPE_UPDATED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -129,7 +130,8 @@ void ConfigureServices(IServiceCollection services)
         sp.GetRequiredService<ILogger<RabbitMqService>>(),
         sp.GetRequiredService<INotificationService>(),
         messageSentToChatExchange,
-        sendNotificationExchange
+        sendNotificationExchange,
+        scopeUpdatedExchange
     ));
 }
 

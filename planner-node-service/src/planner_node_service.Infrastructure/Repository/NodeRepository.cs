@@ -5,6 +5,10 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using planner_server_package.Events;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
+using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
 {
@@ -13,12 +17,14 @@ namespace planner_node_service.Infrastructure.Repository
         private readonly NodeDbContext _context;
         private readonly ILogger<NodeRepository> _logger;
         private readonly IScopeRepository _scopeRepository;
+        private readonly IPublisherService _publisherService;
 
-        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger, IScopeRepository scopeRepository)
+        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger, IScopeRepository scopeRepository, IPublisherService publisherService)
         {
             _context = context;
             _logger = logger;
             _scopeRepository = scopeRepository;
+            _publisherService = publisherService;
         }
 
         public async Task<List<NodeBody>> AddOrUpdateNodes(List<NodeBody> nodes)
@@ -51,6 +57,27 @@ namespace planner_node_service.Infrastructure.Repository
                     await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Update, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
                     await _context.SaveChangesAsync();
+
+                    var directUserIds = _context.AccessRules
+                        .Where(ar => ar.Subject is UserAccessSubject && ar.NodeId == nodeBody.Id)
+                        .Select(ar => ((UserAccessSubject)ar.Subject).Id)
+                        .ToList();
+
+                    var userIdsFromGroups = _context.AccessRules
+                        .Where(ar => ar.Subject is GroupAccessSubject && ar.NodeId == nodeBody.Id)
+                        .Select(ar => (GroupAccessSubject)ar.Subject)
+                        .SelectMany(group => group.Members.Select(m => m.Id))
+                        .Distinct()
+                        .ToList();
+
+                    var allUserIds = directUserIds
+                        .Concat(userIdsFromGroups)
+                        .Distinct()
+                        .ToList();
+
+                    var scopeUpdated = new ScopeUpdatedEvent() { ScopeId = nodeBody.Id, AccountIds = allUserIds };
+
+                    await _publisherService.Publish(scopeUpdated, PublishEvent.ScopeUpdated);
                 }
 
                 return existingScope.ToNodeBody();
