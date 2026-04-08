@@ -52,9 +52,9 @@ namespace planner_content_service.Api.Controllers
             );
 
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, new Response<BoardBody>() { RequestId = boardBody.Id, Body = result.Body });
+                return StatusCode((int)result.StatusCode, new Response<BoardBody>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, new Response<BoardBody>() { RequestId = boardBody.Id, ErrorCodes = result.ErrorCodes });
+            return StatusCode((int)result.StatusCode, new Response<BoardBody>() { ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("createBoards"), Authorize]

@@ -9,7 +9,6 @@ namespace planner_client_package.Entities
 {
     public class Response<T>
     {
-        public Guid RequestId { get; set; }
         public T Body { get; set; }
         public List<ErrorCode> ErrorCodes { get; set; }
     }

@@ -131,11 +131,10 @@ namespace planner_chat_service.Api.Controllers
                     createChatBody)
                 );
 
-            //var result = await _chatService.CreatePersonalChat(tokenPayload.AccountId, tokenPayload.SessionId, createChatBody.Body);
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+                return StatusCode((int)result.StatusCode, new Response<ChatBody>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode);
+            return StatusCode((int)result.StatusCode, new Response<ChatBody>() { ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("api/chat/messages")]
