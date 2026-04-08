@@ -1,16 +1,15 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using planner_node_service.Core;
 using planner_node_service.Core.Entities.Models;
-using System.Reflection;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace planner_node_service.Infrastructure.Data
+namespace planner_node_service.Core
 {
-    public class NodeDbContext : DbContext, INodeDbContext
+    public interface INodeDbContext
     {
-        public NodeDbContext(DbContextOptions<NodeDbContext> options) : base(options)
-        {
-        }
-
         public DbSet<Node> Nodes { get; set; }
         public DbSet<NodeLink> NodeLinks { get; set; }
         public DbSet<SyncScopeAccess> SyncScopeAccess { get; set; }
@@ -25,18 +24,5 @@ namespace planner_node_service.Infrastructure.Data
         public DbSet<ContentLog> ContentLogs { get; set; }
         public DbSet<AccessLog> AccessLogs { get; set; }
         public DbSet<NotificationSettings> NotificationSettings { get; set; }
-
-        protected override void OnModelCreating(ModelBuilder modelBuilder)
-        {
-            base.OnModelCreating(modelBuilder);
-
-            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
-
-            modelBuilder.Entity<Node>().UseTptMappingStrategy();
-
-            modelBuilder.Entity<AccessSubject>().UseTptMappingStrategy();
-            modelBuilder.Entity<UserAccessSubject>().HasBaseType<AccessSubject>();
-            modelBuilder.Entity<GroupAccessSubject>().HasBaseType<AccessSubject>();
-        }
     }
 }

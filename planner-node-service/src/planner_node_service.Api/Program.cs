@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_node_service.App.Service;
+using planner_node_service.Core;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using planner_node_service.Infrastructure.Data;
@@ -102,7 +103,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddDbContext<NodeDbContext>(options =>
+    services.AddDbContext<INodeDbContext, NodeDbContext>(options =>
     {
         options.UseNpgsql(nodeDbConnectionString, builder =>
         {

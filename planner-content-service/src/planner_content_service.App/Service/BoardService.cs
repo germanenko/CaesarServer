@@ -265,7 +265,12 @@ namespace planner_content_service.App.Service
                 result.Childs = columns.Body;
             }
 
-            result.AccessRule = responseBody?.AccessRule;
+            if (responseBody != null)
+            {
+                result.AccessRule = responseBody.AccessRule;
+                result.Version = responseBody.Version;
+                result.ScopeVersion = responseBody.ScopeVersion;
+            }
 
             return new ServiceResponse<BoardBody>
             {

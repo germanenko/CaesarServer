@@ -435,6 +435,7 @@ namespace planner_node_service.App.Service
                 {
                     node.SyncKind = matchingRequest.SyncKind;
                     node.Version = matchingRequest.Version;
+                    node.ScopeVersion = matchingRequest.ScopeVersion;
                 }
             }
 

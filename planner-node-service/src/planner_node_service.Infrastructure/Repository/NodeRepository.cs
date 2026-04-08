@@ -82,7 +82,9 @@ namespace planner_node_service.Infrastructure.Repository
                     await _publisherService.Publish(scopeUpdated, PublishEvent.ScopeUpdated);
                 }
 
-                return existingScope.ToNodeBody();
+                var resultScopeBody = existingScope.ToNodeBody();
+
+                return resultScopeBody;
             }
 
             await AddContentLog(nodeBody.Id, nodeBody.Id);
