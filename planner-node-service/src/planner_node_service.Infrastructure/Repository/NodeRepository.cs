@@ -62,13 +62,13 @@ namespace planner_node_service.Infrastructure.Repository
 
                     var directUserIds = _context.AccessRules
                         .Where(ar => ar.Subject is UserAccessSubject && ar.NodeId == nodeBody.Id)
-                        .Select(ar => ((UserAccessSubject)ar.Subject).Id)
+                        .Select(ar => ((UserAccessSubject)ar.Subject).AccountId)
                         .ToList();
 
                     var userIdsFromGroups = _context.AccessRules
                         .Where(ar => ar.Subject is GroupAccessSubject && ar.NodeId == nodeBody.Id)
                         .Select(ar => (GroupAccessSubject)ar.Subject)
-                        .SelectMany(group => group.Members.Select(m => m.Id))
+                        .SelectMany(group => group.Members.Select(m => m.AccountId))
                         .Distinct()
                         .ToList();
 
