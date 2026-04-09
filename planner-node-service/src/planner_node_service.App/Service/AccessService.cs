@@ -3,6 +3,9 @@ using planner_common_package.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using planner_server_package;
+using planner_server_package.Events;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
 using System.Net;
 
 namespace planner_node_service.App.Service
@@ -11,11 +14,13 @@ namespace planner_node_service.App.Service
     {
         private readonly IAccessRepository _accessRepository;
         private readonly INodeRepository _nodeRepository;
+        private readonly IPublisherService _publisherService;
 
-        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository)
+        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository, IPublisherService publisherService)
         {
             _accessRepository = accessRepository;
             _nodeRepository = nodeRepository;
+            _publisherService = publisherService;
         }
 
         // Выдача доступа
@@ -147,6 +152,14 @@ namespace planner_node_service.App.Service
                     Errors = new[] { "Доступ не отозван" }
                 };
             }
+
+            var accessRevokedEvent = new AccessRevokedEvent()
+            {
+                AccountId = granteeId,
+                NodeId = nodeId
+            };
+
+            await _publisherService.Publish(accessRevokedEvent, PublishEvent.AccessRevoked);
 
             return new ServiceResponse<bool>()
             {

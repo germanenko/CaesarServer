@@ -50,6 +50,7 @@ void ConfigureServices(IServiceCollection services)
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
     var scopeUpdatedExchange = GetEnvVar("RABBITMQ_SCOPE_UPDATED_EXCHANGE");
+    var accessRevokedExchange = GetEnvVar("RABBITMQ_ACCESS_REVOKED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -125,6 +126,7 @@ void ConfigureServices(IServiceCollection services)
                 { PublishEvent.ContentNodes, contentNodesExchange },
                 { PublishEvent.ChatNodes, chatNodesExchange },
                 { PublishEvent.ScopeUpdated, scopeUpdatedExchange },
+                { PublishEvent.AccessRevoked, accessRevokedExchange },
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));

@@ -10,6 +10,6 @@ namespace planner_client_package.Entities.WebSockets
     {
         ScopeUpdated,
         ChatUpdated,
-        RevokeAccess
+        AccessRevoked
     }
 }

@@ -37,7 +37,8 @@ namespace planner_notify_service.Infrastructure.Service
             INotificationService notificationService,
             string messageSentToChatExchange,
             string sendNotificationExchange,
-            string scopeUpdatedExchange)
+            string scopeUpdatedExchange,
+            string accessRevokedExchange)
             : base(hostname, userName, password, prefix, logger)
         {
             _scopeFactory = serviceFactory;
@@ -47,6 +48,7 @@ namespace planner_notify_service.Infrastructure.Service
             AddQueue(messageSentToChatExchange, HandleSendMessage);
             AddQueue(sendNotificationExchange, SendNotification);
             AddQueue(scopeUpdatedExchange, HandleScopeUpdated);
+            AddQueue(accessRevokedExchange, HandleAccessRevokedUpdated);
 
             InitializeRabbitMQ();
         }
@@ -109,7 +111,7 @@ namespace planner_notify_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
-            _logger.LogInformation($" === {message} === ");
+            _logger.LogInformation($" === ScopeUpdated: {message} === ");
 
             using var scope = _scopeFactory.CreateScope();
 
@@ -121,6 +123,36 @@ namespace planner_notify_service.Infrastructure.Service
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, SerializeObject(wsMessage));
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
+        private async Task<ServiceResponse<object>> HandleAccessRevokedUpdated(string message)
+        {
+            var result = JsonSerializer.Deserialize<AccessRevokedEvent>(message);
+            if (result == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            _logger.LogInformation($" === AccessRevoked: {message} === ");
+
+            using var scope = _scopeFactory.CreateScope();
+
+            WebSocketMessage wsMessage = new WebSocketMessage()
+            {
+                MessageType = MessageType.AccessRevoked,
+                Message = result.NodeId
+            };
+
+            await _notificationService.SendMessageToSessions(result.AccountId, SerializeObject(wsMessage));
 
             return new ServiceResponse<object>()
             {

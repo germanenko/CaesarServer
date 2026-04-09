@@ -22,6 +22,7 @@ namespace planner_server_package.Events.Enums
         CreateTask,
         DeleteNode,
         CheckAccess,
+        AccessRevoked,
         SendNotification,
         GetGoogleToken
     }
