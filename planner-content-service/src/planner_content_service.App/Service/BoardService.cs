@@ -271,6 +271,7 @@ namespace planner_content_service.App.Service
                 result.AccessRule = responseBody.AccessRule;
                 result.Version = responseBody.Version;
                 result.ScopeVersion = responseBody.ScopeVersion;
+                result.SyncKind = responseBody.SyncKind;
             }
 
             return new ServiceResponse<BoardBody>
