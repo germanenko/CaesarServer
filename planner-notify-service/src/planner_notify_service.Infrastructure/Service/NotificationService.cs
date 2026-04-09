@@ -1,9 +1,10 @@
+using Microsoft.Extensions.Logging;
+using planner_notify_service.Core.Entities.Response;
+using planner_notify_service.Core.IService;
+using planner_server_package.Entities;
 using System.Collections.Concurrent;
 using System.Net.WebSockets;
 using System.Text.Json;
-using planner_server_package.Entities;
-using planner_notify_service.Core.Entities.Response;
-using planner_notify_service.Core.IService;
 
 namespace planner_notify_service.Infrastructure.Service
 {
@@ -11,9 +12,11 @@ namespace planner_notify_service.Infrastructure.Service
     {
         private ConcurrentDictionary<Guid, ConcurrentDictionary<Guid, NotificationSession>> ActiveSessions { get; set; } = new();
 
-        public NotificationService()
-        {
+        private readonly ILogger<NotificationService> _logger;
 
+        public NotificationService(ILogger<NotificationService> logger)
+        {
+            _logger = logger;
         }
 
         public NotificationSession AddSession(Guid accountId, NotificationSession session)
@@ -78,7 +81,11 @@ namespace planner_notify_service.Infrastructure.Service
             var sessions = GetSessions(accountId);
 
             foreach (var session in sessions)
+            {
+                _logger.LogInformation($"start sending to session {session.SessionId} of account {accountId}");
                 await SendMessage(session.Socket, bytes, WebSocketMessageType.Text);
+                _logger.LogInformation($" === Send message to session {session.SessionId} of account {accountId} === ");
+            }
         }
         private async Task<bool> SendMessage(
             WebSocket socket,

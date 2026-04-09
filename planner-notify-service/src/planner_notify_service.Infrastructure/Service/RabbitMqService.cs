@@ -109,7 +109,6 @@ namespace planner_notify_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
-            _logger.LogInformation($" === scope {result.ScopeId} updated === ");
             _logger.LogInformation($" === {message} === ");
 
             using var scope = _scopeFactory.CreateScope();
