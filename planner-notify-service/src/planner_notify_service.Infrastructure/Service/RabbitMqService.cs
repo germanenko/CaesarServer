@@ -118,7 +118,7 @@ namespace planner_notify_service.Infrastructure.Service
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
                 MessageType = MessageType.ScopeUpdated,
-                Message = result.ScopeId
+                Message = JsonSerializer.SerializeToElement(result.ScopeId)
             };
 
             foreach (var accountId in result.AccountIds)
@@ -149,7 +149,7 @@ namespace planner_notify_service.Infrastructure.Service
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
                 MessageType = MessageType.AccessRevoked,
-                Message = result.NodeId
+                Message = JsonSerializer.SerializeToElement(result.NodeId)
             };
 
             await _notificationService.SendMessageToSessions(result.AccountId, SerializeObject(wsMessage));
