@@ -38,20 +38,29 @@ namespace planner_content_service.App.Service
                 CreatorId = accountId
             };
 
-            var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+            var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
 
-            if (!request.IsSuccess)
+            if (!response.IsSuccess)
             {
                 return new ServiceResponse<ColumnBody>
                 {
-                    IsSuccess = request.IsSuccess,
-                    StatusCode = request.StatusCode,
-                    Errors = request.Errors,
-                    ErrorCodes = request.ErrorCodes
+                    IsSuccess = response.IsSuccess,
+                    StatusCode = response.StatusCode,
+                    Errors = response.Errors,
+                    ErrorCodes = response.ErrorCodes
                 };
             }
 
-            var result = await _boardRepository.CreateOrUpdateColumn(column, accountId);
+            NodeBody responseBody = new NodeBody();
+            if (response.Body != null)
+            {
+                if (response.Body is JsonElement jsonElement)
+                {
+                    responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
+                }
+            }
+
+            var result = await _boardRepository.CreateOrUpdateColumn(column, accountId, responseBody);
 
             if (result == null)
             {
@@ -217,9 +226,11 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId)
         {
+            var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId };
+
             var boardEvent = new CreateBoardEvent()
             {
-                Board = BodyConverter.ClientToServerBody(new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }),
+                Board = BodyConverter.ClientToServerBody(boardBody),
                 CreatorId = accountId
             };
 
@@ -246,7 +257,7 @@ namespace planner_content_service.App.Service
 
             var hasBoard = await _boardRepository.GetBoardById(body.Id);
 
-            var result = await _boardRepository.CreateOrUpdateBoardAsync(body, accountId);
+            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, responseBody);
 
             if (result is null)
             {
@@ -265,15 +276,6 @@ namespace planner_content_service.App.Service
                 result.Childs = columns.Body;
             }
 
-            if (responseBody != null)
-            {
-                result.Link = responseBody.Link;
-                result.AccessRule = responseBody.AccessRule;
-                result.Version = responseBody.Version;
-                result.ScopeVersion = responseBody.ScopeVersion;
-                result.SyncKind = responseBody.SyncKind;
-            }
-
             return new ServiceResponse<BoardBody>
             {
                 IsSuccess = true,
@@ -284,7 +286,9 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> bodies, Guid accountId)
         {
-            var result = await _boardRepository.CreateOrUpdateBoards(bodies, accountId);
+            var boardBodies = bodies.Select(body => new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }).ToList();
+
+            var result = await _boardRepository.CreateOrUpdateBoards(boardBodies, accountId);
 
             if (result is null)
             {

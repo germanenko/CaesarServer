@@ -8,9 +8,9 @@ namespace planner_content_service.Core.IRepository
     public interface IBoardRepository
     {
         Task<BoardBody?> GetBoardById(Guid boardId);
-        Task<BoardBody?> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody createBoardBody, Guid accountId);
-        Task<List<BoardBody>?> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> boards, Guid accountId);
-        Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId);
+        Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata);
+        Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId);
+        Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId, NodeBody metadata);
         Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId);
         Task<bool> DeleteNode(Guid nodeId, Guid accountId);
     }

@@ -41,4 +41,20 @@ namespace planner_client_package.Entities
             return base.Equals(obj);
         }
     }
+
+    public static class NodeBodyExtensions
+    {
+        public static T ApplyNodeMetadata<T>(this T target, NodeBody source) where T : NodeBody
+        {
+            if (source == null) return target;
+
+            target.Link = source.Link;
+            target.AccessRule = source.AccessRule;
+            target.Version = source.Version;
+            target.ScopeVersion = source.ScopeVersion;
+            target.SyncKind = source.SyncKind;
+
+            return target;
+        }
+    }
 }

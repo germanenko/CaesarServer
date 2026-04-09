@@ -34,17 +34,17 @@ namespace planner_content_service.Infrastructure.Repository
             return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId))?.ToBoardBody();
         }
 
-        public async Task<BoardBody?> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody createBoardBody, Guid accountId)
+        public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)
         {
             try
             {
-                _logger.LogInformation($"Props: {createBoardBody.Props}");
-                var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == createBoardBody.Id);
+                _logger.LogInformation($"Props: {boardBody.Props}");
+                var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == boardBody.Id);
 
                 if (board != null)
                 {
-                    board.Name = createBoardBody.Name;
-                    board.Props = createBoardBody.Props;
+                    board.Name = boardBody.Name;
+                    board.Props = boardBody.Props;
 
                     await _context.SaveChangesAsync();
 
@@ -53,33 +53,33 @@ namespace planner_content_service.Infrastructure.Repository
 
                 var newBoard = new Board
                 {
-                    Id = createBoardBody.Id != Guid.Empty ? createBoardBody.Id : Guid.NewGuid(),
-                    Name = createBoardBody.Name,
+                    Id = boardBody.Id != Guid.Empty ? boardBody.Id : Guid.NewGuid(),
+                    Name = boardBody.Name,
                     Type = NodeType.Board,
-                    Props = createBoardBody.Props
+                    Props = boardBody.Props
                 };
 
                 await _context.Boards.AddAsync(newBoard);
 
                 await _context.SaveChangesAsync();
 
-                return newBoard.ToBoardBody();
+                return newBoard.ToBoardBody().ApplyNodeMetadata(metadata);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Ошибка при создании доски {createBoardBody.Name}: {ex.Message}");
+                Console.WriteLine($"Ошибка при создании доски {boardBody.Name}: {ex.Message}");
 
                 throw;
             }
         }
 
-        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> boards, Guid accountId)
+        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId)
         {
             List<BoardBody> newBoardNodes = new List<BoardBody>();
 
             foreach (var board in boards)
             {
-                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId));
+                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId, board));
             }
 
             await _context.SaveChangesAsync();
@@ -88,7 +88,7 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody columnBody, Guid accountId)
+        public async Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody columnBody, Guid accountId, NodeBody metadata)
         {
             try
             {
@@ -116,7 +116,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                return columnBody;
+                return columnBody.ApplyNodeMetadata(metadata);
             }
             catch (Exception ex)
             {
@@ -146,7 +146,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             foreach (var column in columns)
             {
-                var addedColumn = await CreateOrUpdateColumn(column, accountId);
+                var addedColumn = await CreateOrUpdateColumn(column, accountId, column);
                 if (addedColumn != null)
                     columnNodes.Add(addedColumn);
             }
