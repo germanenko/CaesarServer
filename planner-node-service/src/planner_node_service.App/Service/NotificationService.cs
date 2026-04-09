@@ -18,6 +18,7 @@ namespace planner_node_service.App.Service
             _notificationRepository = notificationRepository;
         }
 
+        // Получить все настройки уведомлений для заданных идентификаторов аккаунтов, где уведомления включены
         public async Task<ServiceResponse<List<ServerNotificationSettings>>> GetEnabledNotificationSettings(List<Guid> accountIds)
         {
             var settings = await _notificationRepository.GetEnabledNotificationSettingsAsync(accountIds);
@@ -30,6 +31,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Добавление новых настроек уведомлений
         public async Task<ServiceResponse<NotificationSettings>> AddNotificationSettings(ServerNotificationSettings notificationSettingsBody)
         {
             var settings = await _notificationRepository.AddNotificationSettings(notificationSettingsBody);

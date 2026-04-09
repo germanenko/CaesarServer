@@ -17,13 +17,15 @@ namespace planner_node_service.Infrastructure.Repository
         private readonly NodeDbContext _context;
         private readonly ILogger<NodeRepository> _logger;
         private readonly IScopeRepository _scopeRepository;
+        private readonly ILogRepository _logRepository;
         private readonly IPublisherService _publisherService;
 
-        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger, IScopeRepository scopeRepository, IPublisherService publisherService)
+        public NodeRepository(NodeDbContext context, ILogger<NodeRepository> logger, IScopeRepository scopeRepository, ILogRepository logRepository, IPublisherService publisherService)
         {
             _context = context;
             _logger = logger;
             _scopeRepository = scopeRepository;
+            _logRepository = logRepository;
             _publisherService = publisherService;
         }
 
@@ -84,6 +86,10 @@ namespace planner_node_service.Infrastructure.Repository
 
                 var resultScopeBody = existingScope.ToNodeBody();
 
+                var lastScopeLog = await _logRepository.GetLastLogForScope(resultScopeBody.Id);
+
+                resultScopeBody.ScopeVersion = lastScopeLog?.ScopeVersion ?? 0;
+
                 return resultScopeBody;
             }
 
@@ -108,6 +114,7 @@ namespace planner_node_service.Infrastructure.Repository
                 RelationType = RelationType.Me
             };
 
+            // Если это новый скоуп, то создаем связь самого себя с самим собой и правило доступа для создателя
             await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = ActionType.Create, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
             var rule = await AddAccessRule(nodeBody.UpdatedBy, node);
@@ -115,7 +122,13 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
 
             var body = result.ToNodeBody();
+
+            // Устанавливаем правило доступа в ответ
             body.AccessRule = rule.ToBody();
+
+            // Получаем последний лог для этого скопа и устанавливае в теле ответа
+            var lastNewScopeLog = await _logRepository.GetLastLogForScope(body.Id);
+            body.ScopeVersion = lastNewScopeLog?.ScopeVersion ?? 0;
 
             return body;
         }
@@ -347,7 +360,7 @@ namespace planner_node_service.Infrastructure.Repository
             await _context.AccessLogs.AddAsync(newLog);
         }
 
-        public async Task AddContentLog(Guid scopeId, Guid nodeId, ActionType? action = null)
+        public async Task<ContentLog> AddContentLog(Guid scopeId, Guid nodeId, ActionType? action = null)
         {
             var lastEntityLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.EntityId == nodeId);
             var lastScopeLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == scopeId);
@@ -365,7 +378,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             var newLog = new ContentLog(scopeId, nodeId, actionType, (lastScopeLog?.ScopeVersion ?? -1) + 1);
 
-            await _context.ContentLogs.AddAsync(newLog);
+            return (await _context.ContentLogs.AddAsync(newLog)).Entity;
         }
 
         public async Task<Node?> GetNode(Guid nodeId)
@@ -448,50 +461,6 @@ namespace planner_node_service.Infrastructure.Repository
             var nodeBodies = allNodes.Select(x => x.ToNodeBody());
 
             return allNodes.DistinctBy(x => x.Id).ToList();
-        }
-
-        public async Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId)
-        {
-            var userSubject = await _context.Set<UserAccessSubject>()
-                .FirstOrDefaultAsync(u => u.AccountId == accountId);
-
-            var rootIds = await _context.AccessRules
-                .Where(x => x.SubjectId == userSubject.Id)
-                .Select(x => x.NodeId)
-                .ToListAsync();
-
-            if (!rootIds.Any())
-                return Enumerable.Empty<NodeLink>();
-
-            var allLinks = new List<NodeLink>();
-            var visitedNodeIds = new HashSet<Guid>(rootIds);
-            var currentLevelIds = new HashSet<Guid>(rootIds);
-
-            for (var level = 0; level < 5 && currentLevelIds.Any(); level++)
-            {
-                var links = await _context.NodeLinks
-                    .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
-                    .AsNoTracking()
-                    .ToListAsync();
-
-                allLinks.AddRange(links);
-
-                var nextLevelIds = new HashSet<Guid>();
-                foreach (var link in links)
-                {
-                    if (visitedNodeIds.Add(link.ChildId))
-                    {
-                        nextLevelIds.Add(link.ChildId);
-                    }
-                }
-
-                currentLevelIds = nextLevelIds;
-            }
-
-            return allLinks
-                .GroupBy(x => x.Id)
-                .Select(g => g.First())
-                .ToList();
         }
     }
 }

@@ -141,7 +141,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 foreach (var participant in result.ParticipantIds)
                 {
-                    await accessService.CreateAccessRule(participant, result.Chat.Id, Permission.Write);
+                    await accessService.GrantAccess(participant, participant, result.Chat.Id, Permission.Write);
                     await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant, NodeId = result.Chat.Id, NotificationsEnabled = true });
                 }
 
@@ -240,8 +240,6 @@ namespace planner_node_service.Infrastructure.Service
                     }
 
                     await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Column));
-
-                    //await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Column.Link));
                 }
 
                 return new ServiceResponse<object>()

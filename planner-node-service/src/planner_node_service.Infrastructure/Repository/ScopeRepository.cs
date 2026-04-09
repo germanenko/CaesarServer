@@ -19,13 +19,7 @@ namespace planner_node_service.Infrastructure.Repository
             _logger = logger;
         }
 
-
-        public async Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId)
-        {
-            return await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.ScopeId == scopeId && x.AccountId == accountId);
-        }
-
-
+        // Получение всех скоупов, к которым у аккаунта есть доступ
         public async Task<IEnumerable<Node>?> GetScopes(Guid accountId)
         {
             await ClearExcessSyncScopeAccess(accountId);
@@ -39,6 +33,7 @@ namespace planner_node_service.Infrastructure.Repository
             return scopes;
         }
 
+        // Получение скоупа для ноды
         public async Task<Node?> GetNodeScope(Guid nodeId)
         {
             var currentNodeId = nodeId;
@@ -90,9 +85,7 @@ namespace planner_node_service.Infrastructure.Repository
                 var links = await _context.NodeLinks
                     .Where(x => currentLevelIds.Contains(x.ParentId) && x.ParentId != x.ChildId)
                     .Include(x => x.ParentNode)
-                    //.ThenInclude(x => x.Cursor)
                     .Include(x => x.ChildNode)
-                    //.ThenInclude(x => x.Cursor)
                     .AsNoTracking()
                     .ToListAsync();
 
@@ -118,6 +111,7 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task ClearExcessSyncScopeAccess(Guid accountId)
         {
+            // Получение субъекта доступа для пользователя
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
             if (userSubject == null)
@@ -125,12 +119,14 @@ namespace planner_node_service.Infrastructure.Repository
                 return;
             }
 
+            // Получение всех правил доступа для данного субъекта
             var rules = await _context.AccessRules.Include(x => x.Node).Where(x => x.SubjectId == userSubject.Id).ToListAsync();
 
             var ruleNodes = rules.Select(x => x.Node).ToList();
 
             var scopes = new List<Node>();
 
+            // Для каждой ноды, связанной с правилом доступа, определяем его Scope
             foreach (var node in ruleNodes)
             {
                 var scope = await GetNodeScope(node.Id);
@@ -141,16 +137,20 @@ namespace planner_node_service.Infrastructure.Repository
 
             var scopeIds = scopes.Select(x => x.Id).ToList();
 
+            // Получение последних логов доступа для каждого Scope
             var lastLogs = await _context.AccessLogs
                 .Where(x => scopeIds.Contains(x.ScopeId))
                 .GroupBy(x => x.ScopeId)
                 .Select(g => g.OrderByDescending(x => x.Seq).First())
                 .ToListAsync();
 
+            // Получение всех записей SyncScopeAccess для данного аккаунта, которые не соответствуют текущим доступным Scope
             var excessSyncScopes = await _context.SyncScopeAccess.Where(x => x.AccountId == accountId && !scopeIds.Contains(x.ScopeId)).ToListAsync();
 
+            // Удаление лишних записей SyncScopeAccess
             _context.SyncScopeAccess.RemoveRange(excessSyncScopes);
 
+            // Обновление или добавление записей SyncScopeAccess для текущих Scope
             foreach (var scopeId in scopeIds)
             {
                 var log = lastLogs.FirstOrDefault(x => x.ScopeId == scopeId);
@@ -205,42 +205,6 @@ namespace planner_node_service.Infrastructure.Repository
                     }
                 }
             }
-
-            //foreach (var log in lastLogs)
-            //{
-            //    var cache = await _context.SyncScopeAccess.FirstOrDefaultAsync(x => x.AccountId == accountId && x.ScopeId == log.ScopeId);
-
-            //    var access = await CheckScopeAccess(accountId, log.ScopeId);
-            //    Permission permission = Permission.Meta;
-
-            //    if (log.ScopeId == access!.NodeId)
-            //        permission = access.Permission;
-            //    else
-            //        permission = Permission.Meta;
-
-            //    if (cache != null)
-            //    {
-
-            //        if (cache.GraphRevisionUsed < log.GraphRevision ||
-            //            cache.RulesRevisionUsed < log.RulesRevision)
-            //        {
-            //            cache.Permission = permission;
-            //            cache.RulesRevisionUsed = log.RulesRevision;
-            //            cache.GraphRevisionUsed = log.GraphRevision;
-            //        }
-            //    }
-            //    else
-            //    {
-            //        await _context.SyncScopeAccess.AddAsync(new SyncScopeAccess()
-            //        {
-            //            AccountId = accountId,
-            //            ScopeId = log.ScopeId,
-            //            Permission = permission,
-            //            GraphRevisionUsed = log.GraphRevision,
-            //            RulesRevisionUsed = log.RulesRevision
-            //        });
-            //    }
-            //}
 
             await _context.SaveChangesAsync();
         }

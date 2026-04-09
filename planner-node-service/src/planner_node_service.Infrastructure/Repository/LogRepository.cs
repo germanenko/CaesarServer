@@ -15,13 +15,7 @@ namespace planner_node_service.Infrastructure.Repository
             _context = context;
         }
 
-        public async Task<History?> GetCreateHistory(Guid nodeId)
-        {
-            var history = await _context.History.SingleOrDefaultAsync(x => x.NodeId == nodeId && x.Action == ActionType.Create);
-
-            return history;
-        }
-
+        // Получение последней истории для ноды
         public async Task<History?> GetLastHistory(Guid nodeId)
         {
             var history = await _context.History.Where(x => x.NodeId == nodeId).OrderByDescending(x => x.UpdatedAt).FirstOrDefaultAsync();
@@ -29,13 +23,7 @@ namespace planner_node_service.Infrastructure.Repository
             return history;
         }
 
-        public async Task<ContentLog?> GetLastLogForEntity(Guid entityId)
-        {
-            var log = await _context.ContentLogs.Where(x => x.EntityId == entityId).OrderByDescending(x => x.ScopeVersion).FirstOrDefaultAsync();
-
-            return log;
-        }
-
+        // Получение последнего лога для скоупа
         public async Task<ContentLog?> GetLastLogForScope(Guid scopeId)
         {
             var log = await _context.ContentLogs.Where(x => x.ScopeId == scopeId).OrderByDescending(x => x.Seq).FirstOrDefaultAsync();

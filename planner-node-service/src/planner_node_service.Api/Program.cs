@@ -130,7 +130,6 @@ void ConfigureServices(IServiceCollection services)
         ));
 
     services.AddScoped<INodeService, NodeService>();
-    services.AddScoped<IUserService, UserService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<INotificationService, NotificationService>();
     services.AddScoped<IScopeRepository, ScopeRepository>();

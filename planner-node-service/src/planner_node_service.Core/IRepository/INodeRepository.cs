@@ -16,7 +16,6 @@ namespace planner_node_service.Core.IRepository
         Task<IEnumerable<Node>?> GetNodesTree(Guid accountId, List<Guid>? rootIds = null);
         Task<NodeBody?> GetNodeParent(Guid nodeId);
         Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId);
-        Task<IEnumerable<NodeLink>?> GetNodesLinks(Guid accountId);
         Task<NodeLink?> GetNodeLink(Guid childId);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId, List<Guid>? rootIds = null);
         Task<Node?> GetNode(Guid nodeId);

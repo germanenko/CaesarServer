@@ -267,6 +267,7 @@ namespace planner_content_service.App.Service
 
             if (responseBody != null)
             {
+                result.Link = responseBody.Link;
                 result.AccessRule = responseBody.AccessRule;
                 result.Version = responseBody.Version;
                 result.ScopeVersion = responseBody.ScopeVersion;

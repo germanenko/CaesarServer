@@ -13,6 +13,5 @@ namespace planner_node_service.Core.IRepository
         Task<Node?> GetNodeScope(Guid nodeId);
         Task<AccessRule?> CheckScopeAccess(Guid accountId, Guid scopeId);
         Task<IEnumerable<Node>?> GetScopes(Guid accountId);
-        Task<SyncScopeAccess?> GetSyncScopeAccess(Guid accountId, Guid scopeId);
     }
 }

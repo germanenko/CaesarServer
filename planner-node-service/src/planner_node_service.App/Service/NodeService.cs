@@ -3,7 +3,6 @@ using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
-using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using planner_server_package;
@@ -38,8 +37,10 @@ namespace planner_node_service.App.Service
             _logger = logger;
         }
 
+        // Получение нод, принадлежащих данным rootIds (или всех нод, если rootIds не указаны), с учетом доступа и дополнительной информации из других сервисов
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodes(Guid accountId, List<Guid>? rootIds = null)
         {
+            // Получаем ноды из репозитория по данным rootIds (или все ноды, если rootIds не указаны)
             var nodes = await _nodeRepository.GetNodes(accountId, rootIds);
 
             if (nodes == null)
@@ -51,10 +52,13 @@ namespace planner_node_service.App.Service
 
             var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
+            // Список для хранения нод, по которым нужно сделать запросы в другие сервисы
             var requestBodies = new List<NodeBody>();
 
+            // Список для хранения финальных результатов, которые будут возвращены клиенту
             var result = new List<NodeBody>();
 
+            // Проверяем минимальный уровень доступа Read к каждой ноде и распределяем ноды между результатом и запросами к другим сервисам
             foreach (var body in bodies)
             {
                 var hasAccess = await _accessRepository.CheckAccess(accountId, body.Id, Permission.Read);
@@ -68,17 +72,11 @@ namespace planner_node_service.App.Service
                 }
             }
 
+            // Получаем полные тела нод из других сервисов для тех нод и добавляем их в результат
             result.AddRange(await GetNodesFromDomainServices(accountId, requestBodies));
 
-            //result.AddRange(await GetContentNodesByIdAsync(requestBodies) ?? new List<NodeBody>());
-            //result.AddRange(await GetChatNodesByIdAsync(accountId, requestBodies) ?? new List<NodeBody>());
-
-            foreach (var body in bodies)
-            {
-                var history = await _logRepository.GetLastHistory(body.Id);
-                body.UpdatedBy = history.UpdatedById;
-                body.UpdatedAt = history.UpdatedAt;
-            }
+            // Заполняем ноды базовой информацией
+            result = await FillNodes(accountId, result);
 
             result = result.DistinctBy(x => x.Id).ToList();
 
@@ -90,76 +88,70 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetScopes(Guid accountId)
-        {
-            var nodes = await _scopeRepository.GetScopes(accountId);
 
-            var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
-
-            return new ServiceResponse<IEnumerable<NodeBody>>()
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = bodies
-            };
-        }
-
-
+        // Получение нод по Id с учетом доступа и дополнительной информации из других сервисов
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
         {
-            var nodes = new List<NodeBody>();
-            foreach (var id in nodeIds)
+            if (nodeIds.IsNullOrEmpty())
             {
-                if (await _accessRepository.CheckAccess(accountId, id, Permission.Meta))
+                return new ServiceResponse<IEnumerable<NodeBody>>()
                 {
-                    nodes.Add((await _nodeRepository.GetNode(id)).ToNodeBody());
-                    nodes.Add((await _scopeRepository.GetNodeScope(id)).ToNodeBody());
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            var nodes = new List<NodeBody>();
+
+            foreach (var nodeId in nodeIds)
+            {
+                // Проверяем доступ к ноде
+                if (await _accessRepository.CheckAccess(accountId, nodeId, Permission.Meta))
+                {
+                    // Если доступ есть, получаем ноду
+                    var node = await _nodeRepository.GetNode(nodeId);
+
+                    if (node != null)
+                    {
+                        // Добавляем ноду в результат
+                        nodes.Add(node.ToNodeBody());
+
+                        // Получаем Scope ноды и добавляем его в результат, если он существует и отличается от самой ноды
+                        var scope = await _scopeRepository.GetNodeScope(nodeId);
+
+                        if (scope != null && scope.Id != node.Id)
+                            nodes.Add(scope.ToNodeBody());
+                    }
                 }
             }
 
+            // Список для хранения нод, по которым нужно сделать запросы в другие сервисы
             var requestBodies = new List<NodeBody>();
 
+            // Список для хранения финальных результатов, которые будут возвращены клиенту
             var result = new List<NodeBody>();
 
             nodes = nodes.DistinctBy(x => x.Id).ToList();
 
-            foreach (var body in nodes)
+            // Проверяем минимальный уровень доступа Read к каждой ноде и распределяем ноды между результатом и запросами к другим сервисам
+            foreach (var node in nodes)
             {
-                var hasAccess = await _accessRepository.CheckAccess(accountId, body.Id, Permission.Read);
+                var hasAccess = await _accessRepository.CheckAccess(accountId, node.Id, Permission.Read);
                 if (!hasAccess)
                 {
-                    result.Add(body);
+                    result.Add(node);
                 }
                 else
                 {
-                    requestBodies.Add(body);
+                    requestBodies.Add(node);
                 }
             }
 
+            // Получаем полные тела нод из других сервисов для тех нод и добавляем их в результат
             result.AddRange(await GetNodesFromDomainServices(accountId, requestBodies));
 
-            foreach (var body in result)
-            {
-                var history = await _logRepository.GetLastHistory(body.Id);
-                body.UpdatedBy = history.UpdatedById;
-                body.UpdatedAt = history.UpdatedAt;
-
-                if (body.SyncKind == SyncKind.Scope)
-                {
-                    var scopeLog = await _logRepository.GetLastLogForScope(body.Id);
-
-                    body.ScopeVersion = scopeLog.ScopeVersion;
-                }
-
-                var link = await _nodeRepository.GetNodeLink(body.Id);
-                var access = await _accessRepository.GetAccessRuleForNode(accountId, body.Id);
-
-                if (link != null)
-                    body.Link = link.ToBody();
-
-                if (access != null)
-                    body.AccessRule = access.ToBody();
-            }
+            // Заполняем ноды базовой информацией
+            result = await FillNodes(accountId, result);
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
@@ -169,34 +161,10 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<IEnumerable<NodeLinkBody>>> GetNodeLinks(Guid accountId)
-        {
-            var nodeLinks = await _nodeRepository.GetNodesLinks(accountId);
 
-            return new ServiceResponse<IEnumerable<NodeLinkBody>>()
-            {
-                IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodeLinks?
-                  .Where(x => x != null)
-                  .Select(x => x.ToBody())
-                  .ToList()!
-               ?? new List<NodeLinkBody>()
-            };
-        }
-
+        // Добавление или обновление Scope
         public async Task<ServiceResponse<NodeBody>> AddOrUpdateScope(NodeBody nodeBody)
         {
-            if (nodeBody.Name.IsNullOrEmpty())
-            {
-                return new ServiceResponse<NodeBody>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Errors = new[] { "Name field is reqiured" }
-                };
-            }
-
             var newNode = await _nodeRepository.AddOrUpdateScope(nodeBody);
 
             return new ServiceResponse<NodeBody>()
@@ -207,18 +175,10 @@ namespace planner_node_service.App.Service
             };
         }
 
+
+        // Добавление или обновление ноды
         public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody nodeBody)
         {
-            if (nodeBody.Name.IsNullOrEmpty())
-            {
-                return new ServiceResponse<NodeBody>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.BadRequest,
-                    Errors = new[] { "Name field is reqiured" }
-                };
-            }
-
             var newNode = await _nodeRepository.AddOrUpdateNode(nodeBody);
 
             return new ServiceResponse<NodeBody>()
@@ -229,6 +189,8 @@ namespace planner_node_service.App.Service
             };
         }
 
+
+        // Удаление ноды
         public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid nodeId)
         {
             if (await _nodeRepository.GetNode(nodeId) == null)
@@ -261,8 +223,25 @@ namespace planner_node_service.App.Service
             };
         }
 
+
+        // Изменение родителя ноды
         public async Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
         {
+            // Проверяем, что нода и новый родитель существуют
+            var node = await _nodeRepository.GetNode(nodeId);
+            var parent = await _nodeRepository.GetNode(newParentId);
+
+            if (node == null || parent == null)
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.NotFound,
+                    Errors = new[] { "Нет ноды или нового родителя" }
+                };
+            }
+
+            // Проверяем, что у пользователя есть права на запись как к ноде, так и к новому родителю
             var nodeAccess = _accessRepository.CheckAccess(accountId, nodeId, Permission.Write);
             var newParentAccess = _accessRepository.CheckAccess(accountId, newParentId, Permission.Write);
 
@@ -276,6 +255,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Получаем текущую связь ноды, чтобы понять, нужно ли ее создавать или изменять
             var link = await _nodeRepository.GetNodeLink(nodeId);
             var currentParent = link?.ParentNode;
 
@@ -291,6 +271,7 @@ namespace planner_node_service.App.Service
 
             var nodeLink = new NodeLinkBody();
 
+            // Если текущая связь есть, изменяем родителя, если нет - создаем новую связь
             if (currentParent != null)
             {
                 nodeLink = await _nodeRepository.ChangeNodeParent(accountId, nodeId, newParentId);
@@ -313,33 +294,11 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<NodeLink>> AddOrUpdateNodeLink(NodeLinkBody node)
-        {
-            var nodeLink = await _nodeRepository.AddOrUpdateNodeLink(node);
 
-            return new ServiceResponse<NodeLink>()
-            {
-                IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodeLink
-            };
-        }
-
-        public async Task<ServiceResponse<List<NodeLink>>> AddOrUpdateNodeLinks(List<NodeLinkBody> nodes)
-        {
-            var nodeLink = await _nodeRepository.AddOrUpdateNodeLinks(nodes);
-
-            return new ServiceResponse<List<NodeLink>>()
-            {
-                IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK,
-                Body = nodeLink
-            };
-        }
-
-
+        // Получение манифеста нод по списку ScopeIds
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetManifests(Guid accountId, List<Guid> scopeIds)
         {
+            // Получаем ноды, которые принадлежат данным ScopeIds
             var nodes = await GetNodes(accountId, scopeIds);
 
             if (nodes.Body.IsNullOrEmpty())
@@ -351,8 +310,9 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Создаем список для хранения информации о версиях нод, который будет возвращен клиенту
             List<EntityVersionBody> logs = new List<EntityVersionBody>();
-            foreach (var item in nodes.Body)
+            foreach (var item in nodes.Body!)
             {
                 var entityVersion = new EntityVersionBody()
                 {
@@ -363,11 +323,6 @@ namespace planner_node_service.App.Service
                 logs.Add(entityVersion);
             }
 
-            foreach (var item in logs)
-            {
-                _logger.LogInformation($"Log: {item.EntityId} - {item.Version}");
-            }
-
             return new ServiceResponse<List<EntityVersionBody>>()
             {
                 IsSuccess = true,
@@ -376,13 +331,15 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Получение манифеста Scope'ов, к которым у пользователя есть доступ
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId)
         {
-            //! тестовое ожидание для проверки Outbox клиента
+            // Получаем Scope'и, к которым у пользователя есть доступ
+            var nodes = await _scopeRepository.GetScopes(accountId);
 
-            var nodes = await GetScopes(accountId);
+            var bodies = nodes.Select(x => x.ToNodeBody()).ToList();
 
-            if (nodes.Body.IsNullOrEmpty())
+            if (bodies.IsNullOrEmpty())
             {
                 return new ServiceResponse<List<EntityVersionBody>>()
                 {
@@ -391,8 +348,9 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Создаем список для хранения информации о версиях Scope'ов, который будет возвращен клиенту
             List<EntityVersionBody> logs = new List<EntityVersionBody>();
-            foreach (var item in nodes.Body)
+            foreach (var item in bodies!)
             {
                 var log = await _logRepository.GetLastLogForScope(item.Id);
 
@@ -408,11 +366,6 @@ namespace planner_node_service.App.Service
                 }
             }
 
-            foreach (var item in logs)
-            {
-                _logger.LogInformation($"Log: {item.EntityId} - {item.Version}");
-            }
-
             return new ServiceResponse<List<EntityVersionBody>>()
             {
                 IsSuccess = true,
@@ -421,6 +374,8 @@ namespace planner_node_service.App.Service
             };
         }
 
+
+        // Получение полных тел нод из других сервисов 
         public async Task<List<NodeBody>> GetNodesFromDomainServices(Guid accountId, List<NodeBody> requestBodies)
         {
             var result = new List<NodeBody>();
@@ -442,6 +397,7 @@ namespace planner_node_service.App.Service
             return result;
         }
 
+        // Загрузка нод, сохранение их в БД и отправка событий в другие сервисы для синхронизации данных
         public async Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodeBodies, TokenPayload tokenPayload)
         {
             var newNodes = await _nodeRepository.AddOrUpdateNodes(nodeBodies);
@@ -480,6 +436,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Получение полных тел нод из сервиса контента по списку Id нод
         public async Task<List<NodeBody>> GetContentNodesByIdAsync(List<NodeBody> nodes)
         {
             var client = new HttpClient()
@@ -517,6 +474,7 @@ namespace planner_node_service.App.Service
             }
         }
 
+        // Получение полных тел нод из сервиса чата по списку Id нод
         public async Task<List<NodeBody>> GetChatNodesByIdAsync(Guid accountId, List<NodeBody> nodes)
         {
             var client = new HttpClient()
@@ -552,6 +510,54 @@ namespace planner_node_service.App.Service
                 _logger.LogInformation($"Error: {response.StatusCode}");
                 return nodes;
             }
+        }
+
+        public async Task<List<NodeBody>> FillNodes(Guid accountId, List<NodeBody> nodes)
+        {
+            foreach (var body in nodes)
+            {
+                // Получаем ноду из репозитория, чтобы узнать ее версию, и добавляем эту информацию в тело ноды
+                var node = await _nodeRepository.GetNode(body.Id);
+
+                if (node != null)
+                {
+                    body.Version = node.Version;
+                }
+                else
+                {
+                    continue;
+                }
+
+                // Получаем историю изменений ноды, чтобы узнать, кто и когда в последний раз изменял ноду, и добавляем эту информацию в тело ноды
+                var history = await _logRepository.GetLastHistory(body.Id);
+
+                if (history != null)
+                {
+                    body.UpdatedBy = history.UpdatedById;
+                    body.UpdatedAt = history.UpdatedAt;
+                }
+
+                // Если нода является Scope, получаем версию Scope из последнего лога для Scope и добавляем эту информацию в тело ноды
+                if (body.SyncKind == SyncKind.Scope)
+                {
+                    var scopeLog = await _logRepository.GetLastLogForScope(body.Id);
+
+                    if (scopeLog != null)
+                        body.ScopeVersion = scopeLog.ScopeVersion;
+                }
+
+                // Получаем информацию о родителе ноды и правила доступа к ноде, и добавляем эту информацию в тело ноды
+                var link = await _nodeRepository.GetNodeLink(body.Id);
+                var access = await _accessRepository.GetAccessRuleForNode(accountId, body.Id);
+
+                if (link != null)
+                    body.Link = link.ToBody();
+
+                if (access != null)
+                    body.AccessRule = access.ToBody();
+            }
+
+            return nodes;
         }
     }
 }

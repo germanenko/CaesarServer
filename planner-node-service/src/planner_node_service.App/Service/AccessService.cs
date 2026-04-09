@@ -11,17 +11,17 @@ namespace planner_node_service.App.Service
     {
         private readonly IAccessRepository _accessRepository;
         private readonly INodeRepository _nodeRepository;
-        private readonly IUserService _userService;
 
-        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository, IUserService userService)
+        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository)
         {
             _accessRepository = accessRepository;
             _nodeRepository = nodeRepository;
-            _userService = userService;
         }
 
+        // Выдача доступа
         public async Task<ServiceResponse<AccessRuleBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
+            // Проверяем, существует ли нода
             if (_nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<AccessRuleBody>()
@@ -32,6 +32,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Проверяем, имеет ли грантер право выдавать доступ к этой ноде
             if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
                 return new ServiceResponse<AccessRuleBody>()
@@ -42,6 +43,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Выдаем доступ
             var access = await _accessRepository.GrantAccess(granterId, granteeId, nodeId, permission);
 
             if (access == null)
@@ -62,8 +64,10 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Изменение уровня доступа
         public async Task<ServiceResponse<AccessRuleBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
+            // Проверяем, существует ли нода
             if (_nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<AccessRuleBody>()
@@ -74,6 +78,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Проверяем, имеет ли грантер право изменять доступ к этой ноде
             if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
                 return new ServiceResponse<AccessRuleBody>()
@@ -84,6 +89,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Изменяем уровень доступа
             var access = await _accessRepository.ChangePermission(granterId, granteeId, nodeId, permission);
 
             if (access == null)
@@ -104,8 +110,10 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Отзыв доступа
         public async Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
+            // Проверяем, существует ли нода
             if (_nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<bool>()
@@ -116,6 +124,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Проверяем, имеет ли грантер право отзывать доступ к этой ноде
             if (!await _accessRepository.CheckAccess(granterId, nodeId, Permission.Write))
             {
                 return new ServiceResponse<bool>()
@@ -126,6 +135,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            // Отзываем доступ
             var access = await _accessRepository.RevokeAccess(granterId, granteeId, nodeId);
 
             if (access == false)
@@ -146,28 +156,7 @@ namespace planner_node_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AccessRuleBody>> CreateAccessRule(Guid accountId, Guid nodeId, Permission permission)
-        {
-            var access = await _accessRepository.GrantAccess(accountId, accountId, nodeId, permission);
-
-            if (access == null)
-            {
-                return new ServiceResponse<AccessRuleBody>()
-                {
-                    IsSuccess = true,
-                    StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new[] { "Нет доступа к доске" }
-                };
-            }
-
-            return new ServiceResponse<AccessRuleBody>()
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = access.ToBody()
-            };
-        }
-
+        // Создание группы доступа
         public async Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body)
         {
             var group = await _accessRepository.CreateGroup(accountId, body);
@@ -178,7 +167,7 @@ namespace planner_node_service.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
-                    Errors = new[] { "Нет доступа к доске" }
+                    Errors = new[] { "Не удалось создать группу доступа" }
                 };
             }
 
@@ -190,6 +179,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Добавление пользователя в группу доступа
         public async Task<ServiceResponse<AccessGroupMemberBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId)
         {
             var group = await _accessRepository.AddUserToGroup(accountId, userToAdd, groupId);
@@ -212,6 +202,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Удаление пользователя из группы доступа
         public async Task<ServiceResponse<HttpStatusCode>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId)
         {
             var group = await _accessRepository.RemoveUserFromGroup(accountId, userToRemove, groupId);
@@ -234,6 +225,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Получение правил доступа для аккаунта
         public async Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId)
         {
             var access = await _accessRepository.GetAccessRules(accountId);
@@ -263,17 +255,6 @@ namespace planner_node_service.App.Service
                     .Select(x => x.AccountId));
             }
 
-            var profileTasks = accountIds.Distinct()
-            .Select(id => _userService.GetUserData(id))
-            .ToList();
-
-            var profiles = await Task.WhenAll(profileTasks);
-
-            access.Profiles = profiles
-                .Where(profile => profile != null)
-                .Distinct()
-                .ToList();
-
             return new ServiceResponse<AccessBody>()
             {
                 IsSuccess = true,
@@ -282,6 +263,7 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Проверка доступа к ноде
         public async Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId, Permission requiredPermission)
         {
             var access = await _accessRepository.CheckAccess(accountId, nodeId, requiredPermission);
