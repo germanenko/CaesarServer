@@ -4,12 +4,16 @@ WORKDIR /App
 COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
 
-COPY planner-notify-service/*.sln .
-COPY planner-notify-service/src/planner_notify_service.Api/*.csproj ./src/
+COPY planner-notify-service/planner_notify_service.sln .
+
+COPY planner-notify-service/src/planner_notify_service.Api/*.csproj ./src/planner_notify_service.Api/
+COPY planner-notify-service/src/planner_notify_service.App/*.csproj ./src/planner_notify_service.App/
+COPY planner-notify-service/src/planner_notify_service.Core/*.csproj ./src/planner_notify_service.Core/
+COPY planner-notify-service/src/planner_notify_service.Infrastructure/*.csproj ./src/planner_notify_service.Infrastructure/
 
 RUN dotnet restore planner_notify_service.sln
 
-COPY planner-notify-service ./planner-notify-service	
+COPY planner-notify-service ./planner-notify-service
 
 RUN dotnet publish \
   planner-notify-service/src/planner_notify_service.Api/planner_notify_service.Api.csproj \
