@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.WebSockets
 {
-    public record ChatUpdatedMessage
+    public record ChatUpdatedMessage : IMessagePayload
     {
         public Guid ChatId { get; set; }
     }

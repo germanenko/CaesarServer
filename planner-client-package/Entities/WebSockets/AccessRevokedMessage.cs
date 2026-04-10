@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.WebSockets
 {
-    public record AccessRevokedMessage
+    public record AccessRevokedMessage : IMessagePayload
     {
         public Guid NodeId { get; set; }
     }

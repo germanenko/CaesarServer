@@ -6,8 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.WebSockets
 {
-    public record ScopeUpdatedMessage : IMessagePayload
+    public interface IMessagePayload
     {
-        public Guid ScopeId { get; set; }
     }
 }
