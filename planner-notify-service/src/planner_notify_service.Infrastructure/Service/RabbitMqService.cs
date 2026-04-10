@@ -111,6 +111,8 @@ namespace planner_notify_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
+            _logger.LogInformation($" === ScopeUpdated: {message} === ");
+
             var scopeUpdatedMessage = new ScopeUpdatedMessage()
             {
                 ScopeId = result.ScopeId
@@ -142,6 +144,8 @@ namespace planner_notify_service.Infrastructure.Service
                     StatusCode = System.Net.HttpStatusCode.InternalServerError,
                     Errors = new[] { "Ошибка сервера" }
                 };
+
+            _logger.LogInformation($" === AccessRevoked: {message} === ");
 
             var accessRevokedMessage = new AccessRevokedMessage()
             {
