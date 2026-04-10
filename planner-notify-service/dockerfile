@@ -18,8 +18,7 @@ COPY planner-notify-service ./planner-notify-service
 RUN dotnet publish \
   planner-notify-service/src/planner_notify_service.Api/planner_notify_service.Api.csproj \
   -c Release \
-  -o /App/out \
-  --no-restore
+  -o /App/out 
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
