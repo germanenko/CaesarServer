@@ -6,7 +6,8 @@ echo "🧹 Cleaning output..."
 rm -rf out
 
 echo "⚙️ Publishing .NET app..."
-dotnet publish planner-node-service/src/planner_node_service.Api \
+
+dotnet publish src/planner_node_service.Api/planner_node_service.Api.csproj \
   -c Release \
   -o ./out \
   /p:UseAppHost=false \
