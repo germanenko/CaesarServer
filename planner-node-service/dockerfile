@@ -3,7 +3,7 @@ WORKDIR /src
 
 # 1. solution + csproj (для кеша restore)
 COPY ../../NuGet.config .
-COPY ../../nuget-local ./nuget-local
+COPY ../../nuget-local nuget-local
 
 COPY planner_node_service.sln ./
 
