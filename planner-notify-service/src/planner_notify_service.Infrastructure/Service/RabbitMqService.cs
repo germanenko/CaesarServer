@@ -113,12 +113,15 @@ namespace planner_notify_service.Infrastructure.Service
 
             _logger.LogInformation($" === ScopeUpdated: {message} === ");
 
-            using var scope = _scopeFactory.CreateScope();
+            var scopeUpdatedMessage = new ScopeUpdatedMessage()
+            {
+                ScopeId = result.ScopeId
+            };
 
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
                 MessageType = MessageType.ScopeUpdated,
-                Message = JsonSerializer.SerializeToElement(result.ScopeId)
+                Message = JsonSerializer.SerializeToElement(scopeUpdatedMessage)
             };
 
             foreach (var accountId in result.AccountIds)
@@ -144,12 +147,15 @@ namespace planner_notify_service.Infrastructure.Service
 
             _logger.LogInformation($" === AccessRevoked: {message} === ");
 
-            using var scope = _scopeFactory.CreateScope();
+            var accessRevokedMessage = new AccessRevokedMessage()
+            {
+                NodeId = result.NodeId
+            };
 
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
                 MessageType = MessageType.AccessRevoked,
-                Message = JsonSerializer.SerializeToElement(result.NodeId)
+                Message = JsonSerializer.SerializeToElement(accessRevokedMessage)
             };
 
             await _notificationService.SendMessageToSessions(result.AccountId, SerializeObject(wsMessage));
