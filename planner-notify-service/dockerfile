@@ -7,7 +7,7 @@ COPY ../nuget-local ./nuget-local
 COPY planner-notify-service/*.sln .
 COPY planner-notify-service/src/planner_notify_service.Api/*.csproj ./src/
 
-RUN dotnet restore planner-notify-service/planner_notify_service.sln
+RUN dotnet restore ./planner-notify-service/planner_notify_service.sln
 
 COPY planner-notify-service ./planner-notify-service	
 
