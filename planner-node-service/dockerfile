@@ -1,7 +1,24 @@
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
+
+# 1. solution + csproj (для кеша restore)
+COPY planner_node_service.sln ./
+
+COPY src/planner_node_service.Core/*.csproj src/planner_node_service.Core/
+COPY src/planner_node_service.App/*.csproj src/planner_node_service.App/
+COPY src/planner_node_service.Infrastructure/*.csproj src/planner_node_service.Infrastructure/
+COPY src/planner_node_service.Api/*.csproj src/planner_node_service.Api/
+
+RUN dotnet restore planner_node_service.sln
+
+# 2. остальной код
+COPY src ./src
+
+RUN dotnet publish src/planner_node_service.Api/planner_node_service.Api.csproj \
+  -c Release -o /app/out --no-restore
+
+
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
-
-WORKDIR /App
-
-COPY out/ .
-
+WORKDIR /app
+COPY --from=build /app/out .
 ENTRYPOINT ["dotnet", "planner_node_service.Api.dll"]
