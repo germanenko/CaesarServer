@@ -92,6 +92,8 @@ namespace planner_node_service.App.Service
         // Получение нод по Id с учетом доступа и дополнительной информации из других сервисов
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
         {
+            _logger.LogInformation($"GetNodesByIds called with accountId: {accountId} and nodeIds: {string.Join(", ", nodeIds)}");
+
             if (nodeIds.IsNullOrEmpty())
             {
                 return new ServiceResponse<IEnumerable<NodeBody>>()
