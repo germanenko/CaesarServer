@@ -2,8 +2,8 @@ FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
 # 1. solution + csproj (для кеша restore)
-COPY ../NuGet.config .
-COPY ../nuget-local ./nuget-local
+COPY ../../NuGet.config .
+COPY ../../nuget-local ./nuget-local
 
 COPY planner_node_service.sln ./
 
