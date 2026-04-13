@@ -27,11 +27,11 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetNodeBranchesByRootIds(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] List<Guid> nodeIds
+            [FromQuery] List<Guid> rootIds
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.GetNodes(tokenPayload.AccountId, nodeIds);
+            var result = await _nodeService.GetNodes(tokenPayload.AccountId, rootIds);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
