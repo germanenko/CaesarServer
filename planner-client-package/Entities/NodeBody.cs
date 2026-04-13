@@ -3,6 +3,7 @@ using planner_common_package;
 using planner_common_package.Enums;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities
@@ -55,6 +56,32 @@ namespace planner_client_package.Entities
             target.SyncKind = source.SyncKind;
 
             return target;
+        }
+
+        public static IEnumerable<IBody> Extract<T>(this T target) where T : NodeBody
+        {
+            List<IBody> result = new List<IBody> { target };
+
+            result.AddIfNotNull(target.AccessRule);
+            result.AddIfNotNull(target.Link);
+            result.AddRangeIfNotNull(target.Childs);
+
+            if (target.SyncKind == SyncKind.Scope)
+            {
+                result.Add(new ScopeVersionBody(target.Id, target.ScopeVersion));
+            }
+
+            return result;
+        }
+
+        public static void AddIfNotNull<T>(this List<T> list, T item) where T : class
+        {
+            if (item != null) list.Add(item);
+        }
+
+        public static void AddRangeIfNotNull<T>(this List<T> list, IEnumerable<T> items)
+        {
+            if (items != null) list.AddRange(items);
         }
     }
 }

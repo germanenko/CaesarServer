@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using System.Net.Http.Headers;
 
 namespace planner_node_service.Api.Controllers
@@ -44,8 +45,9 @@ namespace planner_node_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.GetNodesByIds(tokenPayload.AccountId, nodeIds);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _nodeService.GetNodesByIds(tokenPayload.AccountId, nodeIds);
+            //return StatusCode((int)result.StatusCode, result.Body); убрал для тестов
+            return StatusCode((int)HttpStatusCode.InternalServerError);
         }
 
         [HttpGet("getManifest"), Authorize]
