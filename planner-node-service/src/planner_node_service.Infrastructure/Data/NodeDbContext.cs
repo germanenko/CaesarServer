@@ -5,7 +5,7 @@ using System.Reflection;
 
 namespace planner_node_service.Infrastructure.Data
 {
-    public class NodeDbContext : DbContext, INodeDbContext
+    public class NodeDbContext : DbContext
     {
         public NodeDbContext(DbContextOptions<NodeDbContext> options) : base(options)
         {

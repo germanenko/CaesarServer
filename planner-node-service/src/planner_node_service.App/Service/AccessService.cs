@@ -27,7 +27,7 @@ namespace planner_node_service.App.Service
         public async Task<ServiceResponse<AccessRuleBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
             // Проверяем, существует ли нода
-            if (_nodeRepository.GetNode(nodeId) == null)
+            if (await _nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<AccessRuleBody>()
                 {
@@ -73,7 +73,7 @@ namespace planner_node_service.App.Service
         public async Task<ServiceResponse<AccessRuleBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
             // Проверяем, существует ли нода
-            if (_nodeRepository.GetNode(nodeId) == null)
+            if (await _nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<AccessRuleBody>()
                 {
@@ -119,7 +119,7 @@ namespace planner_node_service.App.Service
         public async Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId)
         {
             // Проверяем, существует ли нода
-            if (_nodeRepository.GetNode(nodeId) == null)
+            if (await _nodeRepository.GetNode(nodeId) == null)
             {
                 return new ServiceResponse<bool>()
                 {

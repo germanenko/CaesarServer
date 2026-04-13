@@ -104,7 +104,7 @@ void ConfigureServices(IServiceCollection services)
 
     services.AddAuthorization();
 
-    services.AddDbContext<INodeDbContext, NodeDbContext>(options =>
+    services.AddDbContext<NodeDbContext>(options =>
     {
         options.UseNpgsql(nodeDbConnectionString, builder =>
         {
