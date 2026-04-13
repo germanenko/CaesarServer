@@ -22,10 +22,10 @@ namespace planner_node_service.Api.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpGet("getNodeTreesByRootIds"), Authorize]
-        [SwaggerOperation("Получить ноды по Id")]
+        [HttpGet("getNodeBranchesByRootIds"), Authorize]
+        [SwaggerOperation("Получить ветки нод по Id корней")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GetNodeTreesByRootIds(
+        public async Task<IActionResult> GetNodeBranchesByRootIds(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery] List<Guid> nodeIds
         )

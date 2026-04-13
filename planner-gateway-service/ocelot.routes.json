@@ -614,7 +614,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getNodeTreesByRootIds",
+            "DownstreamPathTemplate": "/api/getNodeBranchesByRootIds",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -622,7 +622,7 @@
                     "Port": 8093
                 }
             ],
-            "UpstreamPathTemplate": "/api/getNodeTreesByRootIds",
+            "UpstreamPathTemplate": "/api/getNodeBranchesByRootIds",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
