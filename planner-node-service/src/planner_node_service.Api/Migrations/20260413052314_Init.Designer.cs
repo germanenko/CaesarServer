@@ -12,32 +12,29 @@ using planner_node_service.Infrastructure.Data;
 namespace planner_node_service.Api.Migrations
 {
     [DbContext(typeof(NodeDbContext))]
-    [Migration("20260317071808_setupFkForLogsDebug")]
-    partial class setupFkForLogsDebug
+    [Migration("20260413052314_Init")]
+    partial class Init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "7.0.11")
+                .HasAnnotation("ProductVersion", "8.0.11")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<int>("Seq")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("integer");
 
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Seq"));
 
                     b.Property<long>("GraphRevision")
                         .HasColumnType("bigint");
-
-                    b.Property<Guid>("NodeId")
-                        .HasColumnType("uuid");
 
                     b.Property<int>("Permission")
                         .HasColumnType("integer");
@@ -45,12 +42,15 @@ namespace planner_node_service.Api.Migrations
                     b.Property<long>("RulesRevision")
                         .HasColumnType("bigint");
 
+                    b.Property<Guid>("ScopeId")
+                        .HasColumnType("uuid");
+
                     b.Property<Guid>("SubjectId")
                         .HasColumnType("uuid");
 
-                    b.HasKey("Id");
+                    b.HasKey("Seq");
 
-                    b.HasIndex("NodeId");
+                    b.HasIndex("ScopeId");
 
                     b.ToTable("AccessLogs", (string)null);
                 });
@@ -97,9 +97,11 @@ namespace planner_node_service.Api.Migrations
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.ContentLog", b =>
                 {
-                    b.Property<Guid>("Id")
+                    b.Property<long>("Seq")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Seq"));
 
                     b.Property<int>("Action")
                         .HasColumnType("integer");
@@ -113,13 +115,10 @@ namespace planner_node_service.Api.Migrations
                     b.Property<long>("ScopeVersion")
                         .HasColumnType("bigint");
 
-                    b.HasKey("Id");
+                    b.HasKey("Seq");
 
                     b.HasIndex("EntityId")
                         .HasDatabaseName("IX_ContentLogs_EntityId");
-
-                    b.HasIndex("EntityId", "ScopeVersion")
-                        .IsUnique();
 
                     b.ToTable("ContentLogs", (string)null);
                 });
@@ -156,11 +155,11 @@ namespace planner_node_service.Api.Migrations
                     b.Property<string>("NewVersion")
                         .HasColumnType("text");
 
+                    b.Property<Guid>("NodeId")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("OldVersion")
                         .HasColumnType("text");
-
-                    b.Property<Guid>("TrackableId")
-                        .HasColumnType("uuid");
 
                     b.Property<DateTime>("UpdatedAt")
                         .ValueGeneratedOnAddOrUpdate()
@@ -172,13 +171,47 @@ namespace planner_node_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("TrackableId")
-                        .HasDatabaseName("IX_Histories_TrackableId");
+                    b.HasIndex("NodeId")
+                        .HasDatabaseName("IX_Histories_NodeId");
 
                     b.HasIndex("UpdatedById")
                         .HasDatabaseName("IX_Histories_UpdatedById");
 
                     b.ToTable("History", (string)null);
+                });
+
+            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Props")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("SyncKind")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Type")
+                        .HasColumnType("integer");
+
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Name");
+
+                    b.HasIndex("Type");
+
+                    b.ToTable("Nodes", (string)null);
+
+                    b.UseTptMappingStrategy();
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
@@ -314,27 +347,6 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("SyncScopeAccess");
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
-                {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
-
-                    b.Property<Guid>("CursorId")
-                        .HasColumnType("uuid");
-
-                    b.Property<long>("Version")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CursorId");
-
-                    b.ToTable("Trackables");
-
-                    b.UseTptMappingStrategy();
-                });
-
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
                 {
                     b.HasBaseType("planner_node_service.Core.Entities.Models.AccessSubject");
@@ -359,40 +371,15 @@ namespace planner_node_service.Api.Migrations
                     b.ToTable("UserAccessSubjects");
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
-                {
-                    b.HasBaseType("planner_node_service.Core.Entities.Models.TrackableEntity");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("Props")
-                        .HasColumnType("jsonb");
-
-                    b.Property<int>("SyncKind")
-                        .HasColumnType("integer");
-
-                    b.Property<int>("Type")
-                        .HasColumnType("integer");
-
-                    b.HasIndex("Name");
-
-                    b.HasIndex("Type");
-
-                    b.ToTable("Nodes", (string)null);
-                });
-
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessLog", b =>
                 {
-                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Node")
+                    b.HasOne("planner_node_service.Core.Entities.Models.Node", "Scope")
                         .WithMany()
-                        .HasForeignKey("NodeId")
+                        .HasForeignKey("ScopeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Node");
+                    b.Navigation("Scope");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.AccessRule", b =>
@@ -423,17 +410,6 @@ namespace planner_node_service.Api.Migrations
                         .IsRequired();
 
                     b.Navigation("Group");
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.History", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", "Trackable")
-                        .WithMany()
-                        .HasForeignKey("TrackableId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Trackable");
                 });
 
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.NodeLink", b =>
@@ -507,17 +483,6 @@ namespace planner_node_service.Api.Migrations
                     b.Navigation("Scope");
                 });
 
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.TrackableEntity", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.ContentLog", "Cursor")
-                        .WithMany()
-                        .HasForeignKey("CursorId")
-                        .OnDelete(DeleteBehavior.NoAction)
-                        .IsRequired();
-
-                    b.Navigation("Cursor");
-                });
-
             modelBuilder.Entity("planner_node_service.Core.Entities.Models.GroupAccessSubject", b =>
                 {
                     b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", null)
@@ -532,15 +497,6 @@ namespace planner_node_service.Api.Migrations
                     b.HasOne("planner_node_service.Core.Entities.Models.AccessSubject", null)
                         .WithOne()
                         .HasForeignKey("planner_node_service.Core.Entities.Models.UserAccessSubject", "Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-                });
-
-            modelBuilder.Entity("planner_node_service.Core.Entities.Models.Node", b =>
-                {
-                    b.HasOne("planner_node_service.Core.Entities.Models.TrackableEntity", null)
-                        .WithOne()
-                        .HasForeignKey("planner_node_service.Core.Entities.Models.Node", "Id")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
