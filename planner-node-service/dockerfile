@@ -15,8 +15,14 @@ RUN dotnet restore planner_node_service.sln
 
 COPY planner-node-service/src ./src
 
+RUN dotnet build src/planner_node_service.Api/planner_node_service.Api.csproj \
+  -c Release --no-restore
+
 RUN dotnet publish src/planner_node_service.Api/planner_node_service.Api.csproj \
-  -c Release -o /app/out --no-restore
+  -c Release \
+  -o /app/out \
+  --no-build \
+  /p:UseAppHost=false
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0

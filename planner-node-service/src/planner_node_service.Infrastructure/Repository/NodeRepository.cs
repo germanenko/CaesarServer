@@ -316,6 +316,7 @@ namespace planner_node_service.Infrastructure.Repository
             return nodeParent?.ToNodeBody();
         }
 
+        // изменения родителя ноды
         public async Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
