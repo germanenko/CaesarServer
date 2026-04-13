@@ -22,6 +22,19 @@ namespace planner_node_service.Api.Controllers
             _jwtService = jwtService;
         }
 
+        [HttpGet("getNodeTreesByRootIds"), Authorize]
+        [SwaggerOperation("Получить ноды по Id")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GetNodeTreesByRootIds(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] List<Guid> nodeIds
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.GetNodes(tokenPayload.AccountId, nodeIds);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpGet("getNodesByIds"), Authorize]
         [SwaggerOperation("Получить ноды по Id")]
         [SwaggerResponse(200)]
