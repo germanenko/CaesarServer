@@ -79,22 +79,30 @@ namespace planner_content_service.Infrastructure.Service
                 UpdatedBy = x.UpdatedBy
             }).ToList();
 
-            var taskBodies = tasks.Select(x => new planner_client_package.Entities.TaskBody()
+            //! исправить когда перейдем на новую логику создания задач
+            //var taskBodies = tasks.Select(x => new planner_client_package.Entities.TaskBody() 
+            //{
+            //    Id = x.Id,
+            //    Name = x.Name,
+            //    Props = x.Props,
+            //    PublicationStatus = x.PublicationStatus,
+            //    Type = NodeType.Column,
+            //    UpdatedAt = x.UpdatedAt,
+            //    UpdatedBy = x.UpdatedBy,
+            //    StartDate = x.StartDate,
+            //    EndDate = x.EndDate,
+            //    Description = x.Description,
+            //    HexColor = x.HexColor,
+            //    PriorityOrder = x.PriorityOrder,
+            //    Status = x.Status,
+            //    TaskType = x.TaskType
+            //}).ToList();
+            var taskBodies = tasks.Select(x => new CreateOrUpdateJobBody
             {
                 Id = x.Id,
                 Name = x.Name,
                 Props = x.Props,
-                PublicationStatus = x.PublicationStatus,
-                Type = NodeType.Column,
-                UpdatedAt = x.UpdatedAt,
-                UpdatedBy = x.UpdatedBy,
-                StartDate = x.StartDate,
-                EndDate = x.EndDate,
                 Description = x.Description,
-                HexColor = x.HexColor,
-                PriorityOrder = x.PriorityOrder,
-                Status = x.Status,
-                TaskType = x.TaskType
             }).ToList();
 
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);

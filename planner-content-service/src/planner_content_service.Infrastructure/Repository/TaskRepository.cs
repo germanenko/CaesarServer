@@ -3,13 +3,9 @@ using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
-using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
-using planner_server_package.Converters;
 using planner_server_package.Events;
-using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
-using System.Text.Json;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -30,7 +26,7 @@ namespace planner_content_service.Infrastructure.Repository
             Guid accountId
         )
         {
-            var taskModel = new TaskModel()
+            var taskModel = new Core.Entities.Models.Task()
             {
                 Id = taskBody.Id,
                 Name = taskBody.Name,
@@ -74,7 +70,7 @@ namespace planner_content_service.Infrastructure.Repository
         {
             var result = _context.Nodes
                 .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Task)
-                .Select(x => x as TaskModel)
+                .Select(x => x as Core.Entities.Models.Task)
                 .AsEnumerable();
 
             return result.Select(x => x?.ToTaskBody());

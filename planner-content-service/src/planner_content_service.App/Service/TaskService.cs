@@ -1,4 +1,5 @@
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
@@ -28,19 +29,18 @@ namespace planner_content_service.App.Service
             _publisherService = publisherService;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, TaskBody taskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateJobBody createOrUpdateTaskBody)
         {
-            var errors = new List<string>();
-            if (taskBody.StartDate != null /*&& !DateTime.TryParse(taskBody?.StartDate, out var _) */)
-                errors.Add("Start time format is not correct");
-
-            if (taskBody.EndDate != null /*&& !DateTime.TryParse(taskBody.EndDate, out var _)*/)
-                errors.Add("End time format is not correct");
-
-
-            DateTime? startDate = taskBody.StartDate /*== null ? null : DateTime.Parse(taskBody.StartDate)*/;
-            DateTime? endDate = taskBody.EndDate /*== null ? null : DateTime.Parse(taskBody.EndDate) */;
-
+            var taskBody = new TaskBody()
+            {
+                Id = createOrUpdateTaskBody.Id,
+                Name = createOrUpdateTaskBody.Name,
+                Description = createOrUpdateTaskBody.Description,
+                Link = createOrUpdateTaskBody.Link,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId,
+                Type = NodeType.Task
+            };
 
             CreateTaskEvent taskEvent = new CreateTaskEvent()
             {
@@ -71,11 +71,10 @@ namespace planner_content_service.App.Service
 
             if (result == null)
             {
-                errors.Add("Task not created");
                 return new ServiceResponse<TaskBody>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
-                    Errors = errors.ToArray(),
+                    Errors = ["Task not created"],
                     IsSuccess = false
                 };
             }
@@ -88,7 +87,70 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<TaskBody> taskBodies)
+        public async Task<ServiceResponse<TaskBody>> CreateTaskFromMessage(Guid accountId, Guid messageId, Guid columnId, string taskName)
+        {
+            var taskId = Guid.NewGuid();
+
+            var taskBody = new TaskBody()
+            {
+                Id = taskId,
+                Name = taskName,
+                UpdatedAt = DateTime.UtcNow,
+                TaskType = TaskType.Task,
+                UpdatedBy = accountId,
+                Link = new NodeLinkBody()
+                {
+                    ParentId = columnId,
+                    ChildId = taskId
+                }
+            };
+
+            CreateTaskEvent taskEvent = new CreateTaskEvent()
+            {
+                Task = BodyConverter.ClientToServerBody(taskBody),
+                CreatorId = accountId
+            };
+
+            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateTask);
+
+            if (!nodeComplete.IsSuccess)
+            {
+                return new ServiceResponse<TaskBody>
+                {
+                    IsSuccess = nodeComplete.IsSuccess,
+                    StatusCode = nodeComplete.StatusCode,
+                    Errors = nodeComplete.Errors
+                };
+            }
+
+            if (await _taskRepository.GetAsync(taskBody.Id) != null)
+            {
+                var task = await UpdateTask(accountId, taskBody);
+
+                return task;
+            }
+
+            var result = await _taskRepository.AddAsync(taskBody, accountId);
+
+            if (result == null)
+            {
+                return new ServiceResponse<TaskBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = ["Задача не создана"],
+                    IsSuccess = false
+                };
+            }
+
+            return new ServiceResponse<TaskBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result,
+                IsSuccess = true
+            };
+        }
+
+        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateJobBody> taskBodies)
         {
             var errors = new List<string>();
             List<TaskBody> tasks = new List<TaskBody>();

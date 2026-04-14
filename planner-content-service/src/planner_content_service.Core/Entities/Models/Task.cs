@@ -1,10 +1,15 @@
 using planner_client_package.Entities;
+using planner_common_package.Enums;
 using System.ComponentModel.DataAnnotations;
 
 namespace planner_content_service.Core.Entities.Models
 {
-    public class TaskModel : Node
+    public class Task : Node
     {
+        public Guid PrimarySourceMessageId { get; set; }
+        public MessageSnapshot PrimarySourceSnapshot { get; set; }
+        public MessageState PrimarySourceMessageState { get; set; }
+        public bool CloseWhenChildrenCompleted { get; set; }
         public string? Description { get; set; }
 
         [MaxLength(7)]

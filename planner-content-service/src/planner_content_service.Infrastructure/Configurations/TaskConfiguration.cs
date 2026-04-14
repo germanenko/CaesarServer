@@ -4,9 +4,9 @@ using planner_content_service.Core.Entities.Models;
 
 namespace planner_content_service.Infrastructure.Configurations
 {
-    public class TaskConfiguration : IEntityTypeConfiguration<TaskModel>
+    public class TaskConfiguration : IEntityTypeConfiguration<Core.Entities.Models.Task>
     {
-        public void Configure(EntityTypeBuilder<TaskModel> builder)
+        public void Configure(EntityTypeBuilder<Core.Entities.Models.Task> builder)
         {
             builder.ToTable("Tasks");
 
@@ -19,6 +19,11 @@ namespace planner_content_service.Infrastructure.Configurations
 
             builder.Property(t => t.HexColor)
                 .HasMaxLength(7);
+
+            builder.HasOne(x => x.PrimarySourceSnapshot)
+                .WithMany()
+                .HasForeignKey("snapshot_id")
+                .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasIndex(t => t.StartDate);
             builder.HasIndex(t => t.EndDate);

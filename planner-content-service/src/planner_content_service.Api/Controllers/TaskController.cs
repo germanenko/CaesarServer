@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
@@ -23,19 +24,21 @@ namespace planner_content_service.Api.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpPost("task"), Authorize]
-        [SwaggerOperation("Создать/обновить задачу")]
+        [HttpPost("сreateTaskBasedOnMessage"), Authorize]
+        [SwaggerOperation("Создать задачу на основе сообщения")]
         [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] TaskBody taskBody,
+            [FromQuery] Guid messageId,
+            [FromQuery] Guid columnId,
+            [FromQuery] string taskName,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
+            var result = await _taskService.CreateTaskFromMessage(tokenPayload.AccountId, messageId, columnId, taskName);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
@@ -43,19 +46,19 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
-        [HttpPost("createOrUpdateTasks"), Authorize]
-        [SwaggerOperation("Создать/обновить задачи")]
+        [HttpPost("task"), Authorize]
+        [SwaggerOperation("Создать/обновить задачу")]
         [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
-        public async Task<IActionResult> CreateOrUpdateTasks(
-            [FromBody] List<TaskBody> taskBodies,
+        public async Task<IActionResult> CreateOrUpdateTask<T>(
+            [FromBody] T taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
+        ) where T : CreateOrUpdateJobBody
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateOrUpdateTasks(tokenPayload.AccountId, taskBodies);
+            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
