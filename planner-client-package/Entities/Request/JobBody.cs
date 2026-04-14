@@ -7,12 +7,6 @@ using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities.Request
 {
-    [SwaggerDiscriminator(Discriminator.TypeDiscriminatorPropertyName)]
-    [SwaggerSubType(typeof(MeetingBody), DiscriminatorValue = Discriminator.Meeting)]
-    [SwaggerSubType(typeof(ReminderBody), DiscriminatorValue = Discriminator.Reminder)]
-    [SwaggerSubType(typeof(InformationBody), DiscriminatorValue = Discriminator.Information)]
-    [SwaggerSubType(typeof(TaskBody), DiscriminatorValue = Discriminator.Task)]
-
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
     [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
     [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
