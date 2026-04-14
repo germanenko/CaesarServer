@@ -1,14 +1,20 @@
 ﻿using planner_client_package.Interface;
+using planner_common_package;
 using planner_common_package.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
+
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
+    [JsonDerivedType(typeof(CreateOrUpdateMeetingBody), "Meeting")]
+    [JsonDerivedType(typeof(CreateOrUpdateReminderBody), "Reminder")]
     public class CreateOrUpdateJobBody : IRequest
     {
         public Guid Id { get; set; }
@@ -18,6 +24,8 @@ namespace planner_client_package.Entities.Request
         public string Props { get; set; }
 
         public string Description { get; set; }
+
+        public TaskType Type { get; set; }
 
         public NodeLinkBody Link { get; set; }
     }

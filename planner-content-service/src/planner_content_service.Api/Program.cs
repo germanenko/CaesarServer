@@ -20,6 +20,7 @@ using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Reflection;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -55,6 +56,12 @@ void ConfigureServices(IServiceCollection services)
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
+
+
+    builder.Services.ConfigureHttpJsonOptions(options =>
+    {
+        options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
     builder.Logging.AddConsole();
     builder.Logging.AddDebug();
@@ -211,6 +218,16 @@ void ConfigureSwagger(IServiceCollection services)
         {
             return typeof(CreateOrUpdateJobBody).Assembly.GetTypes()
                 .Where(x => x.IsSubclassOf(baseType));
+        });
+
+        options.SelectDiscriminatorNameUsing(_ => "type");
+
+        options.SelectDiscriminatorValueUsing(type =>
+        {
+            if (type == typeof(CreateOrUpdateMeetingBody)) return "Meeting";
+            if (type == typeof(CreateOrUpdateReminderBody)) return "Reminder";
+
+            return null;
         });
 
         options.SwaggerDoc("v1", new OpenApiInfo
