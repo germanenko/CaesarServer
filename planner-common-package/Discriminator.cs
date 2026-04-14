@@ -15,6 +15,7 @@ namespace planner_common_package
         public const string Reminder = "reminder";
         public const string Meeting = "meeting";
         public const string Task = "task";
+        public const string TaskRequest = "taskRequest";
         public const string Information = "information";
         public const string Chat = "chat";
         public const string ChatMessage = "chatMessage";
