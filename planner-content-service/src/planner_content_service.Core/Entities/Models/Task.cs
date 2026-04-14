@@ -1,51 +1,13 @@
-using planner_client_package.Entities;
-using planner_common_package.Enums;
-using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace planner_content_service.Core.Entities.Models
 {
-    public class Task : Node
+    public class Task : Job
     {
-        public Guid PrimarySourceMessageId { get; set; }
-        public MessageSnapshot PrimarySourceSnapshot { get; set; }
-        public MessageState PrimarySourceMessageState { get; set; }
-        public bool CloseWhenChildrenCompleted { get; set; }
-        public string? Description { get; set; }
-
-        [MaxLength(7)]
-        public string? HexColor { get; set; }
-
-        public DateTime? StartDate { get; set; }
-        public DateTime? EndDate { get; set; }
-
-        public TaskBody ToTaskBody()
-        {
-            return new TaskBody
-            {
-                Id = Id,
-                Name = Name,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                Props = Props,
-                Type = Type
-            };
-        }
-
-        public override NodeBody ToNodeBody()
-        {
-            return new TaskBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-            };
-        }
+        public List<Guid> PermormerIds { get; set; }
     }
 }

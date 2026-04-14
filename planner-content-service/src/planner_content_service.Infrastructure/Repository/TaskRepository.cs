@@ -26,7 +26,7 @@ namespace planner_content_service.Infrastructure.Repository
             Guid accountId
         )
         {
-            var taskModel = new Core.Entities.Models.Task()
+            var taskModel = new Core.Entities.Models.Job()
             {
                 Id = taskBody.Id,
                 Name = taskBody.Name,
@@ -41,7 +41,7 @@ namespace planner_content_service.Infrastructure.Repository
             try
             {
 
-                var task = (await _context.Tasks.AddAsync(taskModel)).Entity;
+                var task = (await _context.Jobs.AddAsync(taskModel)).Entity;
 
                 await _context.SaveChangesAsync();
 
@@ -70,7 +70,7 @@ namespace planner_content_service.Infrastructure.Repository
         {
             var result = _context.Nodes
                 .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Task)
-                .Select(x => x as Core.Entities.Models.Task)
+                .Select(x => x as Core.Entities.Models.Job)
                 .AsEnumerable();
 
             return result.Select(x => x?.ToTaskBody());

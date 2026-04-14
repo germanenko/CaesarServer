@@ -26,7 +26,7 @@ namespace planner_content_service.Api.Controllers
 
         [HttpPost("сreateTaskBasedOnMessage"), Authorize]
         [SwaggerOperation("Создать задачу на основе сообщения")]
-        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(200, Type = typeof(planner_client_package.Entities.TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
@@ -48,12 +48,12 @@ namespace planner_content_service.Api.Controllers
 
         [HttpPost("task"), Authorize]
         [SwaggerOperation("Создать/обновить задачу")]
-        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(200, Type = typeof(planner_client_package.Entities.TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] CreateOrUpdateJobBody taskBody,
+            [FromBody] JobBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {

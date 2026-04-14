@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace planner_content_service.Core.Entities.Models
 {
-    public class MessageSnapshot
+    public class Meeting : Job
     {
-        public Guid Id { get; set; }
-        public Guid MessageId { get; set; }
-        public string Content { get; set; }
+        public DateTime MeetAt { get; set; }
+        public List<Guid> MemberIds { get; set; }
     }
 }

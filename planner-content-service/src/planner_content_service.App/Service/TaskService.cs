@@ -1,17 +1,15 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
-using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
-using planner_server_package.Idempotency.Enum;
 using planner_server_package.RabbitMQ;
 using System.Net;
-using System.Threading.Tasks;
+using TaskBody = planner_client_package.Entities.TaskBody;
 
 namespace planner_content_service.App.Service
 {
@@ -29,7 +27,7 @@ namespace planner_content_service.App.Service
             _publisherService = publisherService;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, CreateOrUpdateJobBody createOrUpdateTaskBody)
+        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask(Guid accountId, JobBody createOrUpdateTaskBody)
         {
             var taskBody = new TaskBody()
             {
@@ -150,7 +148,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<CreateOrUpdateJobBody> taskBodies)
+        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> taskBodies)
         {
             var errors = new List<string>();
             List<TaskBody> tasks = new List<TaskBody>();

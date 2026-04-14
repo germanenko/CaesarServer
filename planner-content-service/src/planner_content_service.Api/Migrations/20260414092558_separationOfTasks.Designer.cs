@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using planner_content_service.Infrastructure.Data;
@@ -11,9 +12,11 @@ using planner_content_service.Infrastructure.Data;
 namespace planner_content_service.Api.Migrations
 {
     [DbContext(typeof(ContentDbContext))]
-    partial class ContentDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260414092558_separationOfTasks")]
+    partial class separationOfTasks
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -155,15 +158,6 @@ namespace planner_content_service.Api.Migrations
                 {
                     b.HasBaseType("planner_content_service.Core.Entities.Models.Job");
 
-                    b.Property<DateTime>("MeetAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.Property<string>("MemberIds")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.HasIndex("MeetAt");
-
                     b.ToTable("Meetings", (string)null);
                 });
 
@@ -171,21 +165,12 @@ namespace planner_content_service.Api.Migrations
                 {
                     b.HasBaseType("planner_content_service.Core.Entities.Models.Job");
 
-                    b.Property<DateTime>("RemindAt")
-                        .HasColumnType("timestamp without time zone");
-
-                    b.HasIndex("RemindAt");
-
                     b.ToTable("Reminders", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Task", b =>
                 {
                     b.HasBaseType("planner_content_service.Core.Entities.Models.Job");
-
-                    b.Property<string>("PermormerIds")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
 
                     b.ToTable("Tasks", (string)null);
                 });

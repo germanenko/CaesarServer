@@ -6,10 +6,11 @@ using System.Threading.Tasks;
 
 namespace planner_content_service.Core.Entities.Models
 {
-    public class MessageSnapshot
+    public class UserTaskColumn
     {
         public Guid Id { get; set; }
-        public Guid MessageId { get; set; }
-        public string Content { get; set; }
+        public Guid AccountId { get; set; }
+        public Guid ColumnId { get; set; }
+        public Guid? ChatId { get; set; }
     }
 }

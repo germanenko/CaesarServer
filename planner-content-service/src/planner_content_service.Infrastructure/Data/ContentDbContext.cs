@@ -21,17 +21,29 @@ namespace planner_content_service.Infrastructure.Data
 
             modelBuilder.Entity<Board>().HasBaseType<Node>();
             modelBuilder.Entity<Column>().HasBaseType<Node>();
-            modelBuilder.Entity<Task>().HasBaseType<Node>();
+
+            modelBuilder.Entity<Job>().HasBaseType<Node>();
 
             modelBuilder.Entity<Node>().ToTable("Nodes");
             modelBuilder.Entity<Board>().ToTable("Boards");
             modelBuilder.Entity<Column>().ToTable("Columns");
+
+            modelBuilder.Entity<Job>().ToTable("Jobs");
             modelBuilder.Entity<Task>().ToTable("Tasks");
+            modelBuilder.Entity<Reminder>().ToTable("Reminders");
+            modelBuilder.Entity<Meeting>().ToTable("Meetings");
+            modelBuilder.Entity<Information>().ToTable("Information");
         }
 
         public DbSet<Node> Nodes { get; set; }
         public DbSet<Board> Boards { get; set; }
         public DbSet<Column> Columns { get; set; }
-        public DbSet<Core.Entities.Models.Task> Tasks { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<Task> Tasks { get; set; }
+        public DbSet<Reminder> Reminders { get; set; }
+        public DbSet<Meeting> Meetings { get; set; }
+        public DbSet<Information> Information { get; set; }
+        public DbSet<UserTaskColumn> UserTaskColumns { get; set; }
+        public DbSet<MessageSnapshot> MessageSnapshots { get; set; }
     }
 }

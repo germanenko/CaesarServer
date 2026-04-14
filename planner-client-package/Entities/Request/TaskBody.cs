@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public class CreateOrUpdateReminderBody : CreateOrUpdateJobBody
+    public class TaskBody : JobBody
     {
-        public CreateOrUpdateReminderBody()
+        public TaskBody()
         {
-            Type = "Reminder";
+            Type = TaskType.Task;
         }
-        public DateTime Date { get; set; }
-        public string Reminder { get; set; }
+
+        public List<Guid> PermormerIds { get; set; }
     }
 }

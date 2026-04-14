@@ -7,9 +7,10 @@ namespace planner_content_service.Core.Entities.Models
 {
     [JsonDerivedType(typeof(Board), Discriminator.Board)]
     [JsonDerivedType(typeof(Column), Discriminator.Column)]
-    [JsonDerivedType(typeof(Task), Discriminator.Task)]
-    public abstract class Node : ModelBase
+    [JsonDerivedType(typeof(Job), Discriminator.Task)]
+    public abstract class Node
     {
+        public Guid Id { get; set; }
         public NodeType Type { get; set; }
         public string Name { get; set; }
         public string? Props { get; set; }

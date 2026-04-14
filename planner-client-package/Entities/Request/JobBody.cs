@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public abstract class CreateOrUpdateJobBody : IRequest
+    public abstract class JobBody : IRequest
     {
         public Guid Id { get; set; }
 
@@ -21,7 +21,7 @@ namespace planner_client_package.Entities.Request
 
         public string Description { get; set; }
 
-        public string Type { get; set; }
+        public TaskType Type { get; set; }
 
         public NodeLinkBody Link { get; set; }
     }

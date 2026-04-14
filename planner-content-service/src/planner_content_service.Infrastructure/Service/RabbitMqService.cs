@@ -59,7 +59,7 @@ namespace planner_content_service.Infrastructure.Service
 
             var boards = response.Bodies.OfType<BoardBody>().ToList();
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
-            var tasks = response.Bodies.OfType<TaskBody>().ToList();
+            var tasks = response.Bodies.OfType<planner_server_package.Entities.TaskBody>().ToList();
 
             var boardBodies = boards.Select(x => new CreateOrUpdateBoardBody()
             {
@@ -97,7 +97,7 @@ namespace planner_content_service.Infrastructure.Service
             //    Status = x.Status,
             //    TaskType = x.TaskType
             //}).ToList();
-            var taskBodies = tasks.Select(x => new CreateOrUpdateReminderBody
+            var taskBodies = tasks.Select(x => new ReminderBody
             {
                 Id = x.Id,
                 Name = x.Name,

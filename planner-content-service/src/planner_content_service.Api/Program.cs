@@ -22,6 +22,8 @@ using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
+Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);
@@ -212,23 +214,6 @@ void ConfigureSwagger(IServiceCollection services)
 {
     services.AddSwaggerGen(options =>
     {
-        options.UseOneOfForPolymorphism();
-
-        options.SelectSubTypesUsing(_ => new[]
-        {
-            typeof(CreateOrUpdateMeetingBody),
-            typeof(CreateOrUpdateReminderBody)
-        });
-
-        options.SelectDiscriminatorNameUsing(_ => "type");
-
-        options.SelectDiscriminatorValueUsing(type =>
-        {
-            if (type == typeof(CreateOrUpdateMeetingBody)) return "Meeting";
-            if (type == typeof(CreateOrUpdateReminderBody)) return "Reminder";
-            return null;
-        });
-
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",

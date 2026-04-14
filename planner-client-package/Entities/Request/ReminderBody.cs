@@ -7,14 +7,13 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public class CreateOrUpdateMeetingBody : CreateOrUpdateJobBody
+    public class ReminderBody : JobBody
     {
-        public CreateOrUpdateMeetingBody()
+        public ReminderBody()
         {
-            Type = "Meeting";
+            Type = TaskType.Reminder;
         }
-        public string Theme { get; set; }
         public DateTime Date { get; set; }
-        public List<Guid> Members { get; set; }
+        public string Reminder { get; set; }
     }
 }
