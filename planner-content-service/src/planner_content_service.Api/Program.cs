@@ -215,13 +215,15 @@ void ConfigureSwagger(IServiceCollection services)
 {
     services.AddSwaggerGen(options =>
     {
-        //options.UseOneOfForPolymorphism();
-
-        //options.SelectSubTypesUsing(baseType =>
-        //{
-        //    return typeof(JobBody).Assembly.GetTypes()
-        //        .Where(x => x.IsSubclassOf(baseType));
-        //});
+        options.UseOneOfForPolymorphism();
+        options.SelectSubTypesUsing(baseType =>
+        {
+            if (baseType == typeof(JobBody))
+            {
+                return new[] { typeof(MeetingBody), typeof(ReminderBody), typeof(InformationBody), typeof(TaskBody) };
+            }
+            return Array.Empty<Type>();
+        });
 
         options.SwaggerDoc("v1", new OpenApiInfo
         {
