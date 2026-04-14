@@ -7,6 +7,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_client_package.Entities.Request;
+using planner_common_package;
 using planner_content_service.App.Service;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
@@ -215,6 +216,12 @@ void ConfigureSwagger(IServiceCollection services)
     services.AddSwaggerGen(options =>
     {
         options.UseOneOfForPolymorphism();
+
+        options.SelectDiscriminatorNameUsing(_ => Discriminator.TypeDiscriminatorPropertyName);
+        options.SelectDiscriminatorValueUsing(subType => subType.BaseType!
+            .GetCustomAttributes<JsonDerivedTypeAttribute>()
+            .FirstOrDefault(x => x.DerivedType == subType)?
+            .TypeDiscriminator!.ToString());
 
         options.SwaggerDoc("v1", new OpenApiInfo
         {
