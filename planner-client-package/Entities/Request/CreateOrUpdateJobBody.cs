@@ -11,10 +11,6 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-
-    [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
-    [JsonDerivedType(typeof(CreateOrUpdateMeetingBody), "Meeting")]
-    [JsonDerivedType(typeof(CreateOrUpdateReminderBody), "Reminder")]
     public abstract class CreateOrUpdateJobBody : IRequest
     {
         public Guid Id { get; set; }
@@ -24,6 +20,8 @@ namespace planner_client_package.Entities.Request
         public string Props { get; set; }
 
         public string Description { get; set; }
+
+        public string Type { get; set; }
 
         public NodeLinkBody Link { get; set; }
     }

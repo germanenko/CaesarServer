@@ -9,6 +9,10 @@ namespace planner_client_package.Entities.Request
 {
     public class CreateOrUpdateReminderBody : CreateOrUpdateJobBody
     {
+        public CreateOrUpdateReminderBody()
+        {
+            Type = "Reminder";
+        }
         public DateTime Date { get; set; }
         public string Reminder { get; set; }
     }
