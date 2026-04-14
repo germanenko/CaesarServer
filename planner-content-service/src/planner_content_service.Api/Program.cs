@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using planner_client_package.Entities.Request;
 using planner_content_service.App.Service;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
@@ -17,6 +18,7 @@ using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
+using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -203,6 +205,14 @@ void ConfigureSwagger(IServiceCollection services)
 {
     services.AddSwaggerGen(options =>
     {
+        options.UseOneOfForPolymorphism();
+
+        options.SelectSubTypesUsing(baseType =>
+        {
+            return typeof(CreateOrUpdateJobBody).Assembly.GetTypes()
+                .Where(x => x.IsSubclassOf(baseType));
+        });
+
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
