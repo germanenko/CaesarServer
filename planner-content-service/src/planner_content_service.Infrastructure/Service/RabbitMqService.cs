@@ -97,7 +97,7 @@ namespace planner_content_service.Infrastructure.Service
             //    Status = x.Status,
             //    TaskType = x.TaskType
             //}).ToList();
-            var taskBodies = tasks.Select(x => new CreateOrUpdateJobBody
+            var taskBodies = tasks.Select(x => new CreateOrUpdateReminderBody
             {
                 Id = x.Id,
                 Name = x.Name,
@@ -107,7 +107,7 @@ namespace planner_content_service.Infrastructure.Service
 
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
             await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);
-            await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
+            //await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
 
             return new ServiceResponse<object>()
             {

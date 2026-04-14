@@ -15,7 +15,7 @@ namespace planner_client_package.Entities.Request
     [JsonPolymorphic(TypeDiscriminatorPropertyName = "type")]
     [JsonDerivedType(typeof(CreateOrUpdateMeetingBody), "Meeting")]
     [JsonDerivedType(typeof(CreateOrUpdateReminderBody), "Reminder")]
-    public class CreateOrUpdateJobBody : IRequest
+    public abstract class CreateOrUpdateJobBody : IRequest
     {
         public Guid Id { get; set; }
 

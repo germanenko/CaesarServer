@@ -214,10 +214,11 @@ void ConfigureSwagger(IServiceCollection services)
     {
         options.UseOneOfForPolymorphism();
         options.UseAllOfForInheritance();
-        options.SelectSubTypesUsing(baseType =>
+
+        options.SelectSubTypesUsing(_ => new[]
         {
-            return typeof(CreateOrUpdateJobBody).Assembly.GetTypes()
-                .Where(x => x.IsSubclassOf(baseType));
+            typeof(CreateOrUpdateMeetingBody),
+            typeof(CreateOrUpdateReminderBody)
         });
 
         options.SelectDiscriminatorNameUsing(_ => "type");
@@ -226,7 +227,6 @@ void ConfigureSwagger(IServiceCollection services)
         {
             if (type == typeof(CreateOrUpdateMeetingBody)) return "Meeting";
             if (type == typeof(CreateOrUpdateReminderBody)) return "Reminder";
-
             return null;
         });
 
