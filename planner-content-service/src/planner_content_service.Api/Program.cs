@@ -213,7 +213,7 @@ void ConfigureSwagger(IServiceCollection services)
     services.AddSwaggerGen(options =>
     {
         options.UseOneOfForPolymorphism();
-
+        options.UseAllOfForInheritance();
         options.SelectSubTypesUsing(baseType =>
         {
             return typeof(CreateOrUpdateJobBody).Assembly.GetTypes()

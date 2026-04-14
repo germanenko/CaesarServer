@@ -9,11 +9,6 @@ namespace planner_client_package.Entities.Request
 {
     public class CreateOrUpdateMeetingBody : CreateOrUpdateJobBody
     {
-        public CreateOrUpdateMeetingBody()
-        {
-            Type = TaskType.Meeting;
-        }
-
         public string Theme { get; set; }
         public DateTime Date { get; set; }
         public List<Guid> Members { get; set; }
