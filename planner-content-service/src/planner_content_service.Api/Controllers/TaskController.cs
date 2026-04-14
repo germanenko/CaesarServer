@@ -52,10 +52,10 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
-        public async Task<IActionResult> CreateOrUpdateTask<T>(
-            [FromBody] T taskBody,
+        public async Task<IActionResult> CreateOrUpdateTask(
+            [FromBody] CreateOrUpdateJobBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        ) where T : CreateOrUpdateJobBody
+        )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
