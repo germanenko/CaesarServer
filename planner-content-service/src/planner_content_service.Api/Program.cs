@@ -214,6 +214,8 @@ void ConfigureSwagger(IServiceCollection services)
 {
     services.AddSwaggerGen(options =>
     {
+        options.UseOneOfForPolymorphism();
+
         options.SwaggerDoc("v1", new OpenApiInfo
         {
             Version = "v1",
