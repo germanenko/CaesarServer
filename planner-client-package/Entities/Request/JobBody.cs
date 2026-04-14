@@ -2,15 +2,15 @@
 using planner_common_package;
 using planner_common_package.Enums;
 using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
+    [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
+    [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
+    [JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
+    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
     public abstract class JobBody : IRequest
     {
         public Guid Id { get; set; }
