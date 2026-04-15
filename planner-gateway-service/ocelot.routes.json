@@ -861,6 +861,19 @@
             "UpstreamHttpMethod": [ "POST", "DELETE", "PATCH" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/createTaskFromMessage",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/task",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/deleted-tasks",
             "DownstreamScheme": "http",

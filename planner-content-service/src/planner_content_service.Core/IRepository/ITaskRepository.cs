@@ -8,6 +8,7 @@ namespace planner_content_service.Core.IRepository
     public interface ITaskRepository
     {
         Task<TaskBody?> AddAsync<T>(T jobBody, Guid accountId) where T : JobBody;
+        Task<TaskBody?> AddJobFromMessageAsync<T>(T jobBody, Guid accountId, Guid messageId, string snapshot) where T : JobBody;
         Task<TaskBody?> GetAsync(Guid id);
         Task<bool> RemoveAsync(Guid id);
         IEnumerable<TaskBody?>? GetAll(List<Guid> ids);

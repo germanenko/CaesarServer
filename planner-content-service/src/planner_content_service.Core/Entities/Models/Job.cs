@@ -68,7 +68,7 @@ namespace planner_content_service.Core.Entities.Models
 
     public static class JobExtensions
     {
-        public static T WithPeriod<T>(this T target, DateTime startDate, DateTime endDate) where T : Job
+        public static Job WithPeriod(this Job target, DateTime startDate, DateTime endDate)
         {
             target.StartDate = startDate;
             target.EndDate = endDate;
@@ -76,14 +76,14 @@ namespace planner_content_service.Core.Entities.Models
             return target;
         }
 
-        public static T WithColor<T>(this T target, string hexColor) where T : Job
+        public static Job WithColor(this Job target, string hexColor)
         {
             target.HexColor = hexColor;
 
             return target;
         }
 
-        public static T WithPrimarySourceMessage<T>(this T target, SourceMessage sourceMessage, string? snapshot) where T : Job
+        public static Job WithPrimarySourceMessage(this Job target, SourceMessage sourceMessage, string snapshot)
         {
             target.PrimarySourceMessage = sourceMessage;
             target.PrimarySourceMessageSnapshot = snapshot;

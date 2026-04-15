@@ -24,43 +24,6 @@ namespace planner_content_service.Infrastructure.Repository
             _jobFactory = jobFactory;
         }
 
-        //public async Task<TaskBody?> AddAsync
-        //(
-        //    JobBody jobBody,
-        //    Guid accountId
-        //)
-        //{
-        //    var taskModel = new Job(false, jobBody.Description);
-        //    taskModel.SetCommon(jobBody.Id, NodeType.Task, jobBody.Name, jobBody.Props);
-
-        //    try
-        //    {
-
-        //        var task = (await _context.Jobs.AddAsync(taskModel)).Entity;
-
-        //        await _context.SaveChangesAsync();
-
-        //        var createTaskChatEvent = new CreateTaskChatEvent
-        //        {
-        //            IsSuccess = false,
-        //            CreateTaskChat = new CreateTaskChat
-        //            {
-        //                TaskId = task.Id,
-        //                CreatorId = accountId,
-        //                ChatName = $"{task.Name} chat"
-        //            }
-        //        };
-
-        //        return jobBody;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
-
-        //        throw;
-        //    }
-        //}
-
         public async Task<TaskBody?> AddAsync<T>
         (
             T taskBody,
@@ -73,6 +36,51 @@ namespace planner_content_service.Infrastructure.Repository
 
             try
             {
+
+                var task = (await _context.AddAsync(job)).Entity;
+
+                await _context.SaveChangesAsync();
+
+                var createTaskChatEvent = new CreateTaskChatEvent
+                {
+                    IsSuccess = false,
+                    CreateTaskChat = new CreateTaskChat
+                    {
+                        TaskId = task.Id,
+                        CreatorId = accountId,
+                        ChatName = $"{task.Name} chat"
+                    }
+                };
+
+                return task.ToTaskBody();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
+
+                throw;
+            }
+        }
+
+        public async Task<TaskBody?> AddJobFromMessageAsync<T>
+        (
+            T taskBody,
+            Guid accountId,
+            Guid messageId,
+            string snapshot
+        ) where T : JobBody
+        {
+            var job = _jobFactory.Create(taskBody);
+
+            job.SetCommon(taskBody.Id, NodeType.Task, taskBody.Name, taskBody.Props);
+
+            try
+            {
+                var sourceMessage = new SourceMessage(messageId, MessageState.Normal);
+
+                await _context.SourceMessages.AddAsync(sourceMessage);
+
+                job = job.WithPrimarySourceMessage(sourceMessage, snapshot);
 
                 var task = (await _context.AddAsync(job)).Entity;
 

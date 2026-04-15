@@ -44,6 +44,11 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Errors);
         }
 
+        [HttpPost("createTaskFromMessage"), Authorize]
+        [SwaggerOperation("Создать задачу от сообщения")]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(400)]
+        [SwaggerResponse(403)]
         public async Task<IActionResult> CreateJobFromMessage(
             [FromQuery] string snapshot,
             [FromQuery] Guid messageId,
@@ -52,7 +57,7 @@ namespace planner_content_service.Api.Controllers
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
+            var result = await _taskService.CreateTaskFromMessage(tokenPayload.AccountId, taskBody, snapshot, messageId);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
