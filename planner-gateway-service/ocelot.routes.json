@@ -870,7 +870,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/api/task",
+            "UpstreamPathTemplate": "/api/createTaskFromMessage",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
