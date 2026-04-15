@@ -11,9 +11,10 @@ namespace planner_content_service.Core.Entities.Models
     [JsonDerivedType(typeof(Meeting), Discriminator.Meeting)]
     [JsonDerivedType(typeof(Task), Discriminator.Task)]
     [JsonDerivedType(typeof(Information), Discriminator.Information)]
-    public class Job : Node
+    public abstract class Job : Node
     {
         public Job(
+            JobType jobType,
             bool closeWhenChildrenCompleted,
             string? description)
         {
@@ -25,6 +26,7 @@ namespace planner_content_service.Core.Entities.Models
         public string? PrimarySourceMessageSnapshot { get; set; }
         public bool CloseWhenChildrenCompleted { get; set; }
         public string? Description { get; set; }
+        public JobType JobType { get; set; }
 
         [MaxLength(7)]
         public string? HexColor { get; set; }
@@ -43,7 +45,8 @@ namespace planner_content_service.Core.Entities.Models
                 StartDate = StartDate,
                 EndDate = EndDate,
                 Props = Props,
-                Type = Type
+                Type = Type,
+                JobType = JobType
             };
         }
 

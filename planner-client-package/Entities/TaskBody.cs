@@ -12,7 +12,7 @@ namespace planner_client_package.Entities
 
         public Status Status { get; set; }
 
-        public TaskType TaskType { get; set; }
+        public JobType JobType { get; set; }
 
         public DateTime? StartDate { get; set; }
 

@@ -11,7 +11,7 @@ namespace planner_client_package.Entities.Request
     {
         public MeetingBody()
         {
-            Type = TaskType.Meeting;
+            Type = JobType.Meeting;
         }
         public string Theme { get; set; }
         public DateTime Date { get; set; }

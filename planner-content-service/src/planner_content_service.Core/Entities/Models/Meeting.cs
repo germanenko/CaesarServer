@@ -14,9 +14,10 @@ namespace planner_content_service.Core.Entities.Models
         public Meeting(
             DateTime meetAt,
             List<Guid> memberIds,
+            JobType jobType,
             bool closeWhenChildrenCompleted,
             string? description)
-            : base(closeWhenChildrenCompleted, description)
+            : base(jobType, closeWhenChildrenCompleted, description)
         {
             MeetAt = meetAt;
             MemberIds = memberIds;

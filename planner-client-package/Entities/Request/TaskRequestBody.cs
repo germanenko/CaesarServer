@@ -11,7 +11,7 @@ namespace planner_client_package.Entities.Request
     {
         public TaskRequestBody()
         {
-            Type = TaskType.Task;
+            Type = JobType.Task;
         }
 
         public List<Guid> PermormerIds { get; set; }

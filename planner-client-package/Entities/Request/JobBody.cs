@@ -21,7 +21,7 @@ namespace planner_client_package.Entities.Request
 
         public string Description { get; set; }
 
-        public TaskType Type { get; set; }
+        public JobType Type { get; set; }
 
         public NodeLinkBody Link { get; set; }
     }

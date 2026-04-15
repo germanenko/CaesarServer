@@ -11,7 +11,7 @@ namespace planner_client_package.Entities.Request
     {
         public InformationBody()
         {
-            Type = TaskType.Information;
+            Type = JobType.Information;
         }
     }
 }

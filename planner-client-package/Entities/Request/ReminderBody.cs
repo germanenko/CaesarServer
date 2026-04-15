@@ -11,7 +11,7 @@ namespace planner_client_package.Entities.Request
     {
         public ReminderBody()
         {
-            Type = TaskType.Reminder;
+            Type = JobType.Reminder;
         }
         public DateTime Date { get; set; }
         public string Reminder { get; set; }
