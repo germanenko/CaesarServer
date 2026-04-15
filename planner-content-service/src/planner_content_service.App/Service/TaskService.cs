@@ -27,6 +27,64 @@ namespace planner_content_service.App.Service
             _publisherService = publisherService;
         }
 
+        public async Task<ServiceResponse<TaskBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobBody
+        {
+            var taskBody = new TaskBody()
+            {
+                Id = createOrUpdateJobBody.Id,
+                Name = createOrUpdateJobBody.Name,
+                Description = createOrUpdateJobBody.Description,
+                Link = createOrUpdateJobBody.Link,
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = accountId,
+                Type = NodeType.Task
+            };
+
+            CreateTaskEvent taskEvent = new CreateTaskEvent()
+            {
+                Task = BodyConverter.ClientToServerBody(taskBody),
+                CreatorId = accountId
+            };
+
+            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateTask);
+
+            if (!nodeComplete.IsSuccess)
+            {
+                return new ServiceResponse<TaskBody>
+                {
+                    IsSuccess = nodeComplete.IsSuccess,
+                    StatusCode = nodeComplete.StatusCode,
+                    Errors = nodeComplete.Errors
+                };
+            }
+
+            if (await _taskRepository.GetAsync(createOrUpdateJobBody.Id) != null)
+            {
+                var task = await UpdateTask(accountId, taskBody);
+
+                return task;
+            }
+
+            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId);
+
+            if (result == null)
+            {
+                return new ServiceResponse<TaskBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = ["Task not created"],
+                    IsSuccess = false
+                };
+            }
+
+            return new ServiceResponse<TaskBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result,
+                IsSuccess = true
+            };
+        }
+
         public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobBody
         {
             var taskBody = new TaskBody()

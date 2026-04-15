@@ -43,5 +43,21 @@ namespace planner_content_service.Api.Controllers
 
             return StatusCode((int)result.StatusCode, result.Errors);
         }
+
+        public async Task<IActionResult> CreateJobFromMessage(
+            [FromQuery] string snapshot,
+            [FromQuery] Guid messageId,
+            [FromBody] JobBody taskBody,
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode, result.Errors);
+        }
     }
 }
