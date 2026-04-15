@@ -1,4 +1,5 @@
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package;
 using planner_common_package.Enums;
 using System.ComponentModel.DataAnnotations;
@@ -12,9 +13,16 @@ namespace planner_content_service.Core.Entities.Models
     [JsonDerivedType(typeof(Information), Discriminator.Information)]
     public class Job : Node
     {
-        public Guid PrimarySourceMessageId { get; set; }
-        public MessageSnapshot PrimarySourceSnapshot { get; set; }
-        public MessageState PrimarySourceMessageState { get; set; }
+        public Job(
+            bool closeWhenChildrenCompleted,
+            string? description)
+        {
+            Description = description;
+            CloseWhenChildrenCompleted = closeWhenChildrenCompleted;
+        }
+
+        public SourceMessage? PrimarySourceMessage { get; set; }
+        public string? PrimarySourceMessageSnapshot { get; set; }
         public bool CloseWhenChildrenCompleted { get; set; }
         public string? Description { get; set; }
 
@@ -52,6 +60,32 @@ namespace planner_content_service.Core.Entities.Models
                 StartDate = StartDate,
                 EndDate = EndDate,
             };
+        }
+    }
+
+    public static class JobExtensions
+    {
+        public static T WithPeriod<T>(this T target, DateTime startDate, DateTime endDate) where T : Job
+        {
+            target.StartDate = startDate;
+            target.EndDate = endDate;
+
+            return target;
+        }
+
+        public static T WithColor<T>(this T target, string hexColor) where T : Job
+        {
+            target.HexColor = hexColor;
+
+            return target;
+        }
+
+        public static T WithPrimarySourceMessage<T>(this T target, SourceMessage sourceMessage, string? snapshot) where T : Job
+        {
+            target.PrimarySourceMessage = sourceMessage;
+            target.PrimarySourceMessageSnapshot = snapshot;
+
+            return target;
         }
     }
 }

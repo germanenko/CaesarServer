@@ -1,7 +1,9 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
+using planner_content_service.Core.IFactory;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Infrastructure.Data;
 using planner_server_package.Events;
@@ -13,35 +15,66 @@ namespace planner_content_service.Infrastructure.Repository
     {
         private readonly ContentDbContext _context;
         private readonly IPublisherService _publisherService;
+        private readonly IJobFactory _jobFactory;
 
-        public TaskRepository(ContentDbContext context, IPublisherService publisherService)
+        public TaskRepository(ContentDbContext context, IPublisherService publisherService, IJobFactory jobFactory)
         {
             _context = context;
             _publisherService = publisherService;
+            _jobFactory = jobFactory;
         }
 
-        public async Task<TaskBody?> AddAsync
+        //public async Task<TaskBody?> AddAsync
+        //(
+        //    JobBody jobBody,
+        //    Guid accountId
+        //)
+        //{
+        //    var taskModel = new Job(false, jobBody.Description);
+        //    taskModel.SetCommon(jobBody.Id, NodeType.Task, jobBody.Name, jobBody.Props);
+
+        //    try
+        //    {
+
+        //        var task = (await _context.Jobs.AddAsync(taskModel)).Entity;
+
+        //        await _context.SaveChangesAsync();
+
+        //        var createTaskChatEvent = new CreateTaskChatEvent
+        //        {
+        //            IsSuccess = false,
+        //            CreateTaskChat = new CreateTaskChat
+        //            {
+        //                TaskId = task.Id,
+        //                CreatorId = accountId,
+        //                ChatName = $"{task.Name} chat"
+        //            }
+        //        };
+
+        //        return jobBody;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
+
+        //        throw;
+        //    }
+        //}
+
+        public async Task<TaskBody?> AddAsync<T>
         (
-            TaskBody taskBody,
+            T taskBody,
             Guid accountId
-        )
+        ) where T : JobBody
         {
-            var taskModel = new Core.Entities.Models.Job()
-            {
-                Id = taskBody.Id,
-                Name = taskBody.Name,
-                Type = NodeType.Task,
-                Description = taskBody.Description,
-                EndDate = taskBody.EndDate,
-                HexColor = taskBody.HexColor,
-                Props = taskBody.Props,
-                StartDate = taskBody.StartDate
-            };
+            var job = _jobFactory.Create(taskBody);
+
+            job.SetCommon(taskBody.Id, NodeType.Task, taskBody.Name, taskBody.Props);
 
             try
             {
 
-                var task = (await _context.Jobs.AddAsync(taskModel)).Entity;
+                var task = (await _context.AddAsync(job)).Entity;
 
                 await _context.SaveChangesAsync();
 
@@ -56,7 +89,7 @@ namespace planner_content_service.Infrastructure.Repository
                     }
                 };
 
-                return taskBody;
+                return task.ToTaskBody();
             }
             catch (Exception ex)
             {

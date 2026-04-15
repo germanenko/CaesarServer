@@ -1,5 +1,4 @@
 using DotNetEnv;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +6,9 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_client_package.Entities.Request;
-using planner_common_package;
+using planner_content_service.App.Factory;
 using planner_content_service.App.Service;
+using planner_content_service.Core.IFactory;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
@@ -19,7 +19,6 @@ using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
-using System.Reflection;
 using System.Text;
 using System.Text.Json.Serialization;
 
@@ -130,6 +129,8 @@ void ConfigureServices(IServiceCollection services)
             builder.MigrationsAssembly("planner_content_service.Api");
         });
     });
+
+    services.AddScoped<IJobFactory, JobFactory>();
 
     services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IUserService, UserService>();

@@ -20,9 +20,9 @@ namespace planner_content_service.Infrastructure.Configurations
             builder.Property(t => t.HexColor)
                 .HasMaxLength(7);
 
-            builder.HasOne(x => x.PrimarySourceSnapshot)
+            builder.HasOne(x => x.PrimarySourceMessage)
                 .WithMany()
-                .HasForeignKey("snapshot_id")
+                .HasForeignKey("message_source_id")
                 .OnDelete(DeleteBehavior.SetNull);
 
             builder.HasIndex(t => t.StartDate);

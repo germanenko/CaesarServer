@@ -15,6 +15,14 @@ namespace planner_content_service.Core.Entities.Models
         public string Name { get; set; }
         public string? Props { get; set; }
 
+        public void SetCommon(Guid? id, NodeType nodeType, string name, string? props = null)
+        {
+            Id = id ?? Guid.NewGuid();
+            Type = nodeType;
+            Name = name;
+            Props = props;
+        }
+
         public abstract NodeBody ToNodeBody();
     }
 }

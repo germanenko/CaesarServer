@@ -8,5 +8,8 @@ namespace planner_content_service.Core.Entities.Models
 {
     public class Information : Job
     {
+        public Information(bool closeWhenChildrenCompleted, string? description) : base(closeWhenChildrenCompleted, description)
+        {
+        }
     }
 }

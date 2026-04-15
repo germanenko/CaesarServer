@@ -24,31 +24,9 @@ namespace planner_content_service.Api.Controllers
             _jwtService = jwtService;
         }
 
-        [HttpPost("сreateTaskBasedOnMessage"), Authorize]
-        [SwaggerOperation("Создать задачу на основе сообщения")]
-        [SwaggerResponse(200, Type = typeof(planner_client_package.Entities.TaskBody))]
-        [SwaggerResponse(400)]
-        [SwaggerResponse(403)]
-
-        public async Task<IActionResult> CreateOrUpdateTask(
-            [FromQuery] Guid messageId,
-            [FromQuery] Guid columnId,
-            [FromQuery] string taskName,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateTaskFromMessage(tokenPayload.AccountId, messageId, columnId, taskName);
-
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
-
         [HttpPost("task"), Authorize]
         [SwaggerOperation("Создать/обновить задачу")]
-        [SwaggerResponse(200, Type = typeof(planner_client_package.Entities.TaskBody))]
+        [SwaggerResponse(200, Type = typeof(TaskBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
