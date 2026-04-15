@@ -14,9 +14,9 @@ namespace planner_content_service.Core.Entities.Models
             string? description)
             : base(closeWhenChildrenCompleted, description)
         {
-            PermormerIds = performerIds;
+            PerformerIds = performerIds;
         }
 
-        public List<Guid> PermormerIds { get; set; }
+        public List<Guid> PerformerIds { get; set; }
     }
 }

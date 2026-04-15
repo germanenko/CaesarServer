@@ -17,7 +17,7 @@ namespace planner_content_service.Infrastructure.Configurations
 
             builder.ToTable("Tasks");
 
-            builder.Property(e => e.PermormerIds)
+            builder.Property(e => e.PerformerIds)
                 .HasConversion(
                     v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
                     v => JsonSerializer.Deserialize<List<Guid>>(v, (JsonSerializerOptions?)null) ?? new List<Guid>(),

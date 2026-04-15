@@ -9,10 +9,10 @@ namespace planner_content_service.Core.Entities.Models
 {
     public class SourceMessage
     {
-        public SourceMessage(Guid id, MessageState state)
+        public SourceMessage(Guid messageId, MessageState messageState)
         {
-            MessageId = id;
-            MessageState = state;
+            MessageId = messageId;
+            MessageState = messageState;
         }
 
         public Guid MessageId { get; set; }
