@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public class TaskBody : JobBody
+    public class TaskRequestBody : JobBody
     {
-        public TaskBody()
+        public TaskRequestBody()
         {
             Type = TaskType.Task;
         }

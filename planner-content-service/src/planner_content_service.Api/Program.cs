@@ -220,7 +220,7 @@ void ConfigureSwagger(IServiceCollection services)
         {
             if (baseType == typeof(JobBody))
             {
-                return new[] { typeof(MeetingBody), typeof(ReminderBody), typeof(InformationBody), typeof(TaskBody) };
+                return new[] { typeof(MeetingBody), typeof(ReminderBody), typeof(InformationBody), typeof(TaskRequestBody) };
             }
             return Array.Empty<Type>();
         });

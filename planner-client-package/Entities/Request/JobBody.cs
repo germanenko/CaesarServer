@@ -10,7 +10,7 @@ namespace planner_client_package.Entities.Request
     [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
     [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
     [JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
-    [JsonDerivedType(typeof(TaskBody), Discriminator.TaskRequest)]
+    [JsonDerivedType(typeof(TaskRequestBody), Discriminator.TaskRequest)]
     public abstract class JobBody : IRequest
     {
         public Guid Id { get; set; }
