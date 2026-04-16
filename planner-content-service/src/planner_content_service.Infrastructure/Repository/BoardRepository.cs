@@ -53,7 +53,11 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, Guid? chatId)
         {
-            return (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId))).Entity.ColumnId;
+            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId))).Entity.ColumnId;
+
+            await _context.SaveChangesAsync();
+
+            return result;
         }
 
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)
