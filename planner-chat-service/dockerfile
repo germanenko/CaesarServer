@@ -30,6 +30,6 @@ WORKDIR /app
 
 COPY --from=build /app/out .
 
-COPY planner-chat-service/src/key.json ./key.json
+COPY planner-chat-service/key.json ./key.json
 
 ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]
