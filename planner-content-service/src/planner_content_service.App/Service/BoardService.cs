@@ -363,7 +363,7 @@ namespace planner_content_service.App.Service
                 return new ServiceResponse<List<ColumnBody>>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
+                    StatusCode = HttpStatusCode.NotFound
                 };
             }
 
