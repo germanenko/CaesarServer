@@ -337,7 +337,7 @@ namespace planner_content_service.App.Service
 
             var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, columnId, null);
 
-            if (existingTaskColumn == null)
+            if (existingTaskColumn != null)
                 return new ServiceResponse<Guid>
                 {
                     IsSuccess = false,
