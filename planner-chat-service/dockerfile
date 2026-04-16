@@ -1,36 +1,32 @@
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
 
-COPY NuGet.config .
+COPY NuGet.config ./
 COPY nuget-local ./nuget-local
 
 COPY planner-chat-service/planner_chat_service.sln .
 
-COPY planner-chat-service/src/planner_chat_service.Core/*.csproj planner_chat_service.Core/
-COPY planner-chat-service/src/planner_chat_service.App/*.csproj planner_chat_service.App/
-COPY planner-chat-service/src/planner_chat_service.Infrastructure/*.csproj planner_chat_service.Infrastructure/
-COPY planner-chat-service/src/planner_chat_service.Api/*.csproj planner_chat_service.Api/
+COPY planner-chat-service/src/planner_chat_service.Core/*.csproj src/planner_chat_service.Core/
+COPY planner-chat-service/src/planner_chat_service.App/*.csproj src/planner_chat_service.App/
+COPY planner-chat-service/src/planner_chat_service.Infrastructure/*.csproj src/planner_chat_service.Infrastructure/
+COPY planner-chat-service/src/planner_chat_service.Api/*.csproj src/planner_chat_service.Api/
 
 RUN dotnet restore planner_chat_service.sln
 
-# весь код + key.json
-COPY planner-chat-service/src .
+COPY planner-chat-service/src ./src
 
-RUN dotnet build planner_chat_service.Api/planner_chat_service.Api.csproj \
-    -c Release --no-restore
+RUN dotnet build src/planner_chat_service.Api/planner_chat_service.Api.csproj \
+  -c Release --no-restore
 
-RUN dotnet publish planner_chat_service.Api/planner_chat_service.Api.csproj \
-    -c Release \
-    -o /app/out \
-    --no-build \
-    /p:UseAppHost=false
+RUN dotnet publish src/planner_chat_service.Api/planner_chat_service.Api.csproj \
+  -c Release \
+  -o /app/out \
+  --no-build \
+  /p:UseAppHost=false
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /app
-
 COPY --from=build /app/out .
-
 COPY --from=build /src/key.json ./key.json
-
 ENTRYPOINT ["dotnet", "planner_chat_service.Api.dll"]
