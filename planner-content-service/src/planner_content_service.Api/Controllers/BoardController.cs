@@ -141,7 +141,7 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("getDefaultColumns"), Authorize]
+        [HttpGet("getDefaultColumns"), Authorize]
         [SwaggerOperation("Получить колонки по умолчанию")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetDefaultColumns(
