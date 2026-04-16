@@ -8,9 +8,17 @@ namespace planner_content_service.Core.Entities.Models
 {
     public class UserTaskColumn
     {
+        public UserTaskColumn(Guid accountId, Guid columnId, Guid? chatId = null)
+        {
+            AccountId = accountId;
+            ColumnId = columnId;
+            ChatId = chatId;
+        }
+
         public Guid Id { get; set; }
         public Guid AccountId { get; set; }
         public Guid ColumnId { get; set; }
+        public Column Column { get; set; }
         public Guid? ChatId { get; set; }
     }
 }

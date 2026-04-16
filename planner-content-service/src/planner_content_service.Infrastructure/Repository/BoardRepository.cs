@@ -34,6 +34,28 @@ namespace planner_content_service.Infrastructure.Repository
             return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId))?.ToBoardBody();
         }
 
+        public async Task<ColumnBody?> GetColumnById(Guid columnId)
+        {
+            return (await _context.Columns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == columnId))?.ToColumnBody();
+        }
+
+        public async Task<Guid?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId)
+        {
+            return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId))?.Id;
+        }
+
+        public async Task<List<ColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId)
+        {
+            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).Select(x => x.Column).ToListAsync();
+
+            return taskColumns.Select(x => x.ToColumnBody()).ToList();
+        }
+
+        public async Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, Guid? chatId)
+        {
+            return (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId))).Entity.ColumnId;
+        }
+
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)
         {
             try

@@ -61,7 +61,6 @@ namespace planner_content_service.Api.Controllers
         [SwaggerOperation("Создать доски")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
-
         public async Task<IActionResult> CreateOrUpdateBoards(
             List<CreateOrUpdateBoardBody> boardBodies,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
@@ -79,7 +78,6 @@ namespace planner_content_service.Api.Controllers
         [HttpPost("board/column"), Authorize]
         [SwaggerOperation("Создать колонку")]
         [SwaggerResponse(200)]
-
         public async Task<IActionResult> CreateOrUpdateColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             ColumnBody column
@@ -106,7 +104,6 @@ namespace planner_content_service.Api.Controllers
         [HttpPost("board/createColumns"), Authorize]
         [SwaggerOperation("Создать колонки")]
         [SwaggerResponse(200)]
-
         public async Task<IActionResult> CreateOrUpdateColumns(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             List<ColumnBody> columns
@@ -114,6 +111,46 @@ namespace planner_content_service.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _boardService.CreateOrUpdateColumns(tokenPayload.AccountId, columns);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("addDefaultColumn"), Authorize]
+        [SwaggerOperation("Добавить колонку по умолчанию")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> AddDefaultColumn(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid columnId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, columnId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("addDefaultColumnForChat"), Authorize]
+        [SwaggerOperation("Добавить колонку по умолчанию для чата")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> AddDefaultColumnForChat(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid columnId,
+            [FromQuery] Guid chatId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _boardService.AddDefaultColumnForChat(tokenPayload.AccountId, columnId, chatId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPost("getDefaultColumns"), Authorize]
+        [SwaggerOperation("Получить колонки по умолчанию")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GetDefaultColumns(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid? chatId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, chatId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

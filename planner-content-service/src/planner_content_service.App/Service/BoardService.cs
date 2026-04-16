@@ -1,4 +1,5 @@
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_client_package.Interface;
@@ -310,6 +311,67 @@ namespace planner_content_service.App.Service
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
                 Body = result
+            };
+        }
+
+        public async Task<ServiceResponse<Guid>> AddDefaultColumn(Guid accountId, Guid columnId)
+        {
+            return await AddDefaultColumnInternal(accountId, columnId);
+        }
+
+        public async Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId)
+        {
+            return await AddDefaultColumnInternal(accountId, columnId, chatId);
+        }
+
+        private async Task<ServiceResponse<Guid>> AddDefaultColumnInternal(Guid accountId, Guid columnId, Guid? chatId = null)
+        {
+            var existingColumn = await _boardRepository.GetColumnById(columnId);
+
+            if (existingColumn == null)
+                return new ServiceResponse<Guid>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, columnId, null);
+
+            if (existingTaskColumn == null)
+                return new ServiceResponse<Guid>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+
+            var taskColumnId = await _boardRepository.AddTaskColumn(accountId, columnId);
+
+            return new ServiceResponse<Guid>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = taskColumnId
+            };
+        }
+
+        public async Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId)
+        {
+            var columns = await _boardRepository.GetUserTaskColumns(accountId, chatId);
+
+            if (columns.IsNullOrEmpty())
+            {
+                return new ServiceResponse<List<ColumnBody>>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest
+                };
+            }
+
+            return new ServiceResponse<List<ColumnBody>>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = columns
             };
         }
     }

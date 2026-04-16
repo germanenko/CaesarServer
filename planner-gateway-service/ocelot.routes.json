@@ -874,6 +874,45 @@
             "UpstreamHttpMethod": [ "POST" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/addDefaultColumn",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/addDefaultColumn",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/addDefaultColumnForChat",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/addDefaultColumnForChat",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/getDefaultColumns",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8889
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getDefaultColumns",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/deleted-tasks",
             "DownstreamScheme": "http",
