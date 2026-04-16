@@ -120,7 +120,7 @@ namespace planner_server_package.Converters
                 EndDate = body.EndDate,
                 HexColor = body.HexColor,
                 PriorityOrder = body.PriorityOrder,
-                TaskType = body.TaskType,
+                JobType = body.JobType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
                 AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
@@ -148,7 +148,7 @@ namespace planner_server_package.Converters
                 Description = body.Description,
                 EndDate = body.EndDate,
                 HexColor = body.HexColor,
-                TaskType = body.TaskType,
+                JobType = body.JobType,
                 PriorityOrder = body.PriorityOrder,
                 Version = body.Version
             };
