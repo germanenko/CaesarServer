@@ -60,6 +60,18 @@ namespace planner_content_service.Infrastructure.Repository
             return result;
         }
 
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        {
+            var messages = await _context.Jobs.Where(x => x.PrimarySourceMessageId == messageId).ToListAsync();
+
+            foreach (var message in messages)
+            {
+                message.PrimarySourceMessageState = state;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)
         {
             try

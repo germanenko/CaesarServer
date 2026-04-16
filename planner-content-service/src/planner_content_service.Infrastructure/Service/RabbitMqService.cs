@@ -30,7 +30,8 @@ namespace planner_content_service.Infrastructure.Service
             IPublisherService publisherService,
             ILogger<RabbitMQServiceBase> logger,
             string contentNodes,
-            string accountCreated)
+            string accountCreated,
+            string messageEditedExchange)
             : base(hostname, userName, password, prefix, logger)
         {
             _serviceFactory = serviceFactory;
@@ -39,6 +40,7 @@ namespace planner_content_service.Infrastructure.Service
 
             AddQueue(contentNodes, HandleContentNodes);
             AddQueue(accountCreated, HandleAccountCreated);
+            AddQueue(messageEditedExchange, HandleMessageEdited);
 
             InitializeRabbitMQ();
         }
@@ -150,6 +152,28 @@ namespace planner_content_service.Infrastructure.Service
             };
 
             await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id);
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
+        private async Task<ServiceResponse<object>> HandleMessageEdited(string message)
+        {
+            using var scope = _serviceFactory.CreateScope();
+            var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
+            var response = JsonSerializer.Deserialize<MessageEditedEvent>(message);
+            if (response == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            await boardService.SetMessageEdited(response.MessageId, response.State);
 
             return new ServiceResponse<object>()
             {

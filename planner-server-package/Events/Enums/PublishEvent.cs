@@ -22,6 +22,7 @@ namespace planner_server_package.Events.Enums
         CheckAccess,
         AccessRevoked,
         SendNotification,
-        GetGoogleToken
+        GetGoogleToken,
+        MessageEdited
     }
 }

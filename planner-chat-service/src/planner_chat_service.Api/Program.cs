@@ -45,6 +45,7 @@ void ConfigureServices(IServiceCollection services)
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
     var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
+    var messageEditedExchange = GetEnvVar("RABBITMQ_MESSAGE_EDITED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -135,6 +136,7 @@ void ConfigureServices(IServiceCollection services)
                 { PublishEvent.CheckAccess, checkAccessExchange },
                 { PublishEvent.SendNotification, sendNotificationExchange },
                 { PublishEvent.GetGoogleToken, getGoogleTokenExchange },
+                { PublishEvent.MessageEdited, messageEditedExchange }
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));

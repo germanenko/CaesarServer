@@ -17,5 +17,6 @@ namespace planner_content_service.Core.IRepository
         Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId);
         Task<bool> DeleteNode(Guid nodeId, Guid accountId);
         Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, Guid? chatId = null);
+        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
     }
 }

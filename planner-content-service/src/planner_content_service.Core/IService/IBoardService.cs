@@ -1,5 +1,6 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_server_package;
 using planner_server_package.Entities;
@@ -18,5 +19,6 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<Guid>> AddDefaultColumn(Guid accountId, Guid columnId);
         Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId);
         Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId);
+        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
     }
 }

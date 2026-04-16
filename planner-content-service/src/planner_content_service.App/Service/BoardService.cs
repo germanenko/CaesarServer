@@ -374,5 +374,10 @@ namespace planner_content_service.App.Service
                 Body = columns
             };
         }
+
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        {
+            await _boardRepository.SetMessageEdited(messageId, state);
+        }
     }
 }

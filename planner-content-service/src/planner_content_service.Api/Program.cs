@@ -56,6 +56,7 @@ void ConfigureServices(IServiceCollection services)
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
+    var messageEditedExchange = GetEnvVar("RABBITMQ_MESSAGE_EDITED_EXCHANGE");
 
 
     builder.Services.ConfigureHttpJsonOptions(options =>
@@ -169,7 +170,8 @@ void ConfigureServices(IServiceCollection services)
         sp.GetRequiredService<IPublisherService>(),
         sp.GetRequiredService<ILogger<RabbitMqService>>(),
         contentNodesExchange,
-        accountCreatedExchange
+        accountCreatedExchange,
+        messageEditedExchange
     ));
 }
 

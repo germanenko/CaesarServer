@@ -207,6 +207,10 @@ namespace planner_chat_service.App.Service
                     };
                 }
 
+                var messageEditedEvent = new MessageEditedEvent(message.Id, MessageState.Edited);
+
+                await _notifyService.Publish(messageEditedEvent, PublishEvent.MessageEdited);
+
                 return new ServiceResponse<MessageBody>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -255,6 +259,10 @@ namespace planner_chat_service.App.Service
                     };
                 }
 
+                var messageEditedEvent = new MessageEditedEvent(message.Id, MessageState.Deleted);
+
+                await _notifyService.Publish(messageEditedEvent, PublishEvent.MessageEdited);
+
                 return new ServiceResponse<MessageBody>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -302,6 +310,10 @@ namespace planner_chat_service.App.Service
                         Errors = new[] { "Не удалось удалить сообщение" }
                     };
                 }
+
+                var messageEditedEvent = new MessageEditedEvent(message.Id, MessageState.Deleted);
+
+                await _notifyService.Publish(messageEditedEvent, PublishEvent.MessageEdited);
 
                 return new ServiceResponse<MessageBody>
                 {
