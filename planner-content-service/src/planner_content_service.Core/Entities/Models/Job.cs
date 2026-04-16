@@ -21,7 +21,8 @@ namespace planner_content_service.Core.Entities.Models
             CloseWhenChildrenCompleted = closeWhenChildrenCompleted;
         }
 
-        public SourceMessage? PrimarySourceMessage { get; set; }
+        public Guid? PrimarySourceMessageId { get; set; }
+        public MessageState? PrimarySourceMessageState { get; set; }
         public string? PrimarySourceMessageSnapshot { get; set; }
         public bool CloseWhenChildrenCompleted { get; set; }
         public string? Description { get; set; }
@@ -82,10 +83,11 @@ namespace planner_content_service.Core.Entities.Models
             return target;
         }
 
-        public static Job WithPrimarySourceMessage(this Job target, SourceMessage sourceMessage, string snapshot)
+        public static Job WithPrimarySourceMessage(this Job target, Guid sourceMessageId, string snapshot)
         {
-            target.PrimarySourceMessage = sourceMessage;
+            target.PrimarySourceMessageId = sourceMessageId;
             target.PrimarySourceMessageSnapshot = snapshot;
+            target.PrimarySourceMessageState = MessageState.Normal;
 
             return target;
         }

@@ -76,11 +76,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             try
             {
-                var sourceMessage = new SourceMessage(messageId, MessageState.Normal);
-
-                await _context.SourceMessages.AddAsync(sourceMessage);
-
-                job = job.WithPrimarySourceMessage(sourceMessage, snapshot);
+                job = job.WithPrimarySourceMessage(messageId, snapshot);
 
                 var task = (await _context.AddAsync(job)).Entity;
 

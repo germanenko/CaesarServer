@@ -44,6 +44,5 @@ namespace planner_content_service.Infrastructure.Data
         public DbSet<Meeting> Meetings { get; set; }
         public DbSet<Information> Information { get; set; }
         public DbSet<UserTaskColumn> UserTaskColumns { get; set; }
-        public DbSet<SourceMessage> SourceMessages { get; set; }
     }
 }
