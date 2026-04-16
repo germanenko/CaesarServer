@@ -11,11 +11,11 @@ namespace planner_content_service.Core.Entities.Models
     {
         public Task(
             List<Guid> performerIds,
-            JobType jobType,
             bool closeWhenChildrenCompleted,
             string? description)
-            : base(jobType, closeWhenChildrenCompleted, description)
+            : base(closeWhenChildrenCompleted, description)
         {
+            JobType = JobType.Task;
             PerformerIds = performerIds;
         }
 

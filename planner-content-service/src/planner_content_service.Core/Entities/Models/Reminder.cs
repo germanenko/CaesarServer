@@ -11,11 +11,11 @@ namespace planner_content_service.Core.Entities.Models
     {
         public Reminder(
             DateTime remindAt,
-            JobType jobType,
             bool closeWhenChildrenCompleted,
             string? description)
-            : base(jobType, closeWhenChildrenCompleted, description)
+            : base(closeWhenChildrenCompleted, description)
         {
+            JobType = JobType.Reminder;
             RemindAt = remindAt;
         }
 

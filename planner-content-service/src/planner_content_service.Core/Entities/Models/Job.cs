@@ -14,7 +14,6 @@ namespace planner_content_service.Core.Entities.Models
     public abstract class Job : Node
     {
         public Job(
-            JobType jobType,
             bool closeWhenChildrenCompleted,
             string? description)
         {

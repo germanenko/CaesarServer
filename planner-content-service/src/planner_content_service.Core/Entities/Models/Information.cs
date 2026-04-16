@@ -9,8 +9,9 @@ namespace planner_content_service.Core.Entities.Models
 {
     public class Information : Job
     {
-        public Information(JobType jobType, bool closeWhenChildrenCompleted, string? description) : base(jobType, closeWhenChildrenCompleted, description)
+        public Information(bool closeWhenChildrenCompleted, string? description) : base(closeWhenChildrenCompleted, description)
         {
+            JobType = JobType.Information;
         }
     }
 }
