@@ -59,7 +59,7 @@ namespace planner_content_service.Infrastructure.Service
 
             var boards = response.Bodies.OfType<BoardBody>().ToList();
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
-            var tasks = response.Bodies.OfType<planner_server_package.Entities.TaskBody>().ToList();
+            var tasks = response.Bodies.OfType<planner_server_package.Entities.JobBody>().ToList();
 
             var boardBodies = boards.Select(x => new CreateOrUpdateBoardBody()
             {

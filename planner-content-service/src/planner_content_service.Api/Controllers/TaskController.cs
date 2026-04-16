@@ -6,6 +6,8 @@ using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
+using JobBody = planner_client_package.Entities.JobBody;
+using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.Api.Controllers
 {
@@ -26,12 +28,12 @@ namespace planner_content_service.Api.Controllers
 
         [HttpPost("task"), Authorize]
         [SwaggerOperation("Создать/обновить задачу")]
-        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(200, Type = typeof(JobBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] JobBody taskBody,
+            [FromBody] JobRequestBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -46,13 +48,13 @@ namespace planner_content_service.Api.Controllers
 
         [HttpPost("createTaskFromMessage"), Authorize]
         [SwaggerOperation("Создать задачу от сообщения")]
-        [SwaggerResponse(200, Type = typeof(TaskBody))]
+        [SwaggerResponse(200, Type = typeof(JobBody))]
         [SwaggerResponse(400)]
         [SwaggerResponse(403)]
         public async Task<IActionResult> CreateJobFromMessage(
             [FromQuery] string snapshot,
             [FromQuery] Guid messageId,
-            [FromBody] JobBody taskBody,
+            [FromBody] JobRequestBody taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {

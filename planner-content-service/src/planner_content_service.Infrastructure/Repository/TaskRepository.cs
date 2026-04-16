@@ -8,6 +8,8 @@ using planner_content_service.Core.IRepository;
 using planner_content_service.Infrastructure.Data;
 using planner_server_package.Events;
 using planner_server_package.RabbitMQ;
+using JobBody = planner_client_package.Entities.JobBody;
+using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -24,15 +26,15 @@ namespace planner_content_service.Infrastructure.Repository
             _jobFactory = jobFactory;
         }
 
-        public async Task<TaskBody?> AddAsync<T>
+        public async Task<JobBody?> AddAsync<T>
         (
             T taskBody,
             Guid accountId
-        ) where T : JobBody
+        ) where T : JobRequestBody
         {
             var job = _jobFactory.Create(taskBody);
 
-            job.SetCommon(taskBody.Id, NodeType.Task, taskBody.Name, taskBody.Props);
+            job.SetCommon(taskBody.Id, NodeType.Job, taskBody.Name, taskBody.Props);
 
             try
             {
@@ -62,17 +64,17 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<TaskBody?> AddJobFromMessageAsync<T>
+        public async Task<JobBody?> AddJobFromMessageAsync<T>
         (
             T taskBody,
             Guid accountId,
             Guid messageId,
             string snapshot
-        ) where T : JobBody
+        ) where T : JobRequestBody
         {
             var job = _jobFactory.Create(taskBody);
 
-            job.SetCommon(taskBody.Id, NodeType.Task, taskBody.Name, taskBody.Props);
+            job.SetCommon(taskBody.Id, NodeType.Job, taskBody.Name, taskBody.Props);
 
             try
             {
@@ -103,10 +105,10 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public IEnumerable<TaskBody?>? GetAll(List<Guid> ids)
+        public IEnumerable<JobBody?>? GetAll(List<Guid> ids)
         {
             var result = _context.Nodes
-                .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Task)
+                .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Job)
                 .Select(x => x as Core.Entities.Models.Job)
                 .AsEnumerable();
 
@@ -114,7 +116,7 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<TaskBody?> GetAsync(Guid id)
+        public async Task<JobBody?> GetAsync(Guid id)
             => (await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id))?.ToTaskBody();
 
@@ -129,10 +131,10 @@ namespace planner_content_service.Infrastructure.Repository
             return true;
         }
 
-        public async Task<TaskBody?> UpdateAsync(
+        public async Task<JobBody?> UpdateAsync(
             Guid id,
             Guid accountId,
-            TaskBody updatedNode,
+            JobBody updatedNode,
             DateTime changeDate)
         {
             var task = await _context.Tasks

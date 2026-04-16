@@ -30,9 +30,7 @@ namespace planner_node_service.Infrastructure.Service
             IWebSocketService notificationService,
             string queue,
             string createPersonalChatQueue,
-            string createBoard,
-            string createColumn,
-            string createTask,
+            string createNode,
             string getUsersWithEnabledNotifications,
             string checkAccess,
             string deleteNode)
@@ -46,9 +44,7 @@ namespace planner_node_service.Infrastructure.Service
 
             AddQueue(queue, HandleSendMessage);
             AddQueue(createPersonalChatQueue, HandleNewChat);
-            AddQueue(createBoard, HandleNewBoard);
-            AddQueue(createColumn, HandleNewColumn);
-            AddQueue(createTask, HandleNewTask);
+            AddQueue(createNode, HandleNewNode);
             AddQueue(getUsersWithEnabledNotifications, HandleGetNotificationSettings);
             AddQueue(checkAccess, CheckAccess);
             AddQueue(deleteNode, DeleteNode);
@@ -157,11 +153,13 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<ServiceResponse<object>> HandleNewBoard(string message)
-        {
-            var result = JsonSerializer.Deserialize<CreateBoardEvent>(message);
 
-            _logger.LogInformation($"NodeService received new board: {message}");
+
+        private async Task<ServiceResponse<object>> HandleNewNode(string message)
+        {
+            var result = JsonSerializer.Deserialize<CreateNodeEvent>(message);
+
+            _logger.LogInformation($"NodeService received new node: {message}");
 
             if (result == null)
             {
@@ -175,59 +173,15 @@ namespace planner_node_service.Infrastructure.Service
 
             try
             {
-                _logger.LogInformation($"{result.Board}");
-
-                using var scope = _scopeFactory.CreateScope();
-                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
-                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-                var notificationService = scope.ServiceProvider.GetRequiredService<INotificationService>();
-
-                var board = await nodeService.AddOrUpdateScope(BodyConverter.ServerToClientBody(result.Board));
-
-                _logger.LogInformation(JsonSerializer.Serialize(board));
-
-                //await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = result.CreatorId, NodeId = result.Board.Id, NotificationsEnabled = true });
-
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = true,
-                    Body = board.Body
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding board node");
-                throw;
-            }
-        }
-
-        private async Task<ServiceResponse<object>> HandleNewColumn(string message)
-        {
-            var result = JsonSerializer.Deserialize<CreateColumnEvent>(message);
-
-            _logger.LogInformation($"NodeService received new column: {message}");
-
-            if (result == null)
-            {
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
-                    Errors = new[] { "Ошибка сервера" }
-                };
-            }
-
-            try
-            {
-                _logger.LogInformation($"{result.Column}");
+                _logger.LogInformation($"{result.Node}");
 
                 using var scope = _scopeFactory.CreateScope();
                 var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
                 var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
 
-                if (result.Column.Link != null)
+                if (result.Node.Link != null)
                 {
-                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Column.Link.ParentId, Permission.Write)).Body;
+                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Node.Link.ParentId, Permission.Write)).Body;
 
                     if (!hasAccess)
                     {
@@ -239,7 +193,7 @@ namespace planner_node_service.Infrastructure.Service
                         };
                     }
 
-                    await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Column));
+                    await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Node));
                 }
 
                 return new ServiceResponse<object>()
@@ -254,60 +208,6 @@ namespace planner_node_service.Infrastructure.Service
             }
         }
 
-        private async Task<ServiceResponse<object>> HandleNewTask(string message)
-        {
-            var result = JsonSerializer.Deserialize<CreateTaskEvent>(message);
-
-            _logger.LogInformation($"NodeService received new task: {message}");
-
-            if (result == null)
-            {
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
-                    Errors = new[] { "Ошибка сервера" }
-                };
-            }
-
-            try
-            {
-                _logger.LogInformation($"{result.Task}");
-
-                using var scope = _scopeFactory.CreateScope();
-                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
-                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-
-                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Task));
-
-                if (result.Task.Link != null)
-                {
-                    var can = (await accessService.CheckAccess(result.CreatorId, result.Task.Link.ParentId, Permission.Write)).Body;
-
-                    if (!can)
-                    {
-                        return new ServiceResponse<object>()
-                        {
-                            IsSuccess = false,
-                            StatusCode = System.Net.HttpStatusCode.Forbidden,
-                            Errors = new[] { "Нет доступа" }
-                        };
-                    }
-
-                    //await nodeService.AddOrUpdateNodeLink(BodyConverter.ServerToClientBody(result.Task.Link));
-                }
-
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = true
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding task node");
-                throw;
-            }
-        }
 
         private async Task<ServiceResponse<object>> HandleGetNotificationSettings(string message)
         {

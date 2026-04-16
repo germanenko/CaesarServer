@@ -9,7 +9,7 @@ namespace planner_server_package.Entities
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
     [JsonDerivedType(typeof(BoardBody), Discriminator.Board)]
     [JsonDerivedType(typeof(ColumnBody), Discriminator.Column)]
-    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
+    [JsonDerivedType(typeof(JobBody), Discriminator.Task)]
     [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
     [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
     public class NodeBody : ISyncable
@@ -19,8 +19,6 @@ namespace planner_server_package.Entities
         public SyncKind SyncKind { get; set; }
         public string Name { get; set; }
         public string Props { get; set; }
-        public Guid CreatedBy { get; set; }
-        public DateTime CreatedAt { get; set; }
         public Guid UpdatedBy { get; set; }
         public DateTime UpdatedAt { get; set; }
         public long Version { get; set; }

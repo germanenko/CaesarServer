@@ -4,7 +4,7 @@
     {
         Board,
         Column,
-        Task,
+        Job,
         Chat,
         Message,
         AccessRight,

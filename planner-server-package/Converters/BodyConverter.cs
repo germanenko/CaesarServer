@@ -12,18 +12,57 @@ using ChatSettingsClient = planner_client_package.Entities.ChatSettingsBody;
 using ChatSettingsServer = planner_server_package.Entities.ChatSettingsBody;
 using ColumnClient = planner_client_package.Entities.ColumnBody;
 using ColumnServer = planner_server_package.Entities.ColumnBody;
+using JobClient = planner_client_package.Entities.JobBody;
+using JobServer = planner_server_package.Entities.JobBody;
 using MessageClient = planner_client_package.Entities.MessageBody;
 using MessageServer = planner_server_package.Entities.MessageBody;
+using NodeClient = planner_client_package.Entities.NodeBody;
 using NodeLinkClient = planner_client_package.Entities.NodeLinkBody;
 using NodeLinkServer = planner_server_package.Entities.NodeLinkBody;
-using TaskClient = planner_client_package.Entities.TaskBody;
-using TaskServer = planner_server_package.Entities.TaskBody;
+using NodeServer = planner_server_package.Entities.NodeBody;
 
 
 namespace planner_server_package.Converters
 {
     public static class BodyConverter
     {
+        public static NodeClient ServerToClientBody(NodeServer body)
+        {
+            return new NodeClient()
+            {
+                Id = body.Id,
+                Name = body.Name,
+                Props = body.Props,
+                Type = body.Type,
+                UpdatedAt = body.UpdatedAt,
+                UpdatedBy = body.UpdatedBy,
+                SyncKind = body.SyncKind,
+                Link = body.Link != null ? ServerToClientBody(body.Link) : null,
+                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                Version = body.Version
+            };
+        }
+
+
+
+        public static NodeServer ClientToServerBody(NodeClient body)
+        {
+            return new NodeServer()
+            {
+                Id = body.Id,
+                Name = body.Name,
+                Props = body.Props,
+                Type = body.Type,
+                UpdatedAt = body.UpdatedAt,
+                UpdatedBy = body.UpdatedBy,
+                SyncKind = body.SyncKind,
+                Link = body.Link != null ? ClientToServerBody(body.Link) : null,
+                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                Version = body.Version
+            };
+        }
+
+
         public static BoardClient ServerToClientBody(BoardServer body)
         {
             return new BoardClient()
@@ -102,9 +141,9 @@ namespace planner_server_package.Converters
         }
 
 
-        public static TaskClient ServerToClientBody(TaskServer body)
+        public static JobClient ServerToClientBody(JobServer body)
         {
-            return new TaskClient()
+            return new JobClient()
             {
                 Id = body.Id,
                 Name = body.Name,
@@ -129,9 +168,9 @@ namespace planner_server_package.Converters
 
 
 
-        public static TaskServer ClientToServerBody(TaskClient body)
+        public static JobServer ClientToServerBody(JobClient body)
         {
-            return new TaskServer()
+            return new JobServer()
             {
                 Id = body.Id,
                 Name = body.Name,

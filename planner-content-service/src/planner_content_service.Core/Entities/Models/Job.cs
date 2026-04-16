@@ -4,6 +4,7 @@ using planner_common_package;
 using planner_common_package.Enums;
 using System.ComponentModel.DataAnnotations;
 using System.Text.Json.Serialization;
+using JobBody = planner_client_package.Entities.JobBody;
 
 namespace planner_content_service.Core.Entities.Models
 {
@@ -34,9 +35,9 @@ namespace planner_content_service.Core.Entities.Models
         public DateTime? StartDate { get; set; }
         public DateTime? EndDate { get; set; }
 
-        public TaskBody ToTaskBody()
+        public JobBody ToTaskBody()
         {
-            return new TaskBody
+            return new JobBody
             {
                 Id = Id,
                 Name = Name,
@@ -52,7 +53,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return new TaskBody
+            return new JobBody
             {
                 Id = Id,
                 Name = Name,

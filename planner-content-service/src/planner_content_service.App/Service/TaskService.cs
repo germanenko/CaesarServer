@@ -9,7 +9,8 @@ using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using System.Net;
-using TaskBody = planner_client_package.Entities.TaskBody;
+using JobBody = planner_client_package.Entities.JobBody;
+using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.App.Service
 {
@@ -27,9 +28,9 @@ namespace planner_content_service.App.Service
             _publisherService = publisherService;
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobBody
+        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobRequestBody
         {
-            var taskBody = new TaskBody()
+            var taskBody = new JobBody()
             {
                 Id = createOrUpdateJobBody.Id,
                 Name = createOrUpdateJobBody.Name,
@@ -37,20 +38,20 @@ namespace planner_content_service.App.Service
                 Link = createOrUpdateJobBody.Link,
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = accountId,
-                Type = NodeType.Task
+                Type = NodeType.Job
             };
 
-            CreateTaskEvent taskEvent = new CreateTaskEvent()
+            CreateNodeEvent taskEvent = new CreateNodeEvent()
             {
-                Task = BodyConverter.ClientToServerBody(taskBody),
+                Node = BodyConverter.ClientToServerBody(taskBody),
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateTask);
+            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
 
             if (!nodeComplete.IsSuccess)
             {
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<JobBody>
                 {
                     IsSuccess = nodeComplete.IsSuccess,
                     StatusCode = nodeComplete.StatusCode,
@@ -69,7 +70,7 @@ namespace planner_content_service.App.Service
 
             if (result == null)
             {
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<JobBody>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     Errors = ["Task not created"],
@@ -77,7 +78,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            return new ServiceResponse<TaskBody>
+            return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = result,
@@ -85,9 +86,9 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<TaskBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobBody
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobRequestBody
         {
-            var taskBody = new TaskBody()
+            var taskBody = new JobBody()
             {
                 Id = createOrUpdateJobBody.Id,
                 Name = createOrUpdateJobBody.Name,
@@ -95,20 +96,20 @@ namespace planner_content_service.App.Service
                 Link = createOrUpdateJobBody.Link,
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = accountId,
-                Type = NodeType.Task
+                Type = NodeType.Job
             };
 
-            CreateTaskEvent taskEvent = new CreateTaskEvent()
+            CreateNodeEvent taskEvent = new CreateNodeEvent()
             {
-                Task = BodyConverter.ClientToServerBody(taskBody),
+                Node = BodyConverter.ClientToServerBody(taskBody),
                 CreatorId = accountId
             };
 
-            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateTask);
+            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
 
             if (!nodeComplete.IsSuccess)
             {
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<JobBody>
                 {
                     IsSuccess = nodeComplete.IsSuccess,
                     StatusCode = nodeComplete.StatusCode,
@@ -127,7 +128,7 @@ namespace planner_content_service.App.Service
 
             if (result == null)
             {
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<JobBody>
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     Errors = ["Task not created"],
@@ -135,7 +136,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            return new ServiceResponse<TaskBody>
+            return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = result,
@@ -143,10 +144,10 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> taskBodies)
+        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies) where T : JobRequestBody
         {
             var errors = new List<string>();
-            List<TaskBody> tasks = new List<TaskBody>();
+            List<JobBody> tasks = new List<JobBody>();
             foreach (var taskBody in taskBodies)
             {
                 var result = await CreateOrUpdateTask(accountId, taskBody);
@@ -157,7 +158,7 @@ namespace planner_content_service.App.Service
                 }
                 else
                 {
-                    return new ServiceResponse<List<TaskBody>>
+                    return new ServiceResponse<List<JobBody>>
                     {
                         StatusCode = HttpStatusCode.BadRequest,
                         IsSuccess = false,
@@ -166,7 +167,7 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            return new ServiceResponse<List<TaskBody>>
+            return new ServiceResponse<List<JobBody>>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = tasks,
@@ -176,7 +177,7 @@ namespace planner_content_service.App.Service
 
 
 
-        public async Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, TaskBody taskBody)
+        public async Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody)
         {
             var errors = new List<string>();
 
@@ -187,7 +188,7 @@ namespace planner_content_service.App.Service
                 errors.Add("End time format is not correct");
 
             if (errors.Any())
-                return new ServiceResponse<TaskBody>
+                return new ServiceResponse<JobBody>
                 {
                     Errors = errors.ToArray(),
                     StatusCode = HttpStatusCode.BadRequest,
@@ -198,12 +199,12 @@ namespace planner_content_service.App.Service
             DateTime? endDate = taskBody.EndDate/* == null ? null : DateTime.Parse(taskBody.EndDate) */;
 
             var result = await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow);
-            return result == null ? new ServiceResponse<TaskBody>
+            return result == null ? new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Errors = new string[] { "Task not updated" },
                 IsSuccess = false
-            } : new ServiceResponse<TaskBody>
+            } : new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = result,
@@ -211,10 +212,10 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<TaskBody> taskBodies)
+        public async Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies)
         {
             var errors = new List<string>();
-            List<TaskBody> result = new List<TaskBody>();
+            List<JobBody> result = new List<JobBody>();
             foreach (var taskBody in taskBodies)
             {
                 if (taskBody.StartDate != null/* && !DateTime.TryParse(taskBody?.StartDate, out var _)*/)
@@ -224,7 +225,7 @@ namespace planner_content_service.App.Service
                     errors.Add("End time format is not correct");
 
                 if (errors.Any())
-                    return new ServiceResponse<List<TaskBody>>
+                    return new ServiceResponse<List<JobBody>>
                     {
                         Errors = errors.ToArray(),
                         StatusCode = HttpStatusCode.BadRequest,
@@ -237,12 +238,12 @@ namespace planner_content_service.App.Service
                 result.Add(await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow));
             }
 
-            return result.Count != taskBodies.Count ? new ServiceResponse<List<TaskBody>>
+            return result.Count != taskBodies.Count ? new ServiceResponse<List<JobBody>>
             {
                 StatusCode = HttpStatusCode.BadRequest,
                 Errors = new string[] { "Not all tasks updated" },
                 IsSuccess = false
-            } : new ServiceResponse<List<TaskBody>>
+            } : new ServiceResponse<List<JobBody>>
             {
                 StatusCode = HttpStatusCode.OK,
                 Body = result,

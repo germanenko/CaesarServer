@@ -51,9 +51,7 @@ void ConfigureServices(IServiceCollection services)
     var username = GetEnvVar("RABBITMQ_USERNAME");
     var password = GetEnvVar("RABBITMQ_PASSWORD");
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
-    var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
-    var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
-    var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
+    var createNodeExchange = GetEnvVar("RABBITMQ_CREATE_NODE_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
     var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
@@ -152,9 +150,7 @@ void ConfigureServices(IServiceCollection services)
             password,
             new Dictionary<PublishEvent, string> {
                 { PublishEvent.AddAccountsToTaskChats, addAccountsToTaskChatsQueue },
-                { PublishEvent.CreateBoard, createBoardExchange },
-                { PublishEvent.CreateColumn, createColumnExchange },
-                { PublishEvent.CreateTask, createTaskExchange },
+                { PublishEvent.CreateNode, createNodeExchange },
                 { PublishEvent.CheckAccess, checkAccessExchange },
                 { PublishEvent.DeleteNode, deleteNodeExchange }
             },

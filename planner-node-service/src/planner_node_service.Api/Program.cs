@@ -41,9 +41,7 @@ void ConfigureServices(IServiceCollection services)
 
     var messageSentToChatQueue = GetEnvVar("RABBITMQ_MESSAGE_SENT_TO_CHAT_QUEUE");
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
-    var createBoardExchange = GetEnvVar("RABBITMQ_CREATE_BOARD_EXCHANGE");
-    var createColumnExchange = GetEnvVar("RABBITMQ_CREATE_COLUMN_EXCHANGE");
-    var createTaskExchange = GetEnvVar("RABBITMQ_CREATE_TASK_EXCHANGE");
+    var createNodeExchange = GetEnvVar("RABBITMQ_CREATE_NODE_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
@@ -151,9 +149,7 @@ void ConfigureServices(IServiceCollection services)
         sp.GetRequiredService<IWebSocketService>(),
         messageSentToChatQueue,
         createPersonalChatQueue,
-        createBoardExchange,
-        createColumnExchange,
-        createTaskExchange,
+        createNodeExchange,
         getUsersWithEnabledNotifications,
         checkAccessExchange,
         deleteNodeExchange

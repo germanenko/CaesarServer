@@ -1,16 +1,17 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_server_package;
-using TaskBody = planner_client_package.Entities.TaskBody;
+using JobBody = planner_client_package.Entities.JobBody;
+using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.Core.IService
 {
     public interface ITaskService
     {
-        Task<ServiceResponse<TaskBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobBody;
-        Task<ServiceResponse<TaskBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobBody;
-        Task<ServiceResponse<List<TaskBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> createOrUpdateTaskBodies);
-        Task<ServiceResponse<TaskBody>> UpdateTask(Guid accountId, TaskBody taskBody);
-        Task<ServiceResponse<List<TaskBody>>> UpdateTasks(Guid accountId, List<TaskBody> taskBodies);
+        Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobRequestBody;
+        Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobRequestBody;
+        Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> createOrUpdateTaskBodies) where T : JobRequestBody;
+        Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody);
+        Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies);
     }
 }

@@ -12,7 +12,7 @@ namespace planner_client_package.Interface
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
     [JsonDerivedType(typeof(BoardBody), Discriminator.Board)]
     [JsonDerivedType(typeof(ColumnBody), Discriminator.Column)]
-    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
+    [JsonDerivedType(typeof(JobBody), Discriminator.Task)]
     [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
     [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
     [JsonDerivedType(typeof(NotificationSettingsBody), Discriminator.NotificationSettings)]

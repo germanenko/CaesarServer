@@ -33,13 +33,13 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
         {
-            CreateColumnEvent columnEvent = new CreateColumnEvent()
+            CreateNodeEvent columnEvent = new CreateNodeEvent()
             {
-                Column = BodyConverter.ClientToServerBody(column),
+                Node = BodyConverter.ClientToServerBody(column),
                 CreatorId = accountId
             };
 
-            var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+            var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
             if (!response.IsSuccess)
             {
@@ -149,13 +149,13 @@ namespace planner_content_service.App.Service
 
             foreach (var column in columns)
             {
-                CreateColumnEvent columnEvent = new CreateColumnEvent()
+                CreateNodeEvent columnEvent = new CreateNodeEvent()
                 {
-                    Column = BodyConverter.ClientToServerBody(reminderColumn),
+                    Node = BodyConverter.ClientToServerBody(reminderColumn),
                     CreatorId = accountId
                 };
 
-                var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateColumn);
+                var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
                 if (!request.IsSuccess)
                 {
@@ -229,13 +229,13 @@ namespace planner_content_service.App.Service
         {
             var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId };
 
-            var boardEvent = new CreateBoardEvent()
+            var boardEvent = new CreateNodeEvent()
             {
-                Board = BodyConverter.ClientToServerBody(boardBody),
+                Node = BodyConverter.ClientToServerBody(boardBody),
                 CreatorId = accountId
             };
 
-            var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateBoard);
+            var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
 
             if (!response.IsSuccess)
             {
