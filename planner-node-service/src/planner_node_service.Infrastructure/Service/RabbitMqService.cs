@@ -135,7 +135,7 @@ namespace planner_node_service.Infrastructure.Service
 
                 foreach (var participant in result.ParticipantIds)
                 {
-                    await accessService.GrantAccess(participant, participant, result.Chat.Id, Permission.Write);
+                    await accessService.AddAccess(participant, result.Chat.Id, Permission.Write);
                     await notificationService.AddNotificationSettings(new NotificationSettingsBody() { AccountId = participant, NodeId = result.Chat.Id, NotificationsEnabled = true });
                 }
 

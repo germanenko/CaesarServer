@@ -23,6 +23,41 @@ namespace planner_node_service.App.Service
             _publisherService = publisherService;
         }
 
+        // Создание доступа
+        public async Task<ServiceResponse<AccessRuleBody>> AddAccess(Guid accountId, Guid nodeId, Permission permission)
+        {
+            // Проверяем, существует ли нода
+            if (await _nodeRepository.GetNode(nodeId) == null)
+            {
+                return new ServiceResponse<AccessRuleBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Ноды не существует" }
+                };
+            }
+
+            // Выдаем доступ
+            var access = await _accessRepository.AddAccess(accountId, nodeId, permission);
+
+            if (access == null)
+            {
+                return new ServiceResponse<AccessRuleBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    Errors = new[] { "Доступ не выдан" }
+                };
+            }
+
+            return new ServiceResponse<AccessRuleBody>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access.ToBody()
+            };
+        }
+
         // Выдача доступа
         public async Task<ServiceResponse<AccessRuleBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
         {
@@ -49,7 +84,7 @@ namespace planner_node_service.App.Service
             }
 
             // Выдаем доступ
-            var access = await _accessRepository.GrantAccess(granterId, granteeId, nodeId, permission);
+            var access = await _accessRepository.AddAccess(granteeId, nodeId, permission);
 
             if (access == null)
             {

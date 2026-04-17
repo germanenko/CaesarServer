@@ -58,9 +58,9 @@ namespace planner_node_service.Infrastructure.Repository
             return existing;
         }
 
-        public async Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
+        public async Task<AccessRule?> AddAccess(Guid accountId, Guid nodeId, Permission permission)
         {
-            var userSubject = await CreateOrGetUserSubject(granteeId);
+            var userSubject = await CreateOrGetUserSubject(accountId);
 
             var existing = await _context.AccessRules
                 .FirstOrDefaultAsync(x =>

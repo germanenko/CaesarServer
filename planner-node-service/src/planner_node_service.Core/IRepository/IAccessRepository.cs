@@ -6,7 +6,7 @@ namespace planner_node_service.Core.IRepository
 {
     public interface IAccessRepository
     {
-        Task<AccessRule?> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
+        Task<AccessRule?> AddAccess(Guid accountId, Guid nodeId, Permission permission);
         Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
         Task<bool> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId);
         Task<GroupAccessSubject?> CreateGroup(Guid accountId, CreateAccessGroupBody body);
