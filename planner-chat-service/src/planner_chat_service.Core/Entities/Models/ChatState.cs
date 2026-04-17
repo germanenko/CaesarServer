@@ -7,9 +7,9 @@ namespace planner_chat_service.Core.Entities.Models
     {
         public Guid ChatId { get; set; }
         public Chat Chat { get; set; }
-        public long LastMessageSeq { get; set; }
-        public long EditCursorId { get; set; }
-        public ChatEdit EditCursor { get; set; }
+        public long? LastMessageSeq { get; set; }
+        public long? EditCursorId { get; set; }
+        public ChatEdit? EditCursor { get; set; }
         public MessagePreview? LastPreview { get; set; }
 
         public ChatStateBody ToBody()
