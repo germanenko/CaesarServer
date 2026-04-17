@@ -4,10 +4,7 @@ using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
-using System.ComponentModel.DataAnnotations;
 using System.Net;
-using JobBody = planner_client_package.Entities.JobBody;
-using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.Api.Controllers
 {
@@ -33,7 +30,7 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(403)]
 
         public async Task<IActionResult> CreateOrUpdateTask(
-            [FromBody] JobRequestBody taskBody,
+            [FromBody] JobBodyRequest taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {
@@ -54,7 +51,7 @@ namespace planner_content_service.Api.Controllers
         public async Task<IActionResult> CreateJobFromMessage(
             [FromQuery] string snapshot,
             [FromQuery] Guid messageId,
-            [FromBody] JobRequestBody taskBody,
+            [FromBody] JobBodyRequest taskBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
         )
         {

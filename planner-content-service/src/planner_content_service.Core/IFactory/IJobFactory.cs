@@ -10,6 +10,6 @@ namespace planner_content_service.Core.IFactory
 {
     public interface IJobFactory
     {
-        Job Create(JobBody body);
+        Job Create(JobBodyRequest body);
     }
 }

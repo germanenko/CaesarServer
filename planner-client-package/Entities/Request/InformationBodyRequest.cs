@@ -7,14 +7,11 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public class MeetingBody : JobBody
+    public class InformationBodyRequest : JobBodyRequest
     {
-        public MeetingBody()
+        public InformationBodyRequest()
         {
-            Type = JobType.Meeting;
+            Type = JobType.Information;
         }
-        public string Theme { get; set; }
-        public DateTime Date { get; set; }
-        public List<Guid> Members { get; set; }
     }
 }

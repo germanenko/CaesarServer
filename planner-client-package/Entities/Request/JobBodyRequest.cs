@@ -7,11 +7,11 @@ using System.Text.Json.Serialization;
 namespace planner_client_package.Entities.Request
 {
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
-    [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
-    [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
-    [JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
-    [JsonDerivedType(typeof(TaskRequestBody), Discriminator.Task)]
-    public abstract class JobBody : IRequest
+    [JsonDerivedType(typeof(MeetingBodyRequest), Discriminator.Meeting)]
+    [JsonDerivedType(typeof(ReminderBodyRequest), Discriminator.Reminder)]
+    [JsonDerivedType(typeof(InformationBodyRequest), Discriminator.Information)]
+    [JsonDerivedType(typeof(TaskBodyRequest), Discriminator.Task)]
+    public abstract class JobBodyRequest : IRequest
     {
         public Guid Id { get; set; }
 

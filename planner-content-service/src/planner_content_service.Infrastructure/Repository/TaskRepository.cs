@@ -8,8 +8,6 @@ using planner_content_service.Core.IRepository;
 using planner_content_service.Infrastructure.Data;
 using planner_server_package.Events;
 using planner_server_package.RabbitMQ;
-using JobBody = planner_client_package.Entities.JobBody;
-using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.Infrastructure.Repository
 {
@@ -30,7 +28,7 @@ namespace planner_content_service.Infrastructure.Repository
         (
             T taskBody,
             Guid accountId
-        ) where T : JobRequestBody
+        ) where T : JobBodyRequest
         {
             var job = _jobFactory.Create(taskBody);
 
@@ -70,7 +68,7 @@ namespace planner_content_service.Infrastructure.Repository
             Guid accountId,
             Guid messageId,
             string snapshot
-        ) where T : JobRequestBody
+        ) where T : JobBodyRequest
         {
             var job = _jobFactory.Create(taskBody);
 

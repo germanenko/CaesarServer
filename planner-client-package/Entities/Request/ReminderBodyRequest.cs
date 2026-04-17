@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.Request
 {
-    public class ReminderBody : JobBody
+    public class ReminderBodyRequest : JobBodyRequest
     {
-        public ReminderBody()
+        public ReminderBodyRequest()
         {
             Type = JobType.Reminder;
         }

@@ -217,9 +217,9 @@ void ConfigureSwagger(IServiceCollection services)
         options.UseOneOfForPolymorphism();
         options.SelectSubTypesUsing(baseType =>
         {
-            if (baseType == typeof(JobBody))
+            if (baseType == typeof(JobBodyRequest))
             {
-                return new[] { typeof(MeetingBody), typeof(ReminderBody), typeof(InformationBody), typeof(TaskRequestBody) };
+                return new[] { typeof(MeetingBodyRequest), typeof(ReminderBodyRequest), typeof(InformationBodyRequest), typeof(TaskBodyRequest) };
             }
             return Array.Empty<Type>();
         });

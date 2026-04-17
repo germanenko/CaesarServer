@@ -99,7 +99,7 @@ namespace planner_content_service.Infrastructure.Service
             //    Status = x.Status,
             //    TaskType = x.TaskType
             //}).ToList();
-            var taskBodies = tasks.Select(x => new ReminderBody
+            var taskBodies = tasks.Select(x => new ReminderBodyRequest
             {
                 Id = x.Id,
                 Name = x.Name,

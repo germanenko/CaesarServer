@@ -10,8 +10,6 @@ using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using System.Net;
-using JobBody = planner_client_package.Entities.JobBody;
-using JobRequestBody = planner_client_package.Entities.Request.JobBody;
 
 namespace planner_content_service.App.Service
 {
@@ -32,7 +30,7 @@ namespace planner_content_service.App.Service
             _accessService = accessService;
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobRequestBody
+        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobBodyRequest
         {
             var hasAccess = await _accessService.CheckAccess(accountId, messageId, Permission.Read);
 
@@ -102,7 +100,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobRequestBody
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobBodyRequest
         {
             var taskBody = new JobBody()
             {
@@ -160,7 +158,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies) where T : JobRequestBody
+        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies) where T : JobBodyRequest
         {
             var errors = new List<string>();
             List<JobBody> tasks = new List<JobBody>();
