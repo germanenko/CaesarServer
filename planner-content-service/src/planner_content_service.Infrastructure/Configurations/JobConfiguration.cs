@@ -8,7 +8,7 @@ namespace planner_content_service.Infrastructure.Configurations
     {
         public void Configure(EntityTypeBuilder<Job> builder)
         {
-            builder.ToTable("Tasks");
+            builder.ToTable("Jobs");
 
             builder.Property(t => t.Name)
                 .HasMaxLength(128)
@@ -19,6 +19,11 @@ namespace planner_content_service.Infrastructure.Configurations
 
             builder.Property(t => t.HexColor)
                 .HasMaxLength(7);
+
+            builder.HasOne(x => x.PrimarySourceMessage)
+                .WithMany()
+                .HasForeignKey(x => x.PrimarySourceMessageId)
+                .OnDelete(DeleteBehavior.NoAction);
 
             builder.HasIndex(t => t.StartDate);
             builder.HasIndex(t => t.EndDate);

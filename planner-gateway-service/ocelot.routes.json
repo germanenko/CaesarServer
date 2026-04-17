@@ -771,6 +771,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/checkAccess",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/checkAccess",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/grantAccess",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

@@ -2,6 +2,7 @@ using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
+using planner_server_package;
 
 namespace planner_content_service.Core.IRepository
 {
@@ -18,5 +19,7 @@ namespace planner_content_service.Core.IRepository
         Task<bool> DeleteNode(Guid nodeId, Guid accountId);
         Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, Guid? chatId = null);
         System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
+        Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId);
+        Task<AttachedMessage> AttachMessage(Guid jobId, Guid messageId, string snapshot);
     }
 }

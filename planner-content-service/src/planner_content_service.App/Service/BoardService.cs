@@ -8,6 +8,7 @@ using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package;
+using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -21,14 +22,16 @@ namespace planner_content_service.App.Service
     public class BoardService : IBoardService
     {
         private readonly IBoardRepository _boardRepository;
+        private readonly IAccessService _accessService;
         private readonly IPublisherService _publisherService;
         private readonly ILogger<BoardService> _logger;
 
-        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger)
+        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger, IAccessService accessService)
         {
             _boardRepository = boardRepository;
             _publisherService = publisherService;
             _logger = logger;
+            _accessService = accessService;
         }
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
@@ -195,11 +198,9 @@ namespace planner_content_service.App.Service
             List<ColumnBody> columnsToStore = new List<ColumnBody>();
             foreach (var column in columns)
             {
-                var checkAccess = new CheckAccessRequest(accountId, column.Id, Permission.Write);
+                var hasAccess = await _accessService.CheckAccess(accountId, column.Id, Permission.Write);
 
-                var hasAccess = await _publisherService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-                if (hasAccess.IsSuccess)
+                if (hasAccess)
                 {
                     columnsToStore.Add(column);
                 }
@@ -378,6 +379,40 @@ namespace planner_content_service.App.Service
         public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
         {
             await _boardRepository.SetMessageEdited(messageId, state);
+        }
+
+        public async Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid jobId, Guid messageId, string snapshot)
+        {
+            var existingAttachedMessage = await _boardRepository.GetAttachedMessage(jobId, messageId);
+
+            if (existingAttachedMessage != null)
+            {
+                return new ServiceResponse<AttachedMessageBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    ErrorCodes = [ErrorCode.AlreadyExist]
+                };
+            }
+
+            var attachedMessage = await _boardRepository.AttachMessage(jobId, messageId, snapshot);
+
+            if (attachedMessage == null)
+            {
+                return new ServiceResponse<AttachedMessageBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    ErrorCodes = [ErrorCode.Infrastructure]
+                };
+            }
+
+            return new ServiceResponse<AttachedMessageBody>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = attachedMessage.ToBody()
+            };
         }
     }
 }

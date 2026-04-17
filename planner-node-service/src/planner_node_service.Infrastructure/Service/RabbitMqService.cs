@@ -32,7 +32,6 @@ namespace planner_node_service.Infrastructure.Service
             string createPersonalChatQueue,
             string createNode,
             string getUsersWithEnabledNotifications,
-            string checkAccess,
             string deleteNode)
             : base(hostname, userName, password, prefix, logger)
         {
@@ -46,7 +45,6 @@ namespace planner_node_service.Infrastructure.Service
             AddQueue(createPersonalChatQueue, HandleNewChat);
             AddQueue(createNode, HandleNewNode);
             AddQueue(getUsersWithEnabledNotifications, HandleGetNotificationSettings);
-            AddQueue(checkAccess, CheckAccess);
             AddQueue(deleteNode, DeleteNode);
 
             InitializeRabbitMQ();
@@ -246,43 +244,6 @@ namespace planner_node_service.Infrastructure.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while return enabled notification settings");
-                throw;
-            }
-        }
-
-        private async Task<ServiceResponse<object>> CheckAccess(string message)
-        {
-            var result = JsonSerializer.Deserialize<CheckAccessRequest>(message);
-
-            _logger.LogInformation($"NodeService received request: {message}");
-
-            if (result == null)
-            {
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
-                    Errors = new[] { "Ошибка сервера" }
-                };
-            }
-
-            try
-            {
-                using var scope = _scopeFactory.CreateScope();
-                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-
-                var access = await accessService.CheckAccess(result.AccountId, result.NodeId, result.MinRequiredPermission);
-
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = true,
-                    StatusCode = access.StatusCode,
-                    Body = access.Body
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while checking access");
                 throw;
             }
         }

@@ -1,5 +1,7 @@
 using planner_common_package.Enums;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace planner_client_package.Entities
@@ -21,6 +23,6 @@ namespace planner_client_package.Entities
         [RegularExpression("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$")]
         public string HexColor { get; set; }
 
-        [Required] public PublicationStatus PublicationStatus { get; set; }
+        public ICollection<AttachedMessageBody> AttachedMessages { get; set; }
     }
 }

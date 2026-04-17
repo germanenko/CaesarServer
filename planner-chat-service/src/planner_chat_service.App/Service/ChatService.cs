@@ -7,6 +7,7 @@ using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
 using planner_server_package;
+using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -23,6 +24,7 @@ namespace planner_chat_service.App.Service
         private readonly IChatConnector _chatConnector;
         private readonly IPublisherService _notifyService;
         private readonly IUserService _userService;
+        private readonly IAccessService _accessService;
         private readonly ILogger<ChatService> _logger;
 
         public ChatService(
@@ -31,6 +33,7 @@ namespace planner_chat_service.App.Service
             IChatConnector chatConnector,
             IPublisherService notifyService,
             IUserService userService,
+            IAccessService accessService,
             ILogger<ChatService> logger)
         {
             _chatRepository = chatRepository;
@@ -38,6 +41,7 @@ namespace planner_chat_service.App.Service
             _chatConnector = chatConnector;
             _notifyService = notifyService;
             _userService = userService;
+            _accessService = accessService;
             _logger = logger;
         }
 
@@ -56,11 +60,9 @@ namespace planner_chat_service.App.Service
 
             var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
-            var checkAccess = new CheckAccessRequest(accountId, chatId, Permission.Read);
+            var hasAccess = await _accessService.CheckAccess(accountId, chatId, Permission.Read);
 
-            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-            if (chatMembership == null || hasAccess.StatusCode != HttpStatusCode.OK)
+            if (chatMembership == null || !hasAccess)
                 return;
 
             var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
@@ -189,11 +191,9 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+            var hasAccess = await _accessService.CheckAccess(accountId, existingMessage.Id, Permission.Write);
 
-            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            if (hasAccess)
             {
                 var message = await _chatRepository.UpdateMessage(accountId, updatedMessage);
 
@@ -241,11 +241,9 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+            var hasAccess = await _accessService.CheckAccess(accountId, existingMessage.Id, Permission.Write);
 
-            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            if (hasAccess)
             {
                 var message = await _chatRepository.DeleteMessage(accountId, messageId);
 
@@ -293,11 +291,9 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var checkAccess = new CheckAccessRequest(accountId, existingMessage.Id, Permission.Write);
+            var hasAccess = await _accessService.CheckAccess(accountId, existingMessage.Id, Permission.Write);
 
-            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-            if (hasAccess.StatusCode == HttpStatusCode.OK)
+            if (hasAccess)
             {
                 var message = await _chatRepository.DeleteMessageForMe(accountId, messageId);
 

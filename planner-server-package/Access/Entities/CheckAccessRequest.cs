@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_server_package.Events
+namespace planner_server_package.Access.Entities
 {
     public class CheckAccessRequest
     {

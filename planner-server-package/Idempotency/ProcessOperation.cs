@@ -14,7 +14,7 @@ namespace planner_server_package.Idempotency
         public OperationName OperationName { get; set; }
         public Guid OperationId { get; set; }
         public string RequestHash { get; set; }
-        public Status Status { get; set; }
+        public ProcessStatus Status { get; set; }
         public DateTime StartAtUtc { get; set; }
         public DateTime CompletedAtUtc { get; set; }
         public string ResultJson { get; set; }

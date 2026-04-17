@@ -10,7 +10,7 @@ namespace planner_node_service.Api.CustomAttributes
         public void OnAuthorization(AuthorizationFilterContext context)
         {
             var requestHost = context.HttpContext.Request.Host.Host;
-            var allowedHosts = new[] { "127.0.0.1", "planner-chat-server", "planner-notify-service" };
+            var allowedHosts = new[] { "127.0.0.1", "planner-content-service", "planner-chat-server", "planner-notify-service" };
 
             if (!allowedHosts.Contains(requestHost))
             {

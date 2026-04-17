@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_server_package.Idempotency.Enum
+namespace planner_common_package.Enums
 {
     public enum OperationFailureCode
     {

@@ -19,7 +19,6 @@ namespace planner_server_package.Events.Enums
         ChatNodes,
         CreateNode,
         DeleteNode,
-        CheckAccess,
         AccessRevoked,
         SendNotification,
         GetGoogleToken,

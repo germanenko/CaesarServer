@@ -2,7 +2,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
+using planner_node_service.Api.CustomAttributes;
 using planner_node_service.Core.IService;
+using planner_server_package.Events;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Http.Headers;
 
@@ -21,6 +23,20 @@ namespace planner_node_service.Api.Controllers
         {
             _accessService = accessService;
             _jwtService = jwtService;
+        }
+
+        [LocalOnly]
+        [HttpGet("checkAccess")]
+        [SwaggerOperation("Проверить доступ")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GrantAccess(
+            [FromQuery] Guid accountId,
+            [FromQuery] Guid nodeId,
+            [FromQuery] Permission minRequiredPermission
+        )
+        {
+            var result = await _accessService.CheckAccess(accountId, nodeId, minRequiredPermission);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
 
         [HttpPost("grantAccess"), Authorize]

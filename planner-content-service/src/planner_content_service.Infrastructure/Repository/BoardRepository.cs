@@ -7,6 +7,7 @@ using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
+using planner_server_package;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -62,14 +63,30 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
         {
-            var messages = await _context.Jobs.Where(x => x.PrimarySourceMessageId == messageId).ToListAsync();
+            var messages = await _context.AttachedMessages.Where(x => x.MessageId == messageId).ToListAsync();
 
             foreach (var message in messages)
             {
-                message.PrimarySourceMessageState = state;
+                message.State = state;
             }
 
             await _context.SaveChangesAsync();
+        }
+
+        public async Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId)
+        {
+            var attachedMessage = await _context.AttachedMessages.AsNoTracking().FirstOrDefaultAsync(x => x.JobId == jobId && x.MessageId == messageId);
+
+            return attachedMessage;
+        }
+
+        public async Task<AttachedMessage> AttachMessage(Guid jobId, Guid messageId, string snapshot)
+        {
+            var attachedMessage = (await _context.AttachedMessages.AddAsync(new AttachedMessage(jobId, messageId, snapshot))).Entity;
+
+            await _context.SaveChangesAsync();
+
+            return attachedMessage;
         }
 
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)

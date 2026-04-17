@@ -147,7 +147,6 @@ namespace planner_server_package.Converters
             {
                 Id = body.Id,
                 Name = body.Name,
-                PublicationStatus = body.PublicationStatus,
                 Props = body.Props,
                 Type = body.Type,
                 UpdatedAt = body.UpdatedAt,
@@ -174,7 +173,6 @@ namespace planner_server_package.Converters
             {
                 Id = body.Id,
                 Name = body.Name,
-                PublicationStatus = body.PublicationStatus,
                 Props = body.Props,
                 Type = body.Type,
                 UpdatedAt = body.UpdatedAt,

@@ -12,6 +12,7 @@ using planner_chat_service.Core.IService;
 using planner_chat_service.Infrastructure.Data;
 using planner_chat_service.Infrastructure.Repository;
 using planner_chat_service.Infrastructure.Service;
+using planner_server_package.Access;
 using planner_server_package.Events.Enums;
 using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
@@ -40,7 +41,6 @@ void ConfigureServices(IServiceCollection services)
     var createPersonalChatQueue = GetEnvVar("RABBITMQ_CREATE_PERSONAL_CHAT_QUEUE");
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
-    var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
     var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
     var messageEditedExchange = GetEnvVar("RABBITMQ_MESSAGE_EDITED_EXCHANGE");
@@ -110,6 +110,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IChatConnectionService, ChatConnectionService>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IAccessService, AccessService>();
 
 
 
@@ -131,7 +132,6 @@ void ConfigureServices(IServiceCollection services)
                 { PublishEvent.MessageSentToChat, messageSentToChatQueue },
                 { PublishEvent.CreatePersonalChat, createPersonalChatQueue },
                 { PublishEvent.GetNotificationSettings, getUsersWithEnabledNotifications },
-                { PublishEvent.CheckAccess, checkAccessExchange },
                 { PublishEvent.SendNotification, sendNotificationExchange },
                 { PublishEvent.GetGoogleToken, getGoogleTokenExchange },
                 { PublishEvent.MessageEdited, messageEditedExchange }

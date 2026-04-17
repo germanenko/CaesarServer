@@ -20,5 +20,6 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId);
         Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId);
         System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
+        Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid jobId, Guid messageId, string snapshot);
     }
 }

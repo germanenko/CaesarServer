@@ -5,7 +5,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace planner_server_package.Idempotency.Enum
+namespace planner_common_package.Enums
 {
     public class OperationFailureCodeAttribute : Attribute
     {
@@ -31,6 +31,9 @@ namespace planner_server_package.Idempotency.Enum
 
         [OperationFailureCode(OperationFailureCode.Conflict)]
         DuplicateRequest = 202,
+
+        [OperationFailureCode(OperationFailureCode.Conflict)]
+        AlreadyExist = 203,
 
         [OperationFailureCode(OperationFailureCode.Infrastructure)]
         Infrastructure = 300,

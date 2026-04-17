@@ -14,6 +14,7 @@ using planner_content_service.Core.IService;
 using planner_content_service.Infrastructure.Data;
 using planner_content_service.Infrastructure.Repository;
 using planner_content_service.Infrastructure.Service;
+using planner_server_package.Access;
 using planner_server_package.Events.Enums;
 using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
@@ -53,7 +54,6 @@ void ConfigureServices(IServiceCollection services)
     var addAccountsToTaskChatsQueue = GetEnvVar("RABBITMQ_CHAT_ADD_ACCOUNTS_TO_TASK_CHATS_QUEUE_NAME");
     var createNodeExchange = GetEnvVar("RABBITMQ_CREATE_NODE_EXCHANGE");
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
-    var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
     var messageEditedExchange = GetEnvVar("RABBITMQ_MESSAGE_EDITED_EXCHANGE");
@@ -132,6 +132,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IJobFactory, JobFactory>();
 
     services.AddScoped<IIdempotencyService, IdempotencyService>();
+    services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
@@ -152,7 +153,6 @@ void ConfigureServices(IServiceCollection services)
             new Dictionary<PublishEvent, string> {
                 { PublishEvent.AddAccountsToTaskChats, addAccountsToTaskChatsQueue },
                 { PublishEvent.CreateNode, createNodeExchange },
-                { PublishEvent.CheckAccess, checkAccessExchange },
                 { PublishEvent.DeleteNode, deleteNodeExchange }
             },
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()

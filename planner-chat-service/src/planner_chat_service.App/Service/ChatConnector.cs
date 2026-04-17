@@ -5,6 +5,7 @@ using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
+using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -22,6 +23,7 @@ namespace planner_chat_service.App.Service
         private readonly IChatRepository _chatRepository;
         private readonly IPublisherService _notifyService;
         private readonly IUserService _userService;
+        private readonly IAccessService _accessService;
         private readonly ILogger<ChatConnector> _logger;
         private readonly JsonSerializerOptions options = new()
         {
@@ -33,13 +35,15 @@ namespace planner_chat_service.App.Service
             IChatRepository chatRepository,
             IPublisherService notifyService,
             ILogger<ChatConnector> logger,
-            IUserService userService
+            IUserService userService,
+            IAccessService accessService
         )
         {
             _chatRepository = chatRepository;
             _notifyService = notifyService;
             _logger = logger;
             _userService = userService;
+            _accessService = accessService;
         }
 
         public async Task Invoke(
@@ -288,11 +292,9 @@ namespace planner_chat_service.App.Service
             input = input.Replace("\0", "");
             var sentMessage = JsonSerializer.Deserialize<SendMessageBody>(input, options);
 
-            var checkAccess = new CheckAccessRequest(accountId, sentMessage.Link.ParentId, Permission.Read);
+            var hasAccess = await _accessService.CheckAccess(accountId, sentMessage.Link.ParentId, Permission.Read);
 
-            var hasAccess = await _notifyService.Publish(checkAccess, PublishEvent.CheckAccess);
-
-            if (hasAccess.StatusCode != System.Net.HttpStatusCode.OK)
+            if (!hasAccess)
                 return null;
 
             return await ProcessSentMessage(sentMessage, sessions, allUserIds, chat, accountId);

@@ -23,8 +23,8 @@ namespace planner_content_service.Core.Entities.Models
         }
 
         public Guid? PrimarySourceMessageId { get; set; }
-        public MessageState? PrimarySourceMessageState { get; set; }
-        public string? PrimarySourceMessageSnapshot { get; set; }
+        public AttachedMessage? PrimarySourceMessage { get; set; }
+        public ICollection<AttachedMessage> AttachedMessages { get; set; } = new List<AttachedMessage>();
         public bool CloseWhenChildrenCompleted { get; set; }
         public string? Description { get; set; }
         public JobType JobType { get; set; }
@@ -84,11 +84,9 @@ namespace planner_content_service.Core.Entities.Models
             return target;
         }
 
-        public static Job WithPrimarySourceMessage(this Job target, Guid sourceMessageId, string snapshot)
+        public static Job WithPrimarySourceMessage(this Job target, AttachedMessage sourceMessage)
         {
-            target.PrimarySourceMessageId = sourceMessageId;
-            target.PrimarySourceMessageSnapshot = snapshot;
-            target.PrimarySourceMessageState = MessageState.Normal;
+            target.PrimarySourceMessage = sourceMessage;
 
             return target;
         }

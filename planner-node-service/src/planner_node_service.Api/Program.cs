@@ -45,7 +45,6 @@ void ConfigureServices(IServiceCollection services)
     var contentNodesExchange = GetEnvVar("RABBITMQ_CONTENT_NODES_EXCHANGE");
     var chatNodesExchange = GetEnvVar("RABBITMQ_CHAT_NODES_EXCHANGE");
     var getUsersWithEnabledNotifications = GetEnvVar("RABBITMQ_GET_NOTIFICATION_SETTINGS_WITH_ENABLED_EXCHANGE");
-    var checkAccessExchange = GetEnvVar("RABBITMQ_CHECK_ACCESS_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
     var scopeUpdatedExchange = GetEnvVar("RABBITMQ_SCOPE_UPDATED_EXCHANGE");
     var accessRevokedExchange = GetEnvVar("RABBITMQ_ACCESS_REVOKED_EXCHANGE");
@@ -151,7 +150,6 @@ void ConfigureServices(IServiceCollection services)
         createPersonalChatQueue,
         createNodeExchange,
         getUsersWithEnabledNotifications,
-        checkAccessExchange,
         deleteNodeExchange
     ));
 }

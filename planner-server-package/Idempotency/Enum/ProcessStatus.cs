@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace planner_server_package.Idempotency.Enum
 {
-    public enum Status
+    public enum ProcessStatus
     {
         InProgress,
         Complete
