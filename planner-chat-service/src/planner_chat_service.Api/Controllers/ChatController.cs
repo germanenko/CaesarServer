@@ -120,21 +120,21 @@ namespace planner_chat_service.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
 
-            //var result = await _idempotencyService.ExecuteOperation(
-            //    requestId,
-            //    tokenPayload.AccountId,
-            //    OperationName.CreateChat,
-            //    JsonSerializer.Serialize(createChatBody),
-            //    async () => await _chatService.CreatePersonalChat(
-            //        tokenPayload.AccountId,
-            //        tokenPayload.SessionId,
-            //        createChatBody)
-            //    );
-
-            var result = await _chatService.CreatePersonalChat(
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.CreateChat,
+                JsonSerializer.Serialize(createChatBody),
+                async () => await _chatService.CreatePersonalChat(
                     tokenPayload.AccountId,
                     tokenPayload.SessionId,
-                    createChatBody);
+                    createChatBody)
+                );
+
+            //var result = await _chatService.CreatePersonalChat(
+            //        tokenPayload.AccountId,
+            //        tokenPayload.SessionId,
+            //        createChatBody);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, new Response<ChatBody>() { Body = result.Body });
