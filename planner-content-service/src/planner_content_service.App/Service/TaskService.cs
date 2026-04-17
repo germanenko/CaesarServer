@@ -4,6 +4,7 @@ using planner_common_package.Enums;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package;
+using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -18,18 +19,33 @@ namespace planner_content_service.App.Service
     {
         private readonly ITaskRepository _taskRepository;
         private readonly IPublisherService _publisherService;
+        private readonly IAccessService _accessService;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
-            IPublisherService publisherService)
+            IPublisherService publisherService,
+            IAccessService accessService)
         {
             _taskRepository = taskRepository;
             _publisherService = publisherService;
+            _accessService = accessService;
         }
 
         public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobRequestBody
         {
+            var hasAccess = await _accessService.CheckAccess(accountId, messageId, Permission.Read);
+
+            if (!hasAccess)
+            {
+                return new ServiceResponse<JobBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.Forbidden,
+                    ErrorCodes = [ErrorCode.WriteDenied]
+                };
+            }
+
             var taskBody = new JobBody()
             {
                 Id = createOrUpdateJobBody.Id,

@@ -10,7 +10,7 @@ namespace planner_chat_service.Core.Entities.Models
         public long LastMessageSeq { get; set; }
         public long EditCursorId { get; set; }
         public ChatEdit EditCursor { get; set; }
-        public MessagePreview LastPreview { get; set; }
+        public MessagePreview? LastPreview { get; set; }
 
         public ChatStateBody ToBody()
         {
@@ -19,7 +19,7 @@ namespace planner_chat_service.Core.Entities.Models
                 ChatId = ChatId,
                 EditCursorId = EditCursorId,
                 LastMessageSeq = LastMessageSeq,
-                LastPreview = LastPreview.ToBody()
+                LastPreview = LastPreview?.ToBody()
             };
         }
     }

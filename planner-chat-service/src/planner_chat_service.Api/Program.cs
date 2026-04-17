@@ -20,6 +20,8 @@ using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
+Env.Load();
+
 var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);

@@ -108,6 +108,7 @@ namespace planner_chat_service.App.Service
                 {
                     StatusCode = HttpStatusCode.Conflict,
                     IsSuccess = false,
+                    ErrorCodes = [ErrorCode.AlreadyExist],
                     Errors = ["chat exist"]
                 };
 

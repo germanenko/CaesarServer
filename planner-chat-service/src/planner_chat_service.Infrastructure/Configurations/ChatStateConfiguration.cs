@@ -23,7 +23,7 @@ namespace planner_chat_service.Infrastructure.Configurations
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.SetNull);
 
-            builder.ComplexProperty(x => x.LastPreview);
+            builder.OwnsOne(x => x.LastPreview);
         }
     }
 }
