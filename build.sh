@@ -65,6 +65,7 @@ build_all() {
         "planner-file-service"
         "planner-email-service"
         "planner-mailbox-service"
+	"planner-analytics-service"
     )
     
     echo -e "${GREEN}=== Начало сборки всех сервисов ===${NC}"
