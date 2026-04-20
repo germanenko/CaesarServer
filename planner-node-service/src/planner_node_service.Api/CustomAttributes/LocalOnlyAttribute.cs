@@ -17,7 +17,7 @@ namespace planner_node_service.Api.CustomAttributes
                 return;
             }
 
-            var ip = remoteIp.ToString();
+            var ip = remoteIp.MapToIPv4().ToString();
 
             if (ip == "127.0.0.1" || ip == "::1")
                 return;
