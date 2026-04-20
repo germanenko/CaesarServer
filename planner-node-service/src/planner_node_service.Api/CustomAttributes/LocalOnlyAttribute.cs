@@ -14,6 +14,7 @@ namespace planner_node_service.Api.CustomAttributes
 
             if (!allowedHosts.Contains(requestHost))
             {
+                Console.WriteLine(requestHost);
                 context.Result = new ForbidResult();
             }
         }
