@@ -1,10 +1,5 @@
 ﻿using planner_client_package.Entities;
 using planner_common_package.Enums;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace planner_content_service.Core.Entities.Models
 {
@@ -12,7 +7,6 @@ namespace planner_content_service.Core.Entities.Models
     {
         public AttachedMessage(Guid jobId, Guid messageId, string snapshot)
         {
-            Id = Guid.NewGuid();
             JobId = jobId;
             MessageId = messageId;
             Snapshot = snapshot;
