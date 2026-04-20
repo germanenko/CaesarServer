@@ -12,13 +12,14 @@ namespace planner_content_service.Core.Entities.Models
     {
         public AttachedMessage(Guid jobId, Guid messageId, string snapshot)
         {
+            Id = Guid.NewGuid();
             JobId = jobId;
             MessageId = messageId;
             Snapshot = snapshot;
             State = MessageState.Normal;
         }
 
-        public Guid Id { get; set; } = Guid.NewGuid();
+        public Guid Id { get; set; }
         public Guid JobId { get; set; }
         public Job Job { get; set; }
         public Guid MessageId { get; set; }
