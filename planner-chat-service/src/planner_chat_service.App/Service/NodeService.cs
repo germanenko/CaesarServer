@@ -40,7 +40,7 @@ namespace planner_chat_service.App.Service
                 if (node is Chat chat)
                 {
                     var chatState = await _chatRepository.GetOrCreateChatState(chat.Id);
-                    var chatUserState = await _chatRepository.GetOrCreateChatUserState(accountId, chat.Id);
+                    var chatUserState = await _chatRepository.GetOrCreateChatUserState(chat.Id, accountId);
                     var chatEdit = await _chatRepository.GetLastChatEdit(chat.Id);
 
                     var chatBody = chat.ToNodeBody();
