@@ -80,6 +80,8 @@ namespace planner_content_service.Infrastructure.Repository
 
                 var primaryAttachedMessage = new AttachedMessage(task.Id, messageId, snapshot);
 
+                await _context.SaveChangesAsync();
+
                 await _context.AttachedMessages.AddAsync(primaryAttachedMessage);
 
                 task = task.WithPrimarySourceMessage(primaryAttachedMessage);
