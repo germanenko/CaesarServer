@@ -18,7 +18,7 @@ namespace planner_content_service.Core.Entities.Models
             State = MessageState.Normal;
         }
 
-        public Guid Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
         public Guid JobId { get; set; }
         public Job Job { get; set; }
         public Guid MessageId { get; set; }
