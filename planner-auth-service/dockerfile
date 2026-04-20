@@ -3,12 +3,26 @@ WORKDIR /App
 
 COPY ../NuGet.config .
 COPY ../nuget-local ./nuget-local
-COPY . .
 
-RUN dotnet restore planner-auth-service/planner_auth_service.sln
-RUN dotnet publish \
-  planner-auth-service/src/planner_auth_service.Api/planner_auth_service.Api.csproj \
-  -c Release -o /App/out
+COPY planner-auth-service/planner_auth_service.sln ./
+
+COPY planner-auth-service/src/planner_auth_service.Core/*.csproj src/planner_auth_service.Core/
+COPY planner-auth-service/src/planner_auth_service.App/*.csproj src/planner_auth_service.App/
+COPY planner-auth-service/src/planner_auth_service.Infrastructure/*.csproj src/planner_auth_service.Infrastructure/
+COPY planner-auth-service/src/planner_auth_service.Api/*.csproj src/planner_auth_service.Api/
+
+RUN dotnet restore planner_auth_service.sln
+
+COPY planner-auth-service/src ./src
+
+RUN dotnet build src/planner_auth_service.Api/planner_auth_service.Api.csproj \
+  -c Release --no-restore
+
+RUN dotnet publish src/planner_auth_service.Api/planner_auth_service.Api.csproj \
+  -c Release \
+  -o /app/out \
+  --no-build \
+  /p:UseAppHost=false
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
