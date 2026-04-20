@@ -1,8 +1,8 @@
-FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
-WORKDIR /App
+FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
+WORKDIR /src
 
-COPY ../NuGet.config .
-COPY ../nuget-local ./nuget-local
+COPY NuGet.config ./
+COPY nuget-local ./nuget-local
 
 COPY planner-auth-service/planner_auth_service.sln ./
 
@@ -26,7 +26,10 @@ RUN dotnet publish src/planner_auth_service.Api/planner_auth_service.Api.csproj 
 
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
-WORKDIR /App
-COPY --from=build-env /App/out .
+WORKDIR /app
+
+COPY --from=build /app/out .
+
 COPY planner-auth-service/local.pfx /https/local.pfx
+
 ENTRYPOINT ["dotnet", "planner_auth_service.Api.dll"]
