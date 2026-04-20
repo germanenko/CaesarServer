@@ -76,13 +76,17 @@ namespace planner_content_service.Infrastructure.Repository
 
             try
             {
+                await using var tx = await _context.Database.BeginTransactionAsync();
+
                 var task = (await _context.AddAsync(job)).Entity;
 
                 var primaryAttachedMessage = (await _context.AttachedMessages.AddAsync(new AttachedMessage(job.Id, messageId, snapshot))).Entity;
 
-                job = job.WithPrimarySourceMessage(primaryAttachedMessage);
+                job.PrimarySourceMessageId = primaryAttachedMessage.Id;
 
                 await _context.SaveChangesAsync();
+
+                await tx.CommitAsync();
 
                 var createTaskChatEvent = new CreateTaskChatEvent
                 {
