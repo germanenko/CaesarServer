@@ -155,6 +155,8 @@ namespace planner_node_service.App.Service
             // Заполняем ноды базовой информацией
             result = await FillNodes(accountId, result);
 
+            result = result.DistinctBy(x => x.Id).ToList();
+
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
                 IsSuccess = true,
