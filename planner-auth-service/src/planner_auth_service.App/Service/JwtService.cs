@@ -100,12 +100,45 @@ namespace planner_auth_service.App.Service
             return GenerateAccessToken(claims, timeSpan);
         }
 
-        // Валидация токена сброса пароля
-        public bool ValidatePasswordResetToken(string token, string expectedEmail = null)
+        // Валидация токена
+        public bool ValidateToken(string token)
         {
             try
             {
-                var claims = GetClaims(token);
+                var handler = new JwtSecurityTokenHandler();
+
+                var validationParameters = new TokenValidationParameters
+                {
+                    ValidateIssuer = true,
+                    ValidIssuer = _issuer,
+
+                    ValidateAudience = true,
+                    ValidAudience = _audience,
+
+                    ValidateIssuerSigningKey = true,
+                    IssuerSigningKey = _signingCredentials.Key,
+
+                    ValidateLifetime = true,
+                    ClockSkew = TimeSpan.Zero
+                };
+
+                handler.ValidateToken(token.Replace("Bearer ", ""), validationParameters, out _);
+
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        // Валидация токена сброса пароля
+        public bool ValidatePasswordResetToken(string token)
+        {
+            try
+            {
+                var principal = Validate(token);
+                var claims = principal.Claims;
 
                 var purpose = claims.FirstOrDefault(c => c.Type == "purpose")?.Value;
                 if (purpose != "password_reset")
@@ -134,6 +167,28 @@ namespace planner_auth_service.App.Service
             {
                 return false;
             }
+        }
+
+        private ClaimsPrincipal Validate(string token)
+        {
+            var handler = new JwtSecurityTokenHandler();
+
+            var parameters = new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = _issuer,
+
+                ValidateAudience = true,
+                ValidAudience = _audience,
+
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _signingCredentials.Key,
+
+                ValidateLifetime = false, // ты сам проверяешь exp
+                ClockSkew = TimeSpan.Zero
+            };
+
+            return handler.ValidateToken(token, parameters, out _);
         }
 
         public PasswordResetTokenPayload GetPasswordResetTokenPayload(string token)

@@ -194,6 +194,20 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/validateToken",
+            "DangerousAcceptAnyServerCertificateValidator": true,
+            "DownstreamScheme": "https",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8888
+                }
+            ],
+            "UpstreamPathTemplate": "/api/validateToken",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/token",
             "DangerousAcceptAnyServerCertificateValidator": true,

@@ -9,7 +9,8 @@ namespace planner_auth_service.Core.IService
         OutputAccountCredentialsBody GenerateDefaultTokenPair(TokenPayload tokenPayload);
         TokenPayload GetTokenPayload(string token);
         string GeneratePasswordResetToken(string userId);
-        bool ValidatePasswordResetToken(string token, string expectedEmail = null);
+        bool ValidatePasswordResetToken(string token);
+        bool ValidateToken(string token);
         PasswordResetTokenPayload GetPasswordResetTokenPayload(string token);
         DateTime GetTokenExpiration(string token);
         void InvalidatePasswordResetToken(string token);

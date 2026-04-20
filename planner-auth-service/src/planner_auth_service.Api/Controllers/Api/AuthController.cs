@@ -188,5 +188,24 @@ namespace planner_auth_service.Api.Controllers.Api
                 TimeRemaining = payload != null ? payload.ExpiresAt - DateTime.UtcNow : TimeSpan.Zero
             });
         }
+
+        [HttpGet("validateToken"), Authorize]
+        [SwaggerOperation("Проверка валидности токена")]
+        [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
+        public IActionResult ValidateToken(
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+        )
+        {
+            var isValid = _jwtService.ValidateToken(token);
+            var payload = _jwtService.GetTokenPayload(token);
+
+            if (isValid)
+                return Ok(new
+                {
+                    Valid = isValid
+                });
+
+            return Forbid();
+        }
     }
 }
