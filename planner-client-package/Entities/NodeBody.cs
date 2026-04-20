@@ -11,7 +11,7 @@ namespace planner_client_package.Entities
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
     [JsonDerivedType(typeof(BoardBody), Discriminator.Board)]
     [JsonDerivedType(typeof(ColumnBody), Discriminator.Column)]
-    [JsonDerivedType(typeof(JobBody), Discriminator.Task)]
+    [JsonDerivedType(typeof(JobBody), Discriminator.Job)]
     [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
     [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
     public class NodeBody : ISyncable, IBody
