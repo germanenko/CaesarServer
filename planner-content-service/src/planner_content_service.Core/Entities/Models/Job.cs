@@ -86,7 +86,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public static Job WithPrimarySourceMessage(this Job target, AttachedMessage sourceMessage)
         {
-            target.PrimarySourceMessageId = sourceMessage.Id;
+            target.PrimarySourceMessage = sourceMessage;
 
             return target;
         }
