@@ -9,14 +9,24 @@ namespace planner_node_service.Api.CustomAttributes
     {
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var requestHost = context.HttpContext.Request.Host.Host;
-            var allowedHosts = new[] { "127.0.0.1", "planner-content-service", "planner-chat-service", "planner-notify-service" };
+            var remoteIp = context.HttpContext.Connection.RemoteIpAddress;
 
-            if (!allowedHosts.Contains(requestHost))
+            if (remoteIp == null)
             {
-                Console.WriteLine(requestHost);
                 context.Result = new ForbidResult();
+                return;
             }
+
+            var ip = remoteIp.ToString();
+
+            if (ip == "127.0.0.1" || ip == "::1")
+                return;
+
+            if (ip.StartsWith("172.18."))
+                return;
+
+            Console.WriteLine(ip);
+            context.Result = new ForbidResult();
         }
     }
 }
