@@ -25,7 +25,7 @@ namespace planner_server_package.Users
 
             _httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri("https://planner-auth-service:8080/api/")
+                BaseAddress = new Uri("https://planner-auth-service:8888/api/")
             };
         }
 
