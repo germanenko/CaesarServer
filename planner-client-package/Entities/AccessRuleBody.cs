@@ -19,23 +19,19 @@ namespace planner_client_package.Entities
         {
             List<IBody> result = new List<IBody> { target };
 
-            if (target.AccessSubject != null)
-            {
-                result.AddIfNotNull(target.AccessSubject);
+            var subject = target.AccessSubject;
 
-                if (target.AccessSubject is UserAccessSubjectBody user)
+            if (subject != null)
+            {
+                result.AddIfNotNull(subject);
+
+                if (subject is UserAccessSubjectBody user)
                 {
                     result.AddIfNotNull(user.Profile);
                 }
-                else
+                else if (subject is GroupAccessSubjectBody group)
                 {
-                    if (((GroupAccessSubjectBody)target.AccessSubject).Members != null)
-                    {
-                        foreach (var member in ((GroupAccessSubjectBody)target.AccessSubject).Members)
-                        {
-                            result.AddIfNotNull(member);
-                        }
-                    }
+                    result.AddRangeIfNotNull(group.Members);
                 }
             }
 
