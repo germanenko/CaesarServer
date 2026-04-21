@@ -435,7 +435,8 @@ namespace planner_node_service.Infrastructure.Repository
             var userIds = accessRights
                 .Select(x => x.Subject)
                 .OfType<UserAccessSubject>()
-                .Select(x => x.AccountId);
+                .Select(x => x.AccountId)
+                .Distinct();
 
             var profiles = new List<ProfileBody>();
 
