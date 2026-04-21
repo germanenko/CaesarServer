@@ -376,11 +376,13 @@ namespace planner_node_service.Infrastructure.Repository
         public async Task<AccessBody?> GetCommonAccessRules(Guid accountId)
         {
             var userRules = _context.AccessRules
+                .Include(x => x.Subject)
                 .Where(ar =>
                     ar.Subject is UserAccessSubject &&
                     ((UserAccessSubject)ar.Subject).AccountId == accountId);
 
             var groupRules = _context.AccessRules
+                .Include(x => x.Subject)
                 .Where(ar =>
                     ar.Subject is GroupAccessSubject &&
                     ((GroupAccessSubject)ar.Subject)
@@ -396,6 +398,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToList();
 
             var relatedRules = await _context.AccessRules
+                .Include(x => x.Subject)
                 .Where(ar => nodeIds.Contains(ar.NodeId))
                 .ToListAsync();
 
