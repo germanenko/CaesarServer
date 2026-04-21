@@ -136,5 +136,17 @@ namespace planner_node_service.Api.Controllers
             var result = await _accessService.GetAccessRules(tokenPayload.AccountId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
+
+        [HttpGet("getCommonAccessGrants"), Authorize]
+        [SwaggerOperation("Получить общие права доступа")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GetCommonAccessRights(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _accessService.GetCommonAccessRules(tokenPayload.AccountId);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
     }
 }

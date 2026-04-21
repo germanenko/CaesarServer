@@ -15,6 +15,7 @@ using planner_node_service.Infrastructure.Repository;
 using planner_node_service.Infrastructure.Service;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Users;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
@@ -128,6 +129,7 @@ void ConfigureServices(IServiceCollection services)
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
+    services.AddScoped<IUserService, UserService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<INotificationService, NotificationService>();

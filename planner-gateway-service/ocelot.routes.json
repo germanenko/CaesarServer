@@ -875,6 +875,19 @@
             "UpstreamHttpMethod": [ "GET" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/getCommonAccessGrants",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getCommonAccessGrants",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
         {
             "DownstreamPathTemplate": "/api/task",
             "DownstreamScheme": "http",

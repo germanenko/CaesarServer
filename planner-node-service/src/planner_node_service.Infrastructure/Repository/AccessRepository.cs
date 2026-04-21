@@ -6,6 +6,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.Entities.Models;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Infrastructure.Data;
+using planner_server_package.Users;
 using System.Data;
 using System.Security;
 
@@ -16,12 +17,14 @@ namespace planner_node_service.Infrastructure.Repository
         private readonly NodeDbContext _context;
         private readonly ILogger<AccessRepository> _logger;
         private readonly IScopeRepository _scopeRepository;
+        private readonly IUserService _userService;
 
-        public AccessRepository(NodeDbContext context, ILogger<AccessRepository> logger, IScopeRepository scopeRepository)
+        public AccessRepository(NodeDbContext context, ILogger<AccessRepository> logger, IScopeRepository scopeRepository, IUserService userService)
         {
             _context = context;
             _logger = logger;
             _scopeRepository = scopeRepository;
+            _userService = userService;
         }
 
         public async Task<AccessRule?> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission)
@@ -366,6 +369,79 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToList();
 
             accessBody.AccessGroupMembers?.AddRange(members);
+
+            return accessBody;
+        }
+
+        public async Task<AccessBody?> GetCommonAccessRules(Guid accountId)
+        {
+            var userRules = _context.AccessRules
+                .Where(ar =>
+                    ar.Subject is UserAccessSubject &&
+                    ((UserAccessSubject)ar.Subject).AccountId == accountId);
+
+            var groupRules = _context.AccessRules
+                .Where(ar =>
+                    ar.Subject is GroupAccessSubject &&
+                    ((GroupAccessSubject)ar.Subject)
+                        .Members.Any(m => m.AccountId == accountId));
+
+            var accessRights = await userRules
+                .Union(groupRules)
+                .ToListAsync();
+
+            var nodeIds = accessRights
+                .Select(x => x.NodeId)
+                .Distinct()
+                .ToList();
+
+            var relatedRules = await _context.AccessRules
+                .Where(ar => nodeIds.Contains(ar.NodeId))
+                .ToListAsync();
+
+            accessRights.AddRange(relatedRules);
+
+            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+
+            if (!accessRights.Any())
+                return null;
+
+            var accessBody = new AccessBody();
+
+            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+
+            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
+
+            var accessGroups = groupRules
+                .Select(x => x.Subject)
+                .OfType<GroupAccessSubject>()
+                .Distinct()
+                .ToList();
+
+            accessBody.AccessGroups = accessGroups
+                .Select(x => x.ToAccessGroupBody())
+                .ToList();
+
+            var members = accessGroups
+                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
+                .Distinct()
+                .ToList();
+
+            accessBody.AccessGroupMembers?.AddRange(members);
+
+            var userIds = accessRights
+                .Select(x => x.Subject)
+                .OfType<UserAccessSubject>()
+                .Select(x => x.AccountId);
+
+            var profiles = new List<ProfileBody>();
+
+            foreach (var userId in userIds)
+            {
+                profiles.Add(await _userService.GetUserData(userId));
+            }
+
+            accessBody.Profiles = profiles;
 
             return accessBody;
         }

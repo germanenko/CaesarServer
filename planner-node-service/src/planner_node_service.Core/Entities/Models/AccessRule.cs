@@ -17,7 +17,7 @@ namespace planner_node_service.Core.Entities.Models
             return new AccessRuleBody
             {
                 Id = Id,
-                AccountId = SubjectId,
+                AccessSubject = Subject.ToBody(),
                 NodeId = NodeId,
                 Permission = Permission
             };

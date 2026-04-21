@@ -15,5 +15,14 @@ namespace planner_node_service.Core.Entities.Models
                 Name = Name
             };
         }
+
+        public override AccessSubjectBody ToBody()
+        {
+            return new GroupAccessSubjectBody()
+            {
+                Id = Id,
+                Name = Name
+            };
+        }
     }
 }

@@ -273,6 +273,29 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Получение правил доступа для аккаунта и общие с ним 
+        public async Task<ServiceResponse<AccessBody>> GetCommonAccessRules(Guid accountId)
+        {
+            var access = await _accessRepository.GetCommonAccessRules(accountId);
+
+            if (access == null)
+            {
+                return new ServiceResponse<AccessBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = HttpStatusCode.OK,
+                    Body = new AccessBody()
+                };
+            }
+
+            return new ServiceResponse<AccessBody>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = access
+            };
+        }
+
         // Получение правил доступа для аккаунта
         public async Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId)
         {
@@ -288,21 +311,6 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            var accountIds = new List<Guid>();
-
-            if (access.AccessRules != null)
-            {
-                accountIds.AddRange(access.AccessRules
-                    .Where(x => x.AccountId.HasValue)
-                    .Select(x => x.AccountId.Value));
-            }
-
-            if (access.AccessGroupMembers != null)
-            {
-                accountIds.AddRange(access.AccessGroupMembers
-                    .Select(x => x.AccountId));
-            }
-
             return new ServiceResponse<AccessBody>()
             {
                 IsSuccess = true,
@@ -310,6 +318,8 @@ namespace planner_node_service.App.Service
                 Body = access
             };
         }
+
+
 
         // Проверка доступа к ноде
         public async Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId, Permission requiredPermission)

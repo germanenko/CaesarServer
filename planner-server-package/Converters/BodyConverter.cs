@@ -368,11 +368,9 @@ namespace planner_server_package.Converters
             return new AccessRuleClient()
             {
                 Id = body.Id,
-                AccessGroupId = body.AccessGroupId,
+                AccessSubject = body.AccessSubject,
                 Permission = body.Permission,
-                AccountId = body.AccountId,
                 NodeId = body.NodeId,
-                AccessGroup = body.AccessGroup != null ? ServerToClientBody(body.AccessGroup) : null
             };
         }
 
@@ -383,11 +381,9 @@ namespace planner_server_package.Converters
             return new AccessRuleServer()
             {
                 Id = body.Id,
-                AccessGroupId = body.AccessGroupId,
+                AccessSubject = body.AccessSubject,
                 Permission = body.Permission,
-                AccountId = body.AccountId,
-                NodeId = body.NodeId,
-                AccessGroup = body.AccessGroup != null ? ClientToServerBody(body.AccessGroup) : null
+                NodeId = body.NodeId
             };
         }
 

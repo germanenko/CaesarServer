@@ -21,5 +21,7 @@ namespace planner_common_package
         public const string NotificationSettings = "notificationSettings";
         public const string Profile = "profile";
         public const string NodeLink = "nodeLink";
+        public const string UserAccessSubject = "userAccessSubject";
+        public const string GroupAccessSubject = "groupAccessSubject";
     }
 }
