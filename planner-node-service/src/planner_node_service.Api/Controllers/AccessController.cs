@@ -125,10 +125,10 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpGet("getAccessGrants"), Authorize]
+        [HttpGet("getAccessRules"), Authorize]
         [SwaggerOperation("Получить список прав доступа")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GetAccessRights(
+        public async Task<IActionResult> GetAccessRules(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
         )
         {
@@ -137,10 +137,10 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpGet("getCommonAccessGrants"), Authorize]
+        [HttpGet("getCommonAccessRules"), Authorize]
         [SwaggerOperation("Получить общие права доступа")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GetCommonAccessRights(
+        public async Task<IActionResult> GetCommonAccessRules(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
         )
         {

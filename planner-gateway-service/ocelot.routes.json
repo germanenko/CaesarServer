@@ -863,7 +863,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getAccessGrants",
+            "DownstreamPathTemplate": "/api/getAccessRules",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -871,12 +871,12 @@
                     "Port": 8093
                 }
             ],
-            "UpstreamPathTemplate": "/api/getAccessGrants",
+            "UpstreamPathTemplate": "/api/getAccessRules",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
 	{
-            "DownstreamPathTemplate": "/api/getCommonAccessGrants",
+            "DownstreamPathTemplate": "/api/getCommonAccessRules",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -884,7 +884,7 @@
                     "Port": 8093
                 }
             ],
-            "UpstreamPathTemplate": "/api/getCommonAccessGrants",
+            "UpstreamPathTemplate": "/api/getCommonAccessRules",
             "UpstreamHttpMethod": [ "GET" ]
         },
 
