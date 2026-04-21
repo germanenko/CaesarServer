@@ -11,11 +11,11 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<AccessRuleBody>> GrantAccess(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
         public Task<ServiceResponse<AccessRuleBody>> ChangePermission(Guid granterId, Guid granteeId, Guid nodeId, Permission permission);
         public Task<ServiceResponse<bool>> RevokeAccess(Guid granterId, Guid granteeId, Guid nodeId);
-        public Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body);
+        public Task<ServiceResponse<GroupAccessSubjectBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body);
         public Task<ServiceResponse<AccessGroupMemberBody>> AddUserToGroup(Guid accountId, Guid userToAdd, Guid groupId);
         public Task<ServiceResponse<HttpStatusCode>> RemoveUserFromGroup(Guid accountId, Guid userToRemove, Guid groupId);
-        public Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId);
-        public Task<ServiceResponse<AccessBody>> GetCommonAccessRules(Guid accountId);
+        public Task<ServiceResponse<List<AccessRuleBody>>> GetAccessRules(Guid accountId);
+        public Task<ServiceResponse<List<AccessRuleBody>>> GetCommonAccessRules(Guid accountId);
         public Task<ServiceResponse<bool>> CheckAccess(Guid accountId, Guid nodeId, Permission minRequiredPermission);
     }
 }

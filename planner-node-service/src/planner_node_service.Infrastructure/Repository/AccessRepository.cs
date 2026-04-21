@@ -326,7 +326,7 @@ namespace planner_node_service.Infrastructure.Repository
             return groupMember;
         }
 
-        public async Task<AccessBody?> GetAccessRules(Guid accountId)
+        public async Task<List<AccessRuleBody>?> GetAccessRules(Guid accountId)
         {
             var userRules = _context.AccessRules
                 .Where(ar =>
@@ -347,11 +347,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (!accessRights.Any())
                 return null;
 
-            var accessBody = new AccessBody();
-
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
-
-            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
 
             var accessGroups = groupRules
                 .Select(x => x.Subject as GroupAccessSubject)
@@ -359,21 +355,25 @@ namespace planner_node_service.Infrastructure.Repository
                 .Distinct()
                 .ToList();
 
-            accessBody.AccessGroups = accessGroups
-                .Select(x => x.ToAccessGroupBody())
-                .ToList();
-
             var members = accessGroups
                 .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
                 .Distinct()
                 .ToList();
 
-            accessBody.AccessGroupMembers?.AddRange(members);
+            var ruleBodies = accessRights.Select(x => x.ToBody());
 
-            return accessBody;
+            foreach (var body in ruleBodies)
+            {
+                if (body.AccessSubject is UserAccessSubjectBody user)
+                {
+                    user.Profile = await _userService.GetUserData(user.AccountId);
+                }
+            }
+
+            return ruleBodies.ToList();
         }
 
-        public async Task<AccessBody?> GetCommonAccessRules(Guid accountId)
+        public async Task<List<AccessRuleBody>?> GetCommonAccessRules(Guid accountId)
         {
             var userRules = _context.AccessRules
                 .Include(x => x.Subject)
@@ -409,11 +409,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (!accessRights.Any())
                 return null;
 
-            var accessBody = new AccessBody();
-
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
-
-            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
 
             var accessGroups = groupRules
                 .Select(x => x.Subject)
@@ -421,33 +417,22 @@ namespace planner_node_service.Infrastructure.Repository
                 .Distinct()
                 .ToList();
 
-            accessBody.AccessGroups = accessGroups
-                .Select(x => x.ToAccessGroupBody())
-                .ToList();
-
             var members = accessGroups
                 .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
                 .Distinct()
                 .ToList();
 
-            accessBody.AccessGroupMembers?.AddRange(members);
+            var ruleBodies = accessRights.Select(x => x.ToBody());
 
-            var userIds = accessRights
-                .Select(x => x.Subject)
-                .OfType<UserAccessSubject>()
-                .Select(x => x.AccountId)
-                .Distinct();
-
-            var profiles = new List<ProfileBody>();
-
-            foreach (var userId in userIds)
+            foreach (var body in ruleBodies)
             {
-                profiles.Add(await _userService.GetUserData(userId));
+                if (body.AccessSubject is UserAccessSubjectBody user)
+                {
+                    user.Profile = await _userService.GetUserData(user.AccountId);
+                }
             }
 
-            accessBody.Profiles = profiles;
-
-            return accessBody;
+            return ruleBodies.ToList();
         }
 
         public async Task<AccessRule?> GetAccessRuleForNode(Guid accountId, Guid nodeId)
@@ -471,28 +456,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (!accessRights.Any())
                 return null;
 
-            var accessBody = new AccessBody();
-
             accessRights = accessRights.DistinctBy(x => x.Id).ToList();
-
-            accessBody.AccessRules = accessRights.Select(x => x.ToBody()).ToList();
-
-            var accessGroups = groupRules
-                .Select(x => x.Subject as GroupAccessSubject)
-                .Where(x => x != null)
-                .Distinct()
-                .ToList();
-
-            accessBody.AccessGroups = accessGroups
-                .Select(x => x.ToAccessGroupBody())
-                .ToList();
-
-            var members = accessGroups
-                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
-                .Distinct()
-                .ToList();
-
-            accessBody.AccessGroupMembers?.AddRange(members);
 
             return accessRights.FirstOrDefault();
         }

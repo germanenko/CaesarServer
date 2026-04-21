@@ -7,9 +7,9 @@ namespace planner_node_service.Core.Entities.Models
         public string Name { get; set; }
         public List<GroupMember> Members { get; set; } = new();
 
-        public AccessGroupBody ToAccessGroupBody()
+        public GroupAccessSubjectBody ToAccessGroupBody()
         {
-            return new AccessGroupBody
+            return new GroupAccessSubjectBody
             {
                 Id = Id,
                 Name = Name

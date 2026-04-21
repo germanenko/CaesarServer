@@ -1,5 +1,5 @@
-﻿using AccessGroupClient = planner_client_package.Entities.AccessGroupBody;
-using AccessGroupServer = planner_server_package.Entities.AccessGroupBody;
+﻿using AccessGroupClient = planner_client_package.Entities.GroupAccessSubjectBody;
+using AccessGroupServer = planner_server_package.Entities.GroupAccessSubjectBody;
 using AccessRuleClient = planner_client_package.Entities.AccessRuleBody;
 using AccessRuleServer = planner_server_package.Entities.AccessRuleBody;
 using AccountSessionsClient = planner_client_package.Entities.AccountSessions;
@@ -38,7 +38,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -57,7 +57,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -76,7 +76,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -96,7 +96,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -115,7 +115,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -135,7 +135,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -160,7 +160,7 @@ namespace planner_server_package.Converters
                 PriorityOrder = body.PriorityOrder,
                 JobType = body.JobType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -179,7 +179,7 @@ namespace planner_server_package.Converters
                 UpdatedBy = body.UpdatedBy,
                 SyncKind = body.SyncKind,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Status = body.Status,
                 StartDate = body.StartDate,
                 Description = body.Description,
@@ -209,7 +209,7 @@ namespace planner_server_package.Converters
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 IsSyncedReadStatus = body.IsSyncedReadStatus,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -233,7 +233,7 @@ namespace planner_server_package.Converters
                 CountOfUnreadMessages = body.CountOfUnreadMessages,
                 ParticipantIds = body.ParticipantIds,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -257,7 +257,7 @@ namespace planner_server_package.Converters
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
                 Link = body.Link != null ? ServerToClientBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ServerToClientBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -282,7 +282,7 @@ namespace planner_server_package.Converters
                 HasBeenRead = body.HasBeenRead,
                 MessageType = body.MessageType,
                 Link = body.Link != null ? ClientToServerBody(body.Link) : null,
-                AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
+                //AccessRule = body.AccessRule != null ? ClientToServerBody(body.AccessRule) : null,
                 Version = body.Version
             };
         }
@@ -363,49 +363,49 @@ namespace planner_server_package.Converters
         }
 
 
-        public static AccessRuleClient ServerToClientBody(AccessRuleServer body)
-        {
-            return new AccessRuleClient()
-            {
-                Id = body.Id,
-                AccessSubject = body.AccessSubject,
-                Permission = body.Permission,
-                NodeId = body.NodeId,
-            };
-        }
+        //public static AccessRuleClient ServerToClientBody(AccessRuleServer body)
+        //{
+        //    return new AccessRuleClient()
+        //    {
+        //        Id = body.Id,
+        //        AccessSubject = body.AccessSubject,
+        //        Permission = body.Permission,
+        //        NodeId = body.NodeId,
+        //    };
+        //}
 
 
 
-        public static AccessRuleServer ClientToServerBody(AccessRuleClient body)
-        {
-            return new AccessRuleServer()
-            {
-                Id = body.Id,
-                AccessSubject = body.AccessSubject,
-                Permission = body.Permission,
-                NodeId = body.NodeId
-            };
-        }
+        //public static AccessRuleServer ClientToServerBody(AccessRuleClient body)
+        //{
+        //    return new AccessRuleServer()
+        //    {
+        //        Id = body.Id,
+        //        AccessSubject = body.AccessSubject,
+        //        Permission = body.Permission,
+        //        NodeId = body.NodeId
+        //    };
+        //}
 
 
-        public static AccessGroupClient ServerToClientBody(AccessGroupServer body)
-        {
-            return new AccessGroupClient()
-            {
-                Id = body.Id,
-                Name = body.Name
-            };
-        }
+        //public static AccessGroupClient ServerToClientBody(AccessGroupServer body)
+        //{
+        //    return new AccessGroupClient()
+        //    {
+        //        Id = body.Id,
+        //        Name = body.Name
+        //    };
+        //}
 
 
 
-        public static AccessGroupServer ClientToServerBody(AccessGroupClient body)
-        {
-            return new AccessGroupServer()
-            {
-                Id = body.Id,
-                Name = body.Name
-            };
-        }
+        //public static AccessGroupServer ClientToServerBody(AccessGroupClient body)
+        //{
+        //    return new AccessGroupServer()
+        //    {
+        //        Id = body.Id,
+        //        Name = body.Name
+        //    };
+        //}
     }
 }

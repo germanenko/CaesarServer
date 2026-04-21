@@ -205,13 +205,13 @@ namespace planner_node_service.App.Service
         }
 
         // Создание группы доступа
-        public async Task<ServiceResponse<AccessGroupBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body)
+        public async Task<ServiceResponse<GroupAccessSubjectBody>> CreateAccessGroup(Guid accountId, CreateAccessGroupBody body)
         {
             var group = await _accessRepository.CreateGroup(accountId, body);
 
             if (group == null)
             {
-                return new ServiceResponse<AccessGroupBody>()
+                return new ServiceResponse<GroupAccessSubjectBody>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.Forbidden,
@@ -219,7 +219,7 @@ namespace planner_node_service.App.Service
                 };
             }
 
-            return new ServiceResponse<AccessGroupBody>()
+            return new ServiceResponse<GroupAccessSubjectBody>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -274,21 +274,21 @@ namespace planner_node_service.App.Service
         }
 
         // Получение правил доступа для аккаунта и общие с ним 
-        public async Task<ServiceResponse<AccessBody>> GetCommonAccessRules(Guid accountId)
+        public async Task<ServiceResponse<List<AccessRuleBody>>> GetCommonAccessRules(Guid accountId)
         {
             var access = await _accessRepository.GetCommonAccessRules(accountId);
 
             if (access == null)
             {
-                return new ServiceResponse<AccessBody>()
+                return new ServiceResponse<List<AccessRuleBody>>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Body = new AccessBody()
+                    Body = new List<AccessRuleBody>()
                 };
             }
 
-            return new ServiceResponse<AccessBody>()
+            return new ServiceResponse<List<AccessRuleBody>>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
@@ -297,21 +297,21 @@ namespace planner_node_service.App.Service
         }
 
         // Получение правил доступа для аккаунта
-        public async Task<ServiceResponse<AccessBody>> GetAccessRules(Guid accountId)
+        public async Task<ServiceResponse<List<AccessRuleBody>>> GetAccessRules(Guid accountId)
         {
             var access = await _accessRepository.GetAccessRules(accountId);
 
             if (access == null)
             {
-                return new ServiceResponse<AccessBody>()
+                return new ServiceResponse<List<AccessRuleBody>>()
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.OK,
-                    Body = new AccessBody()
+                    Body = new List<AccessRuleBody>()
                 };
             }
 
-            return new ServiceResponse<AccessBody>()
+            return new ServiceResponse<List<AccessRuleBody>>()
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,

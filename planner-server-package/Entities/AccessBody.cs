@@ -6,7 +6,7 @@ namespace planner_server_package.Entities
     public class AccessBody : ISyncable
     {
         public List<AccessRuleBody> AccessRules { get; set; }
-        public List<AccessGroupBody> AccessGroups { get; set; }
+        public List<GroupAccessSubjectBody> AccessGroups { get; set; }
         public List<AccessGroupMemberBody> AccessGroupMembers { get; set; }
         public List<ProfileBody> Profiles { get; set; }
     }
