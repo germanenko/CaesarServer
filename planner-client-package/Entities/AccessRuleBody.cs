@@ -1,6 +1,7 @@
 ﻿using planner_client_package.Interface;
 using planner_common_package.Enums;
 using System;
+using System.Collections.Generic;
 
 namespace planner_client_package.Entities
 {
@@ -10,5 +11,35 @@ namespace planner_client_package.Entities
         public AccessSubjectBody AccessSubject { get; set; }
         public Guid NodeId { get; set; }
         public Permission Permission { get; set; }
+    }
+
+    public static class AccessRuleExtensions
+    {
+        public static IEnumerable<IBody> Extract<T>(this T target) where T : AccessRuleBody
+        {
+            List<IBody> result = new List<IBody> { target };
+
+            if (target.AccessSubject != null)
+            {
+                result.AddIfNotNull(target.AccessSubject);
+
+                if (target.AccessSubject is UserAccessSubjectBody user)
+                {
+                    result.AddIfNotNull(user.Profile);
+                }
+                else
+                {
+                    if (((GroupAccessSubjectBody)target.AccessSubject).Members != null)
+                    {
+                        foreach (var member in ((GroupAccessSubjectBody)target.AccessSubject).Members)
+                        {
+                            result.AddIfNotNull(member);
+                        }
+                    }
+                }
+            }
+
+            return result;
+        }
     }
 }

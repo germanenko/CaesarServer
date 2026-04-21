@@ -63,6 +63,13 @@ namespace planner_client_package.Entities
             List<IBody> result = new List<IBody> { target };
 
             result.AddIfNotNull(target.AccessRule);
+            result.AddIfNotNull(target.AccessRule.AccessSubject);
+
+            if (target.AccessRule.AccessSubject != null && target.AccessRule.AccessSubject is UserAccessSubjectBody user)
+            {
+                result.AddIfNotNull(user.Profile);
+            }
+
             result.AddIfNotNull(target.Link);
             result.AddRangeIfNotNull(target.Childs);
 

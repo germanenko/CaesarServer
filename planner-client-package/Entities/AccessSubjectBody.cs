@@ -8,7 +8,7 @@ namespace planner_client_package.Entities
     [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
     [JsonDerivedType(typeof(UserAccessSubjectBody), Discriminator.UserAccessSubject)]
     [JsonDerivedType(typeof(GroupAccessSubjectBody), Discriminator.GroupAccessSubject)]
-    public class AccessSubjectBody : ISyncable
+    public class AccessSubjectBody : IBody, ISyncable
     {
         public Guid Id { get; set; }
     }
