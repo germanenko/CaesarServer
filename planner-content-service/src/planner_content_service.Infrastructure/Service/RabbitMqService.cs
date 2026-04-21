@@ -141,14 +141,8 @@ namespace planner_content_service.Infrastructure.Service
                 Name = "Personal Board",
                 PublicationStatus = PublicationStatus.Active,
                 Type = NodeType.Board,
-                AccessRule = new planner_client_package.Entities.AccessRuleBody()
-                {
-                    Id = Guid.NewGuid(),
-                    AccountId = profile.Id,
-                    NodeId = boardId,
-                    Permission = Permission.Write
-                },
-                UpdatedAt = DateTime.UtcNow
+                UpdatedAt = DateTime.UtcNow,
+                UpdatedBy = profile.Id
             };
 
             await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id);
