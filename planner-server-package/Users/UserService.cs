@@ -60,6 +60,39 @@ namespace planner_server_package.Users
             return null;
         }
 
+        public async Task<List<ProfileBody>> GetUsersData(List<Guid> userIds)
+        {
+            try
+            {
+                var query = string.Join("&", userIds.Select(id => $"accountIds={id}"));
+
+                var response = await _httpClient.GetAsync($"users?{query}");
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+
+                    var users = JsonSerializer.Deserialize<List<ProfileBody>>(content, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                    return users;
+                }
+                else
+                {
+                    var errorContent = await response.Content.ReadAsStringAsync();
+                    _logger.LogWarning("HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Unexpected error for {UserId}", userIds);
+            }
+
+            return null;
+        }
+
         public async Task<ProfileBody> GetUserData(string identifier)
         {
             try

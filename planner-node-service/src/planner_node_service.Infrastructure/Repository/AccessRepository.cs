@@ -424,11 +424,23 @@ namespace planner_node_service.Infrastructure.Repository
 
             var ruleBodies = accessRights.Select(x => x.ToBody()).ToList();
 
+            var userIds = ruleBodies
+                .Select(x => (x.AccessSubject as UserAccessSubjectBody)?.AccountId)
+                .Where(x => x != null)
+                .Select(x => x!.Value)
+                .Distinct()
+                .ToList();
+
+            var users = await _userService.GetUsersData(userIds);
+
+            var userMap = users.ToDictionary(x => x.Id);
+
             foreach (var body in ruleBodies)
             {
-                if (body.AccessSubject is UserAccessSubjectBody user)
+                if (body.AccessSubject is UserAccessSubjectBody user &&
+                    userMap.TryGetValue(user.AccountId, out var profile))
                 {
-                    user.Profile = await _userService.GetUserData(user.AccountId);
+                    user.Profile = profile;
                 }
             }
 

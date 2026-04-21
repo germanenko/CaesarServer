@@ -1,7 +1,7 @@
-using planner_server_package.Entities;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_auth_service.Core.IService;
+using planner_server_package.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
