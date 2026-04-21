@@ -422,7 +422,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .Distinct()
                 .ToList();
 
-            var ruleBodies = accessRights.Select(x => x.ToBody());
+            var ruleBodies = accessRights.Select(x => x.ToBody()).ToList();
 
             foreach (var body in ruleBodies)
             {
@@ -432,7 +432,7 @@ namespace planner_node_service.Infrastructure.Repository
                 }
             }
 
-            return ruleBodies.ToList();
+            return ruleBodies;
         }
 
         public async Task<AccessRule?> GetAccessRuleForNode(Guid accountId, Guid nodeId)
