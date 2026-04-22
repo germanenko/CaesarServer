@@ -29,7 +29,8 @@ namespace planner_content_service.Core.Entities.Models
                 Id = Id,
                 JobId = JobId,
                 Snapshot = Snapshot,
-                MessageId = MessageId
+                MessageId = MessageId,
+                AttachedAtUtc = AttachedAtUtc
             };
         }
     }

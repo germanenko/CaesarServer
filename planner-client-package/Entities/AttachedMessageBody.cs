@@ -13,5 +13,6 @@ namespace planner_client_package.Entities
         public Guid JobId { get; set; }
         public Guid MessageId { get; set; }
         public string Snapshot { get; set; }
+        public DateTime AttachedAtUtc { get; set; }
     }
 }
