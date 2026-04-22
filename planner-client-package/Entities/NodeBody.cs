@@ -14,6 +14,10 @@ namespace planner_client_package.Entities
     [JsonDerivedType(typeof(JobBody), Discriminator.Job)]
     [JsonDerivedType(typeof(ChatBody), Discriminator.Chat)]
     [JsonDerivedType(typeof(MessageBody), Discriminator.ChatMessage)]
+    [JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
+    [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
+    [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
+    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
     public class NodeBody : ISyncable, IBody
     {
         public Guid Id { get; set; }
