@@ -30,7 +30,8 @@ namespace planner_content_service.Core.Entities.Models
                 JobId = JobId,
                 Snapshot = Snapshot,
                 MessageId = MessageId,
-                AttachedAtUtc = AttachedAtUtc
+                AttachedAtUtc = AttachedAtUtc,
+                State = State
             };
         }
     }
