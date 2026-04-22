@@ -1,6 +1,7 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
+using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package;
@@ -262,6 +263,57 @@ namespace planner_content_service.App.Service
                 StatusCode = HttpStatusCode.OK,
                 Body = result,
                 IsSuccess = true
+            };
+        }
+
+        public async Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot)
+        {
+            var existingAttachedMessage = await _taskRepository.GetAttachedMessage(jobId, messageId);
+
+            if (existingAttachedMessage != null)
+            {
+                return new ServiceResponse<AttachedMessageBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    ErrorCodes = [ErrorCode.AlreadyExist]
+                };
+            }
+
+            var attachedMessage = await _taskRepository.AttachMessage(accountId, jobId, messageId, snapshot);
+
+            if (attachedMessage == null)
+            {
+                return new ServiceResponse<AttachedMessageBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.NotFound,
+                    ErrorCodes = [ErrorCode.Infrastructure]
+                };
+            }
+
+            return new ServiceResponse<AttachedMessageBody>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = attachedMessage.ToBody()
+            };
+        }
+
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        {
+            await _taskRepository.SetMessageEdited(messageId, state);
+        }
+
+        public async Task<ServiceResponse<ReadStateBody>> ReadAttachedMessages(Guid accountId, Guid jobId)
+        {
+            var readState = await _taskRepository.UpdateReadState(accountId, jobId);
+
+            return new ServiceResponse<ReadStateBody>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = readState
             };
         }
     }

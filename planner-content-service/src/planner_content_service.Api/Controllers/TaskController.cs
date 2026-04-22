@@ -2,9 +2,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_content_service.App.Service;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
+using System.Net.Http.Headers;
 
 namespace planner_content_service.Api.Controllers
 {
@@ -62,6 +64,34 @@ namespace planner_content_service.Api.Controllers
                 return StatusCode((int)result.StatusCode, result.Body);
 
             return StatusCode((int)result.StatusCode, result.Errors);
+        }
+
+        [HttpPost("attachMessage"), Authorize]
+        [SwaggerOperation("Привязать сообщение к задаче")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> AttachMessage(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid messageId,
+            [FromQuery] Guid jobId,
+            [FromQuery] string snapshot
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.AttachMessage(tokenPayload.AccountId, jobId, messageId, snapshot);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+        [HttpPut("readAttachedMessages"), Authorize]
+        [SwaggerOperation("Прочитать привязанные сообщения задачи")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> ReadAttachedMessages(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid jobId
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _taskService.ReadAttachedMessages(tokenPayload.AccountId, jobId);
+            return StatusCode((int)result.StatusCode, result.Body);
         }
     }
 }

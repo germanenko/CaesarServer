@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
@@ -78,6 +79,8 @@ namespace planner_content_service.Infrastructure.Repository
             {
                 var task = (await _context.AddAsync(job)).Entity;
 
+                await _context.ReadStates.AddAsync(new ReadState(task.Id, accountId));
+
                 var primaryAttachedMessage = new AttachedMessage(task.Id, messageId, snapshot);
 
                 await _context.SaveChangesAsync();
@@ -107,6 +110,92 @@ namespace planner_content_service.Infrastructure.Repository
 
                 throw;
             }
+        }
+
+        public async Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot)
+        {
+            var attachedMessage = (await _context.AttachedMessages.AddAsync(new AttachedMessage(jobId, messageId, snapshot))).Entity;
+
+            var readState = await _context.ReadStates.FirstOrDefaultAsync(x => x.JobId == jobId && x.AccountId == accountId);
+
+            if (readState != null)
+            {
+                readState.LastReadAtUtc = DateTime.UtcNow;
+            }
+            else
+            {
+                await _context.ReadStates.AddAsync(new ReadState(jobId, accountId));
+            }
+
+            await _context.SaveChangesAsync();
+
+            return attachedMessage;
+        }
+
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        {
+            var messages = await _context.AttachedMessages.Where(x => x.MessageId == messageId).ToListAsync();
+
+            foreach (var message in messages)
+            {
+                message.State = state;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId)
+        {
+            var attachedMessage = await _context.AttachedMessages.AsNoTracking().FirstOrDefaultAsync(x => x.JobId == jobId && x.MessageId == messageId);
+
+            return attachedMessage;
+        }
+
+        public async Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId)
+        {
+            var readState = await GetOrCreateReadState(accountId, jobId);
+
+            if (readState == null)
+            {
+                readState = (await _context.ReadStates.AddAsync(new ReadState(jobId, accountId))).Entity;
+            }
+
+            var result = await FillReadState(readState.ToBody());
+
+            return result;
+        }
+
+        public async Task<ReadState> GetOrCreateReadState(Guid accountId, Guid jobId)
+        {
+            var readState = await _context.ReadStates.FirstOrDefaultAsync(x => x.JobId == jobId && x.AccountId == accountId);
+
+            if (readState == null)
+            {
+                readState = (await _context.ReadStates.AddAsync(new ReadState(jobId, accountId))).Entity;
+            }
+
+            return readState;
+        }
+
+        public async Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId)
+        {
+            var readState = await GetOrCreateReadState(accountId, jobId);
+
+            readState.LastReadAtUtc = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            var result = await FillReadState(readState.ToBody());
+
+            return result;
+        }
+
+        public async Task<ReadStateBody> FillReadState(ReadStateBody body)
+        {
+            body.AttachedLastPreview = (await _context.AttachedMessages.OrderByDescending(x => x.AttachedAtUtc).FirstOrDefaultAsync())?.Snapshot;
+            body.AttachedUnreadCount = (await _context.AttachedMessages.Where(x => x.AttachedAtUtc > body.LastReadAtUtc).ToListAsync()).Count;
+
+            return body;
         }
 
         public IEnumerable<JobBody?>? GetAll(List<Guid> ids)

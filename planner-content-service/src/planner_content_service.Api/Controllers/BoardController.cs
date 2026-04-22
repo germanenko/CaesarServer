@@ -153,20 +153,5 @@ namespace planner_content_service.Api.Controllers
             var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, chatId);
             return StatusCode((int)result.StatusCode, result.Body);
         }
-
-        [HttpPost("attachMessage"), Authorize]
-        [SwaggerOperation("Привязать сообщение к задаче")]
-        [SwaggerResponse(200)]
-        public async Task<IActionResult> AttachMessage(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid messageId,
-            [FromQuery] Guid jobId,
-            [FromQuery] string snapshot
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AttachMessage(jobId, messageId, snapshot);
-            return StatusCode((int)result.StatusCode, result.Body);
-        }
     }
 }

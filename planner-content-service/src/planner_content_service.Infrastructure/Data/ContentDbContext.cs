@@ -45,5 +45,6 @@ namespace planner_content_service.Infrastructure.Data
         public DbSet<Information> Information { get; set; }
         public DbSet<UserTaskColumn> UserTaskColumns { get; set; }
         public DbSet<AttachedMessage> AttachedMessages { get; set; }
+        public DbSet<ReadState> ReadStates { get; set; }
     }
 }

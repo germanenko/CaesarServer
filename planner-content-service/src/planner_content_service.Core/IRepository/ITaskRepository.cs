@@ -1,5 +1,7 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_common_package.Enums;
+using planner_content_service.Core.Entities.Models;
 
 namespace planner_content_service.Core.IRepository
 {
@@ -16,5 +18,11 @@ namespace planner_content_service.Core.IRepository
             Guid accountId,
             JobBody updatedNode,
             DateTime changeDate);
+
+        Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot);
+        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
+        Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId);
+        Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId);
+        Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId);
     }
 }

@@ -1,5 +1,6 @@
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_common_package.Enums;
 using planner_server_package;
 
 namespace planner_content_service.Core.IService
@@ -11,5 +12,8 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> createOrUpdateTaskBodies) where T : JobBodyRequest;
         Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody);
         Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies);
+        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
+        Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot);
+        Task<ServiceResponse<ReadStateBody>> ReadAttachedMessages(Guid accountId, Guid jobId);
     }
 }

@@ -375,44 +375,5 @@ namespace planner_content_service.App.Service
                 Body = columns
             };
         }
-
-        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
-        {
-            await _boardRepository.SetMessageEdited(messageId, state);
-        }
-
-        public async Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid jobId, Guid messageId, string snapshot)
-        {
-            var existingAttachedMessage = await _boardRepository.GetAttachedMessage(jobId, messageId);
-
-            if (existingAttachedMessage != null)
-            {
-                return new ServiceResponse<AttachedMessageBody>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.NotFound,
-                    ErrorCodes = [ErrorCode.AlreadyExist]
-                };
-            }
-
-            var attachedMessage = await _boardRepository.AttachMessage(jobId, messageId, snapshot);
-
-            if (attachedMessage == null)
-            {
-                return new ServiceResponse<AttachedMessageBody>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.NotFound,
-                    ErrorCodes = [ErrorCode.Infrastructure]
-                };
-            }
-
-            return new ServiceResponse<AttachedMessageBody>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = attachedMessage.ToBody()
-            };
-        }
     }
 }

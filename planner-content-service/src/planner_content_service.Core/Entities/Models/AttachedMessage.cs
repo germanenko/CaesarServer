@@ -11,6 +11,7 @@ namespace planner_content_service.Core.Entities.Models
             MessageId = messageId;
             Snapshot = snapshot;
             State = MessageState.Normal;
+            AttachedAtUtc = DateTime.UtcNow;
         }
 
         public Guid Id { get; set; }
@@ -19,6 +20,7 @@ namespace planner_content_service.Core.Entities.Models
         public Guid MessageId { get; set; }
         public string Snapshot { get; set; }
         public MessageState State { get; set; }
+        public DateTime AttachedAtUtc { get; set; }
 
         public AttachedMessageBody ToBody()
         {

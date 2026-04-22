@@ -157,7 +157,7 @@ namespace planner_content_service.Infrastructure.Service
         private async Task<ServiceResponse<object>> HandleMessageEdited(string message)
         {
             using var scope = _serviceFactory.CreateScope();
-            var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
+            var taskService = scope.ServiceProvider.GetRequiredService<ITaskService>();
             var response = JsonSerializer.Deserialize<MessageEditedEvent>(message);
             if (response == null)
                 return new ServiceResponse<object>()
@@ -167,7 +167,7 @@ namespace planner_content_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
-            await boardService.SetMessageEdited(response.MessageId, response.State);
+            await taskService.SetMessageEdited(response.MessageId, response.State);
 
             return new ServiceResponse<object>()
             {
