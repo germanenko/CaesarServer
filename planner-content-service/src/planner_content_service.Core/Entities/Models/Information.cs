@@ -27,7 +27,8 @@ namespace planner_content_service.Core.Entities.Models
                 HexColor = HexColor,
                 StartDate = StartDate,
                 EndDate = EndDate,
-                JobType = JobType
+                JobType = JobType,
+                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
             };
         }
     }

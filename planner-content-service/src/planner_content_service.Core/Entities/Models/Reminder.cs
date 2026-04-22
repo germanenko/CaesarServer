@@ -35,7 +35,8 @@ namespace planner_content_service.Core.Entities.Models
                 StartDate = StartDate,
                 EndDate = EndDate,
                 Date = RemindAt,
-                JobType = JobType
+                JobType = JobType,
+                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
             };
         }
     }
