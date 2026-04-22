@@ -25,6 +25,9 @@ namespace planner_content_service.Infrastructure.Configurations
                 .HasForeignKey(x => x.PrimarySourceMessageId)
                 .OnDelete(DeleteBehavior.NoAction);
 
+            builder.Navigation(x => x.AttachedMessages)
+                .AutoInclude();
+
             builder.HasIndex(t => t.StartDate);
             builder.HasIndex(t => t.EndDate);
         }
