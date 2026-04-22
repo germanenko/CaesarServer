@@ -24,6 +24,11 @@ namespace planner_content_service.Infrastructure.Data
 
             modelBuilder.Entity<Job>().HasBaseType<Node>();
 
+            modelBuilder.Entity<Task>().HasBaseType<Job>();
+            modelBuilder.Entity<Reminder>().HasBaseType<Job>();
+            modelBuilder.Entity<Meeting>().HasBaseType<Job>();
+            modelBuilder.Entity<Information>().HasBaseType<Job>();
+
             modelBuilder.Entity<Node>().ToTable("Nodes");
             modelBuilder.Entity<Board>().ToTable("Boards");
             modelBuilder.Entity<Column>().ToTable("Columns");

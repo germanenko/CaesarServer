@@ -49,7 +49,7 @@ namespace planner_content_service.Api.Migrations
                     b.HasIndex("JobId", "MessageId")
                         .IsUnique();
 
-                    b.ToTable("AttachedMessages");
+                    b.ToTable("AttachedMessages", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Node", b =>
@@ -97,7 +97,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("ReadStates");
+                    b.ToTable("ReadStates", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.UserTaskColumn", b =>
@@ -119,7 +119,7 @@ namespace planner_content_service.Api.Migrations
 
                     b.HasIndex("ColumnId");
 
-                    b.ToTable("UserTaskColumns");
+                    b.ToTable("UserTaskColumns", (string)null);
                 });
 
             modelBuilder.Entity("planner_content_service.Core.Entities.Models.Board", b =>
