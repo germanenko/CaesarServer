@@ -190,9 +190,9 @@ namespace planner_node_service.Infrastructure.Service
                             Errors = new[] { "Нет доступа" }
                         };
                     }
-
-                    await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Node));
                 }
+
+                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Node));
 
                 return new ServiceResponse<object>()
                 {
@@ -201,7 +201,7 @@ namespace planner_node_service.Infrastructure.Service
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error while adding column node");
+                _logger.LogError(ex, "Error while adding node");
                 throw;
             }
         }
