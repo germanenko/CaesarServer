@@ -169,7 +169,8 @@ namespace planner_node_service.Infrastructure.Repository
                 Id = nodeBody.Id,
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
-                Props = nodeBody.Props
+                Props = nodeBody.Props,
+                SyncKind = nodeBody.SyncKind
                 //Cursor = cursor
             };
 

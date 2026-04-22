@@ -228,7 +228,7 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId)
         {
-            var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId };
+            var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId, SyncKind = SyncKind.Scope };
 
             var boardEvent = new CreateNodeEvent()
             {

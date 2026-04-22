@@ -20,7 +20,8 @@ namespace planner_chat_service.Core.Entities.Models
                 Type = NodeType.Chat,
                 ImageUrl = Image,
                 ChatType = ChatType,
-                Name = Name
+                Name = Name,
+                SyncKind = SyncKind.Scope
             };
         }
     }
