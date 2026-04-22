@@ -82,12 +82,11 @@ namespace planner_content_service.Infrastructure.Service
             }).ToList();
 
             //! исправить когда перейдем на новую логику создания задач
-            //var taskBodies = tasks.Select(x => new planner_client_package.Entities.TaskBody() 
+            //var taskBodies = tasks.Select(x => new planner_client_package.Entities.Request.JobRequestBody()
             //{
             //    Id = x.Id,
             //    Name = x.Name,
             //    Props = x.Props,
-            //    PublicationStatus = x.PublicationStatus,
             //    Type = NodeType.Column,
             //    UpdatedAt = x.UpdatedAt,
             //    UpdatedBy = x.UpdatedBy,
@@ -97,15 +96,8 @@ namespace planner_content_service.Infrastructure.Service
             //    HexColor = x.HexColor,
             //    PriorityOrder = x.PriorityOrder,
             //    Status = x.Status,
-            //    TaskType = x.TaskType
+            //    JobType = x.JobType
             //}).ToList();
-            var taskBodies = tasks.Select(x => new ReminderBodyRequest
-            {
-                Id = x.Id,
-                Name = x.Name,
-                Props = x.Props,
-                Description = x.Description,
-            }).ToList();
 
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
             await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);

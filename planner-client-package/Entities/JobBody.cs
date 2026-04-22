@@ -1,8 +1,10 @@
+using planner_client_package.Interface;
 using planner_common_package;
 using planner_common_package.Enums;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities
@@ -30,5 +32,16 @@ namespace planner_client_package.Entities
         public string HexColor { get; set; }
 
         public ICollection<AttachedMessageBody> AttachedMessages { get; set; }
+        public ReadStateBody? ReadState { get; set; }
+
+        public override IEnumerable<IBody> Extract()
+        {
+            var result = base.Extract().ToList();
+
+            result.AddIfNotNull(ReadState);
+            result.AddRangeIfNotNull(AttachedMessages);
+
+            return result;
+        }
     }
 }

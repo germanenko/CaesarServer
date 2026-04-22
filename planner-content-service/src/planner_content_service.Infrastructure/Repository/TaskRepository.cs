@@ -53,7 +53,11 @@ namespace planner_content_service.Infrastructure.Repository
                     }
                 };
 
-                return task.ToTaskBody();
+                var result = task.ToTaskBody();
+
+                result = await SetReadStateToJobBody(accountId, result);
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -102,7 +106,11 @@ namespace planner_content_service.Infrastructure.Repository
                     }
                 };
 
-                return task.ToTaskBody();
+                var result = task.ToTaskBody();
+
+                result = await SetReadStateToJobBody(accountId, result);
+
+                return result;
             }
             catch (Exception ex)
             {
@@ -110,6 +118,15 @@ namespace planner_content_service.Infrastructure.Repository
 
                 throw;
             }
+        }
+
+        public async Task<JobBody> SetReadStateToJobBody(Guid accountId, JobBody body)
+        {
+            var readState = await GetOrCreateReadStateAsync(accountId, body.Id);
+
+            body.ReadState = readState;
+
+            return body;
         }
 
         public async Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot)
@@ -244,7 +261,12 @@ namespace planner_content_service.Infrastructure.Repository
             task.Props = updatedNode.Props;
 
             await _context.SaveChangesAsync();
-            return updatedNode;
+
+            var result = task.ToTaskBody();
+
+            result = await SetReadStateToJobBody(accountId, result);
+
+            return result;
         }
     }
 }

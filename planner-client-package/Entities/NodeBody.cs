@@ -41,6 +41,32 @@ namespace planner_client_package.Entities
 
             return base.Equals(obj);
         }
+
+        public virtual IEnumerable<IBody> Extract()
+        {
+            List<IBody> result = new List<IBody> { this };
+
+            var accessRule = AccessRule;
+            var subject = accessRule?.AccessSubject;
+
+            result.AddIfNotNull(accessRule);
+            result.AddIfNotNull(subject);
+
+            if (subject is UserAccessSubjectBody user)
+            {
+                result.AddIfNotNull(user.Profile);
+            }
+
+            result.AddIfNotNull(Link);
+            result.AddRangeIfNotNull(Childs);
+
+            if (SyncKind == SyncKind.Scope)
+            {
+                result.Add(new ScopeVersionBody(Id, ScopeVersion));
+            }
+
+            return result;
+        }
     }
 
     public static class NodeBodyExtensions
@@ -58,31 +84,7 @@ namespace planner_client_package.Entities
             return target;
         }
 
-        public static IEnumerable<IBody> Extract<T>(this T target) where T : NodeBody
-        {
-            List<IBody> result = new List<IBody> { target };
 
-            var accessRule = target.AccessRule;
-            var subject = accessRule?.AccessSubject;
-
-            result.AddIfNotNull(accessRule);
-            result.AddIfNotNull(subject);
-
-            if (subject is UserAccessSubjectBody user)
-            {
-                result.AddIfNotNull(user.Profile);
-            }
-
-            result.AddIfNotNull(target.Link);
-            result.AddRangeIfNotNull(target.Childs);
-
-            if (target.SyncKind == SyncKind.Scope)
-            {
-                result.Add(new ScopeVersionBody(target.Id, target.ScopeVersion));
-            }
-
-            return result;
-        }
 
         public static void AddIfNotNull<T>(this List<T> list, T item) where T : class
         {
