@@ -25,5 +25,23 @@ namespace planner_content_service.Core.Entities.Models
 
         public DateTime MeetAt { get; set; }
         public List<Guid> MemberIds { get; set; }
+
+        public override NodeBody ToNodeBody()
+        {
+            return new MeetingBody
+            {
+                Id = Id,
+                Name = Name,
+                Props = Props,
+                Type = Type,
+                Description = Description,
+                HexColor = HexColor,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                Date = MeetAt,
+                Members = MemberIds,
+                JobType = JobType
+            };
+        }
     }
 }

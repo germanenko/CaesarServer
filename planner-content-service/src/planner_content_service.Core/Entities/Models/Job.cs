@@ -51,20 +51,20 @@ namespace planner_content_service.Core.Entities.Models
             };
         }
 
-        public override NodeBody ToNodeBody()
-        {
-            return new JobBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-            };
-        }
+        public override abstract NodeBody ToNodeBody();
+        //{
+        //    return new JobBody
+        //    {
+        //        Id = Id,
+        //        Name = Name,
+        //        Props = Props,
+        //        Type = Type,
+        //        Description = Description,
+        //        HexColor = HexColor,
+        //        StartDate = StartDate,
+        //        EndDate = EndDate,
+        //    };
+        //}
     }
 
     public static class JobExtensions
