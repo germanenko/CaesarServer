@@ -14,6 +14,7 @@ using planner_server_package;
 using planner_server_package.Entities;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Users;
 using System.Text.Json;
 
 namespace planner_chat_service.App.Service

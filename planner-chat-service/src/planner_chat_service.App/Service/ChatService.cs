@@ -12,6 +12,7 @@ using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Users;
 using System.Net;
 using System.Net.WebSockets;
 
@@ -140,7 +141,7 @@ namespace planner_chat_service.App.Service
                 {
                     var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
                     chat.ImageUrl = user.UrlIcon;
-                    chat.Profile = user;
+                    //chat.Profile = user;
                     chat.Name = user.Nickname;
                 }
             }
@@ -157,7 +158,7 @@ namespace planner_chat_service.App.Service
         {
             var chat = await _chatRepository.GetChat(accountId, userSessionId, chatId);
 
-            chat.Profile = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
+            //chat.Profile = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
 
             return new ServiceResponse<ChatBody>
             {

@@ -10,6 +10,7 @@ using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Users;
 using System.Net.WebSockets;
 using System.Text;
 using System.Text.Json;

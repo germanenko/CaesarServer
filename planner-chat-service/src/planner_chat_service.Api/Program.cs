@@ -17,6 +17,7 @@ using planner_server_package.Events.Enums;
 using planner_server_package.Idempotency;
 using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Users;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
