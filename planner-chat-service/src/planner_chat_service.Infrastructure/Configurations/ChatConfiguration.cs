@@ -10,7 +10,7 @@ namespace planner_chat_service.Infrastructure.Configurations
         {
             builder.ToTable("Chats");
 
-            builder.HasMany(e => e.ChatMemberships)
+            builder.HasMany(e => e.ChatSettings)
                 .WithOne(e => e.Chat)
                 .HasForeignKey(e => e.ChatId)
                 .OnDelete(DeleteBehavior.Cascade);
@@ -21,7 +21,7 @@ namespace planner_chat_service.Infrastructure.Configurations
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.Navigation(x => x.ChatMemberships)
+            builder.Navigation(x => x.ChatSettings)
                 .AutoInclude();
 
 

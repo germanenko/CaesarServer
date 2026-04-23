@@ -72,7 +72,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 })
                 .ToList();
 
-            chat.ChatMemberships = memberships;
+            chat.ChatSettings = memberships;
 
             chat = (await _context.Chats.AddAsync(chat))?.Entity;
 

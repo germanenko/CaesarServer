@@ -43,7 +43,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("SessionId");
 
-                    b.ToTable("AccountChatSessions");
+                    b.ToTable("AccountChatSessions", (string)null);
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatEdit", b =>
@@ -75,7 +75,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("MessageId");
 
-                    b.ToTable("ChatEdits");
+                    b.ToTable("ChatEdits", (string)null);
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatSettings", b =>
@@ -105,7 +105,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasIndex("ChatId");
 
-                    b.ToTable("ChatSettings");
+                    b.ToTable("ChatSettings", (string)null);
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.ChatState", b =>
@@ -193,7 +193,7 @@ namespace planner_chat_service.Api.Migrations
 
                     b.HasKey("MessageId", "AccountId");
 
-                    b.ToTable("UserHiddenMessages");
+                    b.ToTable("UserHiddenMessages", (string)null);
                 });
 
             modelBuilder.Entity("planner_chat_service.Core.Entities.Models.Chat", b =>
@@ -326,7 +326,7 @@ namespace planner_chat_service.Api.Migrations
                         .HasForeignKey("EditCursorId")
                         .OnDelete(DeleteBehavior.SetNull);
 
-                    b.OwnsOne("planner_chat_service.Core.Entities.ValueObjects.MessagePreview", "LastPreview", b1 =>
+                    b.OwnsOne("planner_chat_service.Core.Entities.Models.ChatState.LastPreview#planner_chat_service.Core.Entities.ValueObjects.MessagePreview", "LastPreview", b1 =>
                         {
                             b1.Property<Guid>("ChatStateChatId")
                                 .HasColumnType("uuid");
@@ -346,7 +346,7 @@ namespace planner_chat_service.Api.Migrations
 
                             b1.HasKey("ChatStateChatId");
 
-                            b1.ToTable("ChatStates");
+                            b1.ToTable("ChatStates", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("ChatStateChatId");

@@ -10,7 +10,7 @@ namespace planner_chat_service.Core.Entities.Models
         public Guid? TaskId { get; set; }
 
         public List<ChatMessage> Messages { get; set; } = new();
-        public List<ChatSettings> ChatMemberships { get; set; } = new();
+        public ICollection<ChatSettings> ChatSettings { get; set; } = new List<ChatSettings>();
 
         public override ChatBody ToNodeBody()
         {
