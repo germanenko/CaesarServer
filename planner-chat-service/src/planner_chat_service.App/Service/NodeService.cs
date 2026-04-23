@@ -43,8 +43,6 @@ namespace planner_chat_service.App.Service
             {
                 if (node is Chat chat)
                 {
-                    _logger.LogInformation(JsonSerializer.Serialize(chat.ChatSettings));
-
                     var chatState = await _chatRepository.GetOrCreateChatState(chat.Id);
                     var chatUserState = await _chatRepository.GetOrCreateChatUserState(chat.Id, accountId);
                     var chatEdit = await _chatRepository.GetLastChatEdit(chat.Id);
