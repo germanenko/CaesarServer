@@ -1,10 +1,12 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_server_package;
 using System.Collections.Generic;
+using System.Text.Json;
 
 namespace planner_chat_service.App.Service
 {
@@ -12,12 +14,14 @@ namespace planner_chat_service.App.Service
     {
         private readonly INodeRepository _nodeRepository;
         private readonly IChatRepository _chatRepository;
+        private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, IChatRepository chatRepository)
+            INodeRepository nodeRepository, IChatRepository chatRepository, ILogger<NodeService> logger)
         {
             _nodeRepository = nodeRepository;
             _chatRepository = chatRepository;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
@@ -39,6 +43,8 @@ namespace planner_chat_service.App.Service
             {
                 if (node is Chat chat)
                 {
+                    _logger.LogInformation(JsonSerializer.Serialize(chat));
+
                     var chatState = await _chatRepository.GetOrCreateChatState(chat.Id);
                     var chatUserState = await _chatRepository.GetOrCreateChatUserState(chat.Id, accountId);
                     var chatEdit = await _chatRepository.GetLastChatEdit(chat.Id);
