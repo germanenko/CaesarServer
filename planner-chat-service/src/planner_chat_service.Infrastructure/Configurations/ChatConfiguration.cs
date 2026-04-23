@@ -20,6 +20,11 @@ namespace planner_chat_service.Infrastructure.Configurations
                 .HasForeignKey(e => e.ChatId)
                 .IsRequired(false)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            builder.Navigation(x => x.ChatMemberships)
+                .AutoInclude();
+
+
         }
     }
 }

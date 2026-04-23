@@ -11,6 +11,7 @@ namespace planner_client_package.Entities
         public bool IsSyncedReadStatus { get; set; }
         public ChatType ChatType { get; set; }
         public List<Guid> ParticipantIds { get; set; } = new();
+        public Guid? PartnerId { get; set; }
         public ProfileBody Profile { get; set; }
         public ChatStateBody State { get; set; }
         public ChatUserStateBody UserState { get; set; }

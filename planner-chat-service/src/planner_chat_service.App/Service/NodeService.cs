@@ -48,6 +48,7 @@ namespace planner_chat_service.App.Service
                     chatBody.State = chatState.ToBody();
                     chatBody.UserState = chatUserState.ToBody();
                     chatBody.ChatEdit = chatEdit?.ToBody();
+                    chatBody.PartnerId = chat.ChatMemberships.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
 
                     chatBodies.Add(chatBody);
                 }
