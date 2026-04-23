@@ -52,9 +52,7 @@ namespace planner_chat_service.App.Service
                     chatBody.State = chatState.ToBody();
                     chatBody.UserState = chatUserState.ToBody();
                     chatBody.ChatEdit = chatEdit?.ToBody();
-                    chatBody.PartnerId = (await _chatRepository.GetChatSettingsAsync(chat.Id)).First(x => x.AccountId != accountId).AccountId;
-                    _logger.LogInformation(chatBody.PartnerId.ToString());
-
+                    chatBody.PartnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
 
                     chatBodies.Add(chatBody);
                 }
