@@ -99,8 +99,8 @@ namespace planner_content_service.Infrastructure.Service
             //    JobType = x.JobType
             //}).ToList();
 
-            await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId);
-            await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies);
+            await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId, CancellationToken.None);
+            await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies, CancellationToken.None);
             //await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
 
             return new ServiceResponse<object>()
@@ -137,7 +137,7 @@ namespace planner_content_service.Infrastructure.Service
                 UpdatedBy = profile.Id
             };
 
-            await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id);
+            await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
 
             return new ServiceResponse<object>()
             {
@@ -159,7 +159,7 @@ namespace planner_content_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
-            await taskService.SetMessageEdited(response.MessageId, response.State);
+            await taskService.SetMessageEdited(response.MessageId, response.State, CancellationToken.None);
 
             return new ServiceResponse<object>()
             {

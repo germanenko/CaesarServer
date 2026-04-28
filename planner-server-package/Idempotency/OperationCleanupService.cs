@@ -31,7 +31,7 @@ namespace planner_server_package.Idempotency
             {
                 try
                 {
-                    await CleanUpInactiveDevicesAsync();
+                    await CleanUpInactiveDevicesAsync(stoppingToken);
                 }
                 catch (Exception ex)
                 {
@@ -42,11 +42,11 @@ namespace planner_server_package.Idempotency
             }
         }
 
-        private async Task CleanUpInactiveDevicesAsync()
+        private async Task CleanUpInactiveDevicesAsync(CancellationToken cancellationToken)
         {
             using var scope = _serviceProvider.CreateScope();
             var notifyRepository = scope.ServiceProvider.GetRequiredService<IIdempotencyRepository>();
-            await notifyRepository.DeleteOldRequests();
+            await notifyRepository.DeleteOldRequests(cancellationToken);
         }
     }
 }

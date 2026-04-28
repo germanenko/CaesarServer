@@ -115,7 +115,8 @@ namespace planner_chat_service.Api.Controllers
         public async Task<IActionResult> CreatePersonalChat(
             [FromBody, Required] CreateChatBody createChatBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
@@ -128,7 +129,8 @@ namespace planner_chat_service.Api.Controllers
                 async () => await _chatService.CreatePersonalChat(
                     tokenPayload.AccountId,
                     tokenPayload.SessionId,
-                    createChatBody)
+                    createChatBody),
+                cancellationToken
                 );
 
             //var result = await _chatService.CreatePersonalChat(

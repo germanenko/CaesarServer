@@ -28,7 +28,8 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<JobBody?> AddAsync<T>
         (
             T taskBody,
-            Guid accountId
+            Guid accountId,
+            CancellationToken cancellationToken
         ) where T : JobBodyRequest
         {
             var job = _jobFactory.Create(taskBody);
@@ -55,7 +56,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 var result = task.ToTaskBody();
 
-                result = await SetReadStateToJobBody(accountId, result);
+                result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
                 return result;
             }
@@ -72,7 +73,8 @@ namespace planner_content_service.Infrastructure.Repository
             T taskBody,
             Guid accountId,
             Guid messageId,
-            string snapshot
+            string snapshot,
+            CancellationToken cancellationToken
         ) where T : JobBodyRequest
         {
             var job = _jobFactory.Create(taskBody);
@@ -108,7 +110,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 var result = task.ToTaskBody();
 
-                result = await SetReadStateToJobBody(accountId, result);
+                result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
                 return result;
             }
@@ -120,16 +122,16 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<JobBody> SetReadStateToJobBody(Guid accountId, JobBody body)
+        public async Task<JobBody> SetReadStateToJobBody(Guid accountId, JobBody body, CancellationToken cancellationToken)
         {
-            var readState = await GetOrCreateReadStateAsync(accountId, body.Id);
+            var readState = await GetOrCreateReadStateAsync(accountId, body.Id, cancellationToken);
 
             body.ReadState = readState;
 
             return body;
         }
 
-        public async Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot)
+        public async Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot, CancellationToken cancellationToken)
         {
             var attachedMessage = (await _context.AttachedMessages.AddAsync(new AttachedMessage(jobId, messageId, snapshot))).Entity;
 
@@ -149,7 +151,7 @@ namespace planner_content_service.Infrastructure.Repository
             return attachedMessage;
         }
 
-        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state, CancellationToken cancellationToken)
         {
             var messages = await _context.AttachedMessages.Where(x => x.MessageId == messageId).ToListAsync();
 
@@ -161,28 +163,28 @@ namespace planner_content_service.Infrastructure.Repository
             await _context.SaveChangesAsync();
         }
 
-        public async Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId)
+        public async Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId, CancellationToken cancellationToken)
         {
             var attachedMessage = await _context.AttachedMessages.AsNoTracking().FirstOrDefaultAsync(x => x.JobId == jobId && x.MessageId == messageId);
 
             return attachedMessage;
         }
 
-        public async Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId)
+        public async Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId, CancellationToken cancellationToken)
         {
-            var readState = await GetOrCreateReadState(accountId, jobId);
+            var readState = await GetOrCreateReadState(accountId, jobId, cancellationToken);
 
             if (readState == null)
             {
                 readState = (await _context.ReadStates.AddAsync(new ReadState(jobId, accountId))).Entity;
             }
 
-            var result = await FillReadState(readState.ToBody());
+            var result = await FillReadState(readState.ToBody(), cancellationToken);
 
             return result;
         }
 
-        public async Task<ReadState> GetOrCreateReadState(Guid accountId, Guid jobId)
+        public async Task<ReadState> GetOrCreateReadState(Guid accountId, Guid jobId, CancellationToken cancellationToken)
         {
             var readState = await _context.ReadStates.FirstOrDefaultAsync(x => x.JobId == jobId && x.AccountId == accountId);
 
@@ -194,20 +196,20 @@ namespace planner_content_service.Infrastructure.Repository
             return readState;
         }
 
-        public async Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId)
+        public async Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId, CancellationToken cancellationToken)
         {
-            var readState = await GetOrCreateReadState(accountId, jobId);
+            var readState = await GetOrCreateReadState(accountId, jobId, cancellationToken);
 
             readState.LastReadAtUtc = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            var result = await FillReadState(readState.ToBody());
+            var result = await FillReadState(readState.ToBody(), cancellationToken);
 
             return result;
         }
 
-        public async Task<ReadStateBody> FillReadState(ReadStateBody body)
+        public async Task<ReadStateBody> FillReadState(ReadStateBody body, CancellationToken cancellationToken)
         {
             body.AttachedLastPreview = (await _context.AttachedMessages.OrderByDescending(x => x.AttachedAtUtc).FirstOrDefaultAsync())?.Snapshot;
             body.AttachedUnreadCount = (await _context.AttachedMessages.Where(x => x.AttachedAtUtc > body.LastReadAtUtc).ToListAsync()).Count;
@@ -215,7 +217,7 @@ namespace planner_content_service.Infrastructure.Repository
             return body;
         }
 
-        public IEnumerable<JobBody?>? GetAll(List<Guid> ids)
+        public IEnumerable<JobBody?>? GetAll(List<Guid> ids, CancellationToken cancellationToken)
         {
             var result = _context.Nodes
                 .Where(x => ids.Contains(x.Id) && x.Type == NodeType.Job)
@@ -226,11 +228,13 @@ namespace planner_content_service.Infrastructure.Repository
         }
 
 
-        public async Task<JobBody?> GetAsync(Guid id)
+        public async Task<JobBody?> GetAsync(Guid id, CancellationToken cancellationToken)
             => (await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id))?.ToTaskBody();
 
-        public async Task<bool> RemoveAsync(Guid id)
+        public async Task<bool> RemoveAsync(
+            Guid id,
+            CancellationToken cancellationToken)
         {
             var task = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == id);
             if (task == null)
@@ -245,7 +249,8 @@ namespace planner_content_service.Infrastructure.Repository
             Guid id,
             Guid accountId,
             JobBody updatedNode,
-            DateTime changeDate)
+            DateTime changeDate,
+            CancellationToken cancellationToken)
         {
             var task = await _context.Tasks
                 .FirstOrDefaultAsync(e => e.Id == id);
@@ -264,7 +269,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             var result = task.ToTaskBody();
 
-            result = await SetReadStateToJobBody(accountId, result);
+            result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
             return result;
         }

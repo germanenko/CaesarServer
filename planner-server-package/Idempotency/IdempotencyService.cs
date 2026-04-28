@@ -8,6 +8,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace planner_server_package.Idempotency
@@ -21,16 +22,16 @@ namespace planner_server_package.Idempotency
             _idempotencyRepository = idempotencyRepository;
         }
 
-        public async Task<ProcessOperation> GetOperation(Guid opId, Guid accountId, OperationName opName)
+        public async Task<ProcessOperation> GetOperation(Guid opId, Guid accountId, OperationName opName, CancellationToken cancellationToken)
         {
-            var operation = await _idempotencyRepository.GetOperation(opId, accountId, opName);
+            var operation = await _idempotencyRepository.GetOperation(opId, accountId, opName, cancellationToken);
 
             return operation;
         }
 
-        public async Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, object request, Func<Task<ServiceResponse<TResult>>> handler)
+        public async Task<ServiceResponse<TResult>> ExecuteOperation<TResult>(Guid opId, Guid accountId, OperationName opName, object request, Func<Task<ServiceResponse<TResult>>> handler, CancellationToken cancellationToken)
         {
-            var operation = await GetOperation(opId, accountId, opName);
+            var operation = await GetOperation(opId, accountId, opName, cancellationToken);
 
             var requestHash = ComputeRequestHash(request);
 
@@ -54,7 +55,7 @@ namespace planner_server_package.Idempotency
             }
             else
             {
-                await _idempotencyRepository.AddOperation(opId, accountId, opName, requestHash);
+                await _idempotencyRepository.AddOperation(opId, accountId, opName, requestHash, cancellationToken);
 
                 var result = await handler();
 
@@ -62,11 +63,11 @@ namespace planner_server_package.Idempotency
                 {
                     var errorKind = result.ErrorCodes.Max().GetErrorKind();
 
-                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, errorKind, result.Errors);
+                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, errorKind, result.Errors, cancellationToken);
                 }
                 else
                 {
-                    await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result));
+                    await _idempotencyRepository.SetOperationCompleted(opId, JsonSerializer.Serialize(result), cancellationToken);
                 }
 
                 return result;

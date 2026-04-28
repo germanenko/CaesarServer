@@ -30,52 +30,56 @@ namespace planner_content_service.Infrastructure.Repository
             _logger = logger;
         }
 
-        public async Task<BoardBody?> GetBoardById(Guid boardId)
+        public async Task<BoardBody?> GetBoardById(Guid boardId, CancellationToken cancellationToken = default)
         {
-            return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId))?.ToBoardBody();
+            return (await _context.Boards.AsNoTracking().FirstOrDefaultAsync(x => x.Id == boardId, cancellationToken))?.ToBoardBody();
         }
 
-        public async Task<ColumnBody?> GetColumnById(Guid columnId)
+        public async Task<ColumnBody?> GetColumnById(Guid columnId, CancellationToken cancellationToken = default)
         {
-            return (await _context.Columns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == columnId))?.ToColumnBody();
+            return (await _context.Columns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == columnId, cancellationToken))?.ToColumnBody();
         }
 
-        public async Task<Guid?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId)
+        public async Task<Guid?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken = default)
         {
-            return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId))?.Id;
+            return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId, cancellationToken))?.Id;
         }
 
-        public async Task<List<ColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId)
+        public async Task<List<ColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
         {
-            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).Select(x => x.Column).ToListAsync();
+            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).Select(x => x.Column).ToListAsync(cancellationToken);
 
             return taskColumns.Select(x => x.ToColumnBody()).ToList();
         }
 
-        public async Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, Guid? chatId)
+        public async Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, CancellationToken cancellationToken = default, Guid? chatId = null)
         {
-            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId))).Entity.ColumnId;
+            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId), cancellationToken)).Entity.ColumnId;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return result;
         }
 
 
 
-        public async Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata)
+        public async Task<BoardBody?> CreateOrUpdateBoardAsync(
+            BoardBody boardBody,
+            Guid accountId,
+            NodeBody metadata,
+            CancellationToken cancellationToken = default)
         {
             try
             {
                 _logger.LogInformation($"Props: {boardBody.Props}");
-                var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == boardBody.Id);
+                var board = await _context.Boards.FirstOrDefaultAsync(x => x.Id == boardBody.Id, cancellationToken);
 
                 if (board != null)
                 {
                     board.Name = boardBody.Name;
                     board.Props = boardBody.Props;
 
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     return board.ToBoardBody();
                 }
@@ -88,9 +92,9 @@ namespace planner_content_service.Infrastructure.Repository
                     Props = boardBody.Props
                 };
 
-                await _context.Boards.AddAsync(newBoard);
+                await _context.Boards.AddAsync(newBoard, cancellationToken);
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return newBoard.ToBoardBody().ApplyNodeMetadata(metadata);
             }
@@ -102,33 +106,40 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
-        public async Task<List<BoardBody>?> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId)
+        public async Task<List<BoardBody>?> CreateOrUpdateBoards(
+            List<BoardBody> boards,
+            Guid accountId,
+            CancellationToken cancellationToken = default)
         {
             List<BoardBody> newBoardNodes = new List<BoardBody>();
 
             foreach (var board in boards)
             {
-                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId, board));
+                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId, board, cancellationToken));
             }
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return newBoardNodes;
         }
 
 
-        public async Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody columnBody, Guid accountId, NodeBody metadata)
+        public async Task<ColumnBody?> CreateOrUpdateColumn(
+            ColumnBody columnBody,
+            Guid accountId,
+            NodeBody metadata,
+            CancellationToken cancellationToken = default)
         {
             try
             {
-                var column = await _context.Columns.FirstOrDefaultAsync(x => x.Id == columnBody.Id);
+                var column = await _context.Columns.FirstOrDefaultAsync(x => x.Id == columnBody.Id, cancellationToken);
 
                 if (column != null)
                 {
                     column.Name = columnBody.Name;
                     column.Props = columnBody.Props;
 
-                    await _context.SaveChangesAsync();
+                    await _context.SaveChangesAsync(cancellationToken);
 
                     return columnBody;
                 }
@@ -141,9 +152,9 @@ namespace planner_content_service.Infrastructure.Repository
                     Props = columnBody.Props
                 };
 
-                columnNode = (await _context.Columns.AddAsync(columnNode))?.Entity;
+                columnNode = (await _context.Columns.AddAsync(columnNode, cancellationToken))?.Entity;
 
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync(cancellationToken);
 
                 return columnBody.ApplyNodeMetadata(metadata);
             }
@@ -156,26 +167,32 @@ namespace planner_content_service.Infrastructure.Repository
 
         }
 
-        public async Task<bool> DeleteNode(Guid nodeId, Guid accountId)
+        public async Task<bool> DeleteNode(
+            Guid nodeId,
+            Guid accountId,
+            CancellationToken cancellationToken = default)
         {
-            var column = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId);
+            var column = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId, cancellationToken);
 
             if (column == null) return false;
 
             _context.Nodes.Remove(column);
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return true;
         }
 
-        public async Task<List<ColumnBody>?> CreateOtUpdateColumns(List<ColumnBody> columns, Guid accountId)
+        public async Task<List<ColumnBody>?> CreateOrUpdateColumns(
+            List<ColumnBody> columns,
+            Guid accountId,
+            CancellationToken cancellationToken = default)
         {
             var columnNodes = new List<ColumnBody>();
 
             foreach (var column in columns)
             {
-                var addedColumn = await CreateOrUpdateColumn(column, accountId, column);
+                var addedColumn = await CreateOrUpdateColumn(column, accountId, column, cancellationToken);
                 if (addedColumn != null)
                     columnNodes.Add(addedColumn);
             }

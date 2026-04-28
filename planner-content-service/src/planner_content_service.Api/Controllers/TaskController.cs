@@ -33,11 +33,12 @@ namespace planner_content_service.Api.Controllers
 
         public async Task<IActionResult> CreateOrUpdateTask(
             [FromBody] JobBodyRequest taskBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody);
+            var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
@@ -54,11 +55,12 @@ namespace planner_content_service.Api.Controllers
             [FromQuery] string snapshot,
             [FromQuery] Guid messageId,
             [FromBody] JobBodyRequest taskBody,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
+            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.CreateTaskFromMessage(tokenPayload.AccountId, taskBody, snapshot, messageId);
+            var result = await _taskService.CreateTaskFromMessage(tokenPayload.AccountId, taskBody, snapshot, messageId, cancellationToken);
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
@@ -73,11 +75,12 @@ namespace planner_content_service.Api.Controllers
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery] Guid messageId,
             [FromQuery] Guid jobId,
-            [FromQuery] string snapshot
+            [FromQuery] string snapshot,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.AttachMessage(tokenPayload.AccountId, jobId, messageId, snapshot);
+            var result = await _taskService.AttachMessage(tokenPayload.AccountId, jobId, messageId, snapshot, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -86,11 +89,12 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> ReadAttachedMessages(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid jobId
+            [FromQuery] Guid jobId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _taskService.ReadAttachedMessages(tokenPayload.AccountId, jobId);
+            var result = await _taskService.ReadAttachedMessages(tokenPayload.AccountId, jobId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

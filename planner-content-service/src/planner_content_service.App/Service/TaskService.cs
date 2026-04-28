@@ -31,7 +31,7 @@ namespace planner_content_service.App.Service
             _accessService = accessService;
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             var hasAccess = await _accessService.CheckAccess(accountId, messageId, Permission.Read);
 
@@ -74,14 +74,14 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            if (await _taskRepository.GetAsync(createOrUpdateJobBody.Id) != null)
+            if (await _taskRepository.GetAsync(createOrUpdateJobBody.Id, cancellationToken) != null)
             {
-                var task = await UpdateTask(accountId, taskBody);
+                var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
                 return task;
             }
 
-            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, messageId, snapshot);
+            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, messageId, snapshot, cancellationToken);
 
             if (result == null)
             {
@@ -101,7 +101,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             var taskBody = new JobBody()
             {
@@ -132,14 +132,14 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            if (await _taskRepository.GetAsync(createOrUpdateJobBody.Id) != null)
+            if (await _taskRepository.GetAsync(createOrUpdateJobBody.Id, cancellationToken) != null)
             {
-                var task = await UpdateTask(accountId, taskBody);
+                var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId);
+            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -159,7 +159,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies) where T : JobBodyRequest
+        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             var errors = new List<string>();
             List<JobBody> tasks = new List<JobBody>();
@@ -192,7 +192,7 @@ namespace planner_content_service.App.Service
 
 
 
-        public async Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody)
+        public async Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody, CancellationToken cancellationToken = default)
         {
             var errors = new List<string>();
 
@@ -213,7 +213,7 @@ namespace planner_content_service.App.Service
             DateTime? startDate = taskBody.StartDate/* == null ? null : DateTime.Parse(taskBody.StartDate) */;
             DateTime? endDate = taskBody.EndDate/* == null ? null : DateTime.Parse(taskBody.EndDate) */;
 
-            var result = await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow);
+            var result = await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow, cancellationToken);
             return result == null ? new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.BadRequest,
@@ -227,7 +227,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies)
+        public async Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies, CancellationToken cancellationToken = default)
         {
             var errors = new List<string>();
             List<JobBody> result = new List<JobBody>();
@@ -250,7 +250,7 @@ namespace planner_content_service.App.Service
                 DateTime? startDate = taskBody.StartDate/* == null ? null : DateTime.Parse(taskBody.StartDate)*/;
                 DateTime? endDate = taskBody.EndDate/* == null ? null : DateTime.Parse(taskBody.EndDate)*/;
 
-                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow));
+                result.Add(await _taskRepository.UpdateAsync(taskBody.Id, accountId, taskBody, DateTime.UtcNow, cancellationToken));
             }
 
             return result.Count != taskBodies.Count ? new ServiceResponse<List<JobBody>>
@@ -266,9 +266,9 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot)
+        public async Task<ServiceResponse<AttachedMessageBody>> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot, CancellationToken cancellationToken = default)
         {
-            var existingAttachedMessage = await _taskRepository.GetAttachedMessage(jobId, messageId);
+            var existingAttachedMessage = await _taskRepository.GetAttachedMessage(jobId, messageId, cancellationToken);
 
             if (existingAttachedMessage != null)
             {
@@ -280,7 +280,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var attachedMessage = await _taskRepository.AttachMessage(accountId, jobId, messageId, snapshot);
+            var attachedMessage = await _taskRepository.AttachMessage(accountId, jobId, messageId, snapshot, cancellationToken);
 
             if (attachedMessage == null)
             {
@@ -300,14 +300,14 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state)
+        public async System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state, CancellationToken cancellationToken = default)
         {
-            await _taskRepository.SetMessageEdited(messageId, state);
+            await _taskRepository.SetMessageEdited(messageId, state, cancellationToken);
         }
 
-        public async Task<ServiceResponse<ReadStateBody>> ReadAttachedMessages(Guid accountId, Guid jobId)
+        public async Task<ServiceResponse<ReadStateBody>> ReadAttachedMessages(Guid accountId, Guid jobId, CancellationToken cancellationToken = default)
         {
-            var readState = await _taskRepository.UpdateReadState(accountId, jobId);
+            var readState = await _taskRepository.UpdateReadState(accountId, jobId, cancellationToken);
 
             return new ServiceResponse<ReadStateBody>
             {

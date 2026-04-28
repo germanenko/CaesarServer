@@ -7,22 +7,23 @@ namespace planner_content_service.Core.IRepository
 {
     public interface ITaskRepository
     {
-        Task<JobBody?> AddAsync<T>(T jobBody, Guid accountId) where T : JobBodyRequest;
-        Task<JobBody?> AddJobFromMessageAsync<T>(T jobBody, Guid accountId, Guid messageId, string snapshot) where T : JobBodyRequest;
-        Task<JobBody?> GetAsync(Guid id);
-        Task<bool> RemoveAsync(Guid id);
-        IEnumerable<JobBody?>? GetAll(List<Guid> ids);
+        Task<JobBody?> AddAsync<T>(T jobBody, Guid accountId, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<JobBody?> AddJobFromMessageAsync<T>(T jobBody, Guid accountId, Guid messageId, string snapshot, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<JobBody?> GetAsync(Guid id, CancellationToken cancellationToken);
+        Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken);
+        IEnumerable<JobBody?>? GetAll(List<Guid> ids, CancellationToken cancellationToken);
 
         Task<JobBody?> UpdateAsync(
             Guid id,
             Guid accountId,
             JobBody updatedNode,
-            DateTime changeDate);
+            DateTime changeDate,
+            CancellationToken cancellationToken);
 
-        Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot);
-        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state);
-        Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId);
-        Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId);
-        Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId);
+        Task<AttachedMessage> AttachMessage(Guid accountId, Guid jobId, Guid messageId, string snapshot, CancellationToken cancellationToken);
+        System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state, CancellationToken cancellationToken);
+        Task<AttachedMessage?> GetAttachedMessage(Guid jobId, Guid messageId, CancellationToken cancellationToken);
+        Task<ReadStateBody> GetOrCreateReadStateAsync(Guid accountId, Guid jobId, CancellationToken cancellationToken);
+        Task<ReadStateBody> UpdateReadState(Guid accountId, Guid jobId, CancellationToken cancellationToken);
     }
 }

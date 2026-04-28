@@ -38,7 +38,8 @@ namespace planner_content_service.Api.Controllers
         public async Task<IActionResult> CreateOrUpdateBoard(
             CreateOrUpdateBoardBody boardBody,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
+            CancellationToken cancellationToken
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
@@ -48,7 +49,8 @@ namespace planner_content_service.Api.Controllers
                 tokenInfo.AccountId,
                 OperationName.CreateOrUpdateBoard,
                 boardBody,
-                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId)
+                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId, cancellationToken),
+                cancellationToken
             );
 
             if (result.IsSuccess)
@@ -57,34 +59,18 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, new Response<BoardBody>() { ErrorCodes = result.ErrorCodes });
         }
 
-        [HttpPost("createBoards"), Authorize]
-        [SwaggerOperation("Создать доски")]
-        [SwaggerResponse(200)]
-        [SwaggerResponse(400)]
-        public async Task<IActionResult> CreateOrUpdateBoards(
-            List<CreateOrUpdateBoardBody> boardBodies,
-            [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token
-        )
-        {
-            var tokenInfo = _jwtService.GetTokenPayload(token);
-
-            var result = await _boardService.CreateOrUpdateBoards(boardBodies, tokenInfo.AccountId);
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
-        }
 
         [HttpPost("board/column"), Authorize]
         [SwaggerOperation("Создать колонку")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> CreateOrUpdateColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            ColumnBody column
+            ColumnBodyRequest column,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.CreateOrUpdateColumn(tokenPayload.AccountId, column);
+            var result = await _boardService.CreateOrUpdateColumn(tokenPayload.AccountId, column, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -93,37 +79,27 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> DeleteNode(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            Guid nodeId
+            Guid nodeId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.DeleteNode(tokenPayload.AccountId, nodeId);
+            var result = await _boardService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpPost("board/createColumns"), Authorize]
-        [SwaggerOperation("Создать колонки")]
-        [SwaggerResponse(200)]
-        public async Task<IActionResult> CreateOrUpdateColumns(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            List<ColumnBody> columns
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.CreateOrUpdateColumns(tokenPayload.AccountId, columns);
-            return StatusCode((int)result.StatusCode, result.Body);
-        }
 
         [HttpPost("addDefaultColumn"), Authorize]
         [SwaggerOperation("Добавить колонку по умолчанию")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> AddDefaultColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid columnId
+            [FromQuery] Guid columnId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, columnId);
+            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, columnId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -133,11 +109,12 @@ namespace planner_content_service.Api.Controllers
         public async Task<IActionResult> AddDefaultColumnForChat(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery] Guid columnId,
-            [FromQuery] Guid chatId
+            [FromQuery] Guid chatId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddDefaultColumnForChat(tokenPayload.AccountId, columnId, chatId);
+            var result = await _boardService.AddDefaultColumnForChat(tokenPayload.AccountId, columnId, chatId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
@@ -146,11 +123,12 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetDefaultColumns(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid? chatId
+            [FromQuery] Guid? chatId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, chatId);
+            var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, chatId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

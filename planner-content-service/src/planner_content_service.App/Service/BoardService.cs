@@ -34,11 +34,13 @@ namespace planner_content_service.App.Service
             _accessService = accessService;
         }
 
-        public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBody column)
+        public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBodyRequest column, CancellationToken cancellationToken = default)
         {
+            var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None };
+
             CreateNodeEvent columnEvent = new CreateNodeEvent()
             {
-                Node = BodyConverter.ClientToServerBody(column),
+                Node = BodyConverter.ClientToServerBody(columnBody),
                 CreatorId = accountId
             };
 
@@ -64,7 +66,7 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            var result = await _boardRepository.CreateOrUpdateColumn(column, accountId, responseBody);
+            var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, responseBody, cancellationToken);
 
             if (result == null)
             {
@@ -84,7 +86,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId)
+        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId, CancellationToken cancellationToken = default)
         {
             DeleteNodeEvent deleteEvent = new DeleteNodeEvent()
             {
@@ -104,7 +106,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var result = await _boardRepository.DeleteNode(columnId, accountId);
+            var result = await _boardRepository.DeleteNode(columnId, accountId, cancellationToken);
 
             if (!result)
             {
@@ -125,7 +127,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> CreateBaseColumns(Guid accountId, Guid boardId)
+        public async Task<ServiceResponse<List<ColumnBody>>> CreateBaseColumns(Guid accountId, Guid boardId, CancellationToken cancellationToken = default)
         {
             var columnId = Guid.NewGuid();
 
@@ -172,7 +174,7 @@ namespace planner_content_service.App.Service
             }
 
 
-            var result = await _boardRepository.CreateOtUpdateColumns(columns, accountId);
+            var result = await _boardRepository.CreateOrUpdateColumns(columns, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -192,7 +194,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> CreateOrUpdateColumns(Guid accountId, List<ColumnBody> columns)
+        public async Task<ServiceResponse<List<ColumnBody>>> CreateOrUpdateColumns(Guid accountId, List<ColumnBody> columns, CancellationToken cancellationToken = default)
         {
             List<ColumnBody>? newColumns = new List<ColumnBody>();
             List<ColumnBody> columnsToStore = new List<ColumnBody>();
@@ -206,7 +208,7 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            newColumns = await _boardRepository.CreateOtUpdateColumns(columnsToStore, accountId);
+            newColumns = await _boardRepository.CreateOrUpdateColumns(columnsToStore, accountId, cancellationToken);
 
             if (newColumns == null)
             {
@@ -226,7 +228,36 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId)
+        public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> bodies, Guid accountId, CancellationToken cancellationToken = default)
+        {
+            var boardBodies = bodies.Select(body => new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }).ToList();
+
+            var result = await _boardRepository.CreateOrUpdateBoards(boardBodies, accountId, cancellationToken);
+
+            if (result is null)
+            {
+                return new ServiceResponse<List<BoardBody>>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    ErrorCodes = [ErrorCode.Infrastructure]
+                };
+            }
+
+            foreach (var board in result)
+            {
+                await CreateBaseColumns(accountId, board.Id);
+            }
+
+            return new ServiceResponse<List<BoardBody>>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
+        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId, CancellationToken cancellationToken = default)
         {
             var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId, SyncKind = SyncKind.Scope };
 
@@ -257,9 +288,9 @@ namespace planner_content_service.App.Service
                 }
             }
 
-            var hasBoard = await _boardRepository.GetBoardById(body.Id);
+            var hasBoard = await _boardRepository.GetBoardById(body.Id, cancellationToken);
 
-            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, responseBody);
+            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, responseBody, cancellationToken);
 
             if (result is null)
             {
@@ -286,48 +317,19 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<BoardBody>>> CreateOrUpdateBoards(List<CreateOrUpdateBoardBody> bodies, Guid accountId)
+        public async Task<ServiceResponse<Guid>> AddDefaultColumn(Guid accountId, Guid columnId, CancellationToken cancellationToken = default)
         {
-            var boardBodies = bodies.Select(body => new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }).ToList();
-
-            var result = await _boardRepository.CreateOrUpdateBoards(boardBodies, accountId);
-
-            if (result is null)
-            {
-                return new ServiceResponse<List<BoardBody>>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.InternalServerError,
-                    ErrorCodes = [ErrorCode.Infrastructure]
-                };
-            }
-
-            foreach (var board in result)
-            {
-                await CreateBaseColumns(accountId, board.Id);
-            }
-
-            return new ServiceResponse<List<BoardBody>>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result
-            };
+            return await AddDefaultColumnInternal(accountId, columnId, null, cancellationToken);
         }
 
-        public async Task<ServiceResponse<Guid>> AddDefaultColumn(Guid accountId, Guid columnId)
+        public async Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId, CancellationToken cancellationToken = default)
         {
-            return await AddDefaultColumnInternal(accountId, columnId);
+            return await AddDefaultColumnInternal(accountId, columnId, chatId, cancellationToken);
         }
 
-        public async Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId)
+        private async Task<ServiceResponse<Guid>> AddDefaultColumnInternal(Guid accountId, Guid columnId, Guid? chatId = null, CancellationToken cancellationToken = default)
         {
-            return await AddDefaultColumnInternal(accountId, columnId, chatId);
-        }
-
-        private async Task<ServiceResponse<Guid>> AddDefaultColumnInternal(Guid accountId, Guid columnId, Guid? chatId = null)
-        {
-            var existingColumn = await _boardRepository.GetColumnById(columnId);
+            var existingColumn = await _boardRepository.GetColumnById(columnId, cancellationToken);
 
             if (existingColumn == null)
                 return new ServiceResponse<Guid>
@@ -336,7 +338,7 @@ namespace planner_content_service.App.Service
                     StatusCode = HttpStatusCode.BadRequest
                 };
 
-            var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, columnId, null);
+            var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, columnId, null, cancellationToken);
 
             if (existingTaskColumn != null)
                 return new ServiceResponse<Guid>
@@ -345,7 +347,7 @@ namespace planner_content_service.App.Service
                     StatusCode = HttpStatusCode.BadRequest
                 };
 
-            var taskColumnId = await _boardRepository.AddTaskColumn(accountId, columnId);
+            var taskColumnId = await _boardRepository.AddTaskColumn(accountId, columnId, cancellationToken);
 
             return new ServiceResponse<Guid>
             {
@@ -355,9 +357,9 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId)
+        public async Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
         {
-            var columns = await _boardRepository.GetUserTaskColumns(accountId, chatId);
+            var columns = await _boardRepository.GetUserTaskColumns(accountId, chatId, cancellationToken);
 
             if (columns.IsNullOrEmpty())
             {
