@@ -96,7 +96,7 @@ namespace planner_chat_service.Infrastructure.Service
 
             foreach (var chat in chats)
             {
-                await chatService.CreatePersonalChat(nodes.TokenPayload.AccountId, nodes.TokenPayload.SessionId, new planner_client_package.Entities.CreateChatBody() { Id = chat.Id, CompanionId = chat.ParticipantIds.FirstOrDefault(x => x != nodes.TokenPayload.AccountId) });
+                await chatService.CreatePersonalChat(nodes.TokenPayload.AccountId, nodes.TokenPayload.SessionId, new planner_client_package.Entities.Request.CreateChatBody() { Id = chat.Id, CompanionId = chat.ParticipantIds.FirstOrDefault(x => x != nodes.TokenPayload.AccountId) });
             }
 
             foreach (var chatMessage in messages)
