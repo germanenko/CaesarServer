@@ -876,7 +876,7 @@
         },
 
 	{
-            "DownstreamPathTemplate": "/api/createTaskFromMessage",
+            "DownstreamPathTemplate": "/api/createJobFromMessage",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
                 {
@@ -884,7 +884,7 @@
                     "Port": 8889
                 }
             ],
-            "UpstreamPathTemplate": "/api/createTaskFromMessage",
+            "UpstreamPathTemplate": "/api/createJobFromMessage",
             "UpstreamHttpMethod": [ "POST" ]
         },
 
@@ -926,6 +926,7 @@
             "UpstreamPathTemplate": "/api/addDefaultColumn",
             "UpstreamHttpMethod": [ "POST" ]
         },
+
 
 	{
             "DownstreamPathTemplate": "/api/getDefaultColumns",

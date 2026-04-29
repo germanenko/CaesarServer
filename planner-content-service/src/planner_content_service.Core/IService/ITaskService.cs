@@ -7,7 +7,7 @@ namespace planner_content_service.Core.IService
 {
     public interface ITaskService
     {
-        Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> createOrUpdateTaskBodies, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody, CancellationToken cancellationToken);

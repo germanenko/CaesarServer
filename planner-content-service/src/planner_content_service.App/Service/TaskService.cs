@@ -31,7 +31,7 @@ namespace planner_content_service.App.Service
             _accessService = accessService;
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateTaskFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             var hasAccess = await _accessService.CheckAccess(accountId, messageId, Permission.Read);
 
