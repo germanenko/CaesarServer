@@ -17,6 +17,6 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<List<ColumnBody>>> CreateOrUpdateColumns(Guid accountId, List<ColumnBody> columns, CancellationToken cancellationToken);
         Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId, CancellationToken cancellationToken);
         Task<ServiceResponse<TaskColumnBody>> AddDefaultColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken);
-        Task<ServiceResponse<List<TaskColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken);
+        Task<ServiceResponse<List<TaskColumnBody>>> GetDefaultColumns(Guid accountId, CancellationToken cancellationToken);
     }
 }

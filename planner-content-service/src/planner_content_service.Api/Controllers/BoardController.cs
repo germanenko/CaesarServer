@@ -104,16 +104,15 @@ namespace planner_content_service.Api.Controllers
         }
 
         [HttpGet("getDefaultColumns"), Authorize]
-        [SwaggerOperation("Получить колонки по умолчанию")]
+        [SwaggerOperation("Получить все колонки по умолчанию")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetDefaultColumns(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid? chatId,
             CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, chatId, cancellationToken);
+            var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
     }

@@ -347,9 +347,10 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<TaskColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
+
+        public async Task<ServiceResponse<List<TaskColumnBody>>> GetDefaultColumns(Guid accountId, CancellationToken cancellationToken = default)
         {
-            var columns = await _boardRepository.GetUserTaskColumns(accountId, chatId, cancellationToken);
+            var columns = await _boardRepository.GetAllUserTaskColumns(accountId, cancellationToken);
 
             if (columns.IsNullOrEmpty())
             {

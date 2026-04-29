@@ -45,9 +45,9 @@ namespace planner_content_service.Infrastructure.Repository
             return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId, cancellationToken))?.ToBody();
         }
 
-        public async Task<List<TaskColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
+        public async Task<List<TaskColumnBody>> GetAllUserTaskColumns(Guid accountId, CancellationToken cancellationToken = default)
         {
-            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).ToListAsync(cancellationToken);
+            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId).ToListAsync(cancellationToken);
 
             return taskColumns.Select(x => x.ToBody()).ToList();
         }
