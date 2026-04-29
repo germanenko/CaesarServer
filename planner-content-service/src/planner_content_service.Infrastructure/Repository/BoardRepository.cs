@@ -54,7 +54,7 @@ namespace planner_content_service.Infrastructure.Repository
 
         public async Task<TaskColumnBody> AddTaskColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken = default)
         {
-            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, taskColumn.ColumnId, taskColumn.ChatId, taskColumn.Id), cancellationToken)).Entity;
+            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, taskColumn.ColumnId, taskColumn.Id, taskColumn.ChatId), cancellationToken)).Entity;
 
             await _context.SaveChangesAsync(cancellationToken);
 

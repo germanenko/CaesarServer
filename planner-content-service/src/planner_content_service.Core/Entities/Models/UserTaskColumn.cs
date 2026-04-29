@@ -9,9 +9,9 @@ namespace planner_content_service.Core.Entities.Models
 {
     public class UserTaskColumn
     {
-        public UserTaskColumn(Guid accountId, Guid columnId, Guid? chatId = null, Guid? id = null)
+        public UserTaskColumn(Guid accountId, Guid columnId, Guid id, Guid? chatId = null)
         {
-            Id = id ?? Guid.NewGuid();
+            Id = id;
             AccountId = accountId;
             ColumnId = columnId;
             ChatId = chatId;
