@@ -94,27 +94,12 @@ namespace planner_content_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> AddDefaultColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid columnId,
+            [FromBody] TaskColumnRequest taskColumn,
             CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, columnId, cancellationToken);
-            return StatusCode((int)result.StatusCode, result.Body);
-        }
-
-        [HttpPost("addDefaultColumnForChat"), Authorize]
-        [SwaggerOperation("Добавить колонку по умолчанию для чата")]
-        [SwaggerResponse(200)]
-        public async Task<IActionResult> AddDefaultColumnForChat(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid columnId,
-            [FromQuery] Guid chatId,
-            CancellationToken cancellationToken
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddDefaultColumnForChat(tokenPayload.AccountId, columnId, chatId, cancellationToken);
+            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, taskColumn, cancellationToken);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 

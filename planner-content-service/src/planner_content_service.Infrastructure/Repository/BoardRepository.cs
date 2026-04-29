@@ -40,25 +40,25 @@ namespace planner_content_service.Infrastructure.Repository
             return (await _context.Columns.AsNoTracking().FirstOrDefaultAsync(x => x.Id == columnId, cancellationToken))?.ToColumnBody();
         }
 
-        public async Task<Guid?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken = default)
+        public async Task<TaskColumnBody?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken = default)
         {
-            return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId, cancellationToken))?.Id;
+            return (await _context.UserTaskColumns.AsNoTracking().FirstOrDefaultAsync(x => x.ColumnId == columnId && x.AccountId == accountId && x.ChatId == chatId, cancellationToken))?.ToBody();
         }
 
-        public async Task<List<ColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
+        public async Task<List<TaskColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
         {
-            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).Select(x => x.Column).ToListAsync(cancellationToken);
+            var taskColumns = await _context.UserTaskColumns.Include(x => x.Column).AsNoTracking().Where(x => x.AccountId == accountId && x.ChatId == chatId).ToListAsync(cancellationToken);
 
-            return taskColumns.Select(x => x.ToColumnBody()).ToList();
+            return taskColumns.Select(x => x.ToBody()).ToList();
         }
 
-        public async Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, CancellationToken cancellationToken = default, Guid? chatId = null)
+        public async Task<TaskColumnBody> AddTaskColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken = default)
         {
-            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, columnId, chatId), cancellationToken)).Entity.ColumnId;
+            var result = (await _context.UserTaskColumns.AddAsync(new UserTaskColumn(accountId, taskColumn.ColumnId, taskColumn.ChatId, taskColumn.Id), cancellationToken)).Entity;
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            return result;
+            return result.ToBody();
         }
 
 

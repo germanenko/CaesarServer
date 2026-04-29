@@ -317,60 +317,50 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<Guid>> AddDefaultColumn(Guid accountId, Guid columnId, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<TaskColumnBody>> AddDefaultColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken = default)
         {
-            return await AddDefaultColumnInternal(accountId, columnId, null, cancellationToken);
-        }
-
-        public async Task<ServiceResponse<Guid>> AddDefaultColumnForChat(Guid accountId, Guid columnId, Guid chatId, CancellationToken cancellationToken = default)
-        {
-            return await AddDefaultColumnInternal(accountId, columnId, chatId, cancellationToken);
-        }
-
-        private async Task<ServiceResponse<Guid>> AddDefaultColumnInternal(Guid accountId, Guid columnId, Guid? chatId = null, CancellationToken cancellationToken = default)
-        {
-            var existingColumn = await _boardRepository.GetColumnById(columnId, cancellationToken);
+            var existingColumn = await _boardRepository.GetColumnById(taskColumn.ColumnId, cancellationToken);
 
             if (existingColumn == null)
-                return new ServiceResponse<Guid>
+                return new ServiceResponse<TaskColumnBody>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
 
-            var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, columnId, null, cancellationToken);
+            var existingTaskColumn = await _boardRepository.GetUserTaskColumn(accountId, taskColumn.ColumnId, taskColumn.ChatId, cancellationToken);
 
             if (existingTaskColumn != null)
-                return new ServiceResponse<Guid>
+                return new ServiceResponse<TaskColumnBody>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest
+                    StatusCode = HttpStatusCode.Conflict
                 };
 
-            var taskColumnId = await _boardRepository.AddTaskColumn(accountId, columnId, cancellationToken);
+            var taskColumnBody = await _boardRepository.AddTaskColumn(accountId, taskColumn, cancellationToken);
 
-            return new ServiceResponse<Guid>
+            return new ServiceResponse<TaskColumnBody>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = taskColumnId
+                Body = taskColumnBody
             };
         }
 
-        public async Task<ServiceResponse<List<ColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<List<TaskColumnBody>>> GetDefaultColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken = default)
         {
             var columns = await _boardRepository.GetUserTaskColumns(accountId, chatId, cancellationToken);
 
             if (columns.IsNullOrEmpty())
             {
-                return new ServiceResponse<List<ColumnBody>>
+                return new ServiceResponse<List<TaskColumnBody>>
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.NotFound
                 };
             }
 
-            return new ServiceResponse<List<ColumnBody>>
+            return new ServiceResponse<List<TaskColumnBody>>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,

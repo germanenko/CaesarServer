@@ -10,13 +10,13 @@ namespace planner_content_service.Core.IRepository
     {
         Task<BoardBody?> GetBoardById(Guid boardId, CancellationToken cancellationToken);
         Task<ColumnBody?> GetColumnById(Guid columnId, CancellationToken cancellationToken);
-        Task<Guid?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken);
-        Task<List<ColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken);
+        Task<TaskColumnBody?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken);
+        Task<List<TaskColumnBody>> GetUserTaskColumns(Guid accountId, Guid? chatId, CancellationToken cancellationToken);
         Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata, CancellationToken cancellationToken);
         Task<List<BoardBody>> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId, CancellationToken cancellationToken);
         Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId, NodeBody metadata, CancellationToken cancellationToken);
         Task<List<ColumnBody>> CreateOrUpdateColumns(List<ColumnBody> columns, Guid accountId, CancellationToken cancellationToken);
         Task<bool> DeleteNode(Guid nodeId, Guid accountId, CancellationToken cancellationToken);
-        Task<Guid> AddTaskColumn(Guid accountId, Guid columnId, CancellationToken cancellationToken, Guid? chatId = null);
+        Task<TaskColumnBody> AddTaskColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken);
     }
 }
