@@ -226,8 +226,10 @@ namespace planner_auth_service.Infrastructure.Repository
 
         public async Task DeleteInvalidSessions()
         {
+            var threshold = DateTime.UtcNow - TimeSpan.FromDays(7);
+
             var sessionsToDelete = await _context.AccountSessions
-                .Where(d => d.TokenValidBefore < DateTime.UtcNow)
+                .Where(d => d.TokenValidBefore < threshold)
                 .ToListAsync();
 
             if (sessionsToDelete.Any())
