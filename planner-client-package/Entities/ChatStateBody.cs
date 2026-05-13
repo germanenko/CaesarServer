@@ -13,5 +13,10 @@ namespace planner_client_package.Entities
         public long? EditCursorId { get; set; }
         public int UnreadCount { get; set; }
         public MessagePreviewBody LastPreview { get; set; }
+
+        public ChatStateBody()
+        {
+
+        }
     }
 }

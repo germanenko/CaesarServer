@@ -50,9 +50,9 @@ namespace planner_chat_service.Infrastructure.Repository
             return message;
         }
 
-        public async Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<Guid> participants, CreateChatBody createChatBody, DateTime date)
+        public async Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<ProfileBody> participants, CreateChatBody createChatBody, DateTime date)
         {
-            if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0], participants[1]) != null))
+            if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0].Id, participants[1].Id) != null))
                 return null;
 
             var chat = new Chat
@@ -64,17 +64,17 @@ namespace planner_chat_service.Infrastructure.Repository
             };
 
             var memberships = participants
-                .Select(participantId => new ChatSettings
+                .Select(participant => new ChatSettings
                 {
-                    AccountId = participantId,
+                    AccountId = participant.Id,
                     Chat = chat,
-                    DateLastViewing = date,
+                    DateLastViewing = date
                 })
                 .ToList();
 
             chat.ChatSettings = memberships;
 
-            chat = (await _context.Chats.AddAsync(chat))?.Entity;
+            chat = (await _context.Chats.AddAsync(chat)).Entity;
 
             var chatState = new ChatState()
             {

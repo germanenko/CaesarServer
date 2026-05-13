@@ -1,6 +1,7 @@
 using planner_common_package.Enums;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities
 {
@@ -15,5 +16,8 @@ namespace planner_client_package.Entities
         public ChatStateBody State { get; set; }
         public ChatUserStateBody UserState { get; set; }
         public ChatEditBody ChatEdit { get; set; }
+        public ChatSettingsBody ChatSettings { get; set; }
+
+        public ChatBody() { }
     }
 }

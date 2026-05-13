@@ -14,5 +14,7 @@ namespace planner_client_package.Entities
         public Guid MessageId { get; set; }
         public MessageAction Action { get; set; }
         public int Version { get; set; }
+
+        public ChatEditBody() { }
     }
 }

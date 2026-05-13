@@ -96,10 +96,24 @@ namespace planner_chat_service.App.Service
             Guid sessionId,
             CreateChatBody createChatBody)
         {
-            var participants = new List<Guid>
+            var companion = await _userService.GetUserData(createChatBody.CompanionId);
+
+            if (companion == null)
+                return new ServiceResponse<ChatBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    ErrorCodes = [ErrorCode.NotFound],
+                    Errors = ["User not found"]
+                };
+
+
+            var creator = await _userService.GetUserData(accountId);
+
+            var participants = new List<ProfileBody>
             {
-                accountId,
-                createChatBody.CompanionId
+                creator,
+                companion
             };
 
             var currentDate = DateTime.UtcNow;
@@ -118,8 +132,6 @@ namespace planner_chat_service.App.Service
                 Chat = BodyConverter.ClientToServerBody(result),
                 ParticipantIds = [accountId, createChatBody.CompanionId]
             };
-
-            var companion = await _userService.GetUserData(createChatBody.CompanionId);
 
             _notifyService.Publish(createChatEvent, PublishEvent.CreatePersonalChat);
             _notifyService.Publish(createChatEvent, PublishEvent.AddAccountToChat);

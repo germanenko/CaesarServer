@@ -26,6 +26,9 @@ namespace planner_common_package.Enums
         [OperationFailureCode(OperationFailureCode.Validation)]
         DescriptionRequired = 102,
 
+        [OperationFailureCode(OperationFailureCode.Validation)]
+        NotFound = 103,
+
         [OperationFailureCode(OperationFailureCode.Conflict)]
         VersionMismatch = 201,
 

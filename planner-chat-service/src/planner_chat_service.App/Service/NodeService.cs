@@ -49,9 +49,11 @@ namespace planner_chat_service.App.Service
 
                     var chatBody = chat.ToNodeBody();
 
+                    chatBody.Name = chat.ChatSettings.FirstOrDefault(x => x.AccountId == accountId)?.ChatName ?? "Chat";
                     chatBody.State = chatState.ToBody();
                     chatBody.UserState = chatUserState.ToBody();
                     chatBody.ChatEdit = chatEdit?.ToBody();
+                    chatBody.ChatSettings = chat.ChatSettings.FirstOrDefault(x => x.AccountId == accountId)?.ToBody();
                     chatBody.PartnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
 
                     chatBodies.Add(chatBody);
