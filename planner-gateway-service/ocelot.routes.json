@@ -667,6 +667,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/getNodesByTypes",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getNodesByTypes",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/sendLocalNodes",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

@@ -303,9 +303,19 @@ namespace planner_node_service.Infrastructure.Repository
             return await query.Select(x => x.ChildId).ToListAsync();
         }
 
-        public async Task<IEnumerable<Node>?> GetNodes(Guid accountId, List<Guid>? rootIds = null)
+        public async Task<IEnumerable<Node>> GetNodes(Guid accountId, List<Guid>? rootIds = null)
         {
-            IEnumerable<Node>? nodes = await GetNodesTree(accountId, rootIds);
+            IEnumerable<Node> nodes = await GetNodesTree(accountId, rootIds);
+
+            return nodes;
+        }
+
+        public async Task<IEnumerable<Node>> GetNodesByTypes(Guid accountId, List<NodeType> nodeTypes)
+        {
+            IEnumerable<Node>? nodes = await GetNodesTree(accountId);
+
+            if (nodeTypes != null && nodeTypes.Any())
+                nodes = nodes.Where(x => nodeTypes.Contains(x.Type));
 
             return nodes;
         }
@@ -397,13 +407,13 @@ namespace planner_node_service.Infrastructure.Repository
             return nodeLink;
         }
 
-        public async Task<IEnumerable<Node>?> GetNodesTree(Guid accountId, List<Guid>? rootNodeIds = null)
+        public async Task<IEnumerable<Node>> GetNodesTree(Guid accountId, List<Guid>? rootNodeIds = null)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
             if (userSubject == null)
             {
-                return null;
+                return Enumerable.Empty<Node>();
             }
 
             var query = _context.AccessRules

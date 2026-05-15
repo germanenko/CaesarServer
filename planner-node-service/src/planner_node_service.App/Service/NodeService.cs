@@ -166,6 +166,24 @@ namespace planner_node_service.App.Service
         }
 
 
+        // Получение нод по Id с учетом доступа и дополнительной информации из других сервисов
+        public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByTypes(Guid accountId, List<NodeType> nodeTypes)
+        {
+            _logger.LogInformation($"GetNodesByIds called with accountId: {accountId} and nodeTypes: {string.Join(", ", nodeTypes)}");
+
+            var nodes = await _nodeRepository.GetNodesByTypes(accountId, nodeTypes);
+
+            var result = nodes.DistinctBy(x => x.Id).Select(x => x.ToNodeBody()).ToList();
+
+            return new ServiceResponse<IEnumerable<NodeBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
+            };
+        }
+
+
         // Добавление или обновление Scope
         public async Task<ServiceResponse<NodeBody>> AddOrUpdateScope(NodeBody nodeBody)
         {

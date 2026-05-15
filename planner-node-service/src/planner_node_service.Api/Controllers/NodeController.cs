@@ -106,5 +106,19 @@ namespace planner_node_service.Api.Controllers
             var result = await _nodeService.LoadNodes(nodes, tokenPayload);
             return StatusCode((int)result.StatusCode, result.Body);
         }
+
+        [HttpGet("getNodesByTypes"), Authorize]
+        [SwaggerOperation("Получить ноды по типу")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> GetNodesByTypes(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] List<NodeType> nodeTypes
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.GetNodesByTypes(tokenPayload.AccountId, nodeTypes);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
     }
 }
