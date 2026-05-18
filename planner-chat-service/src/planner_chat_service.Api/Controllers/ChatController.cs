@@ -139,9 +139,9 @@ namespace planner_chat_service.Api.Controllers
             //        createChatBody);
 
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, new Response<ChatBody>() { Body = result.Body });
+                return StatusCode((int)result.StatusCode, result.Body);
 
-            return StatusCode((int)result.StatusCode, new Response<ChatBody>() { ErrorCodes = result.ErrorCodes });
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpPost("api/chat/messages")]
