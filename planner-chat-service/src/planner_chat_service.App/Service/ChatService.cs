@@ -50,7 +50,10 @@ namespace planner_chat_service.App.Service
         {
             var chat = await _chatRepository.GetAsync(chatId);
             if (chat == null)
+            {
+                _logger.LogInformation($"Chat {chatId} not exist");
                 return;
+            }
 
             var session = new ChatSession
             {
@@ -59,16 +62,23 @@ namespace planner_chat_service.App.Service
                 SessionId = sessionId
             };
 
-            var chatMembership = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
+            var chatSettings = await _chatRepository.GetChatSettingsAsync(chatId, accountId);
 
             var hasAccess = await _accessService.CheckAccess(accountId, chatId, Permission.Read);
 
-            if (chatMembership == null || !hasAccess)
-                return;
+            if (chatSettings == null || !hasAccess)
+            {
+                _logger.LogInformation($"settings: {chatSettings}, access: {hasAccess}");
 
-            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatMembership.Id, chatMembership.DateLastViewing);
-            if (accountChatSession == null)
                 return;
+            }
+
+            var accountChatSession = await _chatRepository.CreateOrGetAccountChatSessionAsync(sessionId, chatSettings.Id, chatSettings.DateLastViewing);
+            if (accountChatSession == null)
+            {
+                _logger.LogInformation($"session: {accountChatSession}");
+                return;
+            }
 
             if (!_chatConnectionService.LobbyIsExist(chatId))
             {

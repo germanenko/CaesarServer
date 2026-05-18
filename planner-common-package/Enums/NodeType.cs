@@ -6,9 +6,6 @@
         Column,
         Job,
         Chat,
-        Message,
-        AccessRight,
-        AccessGroup,
-        AccessGroupMember
+        Message
     }
 }
