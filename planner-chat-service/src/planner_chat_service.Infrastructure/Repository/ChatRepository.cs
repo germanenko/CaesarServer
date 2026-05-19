@@ -94,6 +94,8 @@ namespace planner_chat_service.Infrastructure.Repository
             var chatBody = chat.ToNodeBody();
             chatBody.State = chatState.ToBody();
             chatBody.UserState = chatUserState.ToBody();
+            chatBody.PartnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
+            chatBody.ChatSettings = chat.ChatSettings.FirstOrDefault(x => x.AccountId == accountId)?.ToBody();
 
             return chatBody;
         }
