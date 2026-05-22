@@ -8,6 +8,7 @@ using planner_node_service.Infrastructure.Data;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using System.Text.Json;
 using static NpgsqlTypes.NpgsqlTsQuery;
 
 namespace planner_node_service.Infrastructure.Repository
@@ -101,7 +102,8 @@ namespace planner_node_service.Infrastructure.Repository
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
                 //Cursor = cursor,
-                SyncKind = SyncKind.Scope
+                SyncKind = SyncKind.Scope,
+                //BodyJson = JsonSerializer.Serialize(nodeBody)
             };
 
             var result = (await _context.Nodes.AddAsync(node)).Entity;
@@ -170,7 +172,8 @@ namespace planner_node_service.Infrastructure.Repository
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
                 Props = nodeBody.Props,
-                SyncKind = nodeBody.SyncKind
+                SyncKind = nodeBody.SyncKind,
+                //BodyJson = JsonSerializer.Serialize(nodeBody)
                 //Cursor = cursor
             };
 

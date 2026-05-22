@@ -8,6 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+	<PackageReference Include="Npgsql" Version="8.0.6" />
 	<PackageReference Include="Planner.Shared.Server.Contracts" Version="1.0.0" />
 	<PackageReference Include="Planner.Shared.Client.Contracts" Version="1.0.0" />
   </ItemGroup>

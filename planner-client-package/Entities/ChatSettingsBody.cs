@@ -11,5 +11,7 @@ namespace planner_client_package.Entities
         public string ChatName { get; set; }
         public string MessageDraft { get; set; }
         public DateTime DateLastViewing { get; set; } = DateTime.UtcNow;
+
+        public ChatSettingsBody() { }
     }
 }

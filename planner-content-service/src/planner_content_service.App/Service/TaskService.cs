@@ -111,7 +111,8 @@ namespace planner_content_service.App.Service
                 Link = createOrUpdateJobBody.Link,
                 UpdatedAt = DateTime.UtcNow,
                 UpdatedBy = accountId,
-                Type = NodeType.Job
+                Type = NodeType.Job,
+                Props = createOrUpdateJobBody.Props
             };
 
             CreateNodeEvent taskEvent = new CreateNodeEvent()

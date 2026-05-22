@@ -17,7 +17,5 @@ namespace planner_client_package.Entities
         public ChatUserStateBody UserState { get; set; }
         public ChatEditBody ChatEdit { get; set; }
         public ChatSettingsBody ChatSettings { get; set; }
-
-        public ChatBody() { }
     }
 }

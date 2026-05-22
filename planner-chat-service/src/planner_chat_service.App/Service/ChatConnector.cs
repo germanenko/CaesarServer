@@ -4,6 +4,7 @@ using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_client_package.Entities.WebSockets;
 using planner_common_package.Enums;
 using planner_server_package.Access;
 using planner_server_package.Converters;
@@ -130,7 +131,7 @@ namespace planner_chat_service.App.Service
         {
             //if (sentMessage.LastMessageReadId == null)
             //{
-            if (sentMessage.MessageType == MessageType.File && Guid.TryParse(sentMessage.Content, out var messageId))
+            if (sentMessage.MessageType == planner_common_package.Enums.MessageType.File && Guid.TryParse(sentMessage.Content, out var messageId))
             {
                 var message = await _chatRepository.GetMessageAsync(messageId);
                 if (message != null)
@@ -222,24 +223,23 @@ namespace planner_chat_service.App.Service
 
             var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId };
 
-            var bytes = SerializeObject(message);
-            var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, bytes, messageType);
-            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, bytes);
+            var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, messageType);
+            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, message);
         }
 
-        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, byte[] bytes)
+        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, MessageBody messageBody)
         {
             var messageSentToChatEvent = new MessageSentToChatEvent
             {
                 AccountIds = accountIds,
                 AccountSessions = accountSessions.Select(x => BodyConverter.ClientToServerBody(x)),
-                Message = bytes
+                Message = SerializeObject(messageBody)
             };
 
             _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
         }
 
-        private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, byte[] bytes, WebSocketMessageType messageType)
+        private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, MessageBody messageBody, WebSocketMessageType messageType)
         {
             var userSessionsDeliveryMessage = new List<AccountSessions>();
 
@@ -248,7 +248,7 @@ namespace planner_chat_service.App.Service
                 var sessionsReceivedMessage = new List<Guid>();
                 foreach (var session in groupedSessions)
                 {
-                    if (await SendMessageToSession(session.Ws, bytes, messageType))
+                    if (await SendMessageToSession(session.Ws, SerializeObject(new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, Message = JsonSerializer.SerializeToElement(messageBody) }), messageType))
                         sessionsReceivedMessage.Add(session.SessionId);
                 }
 

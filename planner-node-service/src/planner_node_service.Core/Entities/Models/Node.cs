@@ -1,5 +1,6 @@
 ﻿//using Planer_task_board.Core.Entities.Models;
 using Newtonsoft.Json.Serialization;
+using NpgsqlTypes;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
 using System.Text.Json;
@@ -15,6 +16,10 @@ namespace planner_node_service.Core.Entities.Models
         public string? Props { get; set; }
 
         public SyncKind SyncKind { get; set; }
+
+        //! убрал до задачи поисковых индексов
+        //public string BodyJson { get; set; }
+        //public NpgsqlTsVector SearchVector { get; set; }
 
         public override bool Equals(object? obj)
         {

@@ -35,6 +35,19 @@ namespace planner_node_service.Infrastructure.Configurations
             builder.Property(e => e.Props)
                 .HasColumnType("jsonb");
 
+            //! убрал до задачи поисковых индексов
+            //builder.HasGeneratedTsVectorColumn(
+            //    p => p.SearchVector,
+            //    "simple",
+            //    p => new
+            //    {
+            //        p.BodyJson
+            //    });
+
+            //builder
+            //    .HasIndex(p => p.SearchVector)
+            //    .HasMethod("GIN");
+
             builder.HasIndex(e => e.Type);
             builder.HasIndex(e => e.Name);
 
