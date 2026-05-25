@@ -1,11 +1,12 @@
+using planner_client_package.Entities.WebSockets;
 using planner_common_package.Enums;
 using System;
 
 namespace planner_client_package.Entities
 {
-    public class MessageBody : NodeBody
+    public class MessageBody : NodeBody, IMessagePayload
     {
-        public MessageType MessageType { get; set; }
+        public planner_common_package.Enums.MessageType MessageType { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
         public Guid SenderId { get; set; }
