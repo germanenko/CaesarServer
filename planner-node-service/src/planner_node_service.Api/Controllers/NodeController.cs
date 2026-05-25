@@ -25,6 +25,19 @@ namespace planner_node_service.Api.Controllers
             _jwtService = jwtService;
         }
 
+        [LocalOnly]
+        [HttpPost("createOrUpdateNode")]
+        [SwaggerOperation("Создать/обновить ноду")]
+        [SwaggerResponse(200)]
+        public async Task<IActionResult> GetNodeBranchesByRootIds(
+            [FromQuery] Guid accountId,
+            [FromBody] NodeBody nodeBody
+        )
+        {
+            var result = await _nodeService.AddOrUpdateNode(accountId, nodeBody);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
         [HttpGet("getNodeBranchesByRootIds"), Authorize]
         [SwaggerOperation("Получить ветки нод по Id корней")]
         [SwaggerResponse(200)]

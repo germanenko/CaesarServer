@@ -6,6 +6,7 @@ using planner_common_package.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using planner_server_package;
+using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
@@ -199,8 +200,23 @@ namespace planner_node_service.App.Service
 
 
         // Добавление или обновление ноды
-        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(NodeBody nodeBody)
+        public async Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, NodeBody nodeBody)
         {
+            if (nodeBody.Link != null)
+            {
+                var hasAccess = await _accessRepository.CheckAccess(accountId, nodeBody.Link.ParentId, Permission.Write);
+
+                if (!hasAccess)
+                {
+                    return new ServiceResponse<NodeBody>()
+                    {
+                        IsSuccess = false,
+                        StatusCode = System.Net.HttpStatusCode.Forbidden,
+                        Errors = new[] { "Нет доступа" }
+                    };
+                }
+            }
+
             var newNode = await _nodeRepository.AddOrUpdateNode(nodeBody);
 
             return new ServiceResponse<NodeBody>()

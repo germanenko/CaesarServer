@@ -22,6 +22,8 @@ using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 using System.Text.Json.Serialization;
+using IServerNodeService = planner_server_package.Node.INodeService;
+using ServerNodeService = planner_server_package.Node.NodeService;
 
 Env.Load();
 
@@ -134,6 +136,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<IUserService, UserService>();
+    services.AddScoped<IServerNodeService, ServerNodeService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<ITaskService, TaskService>();
     services.AddScoped<IBoardService, BoardService>();

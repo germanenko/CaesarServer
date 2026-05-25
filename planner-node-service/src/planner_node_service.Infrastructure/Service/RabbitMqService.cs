@@ -89,7 +89,7 @@ namespace planner_node_service.Infrastructure.Service
 
             _logger.LogInformation($"Insert message: {message}");
 
-            var chat = await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(chatMessage));
+            var chat = await nodeService.AddOrUpdateNode(chatMessage.SenderId, BodyConverter.ServerToClientBody(chatMessage));
 
             foreach (var accountId in result.AccountIds)
                 await _notificationService.SendMessageToSessions(accountId, result.Message);
@@ -192,7 +192,7 @@ namespace planner_node_service.Infrastructure.Service
                     }
                 }
 
-                await nodeService.AddOrUpdateNode(BodyConverter.ServerToClientBody(result.Node));
+                await nodeService.AddOrUpdateNode(result.CreatorId, BodyConverter.ServerToClientBody(result.Node));
 
                 return new ServiceResponse<object>()
                 {

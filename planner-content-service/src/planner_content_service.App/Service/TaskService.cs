@@ -9,6 +9,7 @@ using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
+using planner_server_package.Node;
 using planner_server_package.RabbitMQ;
 using System.Net;
 
@@ -19,16 +20,19 @@ namespace planner_content_service.App.Service
         private readonly ITaskRepository _taskRepository;
         private readonly IPublisherService _publisherService;
         private readonly IAccessService _accessService;
+        private readonly planner_server_package.Node.INodeService _nodeService;
 
         public TaskService(
             ITaskRepository taskRepository,
             IBoardRepository boardRepository,
             IPublisherService publisherService,
-            IAccessService accessService)
+            IAccessService accessService,
+            planner_server_package.Node.INodeService nodeService)
         {
             _taskRepository = taskRepository;
             _publisherService = publisherService;
             _accessService = accessService;
+            _nodeService = nodeService;
         }
 
         public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken = default) where T : JobBodyRequest
@@ -56,13 +60,14 @@ namespace planner_content_service.App.Service
                 Type = NodeType.Job
             };
 
-            CreateNodeEvent taskEvent = new CreateNodeEvent()
-            {
-                Node = BodyConverter.ClientToServerBody(taskBody),
-                CreatorId = accountId
-            };
+            //CreateNodeEvent taskEvent = new CreateNodeEvent()
+            //{
+            //    Node = BodyConverter.ClientToServerBody(taskBody),
+            //    CreatorId = accountId
+            //};
 
-            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
+            //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -115,13 +120,14 @@ namespace planner_content_service.App.Service
                 Props = createOrUpdateJobBody.Props
             };
 
-            CreateNodeEvent taskEvent = new CreateNodeEvent()
-            {
-                Node = BodyConverter.ClientToServerBody(taskBody),
-                CreatorId = accountId
-            };
+            //CreateNodeEvent taskEvent = new CreateNodeEvent()
+            //{
+            //    Node = BodyConverter.ClientToServerBody(taskBody),
+            //    CreatorId = accountId
+            //};
 
-            var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
+            //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody);
 
             if (!nodeComplete.IsSuccess)
             {

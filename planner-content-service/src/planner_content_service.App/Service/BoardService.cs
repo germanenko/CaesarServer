@@ -13,6 +13,7 @@ using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.Idempotency.Enum;
+using planner_server_package.Node;
 using planner_server_package.RabbitMQ;
 using System.Net;
 using System.Text.Json;
@@ -23,30 +24,44 @@ namespace planner_content_service.App.Service
     {
         private readonly IBoardRepository _boardRepository;
         private readonly IAccessService _accessService;
+        private readonly planner_server_package.Node.INodeService _nodeService;
         private readonly IPublisherService _publisherService;
         private readonly ILogger<BoardService> _logger;
 
-        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger, IAccessService accessService)
+        public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger, IAccessService accessService, planner_server_package.Node.INodeService nodeService)
         {
             _boardRepository = boardRepository;
             _publisherService = publisherService;
             _logger = logger;
             _accessService = accessService;
+            _nodeService = nodeService;
         }
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBodyRequest column, CancellationToken cancellationToken = default)
         {
             var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None, Link = column.Link };
 
-            CreateNodeEvent columnEvent = new CreateNodeEvent()
+            var response = await _nodeService.CreateOrUpdateNode(accountId, columnBody);
+
+            //CreateNodeEvent columnEvent = new CreateNodeEvent()
+            //{
+            //    Node = BodyConverter.ClientToServerBody(columnBody),
+            //    CreatorId = accountId
+            //};
+
+            //var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
+
+            if (response == null)
             {
-                Node = BodyConverter.ClientToServerBody(columnBody),
-                CreatorId = accountId
-            };
+                return new ServiceResponse<ColumnBody>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.InternalServerError,
+                    ErrorCodes = new List<ErrorCode> { ErrorCode.Infrastructure }
+                };
+            }
 
-            var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
-
-            if (!response.IsSuccess)
+            if (response.IsSuccess)
             {
                 return new ServiceResponse<ColumnBody>
                 {
@@ -57,16 +72,16 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            NodeBody responseBody = new NodeBody();
-            if (response.Body != null)
-            {
-                if (response.Body is JsonElement jsonElement)
-                {
-                    responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
-                }
-            }
+            //NodeBody responseBody = new NodeBody();
+            //if (response.Body != null)
+            //{
+            //    if (response.Body is JsonElement jsonElement)
+            //    {
+            //        responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
+            //    }
+            //}
 
-            var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, responseBody, cancellationToken);
+            var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, response.Body, cancellationToken);
 
             if (result == null)
             {
@@ -154,13 +169,15 @@ namespace planner_content_service.App.Service
 
             foreach (var column in columns)
             {
-                CreateNodeEvent columnEvent = new CreateNodeEvent()
-                {
-                    Node = BodyConverter.ClientToServerBody(reminderColumn),
-                    CreatorId = accountId
-                };
+                //CreateNodeEvent columnEvent = new CreateNodeEvent()
+                //{
+                //    Node = BodyConverter.ClientToServerBody(reminderColumn),
+                //    CreatorId = accountId
+                //};
 
-                var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
+                var request = await _nodeService.CreateOrUpdateNode(accountId, column);
+
+                //var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
                 if (!request.IsSuccess)
                 {
@@ -261,13 +278,14 @@ namespace planner_content_service.App.Service
         {
             var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId, SyncKind = SyncKind.Scope };
 
-            var boardEvent = new CreateNodeEvent()
-            {
-                Node = BodyConverter.ClientToServerBody(boardBody),
-                CreatorId = accountId
-            };
+            //var boardEvent = new CreateNodeEvent()
+            //{
+            //    Node = BodyConverter.ClientToServerBody(boardBody),
+            //    CreatorId = accountId
+            //};
 
-            var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
+            //var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
+            var response = await _nodeService.CreateOrUpdateNode(accountId, boardBody);
 
             if (!response.IsSuccess)
             {
@@ -279,18 +297,18 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            NodeBody responseBody = new NodeBody();
-            if (response.Body != null)
-            {
-                if (response.Body is JsonElement jsonElement)
-                {
-                    responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
-                }
-            }
+            //NodeBody responseBody = new NodeBody();
+            //if (response.Body != null)
+            //{
+            //    if (response.Body is JsonElement jsonElement)
+            //    {
+            //        responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
+            //    }
+            //}
 
             var hasBoard = await _boardRepository.GetBoardById(body.Id, cancellationToken);
 
-            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, responseBody, cancellationToken);
+            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, response.Body, cancellationToken);
 
             if (result is null)
             {

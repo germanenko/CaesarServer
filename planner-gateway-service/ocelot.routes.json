@@ -615,6 +615,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/createOrUpdateNode",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/createOrUpdateNode",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/getNodeBranchesByRootIds",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [
