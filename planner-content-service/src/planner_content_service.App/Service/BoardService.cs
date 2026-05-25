@@ -36,7 +36,7 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBodyRequest column, CancellationToken cancellationToken = default)
         {
-            var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None };
+            var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None, Link = column.Link };
 
             CreateNodeEvent columnEvent = new CreateNodeEvent()
             {
