@@ -192,19 +192,10 @@ namespace planner_node_service.Infrastructure.Repository
                         ParentId = nodeBody.Link.ParentId,
                         RelationType = nodeBody.Link.RelationType
                     };
-                }
-                else
-                {
-                    nodeLink = new NodeLink
-                    {
-                        Id = Guid.NewGuid(),
-                        ParentNode = node,
-                        ChildNode = result,
-                        RelationType = RelationType.Me
-                    };
+
+                    await _context.NodeLinks.AddAsync(nodeLink);
                 }
 
-                await _context.NodeLinks.AddAsync(nodeLink);
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
 
                 AccessRuleBody rule = null;
