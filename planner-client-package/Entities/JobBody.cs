@@ -9,12 +9,11 @@ using System.Text.Json.Serialization;
 
 namespace planner_client_package.Entities
 {
-    //[JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
-    //[JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
-    //[JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
-    //[JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
-    //[JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
-    [JsonConverter(typeof(JobBodyConverter))]
+    [JsonPolymorphic(TypeDiscriminatorPropertyName = Discriminator.TypeDiscriminatorPropertyName)]
+    [JsonDerivedType(typeof(InformationBody), Discriminator.Information)]
+    [JsonDerivedType(typeof(MeetingBody), Discriminator.Meeting)]
+    [JsonDerivedType(typeof(ReminderBody), Discriminator.Reminder)]
+    [JsonDerivedType(typeof(TaskBody), Discriminator.Task)]
     public class JobBody : NodeBody
     {
         public string Description { get; set; }
