@@ -51,13 +51,14 @@ namespace planner_content_service.App.Service
 
             //var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
-            if (response == null)
+            if (!response.IsSuccess)
             {
                 return new ServiceResponse<ColumnBody>
                 {
                     IsSuccess = false,
-                    StatusCode = HttpStatusCode.InternalServerError,
-                    ErrorCodes = new List<ErrorCode> { ErrorCode.Infrastructure }
+                    StatusCode = response.StatusCode,
+                    ErrorCodes = response.ErrorCodes,
+                    Errors = response.Errors
                 };
             }
 
@@ -185,6 +186,7 @@ namespace planner_content_service.App.Service
                     {
                         IsSuccess = request.IsSuccess,
                         StatusCode = request.StatusCode,
+                        ErrorCodes = request.ErrorCodes,
                         Errors = request.Errors
                     };
                 }
@@ -289,6 +291,7 @@ namespace planner_content_service.App.Service
 
             if (!response.IsSuccess)
             {
+                _logger.LogInformation($"Board not created {response.StatusCode}");
                 return new ServiceResponse<BoardBody>
                 {
                     IsSuccess = response.IsSuccess,

@@ -212,7 +212,8 @@ namespace planner_node_service.App.Service
                     {
                         IsSuccess = false,
                         StatusCode = System.Net.HttpStatusCode.Forbidden,
-                        Errors = new[] { "Нет доступа" }
+                        Errors = new[] { "Нет доступа" },
+                        ErrorCodes = new List<ErrorCode> { ErrorCode.WriteDenied }
                     };
                 }
             }

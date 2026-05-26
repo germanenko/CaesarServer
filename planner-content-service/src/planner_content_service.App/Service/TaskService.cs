@@ -75,6 +75,7 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = nodeComplete.IsSuccess,
                     StatusCode = nodeComplete.StatusCode,
+                    ErrorCodes = nodeComplete.ErrorCodes,
                     Errors = nodeComplete.Errors
                 };
             }
@@ -135,6 +136,7 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = nodeComplete.IsSuccess,
                     StatusCode = nodeComplete.StatusCode,
+                    ErrorCodes = nodeComplete.ErrorCodes,
                     Errors = nodeComplete.Errors
                 };
             }
