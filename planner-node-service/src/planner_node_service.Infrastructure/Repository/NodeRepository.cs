@@ -206,6 +206,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 var body = result.ToNodeBody();
                 body.AccessRule = rule;
+                body.Link = nodeLink.ToBody();
 
                 return body;
             }
