@@ -293,7 +293,8 @@ namespace planner_content_service.App.Service
                 {
                     IsSuccess = response.IsSuccess,
                     StatusCode = response.StatusCode,
-                    Errors = response.Errors
+                    Errors = response.Errors,
+                    ErrorCodes = response.ErrorCodes
                 };
             }
 
