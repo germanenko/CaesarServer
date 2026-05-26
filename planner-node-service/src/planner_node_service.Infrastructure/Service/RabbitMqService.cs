@@ -30,7 +30,6 @@ namespace planner_node_service.Infrastructure.Service
             IWebSocketService notificationService,
             string queue,
             string createPersonalChatQueue,
-            string createNode,
             string getUsersWithEnabledNotifications,
             string deleteNode)
             : base(hostname, userName, password, prefix, logger)
@@ -43,7 +42,6 @@ namespace planner_node_service.Infrastructure.Service
 
             AddQueue(queue, HandleSendMessage);
             AddQueue(createPersonalChatQueue, HandleNewChat);
-            AddQueue(createNode, HandleNewNode);
             AddQueue(getUsersWithEnabledNotifications, HandleGetNotificationSettings);
             AddQueue(deleteNode, DeleteNode);
 
@@ -147,61 +145,6 @@ namespace planner_node_service.Infrastructure.Service
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error while adding chat node");
-                throw;
-            }
-        }
-
-
-
-        private async Task<ServiceResponse<object>> HandleNewNode(string message)
-        {
-            var result = JsonSerializer.Deserialize<CreateNodeEvent>(message);
-
-            _logger.LogInformation($"NodeService received new node: {message}");
-
-            if (result == null)
-            {
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = false,
-                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
-                    Errors = new[] { "Ошибка сервера" }
-                };
-            }
-
-            try
-            {
-                _logger.LogInformation($"{result.Node}");
-
-                using var scope = _scopeFactory.CreateScope();
-                var nodeService = scope.ServiceProvider.GetRequiredService<INodeService>();
-                var accessService = scope.ServiceProvider.GetRequiredService<IAccessService>();
-
-                if (result.Node.Link != null)
-                {
-                    var hasAccess = (await accessService.CheckAccess(result.CreatorId, result.Node.Link.ParentId, Permission.Write)).Body;
-
-                    if (!hasAccess)
-                    {
-                        return new ServiceResponse<object>()
-                        {
-                            IsSuccess = false,
-                            StatusCode = System.Net.HttpStatusCode.Forbidden,
-                            Errors = new[] { "Нет доступа" }
-                        };
-                    }
-                }
-
-                await nodeService.AddOrUpdateNode(result.CreatorId, BodyConverter.ServerToClientBody(result.Node));
-
-                return new ServiceResponse<object>()
-                {
-                    IsSuccess = true
-                };
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error while adding node");
                 throw;
             }
         }
