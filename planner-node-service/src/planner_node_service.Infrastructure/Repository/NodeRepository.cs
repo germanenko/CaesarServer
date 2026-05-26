@@ -181,7 +181,7 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 var result = (await _context.Nodes.AddAsync(node)).Entity;
 
-                var nodeLink = new NodeLink();
+                NodeLink? nodeLink = null;
 
                 if (nodeBody.Link != null)
                 {
@@ -206,7 +206,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 var body = result.ToNodeBody();
                 body.AccessRule = rule;
-                body.Link = nodeLink.ToBody();
+                body.Link = nodeLink?.ToBody();
 
                 return body;
             }
