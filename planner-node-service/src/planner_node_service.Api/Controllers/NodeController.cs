@@ -29,13 +29,13 @@ namespace planner_node_service.Api.Controllers
         [HttpPost("createOrUpdateNode")]
         [SwaggerOperation("Создать/обновить ноду")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GetNodeBranchesByRootIds(
+        public async Task<IActionResult> CreateOrUpdateNode(
             [FromQuery] Guid accountId,
             [FromBody] NodeBody nodeBody
         )
         {
             var result = await _nodeService.AddOrUpdateNode(accountId, nodeBody);
-            return StatusCode((int)result.StatusCode, result.Body);
+            return StatusCode((int)result.StatusCode, result);
         }
 
         [HttpGet("getNodeBranchesByRootIds"), Authorize]
