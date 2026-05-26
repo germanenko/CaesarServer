@@ -43,14 +43,6 @@ namespace planner_content_service.App.Service
 
             var response = await _nodeService.CreateOrUpdateNode(accountId, columnBody);
 
-            //CreateNodeEvent columnEvent = new CreateNodeEvent()
-            //{
-            //    Node = BodyConverter.ClientToServerBody(columnBody),
-            //    CreatorId = accountId
-            //};
-
-            //var response = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
-
             if (!response.IsSuccess)
             {
                 return new ServiceResponse<ColumnBody>
@@ -61,26 +53,6 @@ namespace planner_content_service.App.Service
                     Errors = response.Errors
                 };
             }
-
-            if (response.IsSuccess)
-            {
-                return new ServiceResponse<ColumnBody>
-                {
-                    IsSuccess = response.IsSuccess,
-                    StatusCode = response.StatusCode,
-                    Errors = response.Errors,
-                    ErrorCodes = response.ErrorCodes
-                };
-            }
-
-            //NodeBody responseBody = new NodeBody();
-            //if (response.Body != null)
-            //{
-            //    if (response.Body is JsonElement jsonElement)
-            //    {
-            //        responseBody = JsonSerializer.Deserialize<NodeBody>(jsonElement);
-            //    }
-            //}
 
             var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, response.Body, cancellationToken);
 
