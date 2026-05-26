@@ -46,6 +46,8 @@ namespace planner_server_package.Node
                 {
                     var result = await response.Content.ReadAsStringAsync();
 
+                    _logger.LogInformation(result);
+
                     var node = JsonSerializer.Deserialize<ServiceResponse<NodeBody>>(result, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
