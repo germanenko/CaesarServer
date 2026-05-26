@@ -289,6 +289,8 @@ namespace planner_content_service.App.Service
             //var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
             var response = await _nodeService.CreateOrUpdateNode(accountId, boardBody);
 
+            _logger.LogInformation(JsonSerializer.Serialize(response));
+
             if (!response.IsSuccess)
             {
                 _logger.LogInformation($"Board not created {response.StatusCode}");
