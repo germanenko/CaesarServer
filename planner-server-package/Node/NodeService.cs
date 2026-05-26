@@ -28,7 +28,7 @@ namespace planner_server_package.Node
 
             _httpClient = new HttpClient(handler)
             {
-                BaseAddress = new Uri("https://planner-node-service:8080/api/")
+                BaseAddress = new Uri("http://planner-node-service:8080/api/")
             };
         }
 
