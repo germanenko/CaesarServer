@@ -36,7 +36,8 @@ namespace planner_content_service.Core.Entities.Models
                 EndDate = EndDate,
                 PermormerIds = PerformerIds,
                 JobType = JobType,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
+                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
+                PrimaryAttachedMessageId = PrimarySourceMessageId
             };
         }
     }

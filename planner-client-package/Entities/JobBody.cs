@@ -31,6 +31,7 @@ namespace planner_client_package.Entities
         [RegularExpression("^#([0-9A-Fa-f]{3}|[0-9A-Fa-f]{6})$")]
         public string HexColor { get; set; }
 
+        public Guid? PrimaryAttachedMessageId { get; set; }
         public ICollection<AttachedMessageBody> AttachedMessages { get; set; }
         public ReadStateBody? ReadState { get; set; }
 
