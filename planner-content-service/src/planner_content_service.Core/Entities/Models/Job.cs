@@ -53,21 +53,37 @@ namespace planner_content_service.Core.Entities.Models
             };
         }
 
-        public override NodeBody ToNodeBody()
+        public abstract override NodeBody ToNodeBody();
+        //{
+        //    return new JobBody
+        //    {
+        //        Id = Id,
+        //        Name = Name,
+        //        Props = Props,
+        //        Type = Type,
+        //        Description = Description,
+        //        HexColor = HexColor,
+        //        StartDate = StartDate,
+        //        EndDate = EndDate,
+        //        AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
+        //        PrimaryAttachedMessageId = PrimarySourceMessageId
+        //    };
+        //}
+
+        protected T FillBody<T>(T body) where T : JobBody
         {
-            return new JobBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
-                PrimaryAttachedMessageId = PrimarySourceMessageId
-            };
+            body.Id = Id;
+            body.Name = Name;
+            body.Props = Props;
+            body.Type = Type;
+            body.Description = Description;
+            body.HexColor = HexColor;
+            body.StartDate = StartDate;
+            body.EndDate = EndDate;
+            body.AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList();
+            body.PrimaryAttachedMessageId = PrimarySourceMessageId;
+
+            return body;
         }
     }
 

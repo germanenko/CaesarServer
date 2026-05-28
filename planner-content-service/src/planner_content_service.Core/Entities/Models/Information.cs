@@ -17,7 +17,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return (InformationBody)base.ToNodeBody();
+            return FillBody(new InformationBody());
         }
     }
 }

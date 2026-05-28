@@ -24,7 +24,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            var body = (ReminderBody)base.ToNodeBody();
+            var body = FillBody(new ReminderBody());
 
             body.Date = RemindAt;
 

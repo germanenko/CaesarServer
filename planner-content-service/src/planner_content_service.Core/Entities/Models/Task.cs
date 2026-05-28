@@ -24,7 +24,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            var body = (TaskBody)base.ToNodeBody();
+            var body = FillBody(new TaskBody());
 
             body.PermormerIds = PerformerIds;
 

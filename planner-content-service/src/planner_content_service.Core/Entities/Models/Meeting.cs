@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace planner_content_service.Core.Entities.Models
 {
@@ -28,7 +29,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            var body = (MeetingBody)base.ToNodeBody();
+            var body = FillBody(new MeetingBody());
 
             body.Members = MemberIds;
             body.Date = MeetAt;
