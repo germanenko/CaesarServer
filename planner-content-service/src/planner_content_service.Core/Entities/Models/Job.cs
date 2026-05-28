@@ -47,24 +47,28 @@ namespace planner_content_service.Core.Entities.Models
                 EndDate = EndDate,
                 Props = Props,
                 Type = Type,
-                JobType = JobType
+                JobType = JobType,
+                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
+                PrimaryAttachedMessageId = PrimarySourceMessageId
             };
         }
 
-        public override abstract NodeBody ToNodeBody();
-        //{
-        //    return new JobBody
-        //    {
-        //        Id = Id,
-        //        Name = Name,
-        //        Props = Props,
-        //        Type = Type,
-        //        Description = Description,
-        //        HexColor = HexColor,
-        //        StartDate = StartDate,
-        //        EndDate = EndDate,
-        //    };
-        //}
+        public override NodeBody ToNodeBody()
+        {
+            return new JobBody
+            {
+                Id = Id,
+                Name = Name,
+                Props = Props,
+                Type = Type,
+                Description = Description,
+                HexColor = HexColor,
+                StartDate = StartDate,
+                EndDate = EndDate,
+                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
+                PrimaryAttachedMessageId = PrimarySourceMessageId
+            };
+        }
     }
 
     public static class JobExtensions

@@ -28,21 +28,12 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return new MeetingBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                Date = MeetAt,
-                Members = MemberIds,
-                JobType = JobType,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
-            };
+            var body = (MeetingBody)base.ToNodeBody();
+
+            body.Members = MemberIds;
+            body.Date = MeetAt;
+
+            return body;
         }
     }
 }

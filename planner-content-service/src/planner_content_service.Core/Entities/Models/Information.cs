@@ -17,19 +17,7 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return new InformationBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                JobType = JobType,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
-            };
+            return (InformationBody)base.ToNodeBody();
         }
     }
 }

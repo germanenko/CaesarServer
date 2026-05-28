@@ -24,20 +24,11 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return new ReminderBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                Date = RemindAt,
-                JobType = JobType,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList()
-            };
+            var body = (ReminderBody)base.ToNodeBody();
+
+            body.Date = RemindAt;
+
+            return body;
         }
     }
 }

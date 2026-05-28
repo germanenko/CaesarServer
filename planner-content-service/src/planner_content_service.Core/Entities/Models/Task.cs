@@ -24,21 +24,11 @@ namespace planner_content_service.Core.Entities.Models
 
         public override NodeBody ToNodeBody()
         {
-            return new TaskBody
-            {
-                Id = Id,
-                Name = Name,
-                Props = Props,
-                Type = Type,
-                Description = Description,
-                HexColor = HexColor,
-                StartDate = StartDate,
-                EndDate = EndDate,
-                PermormerIds = PerformerIds,
-                JobType = JobType,
-                AttachedMessages = AttachedMessages.Select(x => x.ToBody()).ToList(),
-                PrimaryAttachedMessageId = PrimarySourceMessageId
-            };
+            var body = (TaskBody)base.ToNodeBody();
+
+            body.PermormerIds = PerformerIds;
+
+            return body;
         }
     }
 }
