@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
@@ -17,12 +18,14 @@ namespace planner_content_service.Infrastructure.Repository
         private readonly ContentDbContext _context;
         private readonly IPublisherService _publisherService;
         private readonly IJobFactory _jobFactory;
+        private readonly ILogger<TaskRepository> _logger;
 
-        public TaskRepository(ContentDbContext context, IPublisherService publisherService, IJobFactory jobFactory)
+        public TaskRepository(ContentDbContext context, IPublisherService publisherService, IJobFactory jobFactory, ILogger<TaskRepository> logger)
         {
             _context = context;
             _publisherService = publisherService;
             _jobFactory = jobFactory;
+            _logger = logger;
         }
 
         public async Task<JobBody?> AddAsync<T>
@@ -84,6 +87,9 @@ namespace planner_content_service.Infrastructure.Repository
                 var task = (await _context.AddAsync(job)).Entity;
 
                 await _context.ReadStates.AddAsync(new ReadState(task.Id, accountId));
+
+                _logger.LogInformation(taskBody.PrimaryAttachedMessage.MessageId.ToString());
+                _logger.LogInformation(taskBody.PrimaryAttachedMessage.Snapshot);
 
                 var primaryAttachedMessage = new AttachedMessage(task.Id, taskBody.PrimaryAttachedMessage.MessageId, taskBody.PrimaryAttachedMessage.Snapshot)
                 {

@@ -60,13 +60,6 @@ namespace planner_content_service.App.Service
                 Type = NodeType.Job
             };
 
-            //CreateNodeEvent taskEvent = new CreateNodeEvent()
-            //{
-            //    Node = BodyConverter.ClientToServerBody(taskBody),
-            //    CreatorId = accountId
-            //};
-
-            //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
             var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody);
 
             if (!nodeComplete.IsSuccess)
