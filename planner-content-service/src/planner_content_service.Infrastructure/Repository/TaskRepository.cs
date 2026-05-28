@@ -88,12 +88,9 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.ReadStates.AddAsync(new ReadState(task.Id, accountId));
 
-                _logger.LogInformation(taskBody.PrimaryAttachedMessage.MessageId.ToString());
-                _logger.LogInformation(taskBody.PrimaryAttachedMessage.Snapshot);
-
                 var primaryAttachedMessage = new AttachedMessage(task.Id, taskBody.PrimaryAttachedMessage.MessageId, taskBody.PrimaryAttachedMessage.Snapshot)
                 {
-                    Id = task.PrimarySourceMessage.Id
+                    Id = taskBody.PrimaryAttachedMessage.Id
                 };
 
                 await _context.SaveChangesAsync();
