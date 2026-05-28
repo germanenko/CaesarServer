@@ -3,7 +3,7 @@ using System;
 
 namespace planner_client_package.Entities
 {
-    public class NotificationSettingsBody : ISyncable
+    public class NotificationSettingsBody : IBody, ISyncable
     {
         public Guid NodeId { get; set; }
         public bool NotificationsEnabled { get; set; } = true;

@@ -72,8 +72,6 @@ namespace planner_content_service.Infrastructure.Repository
         (
             T taskBody,
             Guid accountId,
-            Guid messageId,
-            string snapshot,
             CancellationToken cancellationToken
         ) where T : JobBodyRequest
         {
@@ -87,7 +85,10 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.ReadStates.AddAsync(new ReadState(task.Id, accountId));
 
-                var primaryAttachedMessage = new AttachedMessage(task.Id, messageId, snapshot);
+                var primaryAttachedMessage = new AttachedMessage(task.Id, taskBody.PrimaryAttachedMessage.MessageId, taskBody.PrimaryAttachedMessage.Snapshot)
+                {
+                    Id = task.PrimarySourceMessage.Id
+                };
 
                 await _context.SaveChangesAsync();
 
@@ -96,17 +97,6 @@ namespace planner_content_service.Infrastructure.Repository
                 task = task.WithPrimarySourceMessage(primaryAttachedMessage);
 
                 await _context.SaveChangesAsync();
-
-                var createTaskChatEvent = new CreateTaskChatEvent
-                {
-                    IsSuccess = false,
-                    CreateTaskChat = new CreateTaskChat
-                    {
-                        TaskId = task.Id,
-                        CreatorId = accountId,
-                        ChatName = $"{task.Name} chat"
-                    }
-                };
 
                 var result = task.ToTaskBody();
 

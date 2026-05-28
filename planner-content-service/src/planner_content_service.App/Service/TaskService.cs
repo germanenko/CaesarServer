@@ -35,9 +35,9 @@ namespace planner_content_service.App.Service
             _nodeService = nodeService;
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, string snapshot, Guid messageId, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
-            var hasAccess = await _accessService.CheckAccess(accountId, messageId, Permission.Read);
+            var hasAccess = await _accessService.CheckAccess(accountId, createOrUpdateJobBody.PrimaryAttachedMessage.MessageId, Permission.Read);
 
             if (!hasAccess)
             {
@@ -87,7 +87,7 @@ namespace planner_content_service.App.Service
                 return task;
             }
 
-            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, messageId, snapshot, cancellationToken);
+            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, cancellationToken);
 
             if (result == null)
             {

@@ -24,5 +24,6 @@ namespace planner_client_package.Entities.Request
         public JobType Type { get; set; }
 
         public NodeLinkBody Link { get; set; }
+        public AttachedMessageBody PrimaryAttachedMessage { get; set; }
     }
 }
