@@ -28,7 +28,7 @@ namespace planner_client_package.Entities
         public Guid UpdatedBy { get; set; }
         public DateTime UpdatedAt { get; set; }
         public long Version { get; set; }
-        public long ScopeVersion { get; set; }
+        public ScopeVersionBody ScopeVersion { get; set; }
         public NodeLinkBody Link { get; set; }
         public AccessRuleBody AccessRule { get; set; }
         public IEnumerable<NodeBody> Childs { get; set; }
@@ -64,10 +64,8 @@ namespace planner_client_package.Entities
             result.AddIfNotNull(Link);
             result.AddRangeIfNotNull(Childs);
 
-            if (SyncKind == SyncKind.Scope)
-            {
-                result.Add(new ScopeVersionBody(Id, ScopeVersion));
-            }
+            if (ScopeVersion != null)
+                result.Add(ScopeVersion);
 
             return result;
         }

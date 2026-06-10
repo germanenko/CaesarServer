@@ -582,7 +582,7 @@ namespace planner_node_service.App.Service
                     var scopeLog = await _logRepository.GetLastLogForScope(body.Id);
 
                     if (scopeLog != null)
-                        body.ScopeVersion = scopeLog.ScopeVersion;
+                        body.ScopeVersion = new ScopeVersionBody(scopeLog.ScopeId, scopeLog.ScopeVersion);
                 }
 
                 // Получаем информацию о родителе ноды и правила доступа к ноде, и добавляем эту информацию в тело ноды

@@ -89,7 +89,8 @@ namespace planner_node_service.Infrastructure.Repository
 
                 var lastScopeLog = await _logRepository.GetLastLogForScope(resultScopeBody.Id);
 
-                resultScopeBody.ScopeVersion = lastScopeLog?.ScopeVersion ?? 0;
+                if (lastScopeLog != null)
+                    resultScopeBody.ScopeVersion = new ScopeVersionBody(lastScopeLog.ScopeId, lastScopeLog.ScopeVersion);
 
                 return resultScopeBody;
             }
@@ -130,7 +131,9 @@ namespace planner_node_service.Infrastructure.Repository
 
             // Получаем последний лог для этого скопа и устанавливае в теле ответа
             var lastNewScopeLog = await _logRepository.GetLastLogForScope(body.Id);
-            body.ScopeVersion = lastNewScopeLog?.ScopeVersion ?? 0;
+
+            if (lastNewScopeLog != null)
+                body.ScopeVersion = new ScopeVersionBody(lastNewScopeLog.ScopeId, lastNewScopeLog.ScopeVersion);
 
             return body;
         }
@@ -204,9 +207,14 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
+                var log = await _scopeRepository.GetScopeVersionByChildNode(nodeBody.Id);
+
                 var body = result.ToNodeBody();
                 body.AccessRule = rule;
                 body.Link = nodeLink?.ToBody();
+
+                if (log != null)
+                    body.ScopeVersion = new ScopeVersionBody(log.ScopeId, log.ScopeVersion);
 
                 return body;
             }

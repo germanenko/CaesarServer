@@ -61,6 +61,19 @@ namespace planner_node_service.Infrastructure.Repository
             return null;
         }
 
+        // Получение версии скоупа для ноды
+        public async Task<ContentLog?> GetScopeVersionByChildNode(Guid nodeId)
+        {
+            var scope = await GetNodeScope(nodeId);
+
+            if (scope == null)
+                return null;
+
+            var scopeVersion = await _context.ContentLogs.FirstOrDefaultAsync(x => x.ScopeId == scope.Id);
+
+            return scopeVersion;
+        }
+
         public async Task<AccessRule?> CheckScopeAccess(Guid accountId, Guid scopeId)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
