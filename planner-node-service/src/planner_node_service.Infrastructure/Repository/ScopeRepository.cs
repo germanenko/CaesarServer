@@ -69,7 +69,7 @@ namespace planner_node_service.Infrastructure.Repository
             if (scope == null)
                 return null;
 
-            var scopeVersion = await _context.ContentLogs.FirstOrDefaultAsync(x => x.ScopeId == scope.Id);
+            var scopeVersion = await _context.ContentLogs.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == scope.Id);
 
             return scopeVersion;
         }

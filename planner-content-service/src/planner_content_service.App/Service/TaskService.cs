@@ -80,7 +80,7 @@ namespace planner_content_service.App.Service
                 return task;
             }
 
-            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, cancellationToken);
+            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, nodeComplete.Body, cancellationToken);
 
             if (result == null)
             {
@@ -141,7 +141,7 @@ namespace planner_content_service.App.Service
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId, cancellationToken);
+            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId, nodeComplete.Body, cancellationToken);
 
             if (result == null)
             {
