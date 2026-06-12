@@ -42,6 +42,8 @@ namespace planner_file_service.Api.Controllers
             if (!Directory.Exists(_storagePath))
                 return NotFound(new { error = "Storage directory not found" });
 
+            Console.WriteLine(_storagePath);
+
             // Ищем все файлы тем
             var themeFiles = Directory.GetFiles(_storagePath, "theme-*.flat.json");
 
