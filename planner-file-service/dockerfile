@@ -10,11 +10,6 @@ RUN dotnet publish \
   planner-file-service/src/planner_file_service.Api/planner_file_service.Api.csproj \
   -c Release -o /App/out
 
-# Копирование файлов тем (простой способ)
-RUN mkdir -p /default-themes
-# Используем find для копирования
-RUN find . -maxdepth 2 -name "*.flat.json" -exec cp {} /default-themes/ \; || true
-
 # Финальный образ
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
@@ -24,6 +19,8 @@ ENV FILE_SERVER_STORAGE_PATH=/file-storage
 RUN mkdir -p ${FILE_SERVER_STORAGE_PATH}
 
 COPY --from=build-env /App/out .
-COPY --from=build-env /default-themes/*.flat.json ${FILE_SERVER_STORAGE_PATH}/ 2>/dev/null || true
+
+# Копируем файлы тем из исходной директории (если они там есть)
+COPY *.flat.json ${FILE_SERVER_STORAGE_PATH}/ 2>/dev/null || true
 
 ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
