@@ -1,3 +1,4 @@
+# Оставьте Dockerfile простым
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /App
 
@@ -10,7 +11,6 @@ RUN dotnet publish \
   planner-file-service/src/planner_file_service.Api/planner_file_service.Api.csproj \
   -c Release -o /App/out
 
-# Финальный образ
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 
@@ -19,8 +19,5 @@ ENV FILE_SERVER_STORAGE_PATH=/file-storage
 RUN mkdir -p ${FILE_SERVER_STORAGE_PATH}
 
 COPY --from=build-env /App/out .
-
-# Копируем файлы тем из исходной директории (если они там есть)
-COPY *.flat.json ${FILE_SERVER_STORAGE_PATH}/ 2>/dev/null || true
 
 ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
