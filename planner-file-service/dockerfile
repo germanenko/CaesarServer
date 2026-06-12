@@ -21,6 +21,6 @@ RUN mkdir -p ${FILE_SERVER_STORAGE_PATH}
 COPY --from=build-env /App/out .
 
 # Копируем всю папку themes в директорию хранения
-COPY themes/ ${FILE_SERVER_STORAGE_PATH}/
+COPY planner-file-service/themes/ ${FILE_SERVER_STORAGE_PATH}/
 
 ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
