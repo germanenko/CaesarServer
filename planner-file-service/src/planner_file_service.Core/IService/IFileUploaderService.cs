@@ -7,6 +7,6 @@ namespace planner_file_service.Core.IService
     {
         Task<ServiceResponse<string>> UploadFileAsync(string directoryPath, Stream stream, string[] supportedExtensions);
         Task<ServiceResponse<Stream>> GetStreamAsync(string directoryPath, string filename);
-        Task<ServiceResponse<Stream>> GetThemeFiles();
+        Task<ServiceResponse<List<Stream>>> GetThemeFiles();
     }
 }
