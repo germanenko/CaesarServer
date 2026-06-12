@@ -1,4 +1,3 @@
-# Оставьте Dockerfile простым
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build-env
 WORKDIR /App
 
@@ -11,6 +10,7 @@ RUN dotnet publish \
   planner-file-service/src/planner_file_service.Api/planner_file_service.Api.csproj \
   -c Release -o /App/out
 
+# Финальный образ
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
 
@@ -19,5 +19,20 @@ ENV FILE_SERVER_STORAGE_PATH=/file-storage
 RUN mkdir -p ${FILE_SERVER_STORAGE_PATH}
 
 COPY --from=build-env /App/out .
+
+# Копируем все flat.json файлы из контекста сборки
+COPY *.flat.json /tmp/themes/ 2>/dev/null || true
+
+# Перемещаем их в нужную директорию
+RUN if [ -d "/tmp/themes" ] && [ "$(ls -A /tmp/themes)" ]; then \
+      cp -v /tmp/themes/*.flat.json ${FILE_SERVER_STORAGE_PATH}/; \
+      echo "Themes copied successfully"; \
+    else \
+      echo "No theme files found, using defaults"; \
+      echo '{"name":"Dark Theme","type":"dark"}' > ${FILE_SERVER_STORAGE_PATH}/dark.flat.json; \
+      echo '{"name":"Light Theme","type":"light"}' > ${FILE_SERVER_STORAGE_PATH}/light.flat.json; \
+    fi
+
+RUN ls -la ${FILE_SERVER_STORAGE_PATH}/
 
 ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
