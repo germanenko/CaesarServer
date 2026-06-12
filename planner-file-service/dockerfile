@@ -20,19 +20,7 @@ RUN mkdir -p ${FILE_SERVER_STORAGE_PATH}
 
 COPY --from=build-env /App/out .
 
-# Копируем все flat.json файлы из контекста сборки
-COPY *.flat.json /tmp/themes/ 2>/dev/null || true
-
-# Перемещаем их в нужную директорию
-RUN if [ -d "/tmp/themes" ] && [ "$(ls -A /tmp/themes)" ]; then \
-      cp -v /tmp/themes/*.flat.json ${FILE_SERVER_STORAGE_PATH}/; \
-      echo "Themes copied successfully"; \
-    else \
-      echo "No theme files found, using defaults"; \
-      echo '{"name":"Dark Theme","type":"dark"}' > ${FILE_SERVER_STORAGE_PATH}/dark.flat.json; \
-      echo '{"name":"Light Theme","type":"light"}' > ${FILE_SERVER_STORAGE_PATH}/light.flat.json; \
-    fi
-
-RUN ls -la ${FILE_SERVER_STORAGE_PATH}/
+# Копируем всю папку themes в директорию хранения
+COPY themes/ ${FILE_SERVER_STORAGE_PATH}/
 
 ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
