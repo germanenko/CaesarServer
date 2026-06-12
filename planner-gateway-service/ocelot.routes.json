@@ -520,6 +520,46 @@
             "UpstreamHttpMethod": [ "POST" ]
         },
 
+	{
+            "DownstreamPathTemplate": "/api/design/themes/metadata",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8091
+                }
+            ],
+            "UpstreamPathTemplate": "/api/design/themes/metadata",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/design/download/{filename}",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8091
+                }
+            ],
+            "UpstreamPathTemplate": "/api/design/download/{filename}",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
+            "DownstreamPathTemplate": "/api/design/download-all",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8091
+                }
+            ],
+            "UpstreamPathTemplate": "/api/design/download-all",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+
         {
             "DownstreamPathTemplate": "/api/profile/download/{filename}",
             "DownstreamScheme": "http",

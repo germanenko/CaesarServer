@@ -1,0 +1,21 @@
+{
+  "id": "halloween",
+  "extends": "dark",
+  "values": {
+    "color.text.primary": "#FFE4B5",
+    "color.text.secondary": "#9CA3AF",
+    "color.background.main": "#2F1B0F",
+    "color.action.primary": "#FF6B00",
+    "color.action.secondary": "#FFA500",
+    "color.button.primary.background": "#FF6B00",
+    "color.button.primary.text": "#FFE4B5",
+    "icon.action.search": "icon.missing",
+    "icon.action.settings": "icon.missing",
+    "icon.navigation.home": "icon.missing",
+    "icon.navigation.back": "icon.missing",
+    "font.body.regular": "font.default",
+    "font.body.bold": "font.default",
+    "font.heading.large": "font.default",
+    "font.heading.small": "font.default"
+  }
+}

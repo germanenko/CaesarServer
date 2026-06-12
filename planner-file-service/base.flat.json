@@ -1,0 +1,20 @@
+{
+  "id": "base",
+  "values": {
+    "color.text.primary": "#FF00FF",
+    "color.text.secondary": "#FF00FF",
+    "color.background.main": "#FF00FF",
+    "color.action.primary": "#FF00FF",
+    "color.action.secondary": "#FF00FF",
+    "color.button.primary.background": "#FF00FF",
+    "color.button.primary.text": "#FF00FF",
+    "icon.action.search": "icon.missing",
+    "icon.action.settings": "icon.missing",
+    "icon.navigation.home": "icon.missing",
+    "icon.navigation.back": "icon.missing",
+    "font.body.regular": "font.default",
+    "font.body.bold": "font.default",
+    "font.heading.large": "font.default",
+    "font.heading.small": "font.default"
+  }
+}

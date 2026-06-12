@@ -1,0 +1,21 @@
+{
+  "id": "dark",
+  "extends": "base",
+  "values": {
+    "color.text.primary": "#FFFFFF",
+    "color.text.secondary": "#9CA3AF",
+    "color.background.main": "#1F2937",
+    "color.action.primary": "#3B82F6",
+    "color.action.secondary": "#10B981",
+    "color.button.primary.background": "#3B82F6",
+    "color.button.primary.text": "#FFFFFF",
+    "icon.action.search": "icon.missing",
+    "icon.action.settings": "icon.missing",
+    "icon.navigation.home": "icon.missing",
+    "icon.navigation.back": "icon.missing",
+    "font.body.regular": "font.default",
+    "font.body.bold": "font.default",
+    "font.heading.large": "font.default",
+    "font.heading.small": "font.default"
+  }
+}

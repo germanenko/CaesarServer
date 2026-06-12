@@ -1,5 +1,6 @@
 using MimeDetective;
 using planner_client_package.Entities;
+using planner_file_service.Core;
 using planner_file_service.Core.IService;
 using planner_server_package;
 using System.Net;
@@ -88,5 +89,55 @@ namespace planner_file_service.App.Service
             };
         }
 
+        public async Task<ServiceResponse<List<Stream>>> GetThemeFiles()
+        {
+            string directoryPath = Constants.LocalPathToStorages;
+
+            if (!Directory.Exists(directoryPath))
+                return new ServiceResponse<List<Stream>>()
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    IsSuccess = false,
+                    Errors = ["Нет доступа"]
+                };
+
+            // Ищем все файлы, соответствующие паттерну: theme-*.flat.json
+            var themeFiles = Directory.GetFiles(directoryPath, "theme-*.flat.json");
+
+            if (themeFiles.Length == 0)
+                return new ServiceResponse<List<Stream>>()
+                {
+                    StatusCode = HttpStatusCode.NotFound,
+                    IsSuccess = false,
+                    Errors = ["No theme files found matching pattern: theme-*.flat.json"]
+                };
+
+            var fileStreams = new List<Stream>();
+
+            foreach (var filePath in themeFiles)
+            {
+                try
+                {
+                    Stream fileStream = File.OpenRead(filePath);
+                    fileStreams.Add(fileStream);
+                }
+                catch (Exception ex)
+                {
+                    return new ServiceResponse<List<Stream>>()
+                    {
+                        StatusCode = HttpStatusCode.InternalServerError,
+                        IsSuccess = false,
+                        Errors = [$"Failed to open file: {Path.GetFileName(filePath)}. Error: {ex.Message}"]
+                    };
+                }
+            }
+
+            return new ServiceResponse<List<Stream>>()
+            {
+                StatusCode = HttpStatusCode.OK,
+                IsSuccess = true,
+                Body = fileStreams
+            };
+        }
     }
 }

@@ -10,8 +10,35 @@ RUN dotnet publish \
   planner-file-service/src/planner_file_service.Api/planner_file_service.Api.csproj \
   -c Release -o /App/out
 
+# Копирование файлов тем
+RUN mkdir -p /default-themes
+COPY *.flat.json /default-themes/ 2>/dev/null || echo "No themes in build context"
 
+# Финальный образ (только один!)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0
 WORKDIR /App
+
+# Переменная окружения для пути хранения файлов
+ENV FILE_SERVER_STORAGE_PATH=/file-storage
+
+# Копирование приложения и тем
 COPY --from=build-env /App/out .
-ENTRYPOINT ["dotnet", "planner_file_service.Api.dll"]
+COPY --from=build-env /default-themes /default-themes
+
+# Скрипт инициализации (копирует темы если volume пуст)
+RUN echo '#!/bin/bash\n\
+STORAGE_PATH=${FILE_SERVER_STORAGE_PATH:-/file-storage}\n\
+echo "Storage path: $STORAGE_PATH"\n\
+mkdir -p "$STORAGE_PATH"\n\
+if [ -d "/default-themes" ] && [ -z "$(ls -A $STORAGE_PATH 2>/dev/null)" ]; then\n\
+    echo "Initializing themes in $STORAGE_PATH..."\n\
+    cp -v /default-themes/*.flat.json "$STORAGE_PATH/" 2>/dev/null || true\n\
+    echo "Themes initialized"\n\
+fi\n\
+echo "Available themes:"\n\
+ls -la "$STORAGE_PATH" 2>/dev/null || echo "No themes found"\n\
+exec dotnet planner_file_service.Api.dll\n\
+' > /App/start.sh && chmod +x /App/start.sh
+
+# Запуск через скрипт инициализации
+ENTRYPOINT ["/App/start.sh"]
