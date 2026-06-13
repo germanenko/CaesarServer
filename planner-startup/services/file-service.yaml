@@ -26,8 +26,4 @@ services:
       - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS}
     volumes:
       - planner-file-server-data:${FILE_SERVER_STORAGE_PATH}
-      - ./planner-file-service/themes:/file-storage
-
-volumes:
-  planner-file-server-data:
-    name: planner-file-server-data
+      #- ./planner-file-service/themes:/file-storage
