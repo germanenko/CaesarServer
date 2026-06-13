@@ -13,9 +13,29 @@
     "icon.action.settings": "SettingsIcon",
     "icon.navigation.home": "HomeIcon",
     "icon.navigation.back": "BackIcon",
-    "font.body.regular": "font.default",
-    "font.body.bold": "font.default",
-    "font.heading.large": "font.default",
-    "font.heading.small": "font.default"
+    "font.body.regular": {
+      "font": "Inter",
+      "size": 16,
+      "weight": 400,
+      "lineHeight": 1.5
+    },
+    "font.body.bold": {
+      "font": "Inter",
+      "size": 16,
+      "weight": 700,
+      "lineHeight": 1.5
+    },
+    "font.heading.large": {
+      "font": "Inter",
+      "size": 32,
+      "weight": 600,
+      "lineHeight": 1.2
+    },
+    "font.heading.small": {
+      "font": "Inter",
+      "size": 24,
+      "weight": 500,
+      "lineHeight": 1.3
+    }
   }
 }
