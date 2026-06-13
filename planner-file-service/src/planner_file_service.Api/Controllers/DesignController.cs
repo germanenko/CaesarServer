@@ -104,13 +104,12 @@ namespace planner_file_service.Api.Controllers
             );
         }
 
-        // Скачивание всех тем одним архивом (дополнительно)
         [HttpGet("download-all")]
         [SwaggerOperation(Summary = "Скачивание всех тем архивом", Description = "Скачивает все темы одним ZIP архивом")]
         [SwaggerResponse(StatusCodes.Status200OK, "Архив скачан", Type = typeof(FileStreamResult))]
         public async Task<IActionResult> DownloadAllThemes()
         {
-            var themeFiles = Directory.GetFiles(_storagePath, "theme-*.flat.json");
+            var themeFiles = Directory.GetFiles(_storagePath, "*.flat.json");
 
             if (themeFiles.Length == 0)
                 return NotFound(new { error = "No theme files found" });
