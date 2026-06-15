@@ -1,8 +1,6 @@
 {
-  "metadata": {
-    "id": "light",
-    "extends": "base"
-  },
+  "id": "light",
+  "extends": "base",
   "colors": {
     "text.primary": "#111827",
     "text.secondary": "#6B7280",
