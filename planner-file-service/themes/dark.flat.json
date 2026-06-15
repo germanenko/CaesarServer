@@ -16,7 +16,7 @@
     "icon.navigation.home": "HomeIcon",
     "icon.navigation.back": "BackIcon"
   },
-  "fonts": {
+  "typography": {
     "body.regular": {
       "font": "Inter-Regular",
       "size": 16,
