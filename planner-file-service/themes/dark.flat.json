@@ -1,21 +1,53 @@
 {
   "id": "dark",
   "extends": "base",
-  "values": {
+  "colors": {
     "color.text.primary": "#FFFFFF",
     "color.text.secondary": "#9CA3AF",
     "color.background.main": "#1F2937",
     "color.action.primary": "#3B82F6",
     "color.action.secondary": "#10B981",
     "color.button.primary.background": "#3B82F6",
-    "color.button.primary.text": "#FFFFFF",
-    "icon.action.search": "icon.missing",
-    "icon.action.settings": "icon.missing",
-    "icon.navigation.home": "icon.missing",
-    "icon.navigation.back": "icon.missing",
-    "font.body.regular": "font.default",
-    "font.body.bold": "font.default",
-    "font.heading.large": "font.default",
-    "font.heading.small": "font.default"
+    "color.button.primary.text": "#FFFFFF"
+  },
+  "icons": {
+    "icon.action.search": "SearchIcon",
+    "icon.action.settings": "SettingsIcon",
+    "icon.navigation.home": "HomeIcon",
+    "icon.navigation.back": "BackIcon"
+  },
+  "typography": {
+    "font.body.regular": {
+      "font": "font.default",
+      "size": 16,
+      "lineHeight": 1.2,
+      "weight": 400
+    },
+    "font.body.bold": {
+      "font": "font.default",
+      "size": 16,
+      "lineHeight": 1.2,
+      "weight": 400
+    },
+    "font.heading.large": {
+      "font": "font.default",
+      "size": 16,
+      "lineHeight": 1.2,
+      "weight": 400
+    },
+    "font.heading.small": {
+      "font": "font.default",
+      "size": 16,
+      "lineHeight": 1.2,
+      "weight": 400
+    }
+  },
+  "spacing": {
+    "spacing.primary": 12,
+    "spacing.secondary": 15
+  },
+  "radii": {
+    "radius.primary": 15,
+    "radius.secondary": 12
   }
 }
