@@ -16,30 +16,30 @@
     "icon.navigation.home": "HomeIcon",
     "icon.navigation.back": "BackIcon"
   },
-  "typography": {
-    "font.body.regular": {
-      "font": "font.default",
+  "fonts": {
+    "body.regular": {
+      "font": "Inter-Regular",
       "size": 16,
-      "lineHeight": 1.2,
-      "weight": 400
+      "weight": 400,
+      "lineHeight": 1.5
     },
-    "font.body.bold": {
-      "font": "font.default",
+    "body.bold": {
+      "font": "Inter-Bold",
       "size": 16,
-      "lineHeight": 1.2,
-      "weight": 400
+      "weight": 700,
+      "lineHeight": 1.5
     },
-    "font.heading.large": {
-      "font": "font.default",
-      "size": 16,
-      "lineHeight": 1.2,
-      "weight": 400
+    "heading.large": {
+      "font": "Inter-ExtraBold",
+      "size": 32,
+      "weight": 600,
+      "lineHeight": 1.2
     },
-    "font.heading.small": {
-      "font": "font.default",
-      "size": 16,
-      "lineHeight": 1.2,
-      "weight": 400
+    "heading.small": {
+      "font": "Inter-Light",
+      "size": 24,
+      "weight": 500,
+      "lineHeight": 1.3
     }
   },
   "spacing": {
