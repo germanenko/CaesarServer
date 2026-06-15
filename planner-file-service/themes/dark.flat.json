@@ -17,25 +17,25 @@
     "icon.navigation.back": "BackIcon"
   },
   "typography": {
-    "body.regular": {
+    "font.body.regular": {
       "font": "Inter-Regular",
       "size": 16,
       "weight": 400,
       "lineHeight": 1.5
     },
-    "body.bold": {
+    "font.body.bold": {
       "font": "Inter-Bold",
       "size": 16,
       "weight": 700,
       "lineHeight": 1.5
     },
-    "heading.large": {
+    "font.heading.large": {
       "font": "Inter-ExtraBold",
       "size": 32,
       "weight": 600,
       "lineHeight": 1.2
     },
-    "heading.small": {
+    "font.heading.small": {
       "font": "Inter-Light",
       "size": 24,
       "weight": 500,
