@@ -14,7 +14,10 @@
     "icon.action.search": "SearchIcon",
     "icon.action.settings": "SettingsIcon",
     "icon.navigation.home": "HomeIcon",
-    "icon.navigation.back": "BackIcon"
+    "icon.navigation.back": "BackIcon",
+    "icon.navigation.settings": "SettingsIcon",
+    "icon.navigation.analytics": "AnalyticsIcon",
+    "icon.navigation.teamManagement": "TeamIcon"
   },
   "typography": {
     "font.body.regular": {
