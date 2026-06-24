@@ -4,7 +4,8 @@
   "colors": {
     "color.text.primary": "#FFFFFF",
     "color.text.secondary": "#9CA3AF",
-    "color.background.main": "#1F2937",
+    "color.background.main": "#0B0F14",
+    "color.header": "#111823",
     "color.action.primary": "#3B82F6",
     "color.action.secondary": "#10B981",
     "color.button.primary.background": "#3B82F6",
