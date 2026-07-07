@@ -18,7 +18,11 @@
     "icon.navigation.back": "BackIcon",
     "icon.navigation.settings": "SettingsIcon",
     "icon.navigation.analytics": "AnalyticsIcon",
-    "icon.navigation.teamManagement": "TeamIcon"
+    "icon.navigation.chats": "ChatsIcon",
+    "icon.navigation.dashboard": "DashboardIcon",
+    "icon.navigation.tasks": "TasksIcon",
+    "icon.navigation.calendar": "CalendarIcon",
+    "icon.navigation.others": "OthersIcon"
   },
   "typography": {
     "font.body.regular": {

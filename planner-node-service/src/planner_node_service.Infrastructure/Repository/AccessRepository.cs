@@ -357,18 +357,15 @@ namespace planner_node_service.Infrastructure.Repository
                 .Distinct()
                 .ToList();
 
-            var members = accessGroups
-                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
-                .Distinct()
-                .ToList();
-
             var ruleBodies = accessRights.Select(x => x.ToBody());
+
+            var profile = await _userService.GetUserData(accountId);
 
             foreach (var body in ruleBodies)
             {
                 if (body.AccessSubject is UserAccessSubjectBody user)
                 {
-                    user.Profile = await _userService.GetUserData(user.AccountId);
+                    user.Profile = profile;
                 }
             }
 
@@ -416,11 +413,6 @@ namespace planner_node_service.Infrastructure.Repository
             var accessGroups = groupRules
                 .Select(x => x.Subject)
                 .OfType<GroupAccessSubject>()
-                .Distinct()
-                .ToList();
-
-            var members = accessGroups
-                .SelectMany(x => x.Members.Select(m => m.ToAccessGroupMemberBody()))
                 .Distinct()
                 .ToList();
 
