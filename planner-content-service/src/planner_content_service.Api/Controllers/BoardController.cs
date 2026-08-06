@@ -5,6 +5,7 @@ using planner_client_package.Entities.Enum;
 using planner_client_package.Entities.Request;
 using planner_common_package;
 using planner_common_package.Entities;
+using planner_common_package.Enums;
 using planner_content_service.Core.IService;
 using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -42,6 +43,10 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
+            await Task.Delay(3000);
+
+            return StatusCode(403, new Response<BoardBody>() { ErrorCodes = [ErrorCode.WriteDenied] });
+
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
             var result = await _idempotencyService.ExecuteOperation(
