@@ -43,9 +43,9 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            await Task.Delay(3000);
+            //await Task.Delay(3000);
 
-            return StatusCode(403, new Response<BoardBody>() { ErrorCodes = [ErrorCode.WriteDenied] });
+            //return StatusCode(403, new Response<BoardBody>() { ErrorCodes = [ErrorCode.WriteDenied] });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
