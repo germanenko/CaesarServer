@@ -1,4 +1,5 @@
-﻿using System;
+﻿using planner_common_package.Entities.WebSockets;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

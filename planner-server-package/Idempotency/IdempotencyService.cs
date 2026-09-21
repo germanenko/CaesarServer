@@ -61,9 +61,7 @@ namespace planner_server_package.Idempotency
 
                 if (result.IsSuccess == false)
                 {
-                    var errorKind = result.ErrorCodes.Max().GetErrorKind();
-
-                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, errorKind, result.Errors, cancellationToken);
+                    await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, result.PrimaryErrorCode.Value.GetErrorKind(), result.Errors, cancellationToken);
                 }
                 else
                 {
@@ -77,6 +75,7 @@ namespace planner_server_package.Idempotency
             {
                 StatusCode = System.Net.HttpStatusCode.Conflict,
                 IsSuccess = false,
+                PrimaryErrorCode = ErrorCode.DuplicateRequest,
                 ErrorCodes = [ErrorCode.DuplicateRequest],
                 Errors = ["Запрос с таким Id уже существует"]
             };

@@ -10,6 +10,7 @@ namespace planner_common_package.Entities
     public class Response<T>
     {
         public T Body { get; set; }
+        public ErrorCode? PrimaryErrorCode { get; set; }
         public List<ErrorCode> ErrorCodes { get; set; }
     }
 }

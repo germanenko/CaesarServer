@@ -1,4 +1,5 @@
 ﻿using Microsoft.Extensions.Logging;
+using planner_common_package.Enums;
 using planner_server_package.Events.Enums;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
@@ -117,6 +118,8 @@ namespace planner_server_package.RabbitMQ
                         tcs.TrySetResult(response ?? new ServiceResponse<object>
                         {
                             IsSuccess = false,
+                            ErrorCodes = [ErrorCode.Infrastructure],
+                            PrimaryErrorCode = ErrorCode.Infrastructure,
                             Errors = new[] { "Invalid response format" }
                         });
                     }
@@ -154,7 +157,9 @@ namespace planner_server_package.RabbitMQ
                 return new ServiceResponse<object>()
                 {
                     IsSuccess = false,
-                    Errors = new[] { "Ошибка сервера" }
+                    Errors = new[] { "Ошибка сервера" },
+                    ErrorCodes = [ErrorCode.Infrastructure],
+                    PrimaryErrorCode = ErrorCode.Infrastructure
                 };
             }
 

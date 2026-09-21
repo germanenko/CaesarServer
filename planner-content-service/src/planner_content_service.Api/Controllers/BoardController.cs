@@ -43,9 +43,9 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            //await Task.Delay(3000);
+            await Task.Delay(3000);
 
-            //return StatusCode(403, new Response<BoardBody>() { ErrorCodes = [ErrorCode.WriteDenied] });
+            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.WriteDenied, ErrorCodes = [ErrorCode.WriteDenied] });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
@@ -61,7 +61,7 @@ namespace planner_content_service.Api.Controllers
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, new Response<BoardBody>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, new Response<BoardBody>() { ErrorCodes = result.ErrorCodes });
+            return StatusCode((int)result.StatusCode, new Response<BoardBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
 
@@ -90,7 +90,7 @@ namespace planner_content_service.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _boardService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);
-            return StatusCode((int)result.StatusCode, result.Body);
+            return StatusCode((int)result.StatusCode, new Response<bool>() { Body = result.Body });
         }
 
 

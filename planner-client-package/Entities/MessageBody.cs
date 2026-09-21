@@ -1,4 +1,5 @@
 using planner_client_package.Entities.WebSockets;
+using planner_common_package.Entities.WebSockets;
 using planner_common_package.Enums;
 using System;
 
