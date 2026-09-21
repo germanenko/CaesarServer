@@ -9,5 +9,6 @@ namespace planner_content_service.Core.IService
         public Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(List<Guid> nodeIds);
         public Task<ServiceResponse<IEnumerable<Node>>> GetNodes(Guid accountId, List<Guid> rootIds);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, Node node);
+        Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId, CancellationToken cancellationToken);
     }
 }

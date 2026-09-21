@@ -1,20 +1,28 @@
 ﻿using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IRepository;
 using planner_content_service.Core.IService;
 using planner_server_package;
+using planner_server_package.Events;
+using planner_server_package.Events.Enums;
+using planner_server_package.RabbitMQ;
+using System.Net;
 
 namespace planner_content_service.App.Service
 {
     public class NodeService : INodeService
     {
         private readonly INodeRepository _nodeRepository;
+        private readonly IPublisherService _publisherService;
 
         public NodeService(
-            INodeRepository nodeRepository)
+            INodeRepository nodeRepository,
+            IPublisherService publisherService)
         {
             _nodeRepository = nodeRepository;
+            _publisherService = publisherService;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(List<Guid> nodeIds)
@@ -50,6 +58,47 @@ namespace planner_content_service.App.Service
                 IsSuccess = true,
                 StatusCode = System.Net.HttpStatusCode.OK,
                 Body = newNode.ToNodeBody()
+            };
+        }
+
+        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId, CancellationToken cancellationToken = default)
+        {
+            DeleteNodeEvent deleteEvent = new DeleteNodeEvent()
+            {
+                NodeId = columnId,
+                AccountId = accountId
+            };
+
+            var request = await _publisherService.Publish(deleteEvent, PublishEvent.DeleteNode);
+
+            if (!request.IsSuccess)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = request.IsSuccess,
+                    StatusCode = request.StatusCode,
+                    Errors = request.Errors
+                };
+            }
+
+            var result = await _nodeRepository.DeleteNode(columnId, accountId, cancellationToken);
+
+            if (!result)
+            {
+                return new ServiceResponse<bool>
+                {
+                    IsSuccess = false,
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = new[] { "Нода не удалена" },
+                    ErrorCodes = [ErrorCode.Infrastructure]
+                };
+            }
+
+            return new ServiceResponse<bool>
+            {
+                IsSuccess = true,
+                StatusCode = HttpStatusCode.OK,
+                Body = result
             };
         }
     }

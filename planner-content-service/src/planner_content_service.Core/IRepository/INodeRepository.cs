@@ -9,5 +9,6 @@ namespace planner_content_service.Core.IRepository
         Task<Node> AddOrUpdateNode(Guid accountId, Node node);
         Task<IEnumerable<Node>?> GetNodes(Guid accountId, List<Guid> nodeIds);
         Task<IEnumerable<Node>?> GetNodesByIds(List<Guid> nodeIds);
+        Task<bool> DeleteNode(Guid nodeId, Guid accountId, CancellationToken cancellationToken);
     }
 }

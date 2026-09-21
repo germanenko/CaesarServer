@@ -25,13 +25,11 @@ namespace planner_content_service.App.Service
         private readonly IBoardRepository _boardRepository;
         private readonly IAccessService _accessService;
         private readonly planner_server_package.Node.INodeService _nodeService;
-        private readonly IPublisherService _publisherService;
         private readonly ILogger<BoardService> _logger;
 
         public BoardService(IBoardRepository boardRepository, IPublisherService publisherService, ILogger<BoardService> logger, IAccessService accessService, planner_server_package.Node.INodeService nodeService)
         {
             _boardRepository = boardRepository;
-            _publisherService = publisherService;
             _logger = logger;
             _accessService = accessService;
             _nodeService = nodeService;
@@ -67,47 +65,6 @@ namespace planner_content_service.App.Service
             }
 
             return new ServiceResponse<ColumnBody>
-            {
-                IsSuccess = true,
-                StatusCode = HttpStatusCode.OK,
-                Body = result
-            };
-        }
-
-        public async Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid columnId, CancellationToken cancellationToken = default)
-        {
-            DeleteNodeEvent deleteEvent = new DeleteNodeEvent()
-            {
-                NodeId = columnId,
-                AccountId = accountId
-            };
-
-            var request = await _publisherService.Publish(deleteEvent, PublishEvent.DeleteNode);
-
-            if (!request.IsSuccess)
-            {
-                return new ServiceResponse<bool>
-                {
-                    IsSuccess = request.IsSuccess,
-                    StatusCode = request.StatusCode,
-                    Errors = request.Errors
-                };
-            }
-
-            var result = await _boardRepository.DeleteNode(columnId, accountId, cancellationToken);
-
-            if (!result)
-            {
-                return new ServiceResponse<bool>
-                {
-                    IsSuccess = false,
-                    StatusCode = HttpStatusCode.BadRequest,
-                    Errors = new[] { "Нода не удалена" },
-                    ErrorCodes = [ErrorCode.Infrastructure]
-                };
-            }
-
-            return new ServiceResponse<bool>
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,

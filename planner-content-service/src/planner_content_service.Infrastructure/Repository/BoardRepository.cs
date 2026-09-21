@@ -167,22 +167,6 @@ namespace planner_content_service.Infrastructure.Repository
 
         }
 
-        public async Task<bool> DeleteNode(
-            Guid nodeId,
-            Guid accountId,
-            CancellationToken cancellationToken = default)
-        {
-            var column = await _context.Nodes.FirstOrDefaultAsync(x => x.Id == nodeId, cancellationToken);
-
-            if (column == null) return false;
-
-            _context.Nodes.Remove(column);
-
-            await _context.SaveChangesAsync(cancellationToken);
-
-            return true;
-        }
-
         public async Task<List<ColumnBody>?> CreateOrUpdateColumns(
             List<ColumnBody> columns,
             Guid accountId,

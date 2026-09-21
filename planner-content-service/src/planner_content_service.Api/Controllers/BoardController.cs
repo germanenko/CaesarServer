@@ -79,21 +79,6 @@ namespace planner_content_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
-        [HttpDelete("deleteNode"), Authorize]
-        [SwaggerOperation("Удалить ноду")]
-        [SwaggerResponse(200)]
-        public async Task<IActionResult> DeleteNode(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            Guid nodeId,
-            CancellationToken cancellationToken
-        )
-        {
-            var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);
-            return StatusCode((int)result.StatusCode, new Response<bool>() { Body = result.Body });
-        }
-
-
         [HttpPost("addDefaultColumn"), Authorize]
         [SwaggerOperation("Добавить колонку по умолчанию")]
         [SwaggerResponse(200)]
