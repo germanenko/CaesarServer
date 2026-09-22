@@ -7,8 +7,9 @@ using System.Threading.Tasks;
 
 namespace planner_common_package.Entities
 {
-    public class Response<T> : ResponseEnvelope
+    public class ResponseEnvelope
     {
-        public T Body { get; set; }
+        public ErrorCode? PrimaryErrorCode { get; set; }
+        public List<ErrorCode> ErrorCodes { get; set; }
     }
 }
