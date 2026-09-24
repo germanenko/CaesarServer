@@ -45,7 +45,7 @@ namespace planner_content_service.Api.Controllers
         {
             await Task.Delay(3000);
 
-            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.WriteDenied, ErrorCodes = [ErrorCode.WriteDenied] });
+            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.VersionMismatch, ErrorCodes = [ErrorCode.VersionMismatch] });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
