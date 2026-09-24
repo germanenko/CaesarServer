@@ -85,31 +85,6 @@ void ConfigureServices(IServiceCollection services)
     var getGoogleTokenExchange = GetEnvVar("RABBITMQ_GET_GOOGLE_TOKEN");
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
 
-
-    services.Configure<ApiBehaviorOptions>(options =>
-    {
-        options.InvalidModelStateResponseFactory = context =>
-        {
-            var errors = context.ModelState
-                .Where(kv => kv.Value.Errors.Count > 0)
-                .ToDictionary(
-                    kv => kv.Key,
-                    kv => kv.Value.Errors
-                              .Select(e => string.IsNullOrEmpty(e.ErrorMessage)
-                                           ? e.Exception?.Message
-                                           : e.ErrorMessage)
-                              .ToArray());
-
-            var body = new ResponseEnvelope
-            {
-                ErrorCodes = [ErrorCode.ValidationError],
-                PrimaryErrorCode = ErrorCode.ValidationError
-            };
-
-            return new BadRequestObjectResult(body);
-        };
-    });
-
     services.AddControllers(e =>
     {
         e.OutputFormatters.RemoveType<HttpNoContentOutputFormatter>();
