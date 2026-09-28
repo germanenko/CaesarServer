@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_common_package.Entities;
+using planner_common_package.Enums;
 using planner_content_service.App.Service;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
@@ -37,6 +39,10 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
+            await Task.Delay(3000);
+
+            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.VersionMismatch, ErrorCodes = [ErrorCode.VersionMismatch] });
+
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);
 
