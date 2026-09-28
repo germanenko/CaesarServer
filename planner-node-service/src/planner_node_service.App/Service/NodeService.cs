@@ -119,11 +119,12 @@ namespace planner_node_service.App.Service
                         // Добавляем ноду в результат
                         nodes.Add(node.ToNodeBody());
 
+                        //! исключил добавление скопа в ответ, тк запрос подразумевает получение конкретных нод по их Id, а не получение связанных скопов. Если нужно будет получать скопы, то лучше сделать отдельный метод для этого
                         // Получаем Scope ноды и добавляем его в результат, если он существует и отличается от самой ноды
-                        var scope = await _scopeRepository.GetNodeScope(nodeId);
+                        //var scope = await _scopeRepository.GetNodeScope(nodeId);
 
-                        if (scope != null && scope.Id != node.Id)
-                            nodes.Add(scope.ToNodeBody());
+                        //if (scope != null && scope.Id != node.Id)
+                        //    nodes.Add(scope.ToNodeBody());
                     }
                 }
             }
