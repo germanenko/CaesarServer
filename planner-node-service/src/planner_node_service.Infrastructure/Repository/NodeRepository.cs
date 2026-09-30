@@ -176,6 +176,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Type = nodeBody.Type,
                 Props = nodeBody.Props,
                 SyncKind = nodeBody.SyncKind,
+                Version = nodeBody.Version
                 //BodyJson = JsonSerializer.Serialize(nodeBody)
                 //Cursor = cursor
             };
