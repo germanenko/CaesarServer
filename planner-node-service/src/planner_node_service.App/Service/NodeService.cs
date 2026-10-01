@@ -462,11 +462,11 @@ namespace planner_node_service.App.Service
             SyncEntitiesEvent chatNodesEvent = new SyncEntitiesEvent()
             {
                 TokenPayload = tokenPayload,
-                Bodies = contentBodies
+                Bodies = chatBodies
             };
 
-            _publisherService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
-            _publisherService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
+            await _publisherService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
+            await _publisherService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
 
             return new ServiceResponse<List<NodeBody>>()
             {
