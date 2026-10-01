@@ -47,9 +47,9 @@ namespace planner_content_service.Api.Controllers
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);
 
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+                return StatusCode((int)result.StatusCode, new Response<JobBody>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, result.Errors);
+            return StatusCode((int)result.StatusCode, new Response<JobBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("createJobFromMessage"), Authorize]
