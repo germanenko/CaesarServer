@@ -460,6 +460,7 @@ namespace planner_node_service.App.Service
 
 
             _logger.LogInformation(contentBodies.Count.ToString());
+            _logger.LogInformation(contentBodies[0].ToString());
             _logger.LogInformation(JsonSerializer.Serialize(contentBodies));
 
 
