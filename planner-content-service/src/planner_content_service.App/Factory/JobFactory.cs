@@ -1,4 +1,5 @@
-﻿using planner_client_package.Entities.Request;
+﻿using planner_client_package.Entities;
+using planner_client_package.Entities.Request;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IFactory;
 
@@ -14,6 +15,18 @@ namespace planner_content_service.App.Factory
                 ReminderBodyRequest r => new Reminder(r.Date, false, r.Description),
                 InformationBodyRequest i => new Information(false, i.Description),
                 TaskBodyRequest t => new Core.Entities.Models.Task(t.PermormerIds, false, t.Description),
+                _ => throw new NotSupportedException()
+            };
+        }
+
+        public Job CreateFromBody(JobBody body)
+        {
+            return body switch
+            {
+                MeetingBody m => new Meeting(m.Date, m.Members, false, m.Description),
+                ReminderBody r => new Reminder(r.Date, false, r.Description),
+                InformationBody i => new Information(false, i.Description),
+                TaskBody t => new Core.Entities.Models.Task(t.PermormerIds, false, t.Description),
                 _ => throw new NotSupportedException()
             };
         }

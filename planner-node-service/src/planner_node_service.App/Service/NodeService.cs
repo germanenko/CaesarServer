@@ -445,6 +445,11 @@ namespace planner_node_service.App.Service
             List<ISyncable> contentBodies = new List<ISyncable>();
             List<ISyncable> chatBodies = new List<ISyncable>();
 
+            foreach (var item in nodeBodies)
+            {
+                _logger.LogInformation(JsonSerializer.Serialize(item));
+            }
+
             contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
@@ -465,8 +470,8 @@ namespace planner_node_service.App.Service
                 Bodies = chatBodies
             };
 
-            await _publisherService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
-            await _publisherService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
+            _publisherService.Publish(contentNodesEvent, PublishEvent.ContentNodes);
+            _publisherService.Publish(chatNodesEvent, PublishEvent.ChatNodes);
 
             return new ServiceResponse<List<NodeBody>>()
             {

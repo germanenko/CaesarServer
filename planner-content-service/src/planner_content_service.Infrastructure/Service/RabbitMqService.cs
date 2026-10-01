@@ -61,7 +61,7 @@ namespace planner_content_service.Infrastructure.Service
 
             var boards = response.Bodies.OfType<BoardBody>().ToList();
             var columns = response.Bodies.OfType<ColumnBody>().ToList();
-            var tasks = response.Bodies.OfType<planner_server_package.Entities.JobBody>().ToList();
+            var tasks = response.Bodies.OfType<JobBody>().ToList();
 
             var boardBodies = boards.Select(x => new CreateOrUpdateBoardBody()
             {
@@ -82,26 +82,27 @@ namespace planner_content_service.Infrastructure.Service
             }).ToList();
 
             //! исправить когда перейдем на новую логику создания задач
-            //var taskBodies = tasks.Select(x => new planner_client_package.Entities.Request.JobRequestBody()
-            //{
-            //    Id = x.Id,
-            //    Name = x.Name,
-            //    Props = x.Props,
-            //    Type = NodeType.Column,
-            //    UpdatedAt = x.UpdatedAt,
-            //    UpdatedBy = x.UpdatedBy,
-            //    StartDate = x.StartDate,
-            //    EndDate = x.EndDate,
-            //    Description = x.Description,
-            //    HexColor = x.HexColor,
-            //    PriorityOrder = x.PriorityOrder,
-            //    Status = x.Status,
-            //    JobType = x.JobType
-            //}).ToList();
+            var taskBodies = tasks.Select(x => new planner_client_package.Entities.JobBody()
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Props = x.Props,
+                Type = NodeType.Column,
+                UpdatedAt = x.UpdatedAt,
+                UpdatedBy = x.UpdatedBy,
+                StartDate = x.StartDate,
+                Version = x.Version,
+                EndDate = x.EndDate,
+                Description = x.Description,
+                HexColor = x.HexColor,
+                PriorityOrder = x.PriorityOrder,
+                Status = x.Status,
+                JobType = x.JobType
+            }).ToList();
 
             await boardService.CreateOrUpdateBoards(boardBodies, response.TokenPayload.AccountId, CancellationToken.None);
             await boardService.CreateOrUpdateColumns(response.TokenPayload.AccountId, columnBodies, CancellationToken.None);
-            //await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies);
+            await taskService.CreateOrUpdateTasks(response.TokenPayload.AccountId, taskBodies, CancellationToken.None);
 
             return new ServiceResponse<object>()
             {

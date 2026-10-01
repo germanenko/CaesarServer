@@ -10,6 +10,7 @@ namespace planner_content_service.Core.IService
         Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> createOrUpdateTaskBodies, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> jobBodies, CancellationToken cancellationToken);
         Task<ServiceResponse<JobBody>> UpdateTask(Guid accountId, JobBody taskBody, CancellationToken cancellationToken);
         Task<ServiceResponse<List<JobBody>>> UpdateTasks(Guid accountId, List<JobBody> taskBodies, CancellationToken cancellationToken);
         System.Threading.Tasks.Task SetMessageEdited(Guid messageId, MessageState state, CancellationToken cancellationToken);

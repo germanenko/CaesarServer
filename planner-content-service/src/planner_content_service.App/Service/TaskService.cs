@@ -102,6 +102,7 @@ namespace planner_content_service.App.Service
 
         public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
+            // базовое тело для отправки в NodeService
             var taskBody = new JobBody()
             {
                 Id = createOrUpdateJobBody.Id,
@@ -161,7 +162,92 @@ namespace planner_content_service.App.Service
             };
         }
 
+
+
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask(Guid accountId, JobBody jobBody, CancellationToken cancellationToken = default)
+        {
+            //CreateNodeEvent taskEvent = new CreateNodeEvent()
+            //{
+            //    Node = BodyConverter.ClientToServerBody(taskBody),
+            //    CreatorId = accountId
+            //};
+
+            //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, jobBody);
+
+            if (!nodeComplete.IsSuccess)
+            {
+                return new ServiceResponse<JobBody>
+                {
+                    IsSuccess = nodeComplete.IsSuccess,
+                    StatusCode = nodeComplete.StatusCode,
+                    ErrorCodes = nodeComplete.ErrorCodes,
+                    Errors = nodeComplete.Errors
+                };
+            }
+
+            if (await _taskRepository.GetAsync(jobBody.Id, cancellationToken) != null)
+            {
+                var task = await UpdateTask(accountId, jobBody, cancellationToken);
+
+                return task;
+            }
+
+            var result = await _taskRepository.AddAsync(jobBody, accountId, nodeComplete.Body, cancellationToken);
+
+            if (result == null)
+            {
+                return new ServiceResponse<JobBody>
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    Errors = ["Task not created"],
+                    IsSuccess = false
+                };
+            }
+
+            return new ServiceResponse<JobBody>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = result,
+                IsSuccess = true
+            };
+        }
+
+
+
         public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        {
+            var errors = new List<string>();
+            List<JobBody> tasks = new List<JobBody>();
+            foreach (var taskBody in taskBodies)
+            {
+                var result = await CreateOrUpdateTask(accountId, taskBody);
+
+                if (result.IsSuccess)
+                {
+                    tasks.Add(result.Body);
+                }
+                else
+                {
+                    return new ServiceResponse<List<JobBody>>
+                    {
+                        StatusCode = HttpStatusCode.BadRequest,
+                        IsSuccess = false,
+                        Errors = result.Errors
+                    };
+                }
+            }
+
+            return new ServiceResponse<List<JobBody>>
+            {
+                StatusCode = HttpStatusCode.OK,
+                Body = tasks,
+                IsSuccess = true
+            };
+        }
+
+
+        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> taskBodies, CancellationToken cancellationToken = default)
         {
             var errors = new List<string>();
             List<JobBody> tasks = new List<JobBody>();

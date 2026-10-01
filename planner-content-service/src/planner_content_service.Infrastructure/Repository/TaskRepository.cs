@@ -72,6 +72,53 @@ namespace planner_content_service.Infrastructure.Repository
             }
         }
 
+
+        public async Task<JobBody?> AddAsync
+        (
+            JobBody jobBody,
+            Guid accountId,
+            NodeBody metadata,
+            CancellationToken cancellationToken
+        )
+        {
+            var job = _jobFactory.CreateFromBody(jobBody);
+
+            job.SetCommon(jobBody.Id, NodeType.Job, jobBody.Name, jobBody.Props);
+
+            try
+            {
+
+                var task = (await _context.AddAsync(job)).Entity;
+
+                await _context.SaveChangesAsync();
+
+                var createTaskChatEvent = new CreateTaskChatEvent
+                {
+                    IsSuccess = false,
+                    CreateTaskChat = new CreateTaskChat
+                    {
+                        TaskId = task.Id,
+                        CreatorId = accountId,
+                        ChatName = $"{task.Name} chat"
+                    }
+                };
+
+                var result = task.ToTaskBody();
+
+                result = await SetReadStateToJobBody(accountId, result, cancellationToken);
+
+                return result.ApplyNodeMetadata(metadata);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка создания задачи: {ex.Message}");
+
+                throw;
+            }
+        }
+
+
+
         public async Task<JobBody?> AddJobFromMessageAsync<T>
         (
             T taskBody,
