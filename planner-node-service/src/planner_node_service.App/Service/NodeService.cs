@@ -1,19 +1,16 @@
 ﻿using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using planner_client_package.Entities;
-using planner_client_package.Interface;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Core.IRepository;
 using planner_node_service.Core.IService;
 using planner_server_package;
-using planner_server_package.Access;
 using planner_server_package.Converters;
 using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.Interface;
 using planner_server_package.RabbitMQ;
-using System.Collections.Generic;
 using System.Net;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -444,8 +441,8 @@ namespace planner_node_service.App.Service
         {
             var newNodes = await _nodeRepository.AddOrUpdateNodes(nodeBodies);
 
-            List<IBody> contentBodies = new List<IBody>();
-            List<IBody> chatBodies = new List<IBody>();
+            List<ISyncable> contentBodies = new List<ISyncable>();
+            List<ISyncable> chatBodies = new List<ISyncable>();
 
             foreach (var item in nodeBodies)
             {
@@ -453,23 +450,16 @@ namespace planner_node_service.App.Service
                 _logger.LogInformation(item.GetType().ToString());
             }
 
-            contentBodies.AddRange(nodeBodies.OfType<BoardBody>());
-            contentBodies.AddRange(nodeBodies.OfType<ColumnBody>());
-            contentBodies.AddRange(nodeBodies.OfType<JobBody>());
+            contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
-            chatBodies.AddRange(nodeBodies.OfType<ChatBody>());
-            chatBodies.AddRange(nodeBodies.OfType<MessageBody>());
-            chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>());
-
-            //contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            //contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            //contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-
-            //chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            //chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            //chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
 
+            _logger.LogInformation(contentBodies.Count.ToString());
             _logger.LogInformation(JsonSerializer.Serialize(contentBodies));
 
 
