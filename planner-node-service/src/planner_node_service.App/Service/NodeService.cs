@@ -450,14 +450,22 @@ namespace planner_node_service.App.Service
                 _logger.LogInformation(JsonSerializer.Serialize(item));
                 _logger.LogInformation(item.GetType().ToString());
             }
+            try
+            {
+                contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+                contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+                contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
-            contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+                chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+                chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+                chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error while converting node bodies to server bodies");
+                throw;
+            }
 
-            chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
-            chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
 
             SyncEntitiesEvent contentNodesEvent = new SyncEntitiesEvent()
             {
