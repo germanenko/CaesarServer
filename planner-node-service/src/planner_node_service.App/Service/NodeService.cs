@@ -451,9 +451,6 @@ namespace planner_node_service.App.Service
                 _logger.LogInformation(item.GetType().ToString());
             }
 
-            _logger.LogInformation($"nodeBodies count: {nodeBodies.Count}");
-            _logger.LogInformation($"jobs count: {nodeBodies.OfType<JobBody>().Count()}");
-
             contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             contentBodies.AddRange(nodeBodies.OfType<ColumnBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             contentBodies.AddRange(nodeBodies.OfType<JobBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
@@ -461,6 +458,9 @@ namespace planner_node_service.App.Service
             chatBodies.AddRange(nodeBodies.OfType<ChatBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             chatBodies.AddRange(nodeBodies.OfType<MessageBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
             chatBodies.AddRange(nodeBodies.OfType<ChatSettingsBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
+
+
+            _logger.LogInformation(JsonSerializer.Serialize(contentBodies));
 
 
             SyncEntitiesEvent contentNodesEvent = new SyncEntitiesEvent()
