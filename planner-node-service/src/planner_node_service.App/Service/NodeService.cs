@@ -448,6 +448,7 @@ namespace planner_node_service.App.Service
             foreach (var item in nodeBodies)
             {
                 _logger.LogInformation(JsonSerializer.Serialize(item));
+                _logger.LogInformation(item.GetType().ToString());
             }
 
             contentBodies.AddRange(nodeBodies.OfType<BoardBody>().Select(x => BodyConverter.ClientToServerBody(x)).ToList());
