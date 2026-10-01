@@ -223,7 +223,11 @@ namespace planner_node_service.Infrastructure.Repository
             {
                 if (existingNode.Equals(node)) return existingNode.ToNodeBody();
 
-                _context.Entry(existingNode).CurrentValues.SetValues(node);
+                existingNode.Name = node.Name;
+                existingNode.Props = node.Props;
+                existingNode.Version = node.Version;
+
+                //_context.Entry(existingNode).CurrentValues.SetValues(node);
 
                 existingNode.Version++;
 
