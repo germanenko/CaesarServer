@@ -43,9 +43,9 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            await Task.Delay(3000);
+            //await Task.Delay(3000);
 
-            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.VersionMismatch, ErrorCodes = [ErrorCode.VersionMismatch] });
+            //return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.VersionMismatch, ErrorCodes = [ErrorCode.VersionMismatch] });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
