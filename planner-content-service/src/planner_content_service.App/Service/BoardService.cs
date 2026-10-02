@@ -180,6 +180,16 @@ namespace planner_content_service.App.Service
         {
             var boardBodies = bodies.Select(body => new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId }).ToList();
 
+            List<Guid> newBoardsIds = new List<Guid>();
+
+            foreach (var body in bodies)
+            {
+                var hasBoard = (await _boardRepository.GetBoardById(body.Id, cancellationToken)) != null;
+
+                if (!hasBoard)
+                    newBoardsIds.Add(body.Id);
+            }
+
             var result = await _boardRepository.CreateOrUpdateBoards(boardBodies, accountId, cancellationToken);
 
             if (result is null)
@@ -192,9 +202,9 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            foreach (var board in result)
+            foreach (var boardId in newBoardsIds)
             {
-                await CreateBaseColumns(accountId, board.Id);
+                await CreateBaseColumns(accountId, boardId);
             }
 
             return new ServiceResponse<List<BoardBody>>
