@@ -9,7 +9,9 @@
     "color.action.primary": "#9AA7B6",
     "color.action.secondary": "#10B981",
     "color.button.primary.background": "#3B82F6",
-    "color.button.primary.text": "#FFFFFF"
+    "color.button.primary.text": "#FFFFFF",
+    "color.navigation.default": "#9AA7B6",
+    "color.navigation.selected": "#3B82F6"
   },
   "icons": {
     "icon.action.search": "SearchIcon",

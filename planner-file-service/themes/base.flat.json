@@ -8,6 +8,8 @@
     "color.action.secondary": "#FF00FF",
     "color.button.primary.background": "#FF00FF",
     "color.button.primary.text": "#FF00FF",
+    "color.navigation.default": "#9AA7B6",
+    "color.navigation.selected": "#3B82F6",
     "icon.action.search": "icon.missing",
     "icon.action.settings": "icon.missing",
     "icon.navigation.home": "icon.missing",
