@@ -236,7 +236,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 }
 
                 existingState.EditCursor = lastEdit;
-                existingState.LastMessageSeq = lastMessage.Seq;
+                existingState.LastMessageSeq = lastMessage?.Seq;
 
                 await _context.SaveChangesAsync();
 
