@@ -10,5 +10,6 @@ namespace planner_client_package.Entities
         public Guid ParentId { get; set; }
         public Guid ChildId { get; set; }
         public RelationType RelationType { get; set; }
+        public int Position { get; set; }
     }
 }

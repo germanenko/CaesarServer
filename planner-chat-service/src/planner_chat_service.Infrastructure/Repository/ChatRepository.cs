@@ -529,7 +529,7 @@ namespace planner_chat_service.Infrastructure.Repository
 
         public async Task<ChatEdit> InsertChatEditLog(Guid chatId, Guid messageId, MessageAction messageAction)
         {
-            var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.MessageId == chatId);
+            var lastChatLog = await _context.ChatEdits.OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.MessageId == messageId);
 
             var log = new ChatEdit() { Action = messageAction, ChatId = lastChatLog?.ChatId ?? chatId, MessageId = messageId, Version = (lastChatLog?.Version ?? -1) + 1, EditedAt = DateTime.UtcNow };
 
