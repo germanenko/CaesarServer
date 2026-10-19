@@ -53,7 +53,7 @@ namespace planner_content_service.Api.Controllers
 
             var stub = _stubs.TryGet(TestStubKeys.NodeDeleteWriteDenied, out var s) ? s : null;
 
-            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response] });
+            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);

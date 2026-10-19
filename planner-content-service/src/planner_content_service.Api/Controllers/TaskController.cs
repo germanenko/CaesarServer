@@ -47,7 +47,7 @@ namespace planner_content_service.Api.Controllers
 
             var stub = _stubs.TryGet(TestStubKeys.DefaultVersionMismatch, out var s) ? s : null;
 
-            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response] });
+            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);
