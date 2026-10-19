@@ -11,6 +11,7 @@ namespace planner_node_service.Core.Entities.Models
         public Guid ChildId { get; set; }
         public Node ChildNode { get; set; }
         public RelationType RelationType { get; set; }
+        public int Position { get; set; }
 
         public NodeLinkBody ToBody()
         {
@@ -19,7 +20,8 @@ namespace planner_node_service.Core.Entities.Models
                 Id = Id,
                 ParentId = ParentId,
                 ChildId = ChildId,
-                RelationType = RelationType
+                RelationType = RelationType,
+                Position = Position
             };
         }
     }
