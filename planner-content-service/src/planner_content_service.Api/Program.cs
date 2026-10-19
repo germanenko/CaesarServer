@@ -148,7 +148,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<ITaskRepository, TaskRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
 
-    builder.Services.AddSingleton<TestStubs>();
+    services.AddSingleton<TestStubs>();
     services.AddSingleton<IJwtService, JwtService>();
 
     services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>
