@@ -6,6 +6,7 @@ using planner_client_package.Entities.Request;
 using planner_common_package;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
+using planner_content_service.Api.Stubs;
 using planner_content_service.Core.IService;
 using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
@@ -21,15 +22,18 @@ namespace planner_content_service.Api.Controllers
         private readonly IBoardService _boardService;
         private readonly IJwtService _jwtService;
         private readonly IIdempotencyService _idempotencyService;
+        private readonly TestStubs _stubs;
 
         public BoardController(
             IBoardService boardService,
             IJwtService jwtService,
-            IIdempotencyService idempotencyService)
+            IIdempotencyService idempotencyService,
+            TestStubs stubs)
         {
             _boardService = boardService;
             _jwtService = jwtService;
             _idempotencyService = idempotencyService;
+            _stubs = stubs;
         }
 
         [HttpPost("board"), Authorize]
@@ -45,7 +49,9 @@ namespace planner_content_service.Api.Controllers
         {
             await Task.Delay(1000);
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.WriteDenied, ErrorCodes = [ErrorCode.WriteDenied] });
+            var stub = _stubs.TryGet("board.update.writeDenied", out var s) ? s : null;
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 

@@ -6,6 +6,7 @@ using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using planner_client_package.Entities.Request;
+using planner_content_service.Api.Stubs;
 using planner_content_service.App.Factory;
 using planner_content_service.App.Service;
 using planner_content_service.Core.IFactory;
@@ -32,6 +33,9 @@ var builder = WebApplication.CreateBuilder(args);
 ConfigureServices(builder.Services);
 
 var app = builder.Build();
+
+app.Services.GetRequiredService<TestStubs>();
+
 app = ConfigureApplication(app);
 ApplyMigrations(app);
 app.MapGet("/", () => $"Content server work");
@@ -58,7 +62,6 @@ void ConfigureServices(IServiceCollection services)
     var accountCreatedExchange = GetEnvVar("RABBITMQ_ACCOUNT_CREATED_EXCHANGE");
     var deleteNodeExchange = GetEnvVar("RABBITMQ_DELETE_NODE_EXCHANGE");
     var messageEditedExchange = GetEnvVar("RABBITMQ_MESSAGE_EDITED_EXCHANGE");
-
 
     builder.Services.ConfigureHttpJsonOptions(options =>
     {
@@ -145,6 +148,7 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<ITaskRepository, TaskRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
 
+    builder.Services.AddSingleton<TestStubs>();
     services.AddSingleton<IJwtService, JwtService>();
 
     services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp =>

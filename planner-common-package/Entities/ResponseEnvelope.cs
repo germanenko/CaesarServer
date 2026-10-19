@@ -11,5 +11,6 @@ namespace planner_common_package.Entities
     {
         public ErrorCode? PrimaryErrorCode { get; set; }
         public List<ErrorCode> ErrorCodes { get; set; }
+        public string? Reason { get; set; }
     }
 }
