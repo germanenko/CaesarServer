@@ -11,7 +11,7 @@ namespace planner_content_service.Api.Stubs
         // объявление всех заглушек - единственное место в коде
         private static readonly TestStub[] _known =
         {
-            new("node.delete.writeDenied",  ErrorCode.WriteDenied,     "даниил, тест отката удаления",  new(2026, 11, 1)),
+            new("node.delete.writeDenied",  ErrorCode.WriteDenied,     "даниил, тест отката удаления",  new(2026, 10, 1)),
             new("board.update.writeDenied", ErrorCode.WriteDenied,     "даниил, тест отката доски",     new(2026, 11, 1)),
             new("default.versionMismatch",  ErrorCode.VersionMismatch, "даниил, разработка merge-окна", new(2026, 11, 1)),
         };
