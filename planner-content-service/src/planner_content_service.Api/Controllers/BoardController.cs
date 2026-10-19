@@ -49,7 +49,7 @@ namespace planner_content_service.Api.Controllers
         {
             await Task.Delay(1000);
 
-            var stub = _stubs.TryGet("board.update.writeDenied", out var s) ? s : null;
+            var stub = _stubs.TryGet(TestStubKeys.BoardUpdateWriteDenied, out var s) ? s : null;
 
             return StatusCode((int)HttpStatusCode.Forbidden, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 

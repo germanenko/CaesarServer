@@ -4,6 +4,7 @@ using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
+using planner_content_service.Api.Stubs;
 using planner_content_service.App.Service;
 using planner_content_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
@@ -18,13 +19,16 @@ namespace planner_content_service.Api.Controllers
     {
         private readonly ITaskService _taskService;
         private readonly IJwtService _jwtService;
+        private readonly TestStubs _stubs;
 
         public TaskController(
             ITaskService taskService,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            TestStubs stubs)
         {
             _taskService = taskService;
             _jwtService = jwtService;
+            _stubs = stubs;
         }
 
         [HttpPost("task"), Authorize]
@@ -41,7 +45,9 @@ namespace planner_content_service.Api.Controllers
         {
             await Task.Delay(1000);
 
-            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.VersionMismatch, ErrorCodes = [ErrorCode.VersionMismatch] });
+            var stub = _stubs.TryGet(TestStubKeys.DefaultVersionMismatch, out var s) ? s : null;
+
+            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response] });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);

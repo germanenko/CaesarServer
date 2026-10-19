@@ -4,6 +4,14 @@ using planner_server_package.Stubs;
 
 namespace planner_content_service.Api.Stubs
 {
+    public class TestStubKeys
+    {
+        public const string NodeDeleteWriteDenied = "node.delete.writeDenied";
+        public const string BoardUpdateWriteDenied = "board.update.writeDenied";
+        public const string DefaultVersionMismatch = "default.versionMismatch";
+    }
+
+
     public sealed class TestStubs
     {
         private readonly Dictionary<string, TestStub> _active = new();
@@ -11,9 +19,9 @@ namespace planner_content_service.Api.Stubs
         // объявление всех заглушек - единственное место в коде
         private static readonly TestStub[] _known =
         {
-            new("node.delete.writeDenied",  ErrorCode.WriteDenied,     "даниил, тест отката удаления",  new(2026, 10, 1)),
-            new("board.update.writeDenied", ErrorCode.WriteDenied,     "даниил, тест отката доски",     new(2026, 10, 1)),
-            new("default.versionMismatch",  ErrorCode.VersionMismatch, "даниил, разработка merge-окна", new(2026, 11, 1)),
+            new(TestStubKeys.NodeDeleteWriteDenied,  ErrorCode.WriteDenied,     "даниил, тест отката удаления",  new(2026, 11, 1)),
+            new(TestStubKeys.BoardUpdateWriteDenied, ErrorCode.WriteDenied,     "даниил, тест отката доски",     new(2026, 11, 1)),
+            new(TestStubKeys.DefaultVersionMismatch,  ErrorCode.VersionMismatch, "даниил, разработка merge-окна", new(2026, 11, 1)),
         };
 
         private readonly ILogger<TestStubs> _logger;

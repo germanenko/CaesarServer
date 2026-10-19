@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
+using planner_content_service.Api.Stubs;
 using planner_content_service.App.Service;
 using planner_content_service.Core.Entities.Models;
 using planner_content_service.Core.IService;
@@ -17,12 +18,14 @@ namespace planner_content_service.Api.Controllers
     {
         private readonly INodeService _nodeService;
         private readonly IJwtService _jwtService;
+        private readonly TestStubs _stubs;
 
         public NodeController(
-            INodeService nodeService, IJwtService jwtService)
+            INodeService nodeService, IJwtService jwtService, TestStubs stubs)
         {
             _nodeService = nodeService;
             _jwtService = jwtService;
+            _stubs = stubs;
         }
 
         [HttpGet("content/getNodesByIds")]
@@ -48,7 +51,9 @@ namespace planner_content_service.Api.Controllers
         {
             await System.Threading.Tasks.Task.Delay(3000);
 
-            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = ErrorCode.WriteDenied, ErrorCodes = [ErrorCode.WriteDenied] });
+            var stub = _stubs.TryGet(TestStubKeys.NodeDeleteWriteDenied, out var s) ? s : null;
+
+            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response] });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);
