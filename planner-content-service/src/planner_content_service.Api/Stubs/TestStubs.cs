@@ -12,7 +12,7 @@ namespace planner_content_service.Api.Stubs
         private static readonly TestStub[] _known =
         {
             new("node.delete.writeDenied",  ErrorCode.WriteDenied,     "даниил, тест отката удаления",  new(2026, 10, 1)),
-            new("board.update.writeDenied", ErrorCode.WriteDenied,     "даниил, тест отката доски",     new(2026, 11, 1)),
+            new("board.update.writeDenied", ErrorCode.WriteDenied,     "даниил, тест отката доски",     new(2026, 10, 1)),
             new("default.versionMismatch",  ErrorCode.VersionMismatch, "даниил, разработка merge-окна", new(2026, 11, 1)),
         };
 
@@ -33,7 +33,6 @@ namespace planner_content_service.Api.Stubs
                 // просроченная работает, но орёт в лог при каждом старте; снимает человек
                 if (DateOnly.FromDateTime(DateTime.UtcNow) > stub.RemoveOn)
                 {
-                    Console.Error.WriteLine($"заглушка {stub.Key} просрочена с {stub.RemoveOn}: {stub.Reason}");
                     _logger.LogError("заглушка {Key} просрочена с {Date}: {Reason}", stub.Key, stub.RemoveOn, stub.Reason);
                 }
 
