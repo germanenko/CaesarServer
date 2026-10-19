@@ -43,7 +43,16 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            await Task.Delay(3000);
+            try
+            {
+                await Task.Delay(3000, cancellationToken);
+            }
+            catch (OperationCanceledException)
+            {
+                Console.WriteLine("Task was canceled.");
+                throw;
+            }
+
 
             var stub = _stubs.TryGet(TestStubKeys.DefaultVersionMismatch, out var s) ? s : null;
 
