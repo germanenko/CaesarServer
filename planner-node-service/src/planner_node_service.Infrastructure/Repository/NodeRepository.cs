@@ -189,19 +189,23 @@ namespace planner_node_service.Infrastructure.Repository
 
                 if (nodeBody.Link != null)
                 {
+                    var lastLink = await _context.NodeLinks.Where(x => x.ParentId == nodeBody.Link.ParentId).OrderBy(x => x.Position).LastOrDefaultAsync();
+
+                    var position = lastLink != null ? lastLink.Position + 1 : 0;
+
                     nodeLink = new NodeLink()
                     {
                         Id = nodeBody.Link.Id,
                         ChildNode = result,
                         ParentId = nodeBody.Link.ParentId,
                         RelationType = nodeBody.Link.RelationType,
-                        Position = nodeBody.Link.Position
+                        Position = position
                     };
 
                     //await _context.NodeLinks.AddAsync(nodeLink);
                     await AddOrUpdateNodeLink(nodeBody.Link);
 
-                    await RecalculateNodeLinkPositions(nodeBody.Link.ParentId);
+                    //await RecalculateNodeLinkPositions(nodeBody.Link.ParentId);
                 }
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
@@ -406,9 +410,9 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
             }
 
-            swapLink.Position = nodeLink.Position;
-
+            var oldPosition = nodeLink.Position;
             nodeLink.Position = newPosition;
+            swapLink.Position += newPosition > oldPosition ? -1 : 1;
 
             var scope = await _scopeRepository.GetNodeScope(nodeId);
 
@@ -416,6 +420,15 @@ namespace planner_node_service.Infrastructure.Repository
                 await AddContentLog(scope.Id, nodeId);
 
             await _context.SaveChangesAsync();
+
+            if (newPosition > oldPosition)
+            {
+                await RecalculateNodeLinkPositionsBefore(nodeLink.ParentId, oldPosition);
+            }
+            else
+            {
+                await RecalculateNodeLinkPositionsAfter(nodeLink.ParentId, oldPosition);
+            }
 
             return nodeLink?.ToBody();
         }
@@ -446,6 +459,35 @@ namespace planner_node_service.Infrastructure.Repository
             for (int i = 0; i < links.Count; i++)
             {
                 links[i].Position = i;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+
+
+        public async Task RecalculateNodeLinkPositionsAfter(Guid parentId, int afterPosition)
+        {
+            var links = await _context.NodeLinks
+                .Where(x => x.ParentId == parentId && x.Position > afterPosition)
+                .OrderBy(x => x.Position)
+                .ToListAsync();
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Position += i > 0 ? 1 : 0;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+
+        public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition)
+        {
+            var links = await _context.NodeLinks
+                .Where(x => x.ParentId == parentId && x.Position < beforePosition)
+                .OrderBy(x => x.Position)
+                .ToListAsync();
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Position += i > 0 ? 1 : 0;
             }
             await _context.SaveChangesAsync();
         }
