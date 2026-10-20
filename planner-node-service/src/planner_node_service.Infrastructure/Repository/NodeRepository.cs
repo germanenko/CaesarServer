@@ -371,6 +371,44 @@ namespace planner_node_service.Infrastructure.Repository
             return nodeLink?.ToBody();
         }
 
+        // изменения позиции ноды
+        public async Task<NodeLinkBody?> ChangeNodePosition(Guid accountId, Guid nodeId, int newPosition)
+        {
+            var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
+
+            if (userSubject == null)
+            {
+                return null;
+            }
+
+            var nodeLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ChildId == nodeId);
+
+            if (nodeLink == null)
+            {
+                return null;
+            }
+
+            var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == nodeLink.ParentId && x.Position == newPosition);
+
+            if (swapLink == null)
+            {
+                return null;
+            }
+
+            swapLink.Position = nodeLink.Position;
+
+            nodeLink.Position = newPosition;
+
+            var scope = await _scopeRepository.GetNodeScope(nodeId);
+
+            if (scope != null)
+                await AddContentLog(scope.Id, nodeId);
+
+            await _context.SaveChangesAsync();
+
+            return nodeLink?.ToBody();
+        }
+
         public async Task AddAccessLog(Guid subjectId, Guid nodeId)
         {
             _logger.LogInformation($"add access log for {nodeId}");

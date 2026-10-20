@@ -333,6 +333,63 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Изменение позиции ноды
+        public async Task<ServiceResponse<NodeLinkBody>> ChangeNodePosition(Guid accountId, Guid nodeId, int newPosition)
+        {
+            // Проверяем, что нода существует
+            var node = await _nodeRepository.GetNode(nodeId);
+
+            if (node == null)
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.NotFound,
+                    Errors = new[] { "Нет ноды" }
+                };
+            }
+
+            // Проверяем, что у пользователя есть права на запись к ноде
+            var nodeAccess = _accessRepository.CheckAccess(accountId, nodeId, Permission.Write);
+
+            if (nodeAccess == null)
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.Forbidden,
+                    Errors = new[] { "Нет доступа" }
+                };
+            }
+
+            // Получаем текущую связь ноды, чтобы понять, нужно ли ее создавать или изменять
+            var link = await _nodeRepository.GetNodeLink(nodeId);
+
+            var nodeLink = new NodeLinkBody();
+
+            // Если текущая связь есть, изменяем родителя, если нет - создаем новую связь
+            if (link != null)
+            {
+                nodeLink = await _nodeRepository.ChangeNodePosition(accountId, nodeId, newPosition);
+            }
+            else
+            {
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.BadRequest,
+                    Errors = new[] { "Нет связи для изменения позиции" }
+                };
+            }
+
+            return new ServiceResponse<NodeLinkBody>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = nodeLink
+            };
+        }
+
 
         // Получение манифеста нод по списку ScopeIds
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetManifests(Guid accountId, List<Guid> scopeIds)

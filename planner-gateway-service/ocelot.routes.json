@@ -720,6 +720,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/changeNodePosition",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/changeNodePosition",
+            "UpstreamHttpMethod": [ "POST" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/getNodesByTypes",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

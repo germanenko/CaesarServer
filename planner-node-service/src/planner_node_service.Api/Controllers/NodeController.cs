@@ -106,6 +106,23 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, result.Body);
         }
 
+
+        [HttpPost("changeNodePosition"), Authorize]
+        [SwaggerOperation("Изменить позицию ноды")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> ChangeNodePosition(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid nodeId,
+            [FromQuery] int newPosition
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.ChangeNodePosition(tokenPayload.AccountId, nodeId, newPosition);
+            return StatusCode((int)result.StatusCode, result.Body);
+        }
+
+
         [HttpPost("sendLocalNodes"), Authorize]
         [SwaggerOperation("Отправить локальные ноды")]
         [SwaggerResponse(200)]
