@@ -44,11 +44,11 @@ namespace planner_content_service.Api.Controllers
         )
         {
 
-            await Task.Delay(3000, cancellationToken);
+            //await Task.Delay(3000, cancellationToken);
 
-            var stub = _stubs.TryGet(TestStubKeys.DefaultVersionMismatch, out var s) ? s : null;
+            //var stub = _stubs.TryGet(TestStubKeys.DefaultVersionMismatch, out var s) ? s : null;
 
-            return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
+            //return StatusCode((int)HttpStatusCode.Conflict, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken);

@@ -194,10 +194,14 @@ namespace planner_node_service.Infrastructure.Repository
                         Id = nodeBody.Link.Id,
                         ChildNode = result,
                         ParentId = nodeBody.Link.ParentId,
-                        RelationType = nodeBody.Link.RelationType
+                        RelationType = nodeBody.Link.RelationType,
+                        Position = nodeBody.Link.Position
                     };
 
-                    await _context.NodeLinks.AddAsync(nodeLink);
+                    //await _context.NodeLinks.AddAsync(nodeLink);
+                    await AddOrUpdateNodeLink(nodeBody.Link);
+
+                    await RecalculateNodeLinkPositions(nodeBody.Link.ParentId);
                 }
 
                 await _context.History.AddAsync(new History() { Id = Guid.NewGuid(), UpdatedById = nodeBody.UpdatedBy, Action = action, NodeId = nodeBody.Id, UpdatedAt = nodeBody.UpdatedAt });
@@ -270,7 +274,8 @@ namespace planner_node_service.Infrastructure.Repository
                     Id = newNodeLink.Id,
                     ParentId = newNodeLink.ParentId,
                     ChildId = newNodeLink.ChildId,
-                    RelationType = newNodeLink.RelationType
+                    RelationType = newNodeLink.RelationType,
+                    Position = newNodeLink.Position
                 };
                 var result = await _context.NodeLinks.AddAsync(newLink);
                 await _context.SaveChangesAsync();
@@ -281,6 +286,7 @@ namespace planner_node_service.Infrastructure.Repository
                 existingNode.ParentId = newNodeLink.ParentId;
                 existingNode.ChildId = newNodeLink.ChildId;
                 existingNode.RelationType = newNodeLink.RelationType;
+                existingNode.Position = newNodeLink.Position;
 
                 await _context.SaveChangesAsync();
                 return existingNode;
@@ -355,7 +361,12 @@ namespace planner_node_service.Infrastructure.Repository
             var oldScope = await _scopeRepository.GetNodeScope(nodeId);
             var newScope = await _scopeRepository.GetNodeScope(newParentId);
 
+            var oldParentId = nodeLink.ParentId;
+
             nodeLink.ParentId = newParentId;
+
+            await RecalculateNodeLinkPositions(oldParentId);
+            await RecalculateNodeLinkPositions(newParentId);
 
             await AddAccessLog(userSubject.Id, newScope.Id);
             await AddContentLog(newScope.Id, nodeId);
@@ -424,6 +435,22 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.AccessLogs.AddAsync(newLog);
         }
+
+
+        public async Task RecalculateNodeLinkPositions(Guid parentId)
+        {
+            var links = await _context.NodeLinks
+                .Where(x => x.ParentId == parentId)
+                .OrderBy(x => x.Position)
+                .ToListAsync();
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Position = i;
+            }
+            await _context.SaveChangesAsync();
+        }
+
+
 
         public async Task<ContentLog> AddContentLog(Guid scopeId, Guid nodeId, ActionType? action = null)
         {

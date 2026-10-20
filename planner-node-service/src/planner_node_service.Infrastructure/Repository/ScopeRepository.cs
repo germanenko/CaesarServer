@@ -45,7 +45,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             while (currentNodeId != Guid.Empty)
             {
-                var parent = (await _context.NodeLinks.Include(x => x.ParentNode).FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
+                var parent = (await _context.NodeLinks.Include(x => x.ParentNode).AsNoTracking().FirstOrDefaultAsync(x => x.ChildId == currentNodeId))?.ParentNode;
 
                 if (parent == null)
                     break;
