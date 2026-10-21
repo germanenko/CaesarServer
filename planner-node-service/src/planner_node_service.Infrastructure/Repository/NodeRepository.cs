@@ -500,7 +500,7 @@ namespace planner_node_service.Infrastructure.Repository
                 .ToListAsync();
             for (int i = 0; i < links.Count; i++)
             {
-                links[i].Position += (i > 0 && links.Count > 1) ? 1 : 0;
+                links[i].Position += 1;
             }
             await _context.SaveChangesAsync();
         }
