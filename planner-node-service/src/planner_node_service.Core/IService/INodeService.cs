@@ -16,7 +16,7 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<NodeBody>> AddOrUpdateScope(NodeBody node);
         public Task<ServiceResponse<NodeBody>> AddOrUpdateNode(Guid accountId, NodeBody node);
         public Task<ServiceResponse<bool>> DeleteNode(Guid accountId, Guid nodeId);
-        public Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId);
+        public Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId, int position);
         public Task<ServiceResponse<NodeLinkBody>> ChangeNodePosition(Guid accountId, Guid nodeId, int newPosition);
         public Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodes, TokenPayload tokenPayload);
     }

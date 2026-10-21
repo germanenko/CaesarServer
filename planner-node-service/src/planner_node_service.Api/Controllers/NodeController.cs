@@ -98,11 +98,12 @@ namespace planner_node_service.Api.Controllers
         public async Task<IActionResult> ChangeNodeParent(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromQuery] Guid nodeId,
-            [FromQuery] Guid newParentId
+            [FromQuery] Guid newParentId,
+            [FromQuery] int position
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.ChangeNodeParent(tokenPayload.AccountId, nodeId, newParentId);
+            var result = await _nodeService.ChangeNodeParent(tokenPayload.AccountId, nodeId, newParentId, position);
             return StatusCode((int)result.StatusCode, result.Body);
         }
 

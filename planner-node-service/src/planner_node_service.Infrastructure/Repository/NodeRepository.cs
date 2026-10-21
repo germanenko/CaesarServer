@@ -273,7 +273,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (existingNode == null)
             {
-                var newLink = new NodeLink
+                existingNode = new NodeLink
                 {
                     Id = newNodeLink.Id,
                     ParentId = newNodeLink.ParentId,
@@ -281,21 +281,42 @@ namespace planner_node_service.Infrastructure.Repository
                     RelationType = newNodeLink.RelationType,
                     Position = newNodeLink.Position
                 };
-                var result = await _context.NodeLinks.AddAsync(newLink);
+
+                existingNode = (await _context.NodeLinks.AddAsync(existingNode)).Entity;
+
                 await _context.SaveChangesAsync();
-                return result.Entity;
             }
             else
             {
-                existingNode.ParentId = newNodeLink.ParentId;
-                existingNode.ChildId = newNodeLink.ChildId;
                 existingNode.RelationType = newNodeLink.RelationType;
-                existingNode.Position = newNodeLink.Position;
-
-                await _context.SaveChangesAsync();
-                return existingNode;
             }
+
+
+            var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.Id != existingNode.Id && x.ParentId == existingNode.ParentId && x.Position == newNodeLink.Position);
+
+            var oldPosition = existingNode.Position;
+            existingNode.Position = newNodeLink.Position;
+            if (swapLink != null)
+            {
+                swapLink.Position += newNodeLink.Position > existingNode.Position ? -1 : 1;
+
+                if (Math.Abs(newNodeLink.Position - oldPosition) > 1)
+                {
+                    if (newNodeLink.Position > oldPosition)
+                    {
+                        await RecalculateNodeLinkPositionsBefore(existingNode.ParentId, newNodeLink.Position, swapLink.Id);
+                    }
+                    else
+                    {
+                        await RecalculateNodeLinkPositionsAfter(existingNode.ParentId, newNodeLink.Position, swapLink.Id);
+                    }
+                }
+            }
+
+            await _context.SaveChangesAsync();
+            return existingNode;
         }
+
 
         public async Task<List<NodeLink>> AddOrUpdateNodeLinks(List<NodeLinkBody> newNodeLinks)
         {
@@ -346,7 +367,7 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
         // изменения родителя ноды
-        public async Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
+        public async Task<NodeLinkBody?> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId, int position)
         {
             var userSubject = await _context.UserAccessSubjects.FirstOrDefaultAsync(x => x.AccountId == accountId);
 
@@ -368,9 +389,9 @@ namespace planner_node_service.Infrastructure.Repository
             var oldParentId = nodeLink.ParentId;
 
             nodeLink.ParentId = newParentId;
+            nodeLink.Position = (await _context.NodeLinks.Where(x => x.ParentId == newParentId).MaxAsync(x => x.Position)) + 1;
 
             await RecalculateNodeLinkPositions(oldParentId);
-            await RecalculateNodeLinkPositions(newParentId);
 
             await AddAccessLog(userSubject.Id, newScope.Id);
             await AddContentLog(newScope.Id, nodeId);
@@ -424,13 +445,16 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.SaveChangesAsync();
 
-            if (newPosition > oldPosition)
+            if (Math.Abs(newPosition - oldPosition) > 1)
             {
-                await RecalculateNodeLinkPositionsBefore(nodeLink.ParentId, oldPosition);
-            }
-            else
-            {
-                await RecalculateNodeLinkPositionsAfter(nodeLink.ParentId, oldPosition);
+                if (newPosition > oldPosition)
+                {
+                    await RecalculateNodeLinkPositionsBefore(nodeLink.ParentId, newPosition, swapLink.Id);
+                }
+                else
+                {
+                    await RecalculateNodeLinkPositionsAfter(nodeLink.ParentId, newPosition, swapLink.Id);
+                }
             }
 
             return nodeLink?.ToBody();
@@ -468,10 +492,10 @@ namespace planner_node_service.Infrastructure.Repository
 
 
 
-        public async Task RecalculateNodeLinkPositionsAfter(Guid parentId, int afterPosition)
+        public async Task RecalculateNodeLinkPositionsAfter(Guid parentId, int afterPosition, Guid swapedLinkId)
         {
             var links = await _context.NodeLinks
-                .Where(x => x.ParentId == parentId && x.Position > afterPosition)
+                .Where(x => x.Id != swapedLinkId && x.ParentId == parentId && x.Position > afterPosition)
                 .OrderBy(x => x.Position)
                 .ToListAsync();
             for (int i = 0; i < links.Count; i++)
@@ -482,15 +506,15 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
 
-        public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition)
+        public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition, Guid swapedLinkId)
         {
             var links = await _context.NodeLinks
-                .Where(x => x.ParentId == parentId && x.Position < beforePosition)
+                .Where(x => x.Id != swapedLinkId && x.ParentId == parentId && x.Position < beforePosition)
                 .OrderBy(x => x.Position)
                 .ToListAsync();
             for (int i = 0; i < links.Count; i++)
             {
-                links[i].Position += i > 0 ? 1 : 0;
+                links[i].Position = i;
             }
             await _context.SaveChangesAsync();
         }

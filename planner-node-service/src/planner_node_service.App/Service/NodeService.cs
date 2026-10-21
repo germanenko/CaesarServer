@@ -264,7 +264,7 @@ namespace planner_node_service.App.Service
 
 
         // Изменение родителя ноды
-        public async Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId)
+        public async Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId, int position)
         {
             // Проверяем, что нода и новый родитель существуют
             var node = await _nodeRepository.GetNode(nodeId);
@@ -313,7 +313,7 @@ namespace planner_node_service.App.Service
             // Если текущая связь есть, изменяем родителя, если нет - создаем новую связь
             if (currentParent != null)
             {
-                nodeLink = await _nodeRepository.ChangeNodeParent(accountId, nodeId, newParentId);
+                nodeLink = await _nodeRepository.ChangeNodeParent(accountId, nodeId, newParentId, position);
             }
             else
             {
@@ -321,6 +321,7 @@ namespace planner_node_service.App.Service
                 {
                     ChildId = nodeId,
                     ParentId = newParentId,
+                    Position = position,
                     RelationType = RelationType.Contains
                 })).ToBody();
             }
