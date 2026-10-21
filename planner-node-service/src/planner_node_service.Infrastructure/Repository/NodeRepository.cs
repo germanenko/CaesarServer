@@ -285,13 +285,17 @@ namespace planner_node_service.Infrastructure.Repository
                 existingNode = (await _context.NodeLinks.AddAsync(existingNode)).Entity;
 
                 await _context.SaveChangesAsync();
+
+                await RecalculateNodeLinkPositionsAfter(existingNode.ParentId, newNodeLink.Position, newNodeLink.Id);
+
+                return existingNode;
             }
             else
             {
                 existingNode.RelationType = newNodeLink.RelationType;
             }
 
-            await InsertNodeLinkInParent(existingNode, newNodeLink.Position);
+            await RecalculatePositions(existingNode, newNodeLink.Position);
             //var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.Id != existingNode.Id && x.ParentId == existingNode.ParentId && x.Position == newNodeLink.Position);
 
             //var oldPosition = existingNode.Position;
@@ -389,34 +393,13 @@ namespace planner_node_service.Infrastructure.Repository
             var oldParentId = nodeLink.ParentId;
 
             nodeLink.ParentId = newParentId;
+            nodeLink.Position = position;
 
-            await InsertNodeLinkInParent(nodeLink, position);
-
-            //var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == newParentId && x.Position == position);
-
-            //var oldPosition = nodeLink.Position;
-            //nodeLink.Position = position;
-
-            //if (swapLink != null)
-            //{
-            //    swapLink.Position += position > oldPosition ? -1 : 1;
-
-            //    if (Math.Abs(position - oldPosition) > 1)
-            //    {
-            //        if (position > oldPosition)
-            //        {
-            //            await RecalculateNodeLinkPositionsBefore(nodeLink.ParentId, position, swapLink.Id);
-            //        }
-            //        else
-            //        {
-            //            await RecalculateNodeLinkPositionsAfter(nodeLink.ParentId, position, swapLink.Id);
-            //        }
-            //    }
-            //}
-
-            //await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
 
             await RecalculateNodeLinkPositions(oldParentId);
+
+            await RecalculateNodeLinkPositionsAfter(newParentId, position, nodeLink.Id);
 
             await AddAccessLog(userSubject.Id, newScope.Id);
             await AddContentLog(newScope.Id, nodeId);
@@ -451,19 +434,8 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
             }
 
-            //var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == nodeLink.ParentId && x.Position == newPosition);
 
-            //if (swapLink == null)
-            //{
-            //    _logger.LogWarning($"Swap link not found for parentId: {nodeLink.ParentId} and newPosition: {newPosition}");
-            //    return null;
-            //}
-
-            //var oldPosition = nodeLink.Position;
-            //nodeLink.Position = newPosition;
-            //swapLink.Position += newPosition > oldPosition ? -1 : 1;
-
-            await InsertNodeLinkInParent(nodeLink, newPosition);
+            await RecalculatePositions(nodeLink, newPosition);
 
             var scope = await _scopeRepository.GetNodeScope(nodeId);
 
@@ -472,23 +444,11 @@ namespace planner_node_service.Infrastructure.Repository
 
             await _context.SaveChangesAsync();
 
-            //if (Math.Abs(newPosition - oldPosition) > 1)
-            //{
-            //    if (newPosition > oldPosition)
-            //    {
-            //        await RecalculateNodeLinkPositionsBefore(nodeLink.ParentId, newPosition, swapLink.Id);
-            //    }
-            //    else
-            //    {
-            //        await RecalculateNodeLinkPositionsAfter(nodeLink.ParentId, newPosition, swapLink.Id);
-            //    }
-            //}
-
             return nodeLink?.ToBody();
         }
 
 
-        private async Task InsertNodeLinkInParent(NodeLink nodeLink, int newPosition)
+        private async Task RecalculatePositions(NodeLink nodeLink, int newPosition)
         {
             var swapLink = await _context.NodeLinks.FirstOrDefaultAsync(x => x.ParentId == nodeLink.ParentId && x.Position == newPosition);
 
@@ -497,7 +457,6 @@ namespace planner_node_service.Infrastructure.Repository
             if (swapLink != null)
             {
                 swapLink.Position += newPosition > oldPosition ? -1 : 1;
-                return;
             }
 
             nodeLink.Position = newPosition;
@@ -552,10 +511,10 @@ namespace planner_node_service.Infrastructure.Repository
 
 
 
-        public async Task RecalculateNodeLinkPositionsAfter(Guid parentId, int afterPosition, Guid swapedLinkId)
+        public async Task RecalculateNodeLinkPositionsAfter(Guid parentId, int afterPosition, Guid ignoreId)
         {
             var links = await _context.NodeLinks
-                .Where(x => x.Id != swapedLinkId && x.ParentId == parentId && x.Position > afterPosition)
+                .Where(x => x.Id != ignoreId && x.ParentId == parentId && x.Position > afterPosition)
                 .OrderBy(x => x.Position)
                 .ToListAsync();
             for (int i = 0; i < links.Count; i++)
@@ -566,10 +525,10 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
 
-        public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition, Guid swapedLinkId)
+        public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition, Guid ignoreId)
         {
             var links = await _context.NodeLinks
-                .Where(x => x.Id != swapedLinkId && x.ParentId == parentId && x.Position < beforePosition)
+                .Where(x => x.Id != ignoreId && x.ParentId == parentId && x.Position < beforePosition)
                 .OrderBy(x => x.Position)
                 .ToListAsync();
             for (int i = 0; i < links.Count; i++)
