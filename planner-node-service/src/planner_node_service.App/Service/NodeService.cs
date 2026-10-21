@@ -365,9 +365,9 @@ namespace planner_node_service.App.Service
             // Получаем текущую связь ноды, чтобы понять, нужно ли ее создавать или изменять
             var link = await _nodeRepository.GetNodeLink(nodeId);
 
-            var nodeLink = new NodeLinkBody();
+            var nodeLink = link?.ToBody();
 
-            // Если текущая связь есть, изменяем родителя, если нет - создаем новую связь
+            // Если текущая связь есть, изменяем позицию, если нет - возвращаем ошибку
             if (link != null)
             {
                 nodeLink = await _nodeRepository.ChangeNodePosition(accountId, nodeId, newPosition);
@@ -382,8 +382,6 @@ namespace planner_node_service.App.Service
                 };
             }
 
-
-            _logger.LogInformation($"Node position changed: NodeId={nodeId}, NewPosition={newPosition}, Link={JsonSerializer.Serialize(nodeLink)}");
             return new ServiceResponse<NodeLinkBody>()
             {
                 IsSuccess = true,
