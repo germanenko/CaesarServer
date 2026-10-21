@@ -393,6 +393,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (userSubject == null)
             {
+                _logger.LogWarning($"User subject not found for accountId: {accountId}");
                 return null;
             }
 
@@ -400,6 +401,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (nodeLink == null)
             {
+                _logger.LogWarning($"Node link not found for nodeId: {nodeId}");
                 return null;
             }
 
@@ -407,6 +409,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (swapLink == null)
             {
+                _logger.LogWarning($"Swap link not found for parentId: {nodeLink.ParentId} and newPosition: {newPosition}");
                 return null;
             }
 
