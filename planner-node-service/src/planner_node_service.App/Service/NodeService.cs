@@ -382,6 +382,8 @@ namespace planner_node_service.App.Service
                 };
             }
 
+            _logger.LogInformation($"Node position changed: {JsonSerializer.Serialize(nodeLink)}");
+
             return new ServiceResponse<NodeLinkBody>()
             {
                 IsSuccess = true,
