@@ -367,6 +367,17 @@ namespace planner_node_service.App.Service
 
             var nodeLink = link?.ToBody();
 
+            if (nodeLink?.Position == newPosition)
+            {
+                _logger.LogInformation($"Node link position is already {newPosition} for nodeId: {nodeId}");
+                return new ServiceResponse<NodeLinkBody>()
+                {
+                    IsSuccess = true,
+                    StatusCode = System.Net.HttpStatusCode.OK,
+                    Body = nodeLink
+                };
+            }
+
             // Если текущая связь есть, изменяем позицию, если нет - возвращаем ошибку
             if (link != null)
             {
