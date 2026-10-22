@@ -399,7 +399,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             await RecalculateNodeLinkPositions(oldParentId);
 
-            await RecalculateNodeLinkPositionsAfter(newParentId, position, nodeLink.Id);
+            await ShiftPositionsAfter(newParentId, position, nodeLink.Id);
 
             await AddAccessLog(userSubject.Id, newScope.Id);
             await AddContentLog(newScope.Id, nodeId);
@@ -523,6 +523,22 @@ namespace planner_node_service.Infrastructure.Repository
             }
             await _context.SaveChangesAsync();
         }
+
+
+
+        public async Task ShiftPositionsAfter(Guid parentId, int afterPosition, Guid ignoreId)
+        {
+            var links = await _context.NodeLinks
+                .Where(x => x.Id != ignoreId && x.ParentId == parentId && x.Position >= afterPosition)
+                .OrderBy(x => x.Position)
+                .ToListAsync();
+            for (int i = 0; i < links.Count; i++)
+            {
+                links[i].Position += 1;
+            }
+            await _context.SaveChangesAsync();
+        }
+
 
 
         public async Task RecalculateNodeLinkPositionsBefore(Guid parentId, int beforePosition, Guid ignoreId)
