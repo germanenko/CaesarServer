@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Api.CustomAttributes;
+using planner_node_service.Api.Stubs;
 using planner_node_service.Core.IService;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -16,13 +17,17 @@ namespace planner_node_service.Api.Controllers
     {
         private readonly INodeService _nodeService;
         private readonly IJwtService _jwtService;
+        private readonly TestStubs _stubs;
+
 
         public NodeController(
             INodeService nodeService,
-            IJwtService jwtService)
+            IJwtService jwtService,
+            TestStubs stubs)
         {
             _nodeService = nodeService;
             _jwtService = jwtService;
+            _stubs = stubs;
         }
 
         [LocalOnly]
@@ -59,6 +64,11 @@ namespace planner_node_service.Api.Controllers
             [FromQuery] List<Guid> nodeIds
         )
         {
+            await Task.Delay(3000);
+
+            return StatusCode((int)HttpStatusCode.InternalServerError, null);
+
+
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.GetNodesByIds(tokenPayload.AccountId, nodeIds);
             return StatusCode((int)result.StatusCode, result.Body);

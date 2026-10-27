@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging.Console;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using planner_node_service.Api.Stubs;
 using planner_node_service.App.Service;
 using planner_node_service.Core;
 using planner_node_service.Core.IRepository;
@@ -15,6 +16,7 @@ using planner_node_service.Infrastructure.Repository;
 using planner_node_service.Infrastructure.Service;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
+using planner_server_package.Stubs;
 using planner_server_package.Users;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
@@ -25,6 +27,9 @@ var builder = WebApplication.CreateBuilder(args);
 
 ConfigureServices(builder.Services);
 var app = builder.Build();
+
+app.Services.GetRequiredService<TestStubs>();
+
 app = ConfigureApplication(app);
 
 ApplyMigrations(app);
@@ -110,7 +115,7 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
-
+    services.AddSingleton<TestStubs>();
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IWebSocketService, WebSocketService>();
 
