@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
+using planner_common_package.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -39,12 +40,12 @@ namespace planner_server_package.Users
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    var user = JsonSerializer.Deserialize<ProfileBody>(content, new JsonSerializerOptions
+                    var user = JsonSerializer.Deserialize<Response<ProfileBody>>(content, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
 
-                    return user;
+                    return user.Body;
                 }
                 else
                 {
@@ -72,12 +73,12 @@ namespace planner_server_package.Users
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    var users = JsonSerializer.Deserialize<List<ProfileBody>>(content, new JsonSerializerOptions
+                    var users = JsonSerializer.Deserialize<Response<List<ProfileBody>>>(content, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
 
-                    return users;
+                    return users.Body;
                 }
                 else
                 {
@@ -103,12 +104,12 @@ namespace planner_server_package.Users
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    var user = JsonSerializer.Deserialize<List<ProfileBody>>(content, new JsonSerializerOptions
+                    var user = JsonSerializer.Deserialize<Response<List<ProfileBody>>>(content, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
 
-                    return user.FirstOrDefault();
+                    return user.Body.FirstOrDefault();
                 }
                 else
                 {
