@@ -41,11 +41,6 @@ namespace planner_auth_service.Api.Controllers.Api
                 return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
 
             return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-            if (result.IsSuccess)
-                return Ok(result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [SwaggerOperation("Авторизация")]
@@ -63,12 +58,6 @@ namespace planner_auth_service.Api.Controllers.Api
                 return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
 
             return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [SwaggerOperation("Добавить Google токен"), Authorize]
@@ -87,11 +76,6 @@ namespace planner_auth_service.Api.Controllers.Api
                 return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
             return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-            if (result.IsSuccess == true)
-                return Ok(result);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [SwaggerOperation("Получить Google токен"), Authorize]
@@ -105,9 +89,9 @@ namespace planner_auth_service.Api.Controllers.Api
 
             var result = await _authService.GetGoogleToken(tokenInfo.AccountId);
             if (result.IsSuccess)
-                return Ok(result.Body);
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, result.Errors);
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [SwaggerOperation("Восстановление токена")]
@@ -142,11 +126,6 @@ namespace planner_auth_service.Api.Controllers.Api
                 return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
 
             return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-            if (result.IsSuccess)
-                return Ok(result.Body);
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [HttpPut("resetPassword")]
@@ -158,17 +137,17 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             if (string.IsNullOrEmpty(token))
-                return BadRequest("Token is required");
+                return StatusCode((int)HttpStatusCode.BadRequest, new Response<string>() { PrimaryErrorCode = ErrorCode.ValidationError, ErrorCodes = [ErrorCode.ValidationError], Reason = "Token is required" });
 
             if (!_jwtService.ValidatePasswordResetToken(token))
-                return BadRequest("Invalid or expired token");
+                return StatusCode((int)HttpStatusCode.BadRequest, new Response<string>() { PrimaryErrorCode = ErrorCode.ValidationError, ErrorCodes = [ErrorCode.ValidationError], Reason = "Invalid or expired token" });
 
             var tokenInfo = _jwtService.GetPasswordResetTokenPayload(token);
             if (tokenInfo == null)
-                return BadRequest("Invalid token payload");
+                return StatusCode((int)HttpStatusCode.BadRequest, new Response<string>() { PrimaryErrorCode = ErrorCode.ValidationError, ErrorCodes = [ErrorCode.ValidationError], Reason = "Invalid token payload" });
 
             if (tokenInfo.ExpiresAt < DateTime.UtcNow)
-                return BadRequest("Token has expired");
+                return StatusCode((int)HttpStatusCode.BadRequest, new Response<string>() { PrimaryErrorCode = ErrorCode.ValidationError, ErrorCodes = [ErrorCode.ValidationError], Reason = "Token has expired" });
 
             var result = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
 
@@ -176,12 +155,9 @@ namespace planner_auth_service.Api.Controllers.Api
             {
                 _jwtService.InvalidatePasswordResetToken(token);
                 return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
-                return StatusCode((int)result.StatusCode);
             }
 
             return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [HttpPut("changePassword"), Authorize]
@@ -200,11 +176,6 @@ namespace planner_auth_service.Api.Controllers.Api
                 return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
             return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
-
-            if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
-
-            return StatusCode((int)result.StatusCode);
         }
 
         [HttpGet("validateResetToken")]
@@ -216,6 +187,16 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             var isValid = _jwtService.ValidatePasswordResetToken(token);
             var payload = _jwtService.GetPasswordResetTokenPayload(token);
+
+            return StatusCode((int)HttpStatusCode.OK, new Response<TokenValidationResponse>()
+            {
+                Body = new()
+                {
+                    Valid = isValid,
+                    ExpiresAt = payload?.ExpiresAt,
+                    TimeRemaining = payload != null ? payload.ExpiresAt - DateTime.UtcNow : TimeSpan.Zero
+                }
+            });
 
             return Ok(new
             {
@@ -235,6 +216,11 @@ namespace planner_auth_service.Api.Controllers.Api
             var isValid = _jwtService.ValidateToken(token);
             var payload = _jwtService.GetTokenPayload(token);
 
+
+            if (isValid)
+                return StatusCode((int)HttpStatusCode.OK, new Response<bool>() { Body = true });
+
+            return StatusCode((int)HttpStatusCode.Forbidden, new Response<bool>() { PrimaryErrorCode = ErrorCode.ReadDenied, ErrorCodes = [ErrorCode.ReadDenied] });
             if (isValid)
                 return Ok(new
                 {

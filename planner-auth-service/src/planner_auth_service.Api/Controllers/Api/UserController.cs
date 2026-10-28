@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_auth_service.Core.IService;
+using planner_common_package.Entities;
 using planner_server_package.Entities;
+using Sprache;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -31,12 +33,12 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _userService.GetProfile(tokenInfo.AccountId);
+            var result = await _userService.GetProfile(tokenInfo.AccountId);
 
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<ProfileBody>() { Body = result.Body });
 
-            return StatusCode((int)response.StatusCode);
+            return StatusCode((int)result.StatusCode, new Response<ProfileBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPatch("userTag"), Authorize]
@@ -51,6 +53,7 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
             var response = await _userService.ChangeAccountTag(tokenInfo.AccountId, userTag);
+
             return StatusCode((int)response);
         }
 
@@ -62,10 +65,11 @@ namespace planner_auth_service.Api.Controllers.Api
         public async Task<IActionResult> GetUserProfileByUserTag([FromQuery, Required] string userTag)
         {
             var response = await _userService.GetProfileByTag(userTag);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { Body = response.Body });
+
+            return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
 
         [HttpGet("users/userTag")]
@@ -76,9 +80,9 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             var response = await _userService.GetAllProfilesByPatternTag(patternUserTag);
             if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+                return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { Body = response.Body });
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
 
         [HttpGet("users")]
@@ -89,9 +93,9 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             var response = await _userService.GetAllProfiles(accountIds);
             if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+                return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { Body = response.Body });
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
 
 
@@ -105,10 +109,11 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             var response = await _userService.GetProfile(identifier);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { Body = response.Body });
+
+            return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
 
 
@@ -122,10 +127,11 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             var response = await _userService.GetProfile(id);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { Body = response.Body });
+
+            return StatusCode((int)response.StatusCode, new Response<ProfileBody>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
 
 
@@ -138,10 +144,11 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             var response = await _userService.GetAllProfilesByPatternIdentifier(identifierPattern);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            if (response.IsSuccess)
+                return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { Body = response.Body });
+
+            return StatusCode((int)response.StatusCode, new Response<IEnumerable<ProfileBody>>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
         }
     }
 }
