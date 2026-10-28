@@ -1,9 +1,12 @@
+using Google.Apis.Auth.OAuth2.Responses;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_auth_service.Core.Entities.Response;
 using planner_auth_service.Core.IService;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package.Entities;
+using Sprache;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
 
@@ -33,6 +36,12 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             string role = Enum.GetName(AccountRole.User)!;
             var result = await _authService.SignUp(signUpBody, role, AuthenticationProvider.Default);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
             if (result.IsSuccess)
                 return Ok(result.Body);
 
@@ -49,6 +58,13 @@ namespace planner_auth_service.Api.Controllers.Api
         public async Task<IActionResult> SignInAsync(SignInBody signInBody)
         {
             var result = await _authService.SignIn(signInBody, AuthenticationProvider.Default);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
+
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, result.Body);
 
@@ -66,6 +82,12 @@ namespace planner_auth_service.Api.Controllers.Api
             var tokenInfo = _jwtService.GetTokenPayload(token);
 
             var result = await _authService.AddGoogleToken(googleToken, tokenInfo.AccountId);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
             if (result.IsSuccess == true)
                 return Ok(result);
 
@@ -102,9 +124,9 @@ namespace planner_auth_service.Api.Controllers.Api
         {
             var result = await _authService.RestoreToken(body.Value, deviceId, deviceTypeId);
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode, result.Body);
+                return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, result.Errors);
+            return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [SwaggerOperation("Google аутентификация")]
@@ -115,6 +137,12 @@ namespace planner_auth_service.Api.Controllers.Api
             [FromHeader(Name = "DeviceTypeId")] DeviceTypeId deviceTypeId)
         {
             var result = await _authService.GoogleAuth(googleToken, deviceTypeId, deviceId);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<OutputAccountCredentialsBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
             if (result.IsSuccess)
                 return Ok(result.Body);
 
@@ -142,15 +170,18 @@ namespace planner_auth_service.Api.Controllers.Api
             if (tokenInfo.ExpiresAt < DateTime.UtcNow)
                 return BadRequest("Token has expired");
 
-            var response = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
+            var result = await _authService.ResetPassword(tokenInfo.AccountId, newPassword);
 
-            if (response.IsSuccess)
+            if (result.IsSuccess)
             {
                 _jwtService.InvalidatePasswordResetToken(token);
-                return StatusCode((int)response.StatusCode);
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
+                return StatusCode((int)result.StatusCode);
             }
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
+            return StatusCode((int)result.StatusCode, result.Errors);
         }
 
         [HttpPut("changePassword"), Authorize]
@@ -163,12 +194,17 @@ namespace planner_auth_service.Api.Controllers.Api
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _authService.ChangePassword(tokenInfo.AccountId, oldPassword, newPassword);
+            var result = await _authService.ChangePassword(tokenInfo.AccountId, oldPassword, newPassword);
 
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
-            return StatusCode((int)response.StatusCode);
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, result.Body);
+
+            return StatusCode((int)result.StatusCode);
         }
 
         [HttpGet("validateResetToken")]

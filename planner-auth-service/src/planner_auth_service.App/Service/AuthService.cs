@@ -52,6 +52,8 @@ namespace planner_auth_service.App.Service
                 return new ServiceResponse<OutputAccountCredentialsBody>
                 {
                     Errors = new string[] { "DeviceId is not correct format" },
+                    PrimaryErrorCode = ErrorCode.ValidationError,
+                    ErrorCodes = [ErrorCode.ValidationError],
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
@@ -63,6 +65,8 @@ namespace planner_auth_service.App.Service
                 return new ServiceResponse<OutputAccountCredentialsBody>
                 {
                     Errors = new string[] { "Session not found" },
+                    PrimaryErrorCode = ErrorCode.NotFound,
+                    ErrorCodes = [ErrorCode.NotFound],
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.NotFound
                 };
@@ -301,6 +305,8 @@ namespace planner_auth_service.App.Service
                 return new ServiceResponse<string>
                 {
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.Infrastructure,
+                    ErrorCodes = [ErrorCode.Infrastructure],
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
@@ -330,6 +336,8 @@ namespace planner_auth_service.App.Service
                 return new ServiceResponse<string>
                 {
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.Infrastructure,
+                    ErrorCodes = [ErrorCode.Infrastructure],
                     StatusCode = HttpStatusCode.BadRequest
                 };
             }
@@ -343,6 +351,8 @@ namespace planner_auth_service.App.Service
                 {
                     Errors = new string[] { "Identifier is not correct format" },
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.ValidationError,
+                    ErrorCodes = [ErrorCode.ValidationError],
                     StatusCode = HttpStatusCode.BadRequest
                 };
 
@@ -352,6 +362,8 @@ namespace planner_auth_service.App.Service
                 {
                     Errors = new string[] { $"DeviceId is not correct format" },
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.ValidationError,
+                    ErrorCodes = [ErrorCode.ValidationError],
                     StatusCode = HttpStatusCode.BadRequest
                 };
 
@@ -361,6 +373,8 @@ namespace planner_auth_service.App.Service
                 {
                     Errors = new string[] { "Account not found" },
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.NotFound,
+                    ErrorCodes = [ErrorCode.NotFound],
                     StatusCode = HttpStatusCode.NotFound
                 };
 
@@ -370,6 +384,8 @@ namespace planner_auth_service.App.Service
                 {
                     Errors = new string[] { "Account created by another provider" },
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.ValidationError,
+                    ErrorCodes = [ErrorCode.ValidationError],
                     StatusCode = HttpStatusCode.Conflict
                 };
             else
@@ -379,6 +395,8 @@ namespace planner_auth_service.App.Service
                 return new ServiceResponse<OutputAccountCredentialsBody>
                 {
                     Errors = new string[] { "Password is not correct" },
+                    PrimaryErrorCode = ErrorCode.ReadDenied,
+                    ErrorCodes = [ErrorCode.ReadDenied],
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest
                 };
@@ -506,6 +524,8 @@ namespace planner_auth_service.App.Service
                 {
                     IsSuccess = true,
                     StatusCode = HttpStatusCode.BadRequest,
+                    PrimaryErrorCode = ErrorCode.Infrastructure,
+                    ErrorCodes = [ErrorCode.Infrastructure],
                     Body = "Ошибка"
                 };
             }
@@ -523,6 +543,8 @@ namespace planner_auth_service.App.Service
                 {
                     IsSuccess = false,
                     StatusCode = HttpStatusCode.BadRequest,
+                    PrimaryErrorCode = ErrorCode.WriteDenied,
+                    ErrorCodes = [ErrorCode.WriteDenied],
                     Body = "Старый пароль неверный"
                 };
             }
