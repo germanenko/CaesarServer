@@ -64,11 +64,6 @@ namespace planner_node_service.Api.Controllers
             [FromQuery] List<Guid> nodeIds
         )
         {
-            await Task.Delay(3000);
-
-            return StatusCode((int)HttpStatusCode.InternalServerError, null);
-
-
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _nodeService.GetNodesByIds(tokenPayload.AccountId, nodeIds);
             return StatusCode((int)result.StatusCode, result.Body);
