@@ -1,5 +1,4 @@
-using planner_auth_service.Core.Entities.Response;
-using planner_common_package.Enums;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package;
 using planner_server_package.Entities;
