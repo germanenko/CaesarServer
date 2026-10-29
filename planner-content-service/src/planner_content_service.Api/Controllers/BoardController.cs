@@ -46,11 +46,11 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            await Task.Delay(1000);
+            //await Task.Delay(1000);
 
-            var stub = _stubs.TryGet(TestStubKeys.BoardUpdateWriteDenied, out var s) ? s : null;
+            //var stub = _stubs.TryGet(TestStubKeys.BoardUpdateWriteDenied, out var s) ? s : null;
 
-            return StatusCode((int)HttpStatusCode.Forbidden, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
+            //return StatusCode((int)HttpStatusCode.Forbidden, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenInfo = _jwtService.GetTokenPayload(token);
 

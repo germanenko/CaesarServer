@@ -58,11 +58,11 @@ namespace planner_content_service.Api.Controllers
             CancellationToken cancellationToken
         )
         {
-            await System.Threading.Tasks.Task.Delay(3000);
+            //await System.Threading.Tasks.Task.Delay(3000);
 
-            var stub = _stubs.TryGet(TestStubKeys.NodeDeleteWriteDenied, out var s) ? s : null;
+            //var stub = _stubs.TryGet(TestStubKeys.NodeDeleteWriteDenied, out var s) ? s : null;
 
-            return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
+            //return StatusCode(403, new Response<BoardBody>() { PrimaryErrorCode = stub.Response, ErrorCodes = [stub.Response], Reason = stub.Reason });
 
             var tokenPayload = _jwtService.GetTokenPayload(token);
             //var result = await _nodeService.DeleteNode(tokenPayload.AccountId, nodeId, cancellationToken);
