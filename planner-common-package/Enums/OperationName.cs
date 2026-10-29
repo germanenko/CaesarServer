@@ -13,38 +13,26 @@ namespace planner_common_package.Enums
         ChatWebSocket,
 
         // Chat
-        GetChats,
         GetChat,
-        GetChatMessages,
-        GetAllChatMessages,
+        EditMessage,
+        DeleteMessageForMe,
+        DeleteMessage,
+        ReadAttachedMessages,
         CreatePersonalChat,
-        SendMessageToEmail,
-        GetChatsSettings,
         CreateOrUpdateMessageDraft,
         CreateOrUpdateMessageDrafts,
         SetEnabledNotifications,
+        AttachMessageToJob,
+        SendToMail,
 
         // Task
-        GetTasks,
-        GetAllTasks,
-        CreateTask,
+        CreateOrUpdateTask,
         CreateJobFromMessage,
-        CreateTasks,
-        UpdateTask,
-        UpdateTasks,
-        AddTaskToColumn,
-        RemoveTaskFromColumn,
 
         // Board
         CreateOrUpdateBoard,
-        CreateBoards,
-        GetAllBoards,
         AddUserToBoard,
-        GetBoardMembers,
-        CreateColumn,
-        CreateColumns,
-        GetColumns,
-        GetAllColumns,
+        CreateOrUpdateColumn,
         GetDefaultColumns,
 
         // User
@@ -52,7 +40,6 @@ namespace planner_common_package.Enums
         GetProfile,
         UploadUserIcon,
         GetUsersByIdentifierPattern,
-        GetOtherUserProfile,
         ChangePassword,
         AddFirebaseToken,
         UploadAvatar,
@@ -66,24 +53,26 @@ namespace planner_common_package.Enums
         ValidateToken,
 
         // Content
-        CreateOrUpdateNode,
         GetManifest,
         GetScopeManifest,
-        GetNodes,
         GetNodeBranchesByRootIds,
         GetNodesByIds,
-        SendAllUpdates,
+        SendLocalUpdates,
         GetNodesByTypes,
 
         // Structure
-        GetNodeLinks,
+        AddDefaultAttachColumn,
         ChangeNodeParent,
         ChangeNodePosition,
-        CreateOrUpdateNodeLink,
-        CreateOrUpdateNodeLinks,
         DeleteNode,
 
         // AccessRights
+        GrantAccess,
+        ChangePermission,
+        RevokeAccess,
+        CreateOrUpdateAccessGroup,
+        AddUserToGroup,
+        RemoveUserFromGroup,
         GetAccessRules,
         GetCommonAccessRules,
 

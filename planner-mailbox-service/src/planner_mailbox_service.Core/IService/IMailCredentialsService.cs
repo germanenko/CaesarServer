@@ -1,6 +1,5 @@
-using planner_client_package.Entities;
+using planner_common_package.Enums;
 using planner_mailbox_service.Core.Entities.Models;
-using planner_mailbox_service.Core.Enums;
 using planner_server_package;
 
 namespace planner_mailbox_service.Core.IService

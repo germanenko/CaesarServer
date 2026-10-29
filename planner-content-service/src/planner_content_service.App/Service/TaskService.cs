@@ -35,7 +35,7 @@ namespace planner_content_service.App.Service
             _nodeService = nodeService;
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid requestId, Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             var hasAccess = await _accessService.CheckAccess(accountId, createOrUpdateJobBody.PrimaryAttachedMessage.MessageId, Permission.Read);
 
@@ -60,7 +60,7 @@ namespace planner_content_service.App.Service
                 Type = NodeType.Job
             };
 
-            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(requestId, accountId, taskBody, OperationName.CreateOrUpdateTask);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -122,7 +122,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
-            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(taskBody.Id, accountId, taskBody, OperationName.CreateOrUpdateTask);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -173,7 +173,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
-            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, jobBody);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(jobBody.Id, accountId, jobBody, OperationName.CreateOrUpdateTask);
 
             if (!nodeComplete.IsSuccess)
             {

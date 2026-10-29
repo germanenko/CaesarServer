@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using planner_common_package.Entities;
 using planner_notify_service.Api.CustomAttributes;
 using planner_notify_service.App.Service;
 using planner_notify_service.Core.Entities.Models;
 using planner_notify_service.Core.IService;
+using Sprache;
 using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 using System.Net;
@@ -52,11 +54,11 @@ namespace planner_notify_service.Api.Controllers
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
-            var response = await _notifyService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken, deviceId);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            var result = await _notifyService.AddFirebaseToken(tokenInfo.AccountId, firebaseToken, deviceId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<FirebaseToken>() { Body = result.Body });
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)result.StatusCode, new Response<FirebaseToken>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("api/sendFCMNotification")]
@@ -69,11 +71,11 @@ namespace planner_notify_service.Api.Controllers
             [FromBody] Dictionary<string, string> data
         )
         {
-            var response = await _notifyService.SendFCMNotification(userId, title, content, data);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode, response.Body);
+            var result = await _notifyService.SendFCMNotification(userId, title, content, data);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<bool>() { Body = result.Body });
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)result.StatusCode, new Response<bool>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
     }
 }

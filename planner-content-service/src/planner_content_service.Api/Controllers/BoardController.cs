@@ -36,7 +36,7 @@ namespace planner_content_service.Api.Controllers
         }
 
         [HttpPost("board"), Authorize]
-        [SwaggerOperation("Создать доску")]
+        [SwaggerOperation("Создать/обновить доску")]
         [SwaggerResponse(200)]
         [SwaggerResponse(400)]
         public async Task<IActionResult> CreateOrUpdateBoard(
@@ -59,7 +59,7 @@ namespace planner_content_service.Api.Controllers
                 tokenInfo.AccountId,
                 OperationName.CreateOrUpdateBoard,
                 boardBody,
-                async () => await _boardService.CreateOrUpdateBoardAsync(boardBody, tokenInfo.AccountId, cancellationToken),
+                async () => await _boardService.CreateOrUpdateBoardAsync(requestId, boardBody, tokenInfo.AccountId, cancellationToken),
                 cancellationToken
             );
 
@@ -71,17 +71,32 @@ namespace planner_content_service.Api.Controllers
 
 
         [HttpPost("board/column"), Authorize]
-        [SwaggerOperation("Создать колонку")]
+        [SwaggerOperation("Создать/обновить колонку")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> CreateOrUpdateColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             ColumnBodyRequest column,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.CreateOrUpdateColumn(tokenPayload.AccountId, column, cancellationToken);
-            return StatusCode((int)result.StatusCode, result.Body);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.CreateOrUpdateColumn,
+                column,
+                async () => await _boardService.CreateOrUpdateColumn(requestId, tokenPayload.AccountId, column, cancellationToken),
+                cancellationToken
+            );
+
+            //var result = await _boardService.CreateOrUpdateColumn(tokenPayload.AccountId, column, cancellationToken);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<ColumnBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<ColumnBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("addDefaultColumn"), Authorize]
@@ -90,12 +105,26 @@ namespace planner_content_service.Api.Controllers
         public async Task<IActionResult> AddDefaultColumn(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
             [FromBody] TaskColumnRequest taskColumn,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, taskColumn, cancellationToken);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _boardService.AddDefaultColumn(tokenPayload.AccountId, taskColumn, cancellationToken);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.AddDefaultAttachColumn,
+                taskColumn,
+                async () => await _boardService.AddDefaultColumn(tokenPayload.AccountId, taskColumn, cancellationToken),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<TaskColumnBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<TaskColumnBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpGet("getDefaultColumns"), Authorize]
@@ -108,7 +137,11 @@ namespace planner_content_service.Api.Controllers
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _boardService.GetDefaultColumns(tokenPayload.AccountId, cancellationToken);
-            return StatusCode((int)result.StatusCode, result.Body);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<List<TaskColumnBody>>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<List<TaskColumnBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
     }
 }

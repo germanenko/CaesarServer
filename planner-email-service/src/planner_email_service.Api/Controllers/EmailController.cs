@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using planner_common_package.Entities;
 using planner_email_service.Api.CustomAttributes;
 using planner_email_service.Core.Entities;
 using planner_email_service.Core.IService;
@@ -45,17 +46,18 @@ namespace planner_email_service.Api.Controllers
             if (account == null || !IsValidEMail(account.Identifier))
             {
                 var response = await _emailService.SendMessage(email, message.Subject, message.Content);
-                if (response.IsSuccess)
-                    return StatusCode((int)response.StatusCode);
 
-                return StatusCode((int)response.StatusCode, response.Errors);
+                if (response.IsSuccess)
+                    return StatusCode((int)response.StatusCode, new Response<string>() { Body = response.Body });
+
+                return StatusCode((int)response.StatusCode, new Response<string>() { PrimaryErrorCode = response.PrimaryErrorCode, ErrorCodes = response.ErrorCodes });
             }
 
             var result = await _emailService.SendMessage(account.Identifier, email, message.Subject, message.Content);
             if (result.IsSuccess)
-                return StatusCode((int)result.StatusCode);
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
-            return StatusCode((int)result.StatusCode, result.Errors);
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [SwaggerOperation("Отправить служебное письмо на почту")]
@@ -70,11 +72,11 @@ namespace planner_email_service.Api.Controllers
             [FromQuery, EmailAddress] string email
         )
         {
-            var response = await _emailService.SendMessage(email, message.Subject, message.Content);
-            if (response.IsSuccess)
-                return StatusCode((int)response.StatusCode);
+            var result = await _emailService.SendMessage(email, message.Subject, message.Content);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });
 
-            return StatusCode((int)response.StatusCode, response.Errors);
+            return StatusCode((int)result.StatusCode, new Response<string>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         private bool IsValidEMail(string email) => Regex.IsMatch(email, @"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");

@@ -1,5 +1,5 @@
+using planner_common_package.Enums;
 using System.Text.Json.Serialization;
-using planner_mailbox_service.Core.Enums;
 
 namespace planner_mailbox_service.Core.Entities.Request
 {

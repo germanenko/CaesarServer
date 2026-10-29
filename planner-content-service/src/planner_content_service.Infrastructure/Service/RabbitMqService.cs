@@ -138,7 +138,7 @@ namespace planner_content_service.Infrastructure.Service
                 UpdatedBy = profile.Id
             };
 
-            await boardService.CreateOrUpdateBoardAsync(new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
+            await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
 
             return new ServiceResponse<object>()
             {

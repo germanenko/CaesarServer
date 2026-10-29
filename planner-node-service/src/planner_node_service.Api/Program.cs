@@ -15,6 +15,8 @@ using planner_node_service.Infrastructure.Data;
 using planner_node_service.Infrastructure.Repository;
 using planner_node_service.Infrastructure.Service;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using planner_server_package.Stubs;
 using planner_server_package.Users;
@@ -115,6 +117,15 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
+    services.AddDbContext<IdempotencyContext>(options =>
+    {
+        options.UseNpgsql(nodeDbConnectionString, builder =>
+        {
+            builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_node_service.Api");
+        });
+    });
+
     services.AddSingleton<TestStubs>();
     services.AddSingleton<IJwtService, JwtService>();
     services.AddSingleton<IWebSocketService, WebSocketService>();
@@ -133,10 +144,14 @@ void ConfigureServices(IServiceCollection services)
             sp.GetRequiredService<ILogger<RabbitMQPublisher>>()
         ));
 
+    services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IUserService, UserService>();
     services.AddScoped<INodeService, NodeService>();
     services.AddScoped<IAccessService, AccessService>();
     services.AddScoped<INotificationService, NotificationService>();
+
+
+    services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
     services.AddScoped<IScopeRepository, ScopeRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IAccessRepository, AccessRepository>();

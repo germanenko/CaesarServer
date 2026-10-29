@@ -1,3 +1,4 @@
+using DotNetEnv;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authentication.OAuth;
@@ -19,9 +20,13 @@ using planner_auth_service.Infrastructure.Service;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package.Events.Enums;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using Swashbuckle.AspNetCore.Filters;
 using System.Text;
+
+Env.Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -169,6 +174,15 @@ void ConfigureServices(IServiceCollection services)
         });
     });
 
+    services.AddDbContext<IdempotencyContext>(options =>
+    {
+        options.UseNpgsql(authDbConnectionString, builder =>
+        {
+            builder.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
+            builder.MigrationsAssembly("planner_auth_service.Api");
+        });
+    });
+
     //services.AddSingleton<IEmailService, EmailService>(sp => new EmailService(
     //    emailSenderEmail,
     //    emailSenderPassword,
@@ -176,6 +190,7 @@ void ConfigureServices(IServiceCollection services)
     //    emailSmtpServer,
     //    emailSmtpPort,
     //    sp.GetRequiredService<ILogger<EmailService>>()));
+
 
     services.AddSingleton<IHashPasswordService, HashPasswordService>(sp => new HashPasswordService(passwordHashKey));
     services.AddSingleton(provider =>
@@ -194,8 +209,10 @@ void ConfigureServices(IServiceCollection services)
                 getGoogleTokenExchange
             );
         });
+    services.AddScoped<IIdempotencyService, IdempotencyService>();
     services.AddScoped<IUserService, UserService>();
 
+    services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();
     services.AddSingleton<IPublisherService, RabbitMQPublisher>(sp => new RabbitMQPublisher(
         rabbitMqHostname,
         rabbitMqUserName,

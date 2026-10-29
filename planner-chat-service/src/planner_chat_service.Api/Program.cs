@@ -116,7 +116,6 @@ void ConfigureServices(IServiceCollection services)
     services.AddScoped<IAccessService, AccessService>();
 
 
-
     services.AddScoped<IChatRepository, ChatRepository>();
     services.AddScoped<INodeRepository, NodeRepository>();
     services.AddScoped<IIdempotencyRepository, IdempotencyRepository>();

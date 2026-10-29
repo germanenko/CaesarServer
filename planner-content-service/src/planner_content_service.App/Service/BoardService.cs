@@ -35,11 +35,11 @@ namespace planner_content_service.App.Service
             _nodeService = nodeService;
         }
 
-        public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid accountId, ColumnBodyRequest column, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<ColumnBody>> CreateOrUpdateColumn(Guid requestId, Guid accountId, ColumnBodyRequest column, CancellationToken cancellationToken = default)
         {
             var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None, Link = column.Link };
 
-            var response = await _nodeService.CreateOrUpdateNode(accountId, columnBody);
+            var response = await _nodeService.CreateOrUpdateNode(requestId, accountId, columnBody, OperationName.CreateOrUpdateColumn);
 
             if (!response.IsSuccess)
             {
@@ -105,7 +105,7 @@ namespace planner_content_service.App.Service
                 //    CreatorId = accountId
                 //};
 
-                var request = await _nodeService.CreateOrUpdateNode(accountId, column);
+                var request = await _nodeService.CreateOrUpdateNode(column.Id, accountId, column, OperationName.CreateOrUpdateColumn);
 
                 //var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
@@ -215,7 +215,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(CreateOrUpdateBoardBody body, Guid accountId, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<BoardBody>> CreateOrUpdateBoardAsync(Guid requestId, CreateOrUpdateBoardBody body, Guid accountId, CancellationToken cancellationToken = default)
         {
             var boardBody = new BoardBody() { Id = body.Id, Name = body.Name, Props = body.Props, Type = NodeType.Board, UpdatedBy = accountId, SyncKind = SyncKind.Scope };
 
@@ -226,7 +226,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
-            var response = await _nodeService.CreateOrUpdateNode(accountId, boardBody);
+            var response = await _nodeService.CreateOrUpdateNode(requestId, accountId, boardBody, OperationName.CreateOrUpdateBoard);
 
             _logger.LogInformation(JsonSerializer.Serialize(response));
 

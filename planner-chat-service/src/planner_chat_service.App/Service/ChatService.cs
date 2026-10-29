@@ -463,15 +463,15 @@ namespace planner_chat_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<List<ChatSettings>>> GetChatsSettings(Guid accountId)
+        public async Task<ServiceResponse<List<ChatSettingsBody>>> GetChatsSettings(Guid accountId)
         {
             var settings = await _chatRepository.GetChatSettingsByAccountIdAsync(accountId);
 
-            return new ServiceResponse<List<ChatSettings>>
+            return new ServiceResponse<List<ChatSettingsBody>>
             {
                 StatusCode = HttpStatusCode.OK,
                 IsSuccess = true,
-                Body = settings
+                Body = settings.Select(x => x.ToBody()).ToList()
             };
         }
     }

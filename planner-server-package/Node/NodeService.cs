@@ -1,5 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
+using planner_common_package;
+using planner_common_package.Entities;
+using planner_common_package.Enums;
 using planner_server_package.Users;
 using System;
 using System.Collections.Generic;
@@ -32,7 +35,7 @@ namespace planner_server_package.Node
             };
         }
 
-        public async Task<ServiceResponse<NodeBody>> CreateOrUpdateNode(Guid accountId, NodeBody nodeBody)
+        public async Task<ServiceResponse<NodeBody>> CreateOrUpdateNode(Guid accountId, Guid requestId, NodeBody nodeBody, OperationName operationName)
         {
             try
             {
@@ -40,7 +43,9 @@ namespace planner_server_package.Node
 
                 var content = new StringContent(s, Encoding.UTF8, MediaTypeNames.Application.Json);
 
-                var response = await _httpClient.PostAsync($"createOrUpdateNode?accountId={accountId}", content);
+                _httpClient.DefaultRequestHeaders.Add(RequestHeader.RequestId, requestId.ToString());
+
+                var response = await _httpClient.PostAsync($"createOrUpdateNode?accountId={accountId}&operationName={operationName}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -48,12 +53,12 @@ namespace planner_server_package.Node
 
                     _logger.LogInformation(result);
 
-                    var node = JsonSerializer.Deserialize<ServiceResponse<NodeBody>>(result, new JsonSerializerOptions
+                    var node = JsonSerializer.Deserialize<Response<ServiceResponse<NodeBody>>>(result, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
 
-                    return node;
+                    return node.Body;
                 }
                 else
                 {

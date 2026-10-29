@@ -3,9 +3,11 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_auth_service.Core.Entities.Response;
 using planner_auth_service.Core.IService;
+using planner_common_package;
 using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_server_package.Entities;
+using planner_server_package.Idempotency.Interface;
 using Sprache;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net;
@@ -18,11 +20,13 @@ namespace planner_auth_service.Api.Controllers.Api
     {
         private readonly IAuthService _authService;
         private readonly IJwtService _jwtService;
+        private readonly IIdempotencyService _idempotencyService;
 
-        public AuthController(IAuthService authService, IJwtService jwtService)
+        public AuthController(IAuthService authService, IJwtService jwtService, IIdempotencyService idempotencyService)
         {
             _authService = authService;
             _jwtService = jwtService;
+            _idempotencyService = idempotencyService;
         }
 
 
@@ -133,6 +137,7 @@ namespace planner_auth_service.Api.Controllers.Api
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(string))]
         public async Task<IActionResult> ResetPassword(
             [FromHeader(Name = "X-Reset-Token")] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromBody] string newPassword
         )
         {
@@ -165,12 +170,23 @@ namespace planner_auth_service.Api.Controllers.Api
         [SwaggerResponse(200, Description = "Успешно", Type = typeof(bool))]
         public async Task<IActionResult> ChangePassword(
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] string oldPassword,
-            [FromQuery] string newPassword
+            [FromQuery] string newPassword,
+            CancellationToken cancellationToken
         )
         {
             var tokenInfo = _jwtService.GetTokenPayload(token);
-            var result = await _authService.ChangePassword(tokenInfo.AccountId, oldPassword, newPassword);
+            //var result = await _authService.ChangePassword(tokenInfo.AccountId, oldPassword, newPassword);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenInfo.AccountId,
+                OperationName.SendToMail,
+                (oldPassword, newPassword),
+                async () => await _authService.ChangePassword(tokenInfo.AccountId, oldPassword, newPassword),
+                cancellationToken
+            );
 
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, new Response<string>() { Body = result.Body });

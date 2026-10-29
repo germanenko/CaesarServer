@@ -1,12 +1,19 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using planner_client_package.Entities;
+using planner_client_package.Interface;
+using planner_common_package;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using planner_node_service.Api.CustomAttributes;
 using planner_node_service.Core.IService;
 using planner_server_package.Events;
+using planner_server_package.Idempotency.Interface;
 using Swashbuckle.AspNetCore.Annotations;
+using System.Net;
 using System.Net.Http.Headers;
+using System.Security;
+using System.Threading;
 
 namespace planner_node_service.Api.Controllers
 {
@@ -16,13 +23,16 @@ namespace planner_node_service.Api.Controllers
     {
         private readonly IAccessService _accessService;
         private readonly IJwtService _jwtService;
+        private readonly IIdempotencyService _idempotencyService;
 
         public AccessController(
             IAccessService accessService,
+            IIdempotencyService idempotencyService,
             IJwtService jwtService)
         {
             _accessService = accessService;
             _jwtService = jwtService;
+            _idempotencyService = idempotencyService;
         }
 
         [LocalOnly]
@@ -32,11 +42,16 @@ namespace planner_node_service.Api.Controllers
         public async Task<IActionResult> GrantAccess(
             [FromQuery] Guid accountId,
             [FromQuery] Guid nodeId,
-            [FromQuery] Permission minRequiredPermission
+            [FromQuery] Permission minRequiredPermission,
+            CancellationToken cancellationToken
         )
         {
             var result = await _accessService.CheckAccess(accountId, nodeId, minRequiredPermission);
-            return StatusCode((int)result.StatusCode, result.Body);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<bool>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<bool>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("grantAccess"), Authorize]
@@ -44,14 +59,29 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> GrantAccess(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] Guid accountId,
             [FromQuery] Guid nodeId,
-            [FromQuery] Permission permission
+            [FromQuery] Permission permission,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId, permission);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId, permission);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.GrantAccess,
+                (accountId, nodeId, permission),
+                async () => await _accessService.GrantAccess(tokenPayload.AccountId, accountId, nodeId, permission),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<AccessRuleBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<AccessRuleBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("changePermission"), Authorize]
@@ -59,14 +89,29 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> ChangePermission(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] Guid accountId,
             [FromQuery] Guid nodeId,
-            [FromQuery] Permission permission
+            [FromQuery] Permission permission,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.ChangePermission(tokenPayload.AccountId, accountId, nodeId, permission);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.ChangePermission(tokenPayload.AccountId, accountId, nodeId, permission);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.ChangePermission,
+                (accountId, nodeId, permission),
+                async () => await _accessService.ChangePermission(tokenPayload.AccountId, accountId, nodeId, permission),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<AccessRuleBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<AccessRuleBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("revokeAccess"), Authorize]
@@ -74,13 +119,28 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> RevokeAccess(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] Guid accountId,
-            [FromQuery] Guid nodeId
+            [FromQuery] Guid nodeId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.RevokeAccess(tokenPayload.AccountId, accountId, nodeId);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.RevokeAccess(tokenPayload.AccountId, accountId, nodeId);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.RevokeAccess,
+                (accountId, nodeId),
+                async () => await _accessService.RevokeAccess(tokenPayload.AccountId, accountId, nodeId),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<bool>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<bool>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpPost("createOrUpdateAccessGroup"), Authorize]
@@ -88,12 +148,27 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> CreateOrUpdateAccessGroup(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromBody] CreateAccessGroupBody body
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
+            [FromBody] CreateAccessGroupBody body,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.CreateAccessGroup(tokenPayload.AccountId, body);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.CreateAccessGroup(tokenPayload.AccountId, body);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.CreateOrUpdateAccessGroup,
+                body,
+                async () => await _accessService.CreateAccessGroup(tokenPayload.AccountId, body),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<GroupAccessSubjectBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<GroupAccessSubjectBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
 
@@ -102,13 +177,28 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> AddUserToGroup(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] Guid userId,
-            [FromQuery] Guid groupId
+            [FromQuery] Guid groupId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.AddUserToGroup(tokenPayload.AccountId, userId, groupId);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.AddUserToGroup(tokenPayload.AccountId, userId, groupId);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.AddUserToGroup,
+                (userId, groupId),
+                async () => await _accessService.AddUserToGroup(tokenPayload.AccountId, userId, groupId),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<AccessGroupMemberBody>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<AccessGroupMemberBody>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpDelete("removeUserFromGroup"), Authorize]
@@ -116,37 +206,62 @@ namespace planner_node_service.Api.Controllers
         [SwaggerResponse(200)]
         public async Task<IActionResult> RemoveUserFromGroup(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
             [FromQuery] Guid userId,
-            [FromQuery] Guid groupId
+            [FromQuery] Guid groupId,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _accessService.RemoveUserFromGroup(tokenPayload.AccountId, userId, groupId);
-            return StatusCode((int)result.StatusCode, result.Body);
+            //var result = await _accessService.RemoveUserFromGroup(tokenPayload.AccountId, userId, groupId);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                requestId,
+                tokenPayload.AccountId,
+                OperationName.RemoveUserFromGroup,
+                (userId, groupId),
+                async () => await _accessService.RemoveUserFromGroup(tokenPayload.AccountId, userId, groupId),
+                cancellationToken
+            );
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<HttpStatusCode>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<HttpStatusCode>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpGet("getAccessRules"), Authorize]
         [SwaggerOperation("Получить список прав доступа")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetAccessRules(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _accessService.GetAccessRules(tokenPayload.AccountId);
-            return StatusCode((int)result.StatusCode, result.Body);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<List<AccessRuleBody>>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<List<AccessRuleBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
         [HttpGet("getCommonAccessRules"), Authorize]
         [SwaggerOperation("Получить общие права доступа")]
         [SwaggerResponse(200)]
         public async Task<IActionResult> GetCommonAccessRules(
-            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
             var result = await _accessService.GetCommonAccessRules(tokenPayload.AccountId);
-            return StatusCode((int)result.StatusCode, result.Body);
+
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<List<AccessRuleBody>>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<List<AccessRuleBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
     }
 }

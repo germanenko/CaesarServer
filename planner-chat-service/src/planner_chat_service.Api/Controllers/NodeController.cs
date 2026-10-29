@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using planner_chat_service.Core.Entities.Models;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
+using planner_common_package.Entities;
 using Swashbuckle.AspNetCore.Annotations;
 using System.Net.Http.Headers;
 
@@ -30,7 +31,10 @@ namespace planner_chat_service.Api.Controllers
         )
         {
             var result = await _nodeService.GetNodesByIds(accountId, nodeIds);
-            return StatusCode((int)result.StatusCode, result.Body);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<IEnumerable<NodeBody>>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<IEnumerable<NodeBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
     }
 }
