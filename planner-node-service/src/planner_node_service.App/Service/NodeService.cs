@@ -583,9 +583,9 @@ namespace planner_node_service.App.Service
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
 
-                var result = JsonSerializer.Deserialize<List<NodeBody>>(resultString, options);
+                var result = JsonSerializer.Deserialize<Response<List<NodeBody>>>(resultString, options);
 
-                return result;
+                return result.Body;
             }
             else
             {
@@ -621,9 +621,9 @@ namespace planner_node_service.App.Service
                     DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull
                 };
 
-                var result = JsonSerializer.Deserialize<List<NodeBody>>(resultString, options);
+                var result = JsonSerializer.Deserialize<Response<List<NodeBody>>>(resultString, options);
 
-                return result;
+                return result.Body;
             }
             else
             {
