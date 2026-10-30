@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
+using planner_common_package.Entities;
 using planner_common_package.Enums;
 using System;
 using System.Net.Http;
@@ -38,9 +39,9 @@ namespace planner_server_package.Access
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
-                    var hasAccess = JsonSerializer.Deserialize<bool>(content);
+                    var hasAccess = JsonSerializer.Deserialize<Response<bool>>(content);
 
-                    return hasAccess;
+                    return hasAccess.Body;
                 }
                 else
                 {
