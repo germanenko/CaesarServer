@@ -39,7 +39,7 @@ namespace planner_node_service.Api.Controllers
         [HttpGet("checkAccess")]
         [SwaggerOperation("Проверить доступ")]
         [SwaggerResponse(200)]
-        public async Task<IActionResult> GrantAccess(
+        public async Task<IActionResult> CheckAccess(
             [FromQuery] Guid accountId,
             [FromQuery] Guid nodeId,
             [FromQuery] Permission minRequiredPermission,
