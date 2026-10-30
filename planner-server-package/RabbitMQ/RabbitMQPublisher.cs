@@ -7,6 +7,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace planner_server_package.RabbitMQ
@@ -18,6 +19,7 @@ namespace planner_server_package.RabbitMQ
         private readonly string _password;
 
         private readonly ILogger<RabbitMQPublisher> _logger;
+        private readonly ConnectionFactory _connectionFactory;
 
         private readonly Dictionary<PublishEvent, string> _exchanges = new Dictionary<PublishEvent, string>();
 
@@ -35,6 +37,13 @@ namespace planner_server_package.RabbitMQ
             _password = password;
 
             _exchanges = exchanges;
+
+            _connectionFactory = new ConnectionFactory()
+            {
+                HostName = _hostname,
+                UserName = _username,
+                Password = _password
+            };
 
             ExchangeDeclare();
         }
@@ -62,7 +71,9 @@ namespace planner_server_package.RabbitMQ
             }
         }
 
-        public async Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent)
+
+
+        public async Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent, bool waitForResponse = true)
         {
             var exchangeName = GetExchangeName(publishEvent);
 
@@ -84,6 +95,26 @@ namespace planner_server_package.RabbitMQ
             );
 
             _logger.LogInformation(JsonSerializer.Serialize(message));
+
+            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
+            var properties = channel.CreateBasicProperties();
+            properties.Persistent = true;
+
+            if (!waitForResponse)
+            {
+                _logger.LogInformation($"Publish event (no reply): {exchangeName}");
+
+                channel.BasicPublish(
+                    exchange: exchangeName,
+                    routingKey: "",
+                    basicProperties: properties,
+                    body: body);
+
+                return new ServiceResponse<object>
+                {
+                    IsSuccess = true
+                };
+            }
 
             var replyQueueName = channel.QueueDeclare(queue: "", exclusive: true, autoDelete: true).QueueName;
 
@@ -132,12 +163,8 @@ namespace planner_server_package.RabbitMQ
                 }
             };
 
-            var body = Encoding.UTF8.GetBytes(JsonSerializer.Serialize(message));
-
-            var properties = channel.CreateBasicProperties();
             properties.CorrelationId = correlationId;
             properties.ReplyTo = replyQueueName;
-            properties.Persistent = true;
 
             _logger.LogInformation($"Publish event: {exchangeName}:{body}");
 

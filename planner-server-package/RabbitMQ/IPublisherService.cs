@@ -9,6 +9,6 @@ namespace planner_server_package.RabbitMQ
 {
     public interface IPublisherService
     {
-        Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent);
+        Task<ServiceResponse<object>> Publish<T>(T message, PublishEvent publishEvent, bool waitForResponse = true);
     }
 }

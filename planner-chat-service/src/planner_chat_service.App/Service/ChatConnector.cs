@@ -223,7 +223,7 @@ namespace planner_chat_service.App.Service
 
             var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId };
 
-            await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged);
+            await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged, false);
 
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, messageType);
             DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, message);
