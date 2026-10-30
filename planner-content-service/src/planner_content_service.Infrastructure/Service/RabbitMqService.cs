@@ -41,8 +41,6 @@ namespace planner_content_service.Infrastructure.Service
 
             _publisherService = publisherService;
 
-            _idempotencyService = idempotencyService;
-
             AddQueue(contentNodes, HandleContentNodes);
             AddQueue(accountCreated, HandleAccountCreated);
             AddQueue(messageEditedExchange, HandleMessageEdited);
