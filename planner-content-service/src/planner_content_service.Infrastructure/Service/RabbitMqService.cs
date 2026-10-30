@@ -149,7 +149,7 @@ namespace planner_content_service.Infrastructure.Service
                 response.ProfileBody.Id,
                 OperationName.CreateOrUpdateBoard,
                 boardBody,
-                async () => await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None),
+                async () => await boardService.CreateOrUpdateBoardAsync(response.EventId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None),
                 CancellationToken.None
             );
 

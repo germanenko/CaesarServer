@@ -226,7 +226,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var response = await _publisherService.Publish(boardEvent, PublishEvent.CreateNode);
-            var response = await _nodeService.CreateOrUpdateNode(requestId, accountId, boardBody, OperationName.CreateOrUpdateBoard);
+            var response = await _nodeService.CreateOrUpdateNode(accountId, requestId, boardBody, OperationName.CreateOrUpdateBoard);
 
             _logger.LogInformation(JsonSerializer.Serialize(response));
 
