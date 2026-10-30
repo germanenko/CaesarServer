@@ -8,6 +8,7 @@ using RabbitMQ.Client.Exceptions;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Text.Json;
 using System.Threading;
@@ -134,6 +135,19 @@ namespace planner_server_package.RabbitMQ
                         );
                     }
 
+                    if (!result.IsSuccess)
+                    {
+                        if (IsTransientError(result.StatusCode))
+                        {
+                            _channel.BasicNack(ea.DeliveryTag, false, requeue: true);
+                        }
+                        else
+                        {
+                            _channel.BasicNack(ea.DeliveryTag, false, requeue: false);
+                        }
+                        return;
+                    }
+
 
                     _channel.BasicAck(ea.DeliveryTag, false);
                 }
@@ -167,6 +181,23 @@ namespace planner_server_package.RabbitMQ
         {
             _queues.Add(queue, (QueueName: GetQueueName(queue), Handler: handler));
         }
+
+
+
+        private static bool IsTransientError(HttpStatusCode statusCode)
+        {
+            return statusCode switch
+            {
+                >= HttpStatusCode.InternalServerError => true,
+
+                HttpStatusCode.RequestTimeout => true,
+                HttpStatusCode.TooManyRequests => true,
+
+                _ => false
+            };
+        }
+
+
 
         public override void Dispose()
         {

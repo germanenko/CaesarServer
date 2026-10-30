@@ -8,11 +8,14 @@ using planner_content_service.Core.IService;
 using planner_server_package;
 using planner_server_package.Entities;
 using planner_server_package.Events;
+using planner_server_package.Idempotency;
+using planner_server_package.Idempotency.Interface;
 using planner_server_package.RabbitMQ;
 using RabbitMQ.Client;
 using RabbitMQ.Client.Events;
 using System.Text;
 using System.Text.Json;
+using System.Threading;
 
 namespace planner_content_service.Infrastructure.Service
 {
@@ -20,9 +23,11 @@ namespace planner_content_service.Infrastructure.Service
     {
         private readonly IServiceScopeFactory _serviceFactory;
         private readonly IPublisherService _publisherService;
+        private readonly IIdempotencyService _idempotencyService;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
+            IIdempotencyService idempotencyService,
             string hostname,
             string userName,
             string password,
@@ -37,6 +42,8 @@ namespace planner_content_service.Infrastructure.Service
             _serviceFactory = serviceFactory;
 
             _publisherService = publisherService;
+
+            _idempotencyService = idempotencyService;
 
             AddQueue(contentNodes, HandleContentNodes);
             AddQueue(accountCreated, HandleAccountCreated);
@@ -138,12 +145,24 @@ namespace planner_content_service.Infrastructure.Service
                 UpdatedBy = profile.Id
             };
 
-            await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
+            //var result = await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
+
+            var result = await _idempotencyService.ExecuteOperation(
+                response.EventId,
+                response.ProfileBody.Id,
+                OperationName.CreateOrUpdateBoard,
+                boardBody,
+                async () => await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None),
+                CancellationToken.None
+            );
 
             return new ServiceResponse<object>()
             {
-                IsSuccess = true,
-                StatusCode = System.Net.HttpStatusCode.OK
+                IsSuccess = result.IsSuccess,
+                StatusCode = result.StatusCode,
+                PrimaryErrorCode = result.PrimaryErrorCode,
+                Errors = result.Errors,
+                ErrorCodes = result.ErrorCodes
             };
         }
 

@@ -707,6 +707,19 @@
         },
 
 	{
+            "DownstreamPathTemplate": "/api/getScopeManifest",
+            "DownstreamScheme": "http",
+            "DownstreamHostAndPorts": [
+                {
+                    "Host": "localhost",
+                    "Port": 8093
+                }
+            ],
+            "UpstreamPathTemplate": "/api/getScopeManifest",
+            "UpstreamHttpMethod": [ "GET" ]
+        },
+
+	{
             "DownstreamPathTemplate": "/api/changeNodeParent",
             "DownstreamScheme": "http",
             "DownstreamHostAndPorts": [

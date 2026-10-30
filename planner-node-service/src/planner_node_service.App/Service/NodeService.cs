@@ -439,6 +439,47 @@ namespace planner_node_service.App.Service
             };
         }
 
+        // Получение манифеста Scope
+        public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopeManifest(Guid accountId, Guid scopeId)
+        {
+            var scope = await _scopeRepository.GetNodeScope(scopeId);
+
+            if (scope == null)
+            {
+                return new ServiceResponse<List<EntityVersionBody>>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.NotFound,
+                    PrimaryErrorCode = ErrorCode.NotFound,
+                    ErrorCodes = [ErrorCode.NotFound],
+                    Errors = ["Scope not found"]
+                };
+            }
+
+            // Создаем список для хранения информации о версиях Scope'ов, который будет возвращен клиенту
+            List<EntityVersionBody> logs = new List<EntityVersionBody>();
+
+            var log = await _logRepository.GetLastLogForScope(scope.Id);
+
+            if (log != null)
+            {
+                var entityVersion = new EntityVersionBody()
+                {
+                    EntityId = log.ScopeId,
+                    Version = log.ScopeVersion
+                };
+
+                logs.Add(entityVersion);
+            }
+
+            return new ServiceResponse<List<EntityVersionBody>>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK,
+                Body = logs
+            };
+        }
+
         // Получение манифеста Scope'ов, к которым у пользователя есть доступ
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopesManifest(Guid accountId)
         {

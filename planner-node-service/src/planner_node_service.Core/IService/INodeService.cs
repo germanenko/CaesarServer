@@ -19,5 +19,6 @@ namespace planner_node_service.Core.IService
         public Task<ServiceResponse<NodeLinkBody>> ChangeNodeParent(Guid accountId, Guid nodeId, Guid newParentId, int position);
         public Task<ServiceResponse<NodeLinkBody>> ChangeNodePosition(Guid accountId, Guid nodeId, int newPosition);
         public Task<ServiceResponse<List<NodeBody>>> LoadNodes(List<NodeBody> nodes, TokenPayload tokenPayload);
+        Task<ServiceResponse<List<EntityVersionBody>>> GetScopeManifest(Guid accountId, Guid scopeId);
     }
 }

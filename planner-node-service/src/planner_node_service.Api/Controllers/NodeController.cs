@@ -137,6 +137,24 @@ namespace planner_node_service.Api.Controllers
             return StatusCode((int)result.StatusCode, new Response<List<EntityVersionBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
         }
 
+        [HttpGet("getScopeManifest"), Authorize]
+        [SwaggerOperation("Получить Scope манифест")]
+        [SwaggerResponse(200)]
+
+        public async Task<IActionResult> GetScopeManifest(
+            [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
+            [FromQuery] Guid scopeId,
+            CancellationToken cancellationToken
+        )
+        {
+            var tokenPayload = _jwtService.GetTokenPayload(token);
+            var result = await _nodeService.GetScopeManifest(tokenPayload.AccountId, scopeId);
+            if (result.IsSuccess)
+                return StatusCode((int)result.StatusCode, new Response<List<EntityVersionBody>>() { Body = result.Body });
+
+            return StatusCode((int)result.StatusCode, new Response<List<EntityVersionBody>>() { PrimaryErrorCode = result.PrimaryErrorCode, ErrorCodes = result.ErrorCodes });
+        }
+
         [HttpPost("changeNodeParent"), Authorize]
         [SwaggerOperation("Изменить родителя ноды")]
         [SwaggerResponse(200)]

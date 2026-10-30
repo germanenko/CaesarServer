@@ -203,10 +203,7 @@ namespace planner_auth_service.App.Service
             var session = await CreateSession(body.DeviceId, account.Id);
             var tokenPair = await UpdateToken(rolename, account.Id, session.Value);
 
-            var accountCreatedEvent = new AccountCreatedEvent()
-            {
-                ProfileBody = account.ToProfileBody()
-            };
+            var accountCreatedEvent = new AccountCreatedEvent(account.ToProfileBody());
 
             await _publisherService.Publish(accountCreatedEvent, PublishEvent.AccountCreated);
 

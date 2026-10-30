@@ -17,6 +17,7 @@ namespace planner_server_package.Events.Enums
         AddAccountsToTaskChats,
         ContentNodes,
         ChatNodes,
+        ChatChanged,
         CreateNode,
         DeleteNode,
         AccessRevoked,
