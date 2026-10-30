@@ -168,7 +168,6 @@ void ConfigureServices(IServiceCollection services)
     services.AddHostedService(sp => new RabbitMqService
     (
         sp.GetRequiredService<IServiceScopeFactory>(),
-        sp.GetRequiredService<IIdempotencyService>(),
         hostname,
         username,
         password,

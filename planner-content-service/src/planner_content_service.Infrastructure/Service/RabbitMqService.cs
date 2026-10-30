@@ -23,11 +23,9 @@ namespace planner_content_service.Infrastructure.Service
     {
         private readonly IServiceScopeFactory _serviceFactory;
         private readonly IPublisherService _publisherService;
-        private readonly IIdempotencyService _idempotencyService;
 
         public RabbitMqService(
             IServiceScopeFactory serviceFactory,
-            IIdempotencyService idempotencyService,
             string hostname,
             string userName,
             string password,
@@ -122,6 +120,7 @@ namespace planner_content_service.Infrastructure.Service
         {
             using var scope = _serviceFactory.CreateScope();
             var boardService = scope.ServiceProvider.GetRequiredService<IBoardService>();
+            var idempotencyService = scope.ServiceProvider.GetRequiredService<IIdempotencyService>();
             var response = JsonSerializer.Deserialize<AccountCreatedEvent>(message);
             if (response == null)
                 return new ServiceResponse<object>()
@@ -147,7 +146,7 @@ namespace planner_content_service.Infrastructure.Service
 
             //var result = await boardService.CreateOrUpdateBoardAsync(boardId, new planner_client_package.Entities.Request.CreateOrUpdateBoardBody() { Id = Guid.NewGuid(), Name = "Personal Board" }, profile.Id, CancellationToken.None);
 
-            var result = await _idempotencyService.ExecuteOperation(
+            var result = await idempotencyService.ExecuteOperation(
                 response.EventId,
                 response.ProfileBody.Id,
                 OperationName.CreateOrUpdateBoard,
