@@ -214,6 +214,9 @@ namespace planner_node_service.Infrastructure.Repository
 
                 if (nodeBody.Link == null) rule = (await AddAccessRule(nodeBody.UpdatedBy, node)).ToBody();
 
+                if (nodeBody.SyncKind == SyncKind.Scope)
+                    await AddInitialContentLog(nodeBody.Id);
+
                 await _context.SaveChangesAsync();
 
                 var log = await _scopeRepository.GetScopeVersionByChildNode(nodeBody.Id);
@@ -576,6 +579,19 @@ namespace planner_node_service.Infrastructure.Repository
 
             return (await _context.ContentLogs.AddAsync(newLog)).Entity;
         }
+
+
+        public async Task<ContentLog> AddInitialContentLog(Guid scopeId)
+        {
+            var lastScopeLog = await _context.ContentLogs.AsNoTracking().OrderByDescending(x => x.Seq).FirstOrDefaultAsync(x => x.ScopeId == scopeId);
+
+            if (lastScopeLog != null) return lastScopeLog;
+
+            var newLog = new ContentLog(scopeId, scopeId, ActionType.Create, (lastScopeLog?.ScopeVersion ?? -1) + 1);
+
+            return (await _context.ContentLogs.AddAsync(newLog)).Entity;
+        }
+
 
         public async Task<Node?> GetNode(Guid nodeId)
         {
