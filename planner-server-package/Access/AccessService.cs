@@ -39,6 +39,8 @@ namespace planner_server_package.Access
                 {
                     var content = await response.Content.ReadAsStringAsync();
 
+                    _logger.LogInformation($"Access checked = {content}");
+
                     var hasAccess = JsonSerializer.Deserialize<Response<bool>>(content);
 
                     return hasAccess.Body;
