@@ -105,7 +105,7 @@ namespace planner_content_service.App.Service
                 //    CreatorId = accountId
                 //};
 
-                var request = await _nodeService.CreateOrUpdateNode(column.Id, accountId, column, OperationName.CreateOrUpdateColumn);
+                var request = await _nodeService.CreateOrUpdateNode(accountId, column.Id, column, OperationName.CreateOrUpdateColumn);
 
                 //var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
