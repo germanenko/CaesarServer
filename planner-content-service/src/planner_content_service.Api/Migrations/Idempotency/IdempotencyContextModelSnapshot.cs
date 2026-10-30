@@ -34,23 +34,17 @@ namespace planner_content_service.Api.Migrations.Idempotency
                     b.Property<string>("Details")
                         .HasColumnType("text");
 
-                    b.Property<int>("ErrorCode")
-                        .HasColumnType("integer");
-
                     b.Property<DateTime>("FailedAtUtc")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("HttpStatusCode")
                         .HasColumnType("integer");
 
-                    b.Property<int>("Kind")
+                    b.Property<int>("OperationFailureCode")
                         .HasColumnType("integer");
 
                     b.Property<int>("OperationName")
                         .HasColumnType("integer");
-
-                    b.Property<Guid?>("ScopeId")
-                        .HasColumnType("uuid");
 
                     b.HasKey("OperationId");
 
