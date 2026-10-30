@@ -43,9 +43,13 @@ namespace planner_server_package.Node
 
                 var content = new StringContent(s, Encoding.UTF8, MediaTypeNames.Application.Json);
 
-                _httpClient.DefaultRequestHeaders.Add(RequestHeader.RequestId, requestId.ToString());
+                using var request = new HttpRequestMessage(HttpMethod.Post,
+                    $"createOrUpdateNode?accountId={accountId}&operationName={operationName}");
 
-                var response = await _httpClient.PostAsync($"createOrUpdateNode?accountId={accountId}&operationName={operationName}", content);
+                request.Content = content;
+                request.Headers.Add(RequestHeader.RequestId, requestId.ToString());
+
+                var response = await _httpClient.SendAsync(request);
 
                 if (response.IsSuccessStatusCode)
                 {
