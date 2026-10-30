@@ -41,7 +41,8 @@ namespace planner_server_package.Access
 
                     _logger.LogInformation($"Access checked = {content}");
 
-                    var hasAccess = JsonSerializer.Deserialize<Response<bool>>(content);
+                    var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+                    var hasAccess = JsonSerializer.Deserialize<Response<bool>>(content, options);
 
                     return hasAccess.Body;
                 }
