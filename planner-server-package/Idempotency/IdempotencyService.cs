@@ -58,6 +58,20 @@ namespace planner_server_package.Idempotency
 
                 if (result.IsSuccess == false)
                 {
+                    if (result.PrimaryErrorCode == null)
+                    {
+                        await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, ErrorCode.Infrastructure.GetErrorKind(), ["Ошибка сервера"], cancellationToken);
+
+                        return new ServiceResponse<TResult>()
+                        {
+                            StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                            IsSuccess = false,
+                            PrimaryErrorCode = ErrorCode.Infrastructure,
+                            ErrorCodes = [ErrorCode.Infrastructure],
+                            Errors = ["Ошибка сервера"]
+                        };
+                    }
+
                     await _idempotencyRepository.SetOperationFailed(opId, result.StatusCode, result.PrimaryErrorCode.Value.GetErrorKind(), result.Errors, cancellationToken);
                 }
                 else
