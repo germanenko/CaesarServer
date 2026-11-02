@@ -39,7 +39,7 @@ namespace planner_content_service.App.Service
         {
             var columnBody = new ColumnBody() { Id = column.Id, Name = column.Name, Props = column.Props, Type = NodeType.Column, UpdatedBy = accountId, SyncKind = SyncKind.None, Link = column.Link };
 
-            var response = await _nodeService.CreateOrUpdateNode(requestId, accountId, columnBody, OperationName.CreateOrUpdateColumn);
+            var response = await _nodeService.CreateOrUpdateNode(accountId, requestId, columnBody, OperationName.CreateOrUpdateColumn);
 
             if (!response.IsSuccess)
             {
