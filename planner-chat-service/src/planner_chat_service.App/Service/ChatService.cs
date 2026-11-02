@@ -113,6 +113,7 @@ namespace planner_chat_service.App.Service
                 {
                     StatusCode = HttpStatusCode.BadRequest,
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.NotFound,
                     ErrorCodes = [ErrorCode.NotFound],
                     Errors = ["User not found"]
                 };
@@ -133,6 +134,7 @@ namespace planner_chat_service.App.Service
                 {
                     StatusCode = HttpStatusCode.Conflict,
                     IsSuccess = false,
+                    PrimaryErrorCode = ErrorCode.AlreadyExist,
                     ErrorCodes = [ErrorCode.AlreadyExist],
                     Errors = ["chat exist"]
                 };

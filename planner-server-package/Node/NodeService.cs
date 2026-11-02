@@ -7,6 +7,7 @@ using planner_server_package.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Net.Mime;
 using System.Text;
@@ -68,14 +69,29 @@ namespace planner_server_package.Node
                 {
                     var errorContent = await response.Content.ReadAsStringAsync();
                     _logger.LogWarning("HTTP {StatusCode}: {Error}", response.StatusCode, errorContent);
+
+
+                    return new ServiceResponse<NodeBody>()
+                    {
+                        StatusCode = response.StatusCode,
+                        IsSuccess = false,
+                        ErrorCodes = [ErrorCode.Infrastructure],
+                        PrimaryErrorCode = ErrorCode.Infrastructure
+                    };
                 }
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error");
-            }
 
-            return null;
+                return new ServiceResponse<NodeBody>()
+                {
+                    StatusCode = HttpStatusCode.BadRequest,
+                    IsSuccess = false,
+                    ErrorCodes = [ErrorCode.Infrastructure],
+                    PrimaryErrorCode = ErrorCode.Infrastructure
+                };
+            }
         }
     }
 }
