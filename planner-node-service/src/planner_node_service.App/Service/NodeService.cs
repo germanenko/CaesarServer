@@ -352,9 +352,9 @@ namespace planner_node_service.App.Service
             }
 
             // Проверяем, что у пользователя есть права на запись к ноде
-            var nodeAccess = _accessRepository.CheckAccess(accountId, nodeId, Permission.Write);
+            var nodeAccess = await _accessRepository.CheckAccess(accountId, nodeId, Permission.Write);
 
-            if (nodeAccess == null)
+            if (nodeAccess == false)
             {
                 return new ServiceResponse<NodeLinkBody>()
                 {

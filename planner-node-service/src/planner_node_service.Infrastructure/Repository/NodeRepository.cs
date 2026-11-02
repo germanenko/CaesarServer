@@ -196,7 +196,7 @@ namespace planner_node_service.Infrastructure.Repository
                     nodeLink = new NodeLink()
                     {
                         Id = nodeBody.Link.Id,
-                        ChildNode = result,
+                        ChildId = result.Id,
                         ParentId = nodeBody.Link.ParentId,
                         RelationType = nodeBody.Link.RelationType,
                         Position = position
