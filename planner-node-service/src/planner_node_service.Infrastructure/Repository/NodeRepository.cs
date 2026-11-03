@@ -175,8 +175,7 @@ namespace planner_node_service.Infrastructure.Repository
                 Name = nodeBody.Name,
                 Type = nodeBody.Type,
                 Props = nodeBody.Props,
-                SyncKind = nodeBody.SyncKind,
-                Version = nodeBody.Version
+                SyncKind = nodeBody.SyncKind
                 //BodyJson = JsonSerializer.Serialize(nodeBody)
                 //Cursor = cursor
             };
@@ -236,7 +235,6 @@ namespace planner_node_service.Infrastructure.Repository
 
                 existingNode.Name = node.Name;
                 existingNode.Props = node.Props;
-                existingNode.Version = node.Version;
 
                 //_context.Entry(existingNode).CurrentValues.SetValues(node);
 
