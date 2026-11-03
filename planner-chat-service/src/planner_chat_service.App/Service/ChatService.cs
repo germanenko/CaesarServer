@@ -451,7 +451,9 @@ namespace planner_chat_service.App.Service
                 {
                     StatusCode = HttpStatusCode.Forbidden,
                     IsSuccess = false,
-                    Errors = new[] { "�� �� �������� ����� ����" }
+                    Errors = new[] { "Нет доступа" },
+                    ErrorCodes = [ErrorCode.ReadDenied],
+                    PrimaryErrorCode = ErrorCode.ReadDenied
                 };
             }
 

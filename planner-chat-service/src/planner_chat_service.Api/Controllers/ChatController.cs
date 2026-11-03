@@ -275,9 +275,8 @@ namespace planner_chat_service.Api.Controllers
 
         public async Task<IActionResult> CreateOrUpdateMessageDraft(
             [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
-            [FromBody, Required] Guid chatId,
+            [FromBody] UpdateMessageDraftRequest messageDraft,
             [FromHeader(Name = nameof(HttpRequestHeader.Authorization))] string token,
-            string content,
             CancellationToken cancellationToken
         )
         {
@@ -288,8 +287,8 @@ namespace planner_chat_service.Api.Controllers
                requestId,
                tokenPayload.AccountId,
                OperationName.CreateOrUpdateMessageDraft,
-               (chatId, content),
-               async () => await _chatService.CreateOrUpdateMessageDraft(tokenPayload.AccountId, chatId, content),
+               messageDraft,
+               async () => await _chatService.CreateOrUpdateMessageDraft(tokenPayload.AccountId, messageDraft.ChatId, messageDraft.Draft),
                cancellationToken
            );
 
