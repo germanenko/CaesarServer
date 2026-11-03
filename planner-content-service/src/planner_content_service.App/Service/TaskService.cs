@@ -143,6 +143,8 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
+                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+
                 return task;
             }
 
@@ -159,9 +161,6 @@ namespace planner_content_service.App.Service
             }
 
             var resultWithMetadata = result.ApplyNodeMetadata(nodeComplete.Body);
-
-            _logger.LogInformation($"Task created on node service with ID: {nodeComplete.Body.Id}, version: {nodeComplete.Body.Version}");
-            _logger.LogInformation($"Task created with ID: {resultWithMetadata.Id}, version: {resultWithMetadata.Version}");
 
             return new ServiceResponse<JobBody>
             {
