@@ -80,7 +80,7 @@ namespace planner_content_service.App.Service
                 return task;
             }
 
-            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, nodeComplete.Body, cancellationToken);
+            var result = await _taskRepository.AddJobFromMessageAsync(createOrUpdateJobBody, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -95,7 +95,7 @@ namespace planner_content_service.App.Service
             return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result,
+                Body = result.ApplyNodeMetadata(nodeComplete.Body),
                 IsSuccess = true
             };
         }
@@ -142,7 +142,7 @@ namespace planner_content_service.App.Service
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId, nodeComplete.Body, cancellationToken);
+            var result = await _taskRepository.AddAsync(createOrUpdateJobBody, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -157,7 +157,7 @@ namespace planner_content_service.App.Service
             return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result,
+                Body = result.ApplyNodeMetadata(nodeComplete.Body),
                 IsSuccess = true
             };
         }
@@ -190,10 +190,12 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, jobBody, cancellationToken);
 
+                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+
                 return task;
             }
 
-            var result = await _taskRepository.AddAsync(jobBody, accountId, nodeComplete.Body, cancellationToken);
+            var result = await _taskRepository.AddAsync(jobBody, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -208,7 +210,7 @@ namespace planner_content_service.App.Service
             return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result,
+                Body = result.ApplyNodeMetadata(nodeComplete.Body),
                 IsSuccess = true
             };
         }

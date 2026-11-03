@@ -7,9 +7,9 @@ namespace planner_content_service.Core.IRepository
 {
     public interface ITaskRepository
     {
-        Task<JobBody?> AddAsync<T>(T jobBody, Guid accountId, NodeBody metadata, CancellationToken cancellationToken) where T : JobBodyRequest;
-        Task<JobBody?> AddAsync(JobBody jobBody, Guid accountId, NodeBody metadata, CancellationToken cancellationToken);
-        Task<JobBody?> AddJobFromMessageAsync<T>(T jobBody, Guid accountId, NodeBody metadata, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<JobBody?> AddAsync<T>(T jobBody, Guid accountId, CancellationToken cancellationToken) where T : JobBodyRequest;
+        Task<JobBody?> AddAsync(JobBody jobBody, Guid accountId, CancellationToken cancellationToken);
+        Task<JobBody?> AddJobFromMessageAsync<T>(T jobBody, Guid accountId, CancellationToken cancellationToken) where T : JobBodyRequest;
         Task<JobBody?> GetAsync(Guid id, CancellationToken cancellationToken);
         Task<bool> RemoveAsync(Guid id, CancellationToken cancellationToken);
         IEnumerable<JobBody?>? GetAll(List<Guid> ids, CancellationToken cancellationToken);

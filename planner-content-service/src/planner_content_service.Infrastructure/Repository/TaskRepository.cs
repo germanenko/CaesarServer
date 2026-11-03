@@ -32,7 +32,6 @@ namespace planner_content_service.Infrastructure.Repository
         (
             T taskBody,
             Guid accountId,
-            NodeBody metadata,
             CancellationToken cancellationToken
         ) where T : JobBodyRequest
         {
@@ -62,7 +61,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
-                return result.ApplyNodeMetadata(metadata);
+                return result;
             }
             catch (Exception ex)
             {
@@ -77,7 +76,6 @@ namespace planner_content_service.Infrastructure.Repository
         (
             JobBody jobBody,
             Guid accountId,
-            NodeBody metadata,
             CancellationToken cancellationToken
         )
         {
@@ -107,7 +105,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
-                return result.ApplyNodeMetadata(metadata);
+                return result;
             }
             catch (Exception ex)
             {
@@ -123,7 +121,6 @@ namespace planner_content_service.Infrastructure.Repository
         (
             T taskBody,
             Guid accountId,
-            NodeBody metadata,
             CancellationToken cancellationToken
         ) where T : JobBodyRequest
         {
@@ -154,7 +151,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 result = await SetReadStateToJobBody(accountId, result, cancellationToken);
 
-                return result.ApplyNodeMetadata(metadata);
+                return result;
             }
             catch (Exception ex)
             {
