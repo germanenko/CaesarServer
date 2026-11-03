@@ -81,7 +81,7 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
-                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+                task.Body = task.Body.ApplyNodeMetadata(nodeComplete.Body);
 
                 return task;
             }
@@ -145,7 +145,7 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
-                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+                task.Body = task.Body.ApplyNodeMetadata(nodeComplete.Body);
 
                 return task;
             }
@@ -200,7 +200,7 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, jobBody, cancellationToken);
 
-                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+                task.Body = task.Body.ApplyNodeMetadata(nodeComplete.Body);
 
                 return task;
             }
