@@ -52,7 +52,7 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, response.Body, cancellationToken);
+            var result = await _boardRepository.CreateOrUpdateColumn(columnBody, accountId, cancellationToken);
 
             if (result == null)
             {
@@ -68,7 +68,7 @@ namespace planner_content_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.ApplyNodeMetadata(response.Body)
             };
         }
 
@@ -105,18 +105,18 @@ namespace planner_content_service.App.Service
                 //    CreatorId = accountId
                 //};
 
-                var request = await _nodeService.CreateOrUpdateNode(accountId, Guid.NewGuid(), column, OperationName.CreateOrUpdateColumn);
+                var response = await _nodeService.CreateOrUpdateNode(accountId, Guid.NewGuid(), column, OperationName.CreateOrUpdateColumn);
 
                 //var request = await _publisherService.Publish(columnEvent, PublishEvent.CreateNode);
 
-                if (!request.IsSuccess)
+                if (!response.IsSuccess)
                 {
                     return new ServiceResponse<List<ColumnBody>>
                     {
-                        IsSuccess = request.IsSuccess,
-                        StatusCode = request.StatusCode,
-                        ErrorCodes = request.ErrorCodes,
-                        Errors = request.Errors
+                        IsSuccess = response.IsSuccess,
+                        StatusCode = response.StatusCode,
+                        ErrorCodes = response.ErrorCodes,
+                        Errors = response.Errors
                     };
                 }
             }
@@ -253,7 +253,7 @@ namespace planner_content_service.App.Service
 
             var hasBoard = await _boardRepository.GetBoardById(body.Id, cancellationToken);
 
-            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, response.Body, cancellationToken);
+            var result = await _boardRepository.CreateOrUpdateBoardAsync(boardBody, accountId, cancellationToken);
 
             if (result is null)
             {
@@ -276,7 +276,7 @@ namespace planner_content_service.App.Service
             {
                 IsSuccess = true,
                 StatusCode = HttpStatusCode.OK,
-                Body = result
+                Body = result.ApplyNodeMetadata(response.Body)
             };
         }
 

@@ -12,9 +12,9 @@ namespace planner_content_service.Core.IRepository
         Task<ColumnBody?> GetColumnById(Guid columnId, CancellationToken cancellationToken);
         Task<TaskColumnBody?> GetUserTaskColumn(Guid accountId, Guid columnId, Guid? chatId, CancellationToken cancellationToken);
         Task<List<TaskColumnBody>> GetAllUserTaskColumns(Guid accountId, CancellationToken cancellationToken);
-        Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, NodeBody metadata, CancellationToken cancellationToken);
+        Task<BoardBody?> CreateOrUpdateBoardAsync(BoardBody boardBody, Guid accountId, CancellationToken cancellationToken);
         Task<List<BoardBody>> CreateOrUpdateBoards(List<BoardBody> boards, Guid accountId, CancellationToken cancellationToken);
-        Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId, NodeBody metadata, CancellationToken cancellationToken);
+        Task<ColumnBody?> CreateOrUpdateColumn(ColumnBody column, Guid accountId, CancellationToken cancellationToken);
         Task<List<ColumnBody>> CreateOrUpdateColumns(List<ColumnBody> columns, Guid accountId, CancellationToken cancellationToken);
         Task<TaskColumnBody> AddTaskColumn(Guid accountId, TaskColumnRequest taskColumn, CancellationToken cancellationToken);
     }

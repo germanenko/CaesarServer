@@ -162,12 +162,11 @@ namespace planner_content_service.App.Service
                 };
             }
 
-            var resultWithMetadata = result.ApplyNodeMetadata(nodeComplete.Body);
 
             return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = resultWithMetadata,
+                Body = result.ApplyNodeMetadata(nodeComplete.Body),
                 IsSuccess = true
             };
         }

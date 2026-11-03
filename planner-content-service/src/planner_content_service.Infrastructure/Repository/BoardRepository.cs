@@ -66,7 +66,6 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<BoardBody?> CreateOrUpdateBoardAsync(
             BoardBody boardBody,
             Guid accountId,
-            NodeBody metadata,
             CancellationToken cancellationToken = default)
         {
             try
@@ -96,7 +95,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return newBoard.ToBoardBody().ApplyNodeMetadata(metadata);
+                return newBoard.ToBoardBody();
             }
             catch (Exception ex)
             {
@@ -115,7 +114,7 @@ namespace planner_content_service.Infrastructure.Repository
 
             foreach (var board in boards)
             {
-                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId, board, cancellationToken));
+                newBoardNodes.Add(await CreateOrUpdateBoardAsync(board, accountId, cancellationToken));
             }
 
             await _context.SaveChangesAsync(cancellationToken);
@@ -127,7 +126,6 @@ namespace planner_content_service.Infrastructure.Repository
         public async Task<ColumnBody?> CreateOrUpdateColumn(
             ColumnBody columnBody,
             Guid accountId,
-            NodeBody metadata,
             CancellationToken cancellationToken = default)
         {
             try
@@ -156,7 +154,7 @@ namespace planner_content_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync(cancellationToken);
 
-                return columnBody.ApplyNodeMetadata(metadata);
+                return columnBody;
             }
             catch (Exception ex)
             {
@@ -167,7 +165,7 @@ namespace planner_content_service.Infrastructure.Repository
 
         }
 
-        public async Task<List<ColumnBody>?> CreateOrUpdateColumns(
+        public async Task<List<ColumnBody>> CreateOrUpdateColumns(
             List<ColumnBody> columns,
             Guid accountId,
             CancellationToken cancellationToken = default)
@@ -176,7 +174,10 @@ namespace planner_content_service.Infrastructure.Repository
 
             foreach (var column in columns)
             {
-                var addedColumn = await CreateOrUpdateColumn(column, accountId, column, cancellationToken);
+                var addedColumn = await CreateOrUpdateColumn(column, accountId, cancellationToken);
+
+                addedColumn.ApplyNodeMetadata(column);
+
                 if (addedColumn != null)
                     columnNodes.Add(addedColumn);
             }
