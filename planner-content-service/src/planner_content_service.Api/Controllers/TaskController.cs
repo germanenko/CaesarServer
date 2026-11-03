@@ -64,7 +64,7 @@ namespace planner_content_service.Api.Controllers
                 tokenPayload.AccountId,
                 OperationName.CreateOrUpdateTask,
                 taskBody,
-                async () => await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, taskBody, cancellationToken),
+                async () => await _taskService.CreateOrUpdateTask(tokenPayload.AccountId, requestId, taskBody, cancellationToken),
                 cancellationToken
             );
 

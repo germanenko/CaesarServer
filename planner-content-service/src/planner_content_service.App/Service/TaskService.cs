@@ -100,7 +100,7 @@ namespace planner_content_service.App.Service
             };
         }
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask<T>(Guid accountId, Guid operationId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
         {
             // базовое тело для отправки в NodeService
             var taskBody = new JobBody()
@@ -122,7 +122,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
-            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, taskBody.Id, taskBody, OperationName.CreateOrUpdateTask);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, operationId, taskBody, OperationName.CreateOrUpdateTask);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -164,7 +164,7 @@ namespace planner_content_service.App.Service
 
 
 
-        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask(Guid accountId, JobBody jobBody, CancellationToken cancellationToken = default)
+        public async Task<ServiceResponse<JobBody>> CreateOrUpdateTask(Guid accountId, Guid operationId, JobBody jobBody, CancellationToken cancellationToken = default)
         {
             //CreateNodeEvent taskEvent = new CreateNodeEvent()
             //{
@@ -173,7 +173,7 @@ namespace planner_content_service.App.Service
             //};
 
             //var nodeComplete = await _publisherService.Publish(taskEvent, PublishEvent.CreateNode);
-            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, jobBody.Id, jobBody, OperationName.CreateOrUpdateTask);
+            var nodeComplete = await _nodeService.CreateOrUpdateNode(accountId, operationId, jobBody, OperationName.CreateOrUpdateTask);
 
             if (!nodeComplete.IsSuccess)
             {
@@ -215,36 +215,36 @@ namespace planner_content_service.App.Service
 
 
 
-        public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies, CancellationToken cancellationToken = default) where T : JobBodyRequest
-        {
-            var errors = new List<string>();
-            List<JobBody> tasks = new List<JobBody>();
-            foreach (var taskBody in taskBodies)
-            {
-                var result = await CreateOrUpdateTask(accountId, taskBody);
+        //public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks<T>(Guid accountId, List<T> taskBodies, CancellationToken cancellationToken = default) where T : JobBodyRequest
+        //{
+        //    var errors = new List<string>();
+        //    List<JobBody> tasks = new List<JobBody>();
+        //    foreach (var taskBody in taskBodies)
+        //    {
+        //        var result = await CreateOrUpdateTask(accountId, Guid.NewGuid(), taskBody);
 
-                if (result.IsSuccess)
-                {
-                    tasks.Add(result.Body);
-                }
-                else
-                {
-                    return new ServiceResponse<List<JobBody>>
-                    {
-                        StatusCode = HttpStatusCode.BadRequest,
-                        IsSuccess = false,
-                        Errors = result.Errors
-                    };
-                }
-            }
+        //        if (result.IsSuccess)
+        //        {
+        //            tasks.Add(result.Body);
+        //        }
+        //        else
+        //        {
+        //            return new ServiceResponse<List<JobBody>>
+        //            {
+        //                StatusCode = HttpStatusCode.BadRequest,
+        //                IsSuccess = false,
+        //                Errors = result.Errors
+        //            };
+        //        }
+        //    }
 
-            return new ServiceResponse<List<JobBody>>
-            {
-                StatusCode = HttpStatusCode.OK,
-                Body = tasks,
-                IsSuccess = true
-            };
-        }
+        //    return new ServiceResponse<List<JobBody>>
+        //    {
+        //        StatusCode = HttpStatusCode.OK,
+        //        Body = tasks,
+        //        IsSuccess = true
+        //    };
+        //}
 
 
         public async Task<ServiceResponse<List<JobBody>>> CreateOrUpdateTasks(Guid accountId, List<JobBody> taskBodies, CancellationToken cancellationToken = default)
@@ -253,7 +253,7 @@ namespace planner_content_service.App.Service
             List<JobBody> tasks = new List<JobBody>();
             foreach (var taskBody in taskBodies)
             {
-                var result = await CreateOrUpdateTask(accountId, taskBody);
+                var result = await CreateOrUpdateTask(accountId, Guid.NewGuid(), taskBody);
 
                 if (result.IsSuccess)
                 {
