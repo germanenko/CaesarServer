@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
@@ -20,6 +21,7 @@ namespace planner_content_service.App.Service
         private readonly ITaskRepository _taskRepository;
         private readonly IPublisherService _publisherService;
         private readonly IAccessService _accessService;
+        private readonly ILogger<TaskService> _logger;
         private readonly planner_server_package.Node.INodeService _nodeService;
 
         public TaskService(
@@ -27,12 +29,14 @@ namespace planner_content_service.App.Service
             IBoardRepository boardRepository,
             IPublisherService publisherService,
             IAccessService accessService,
+            ILogger<TaskService> logger,
             planner_server_package.Node.INodeService nodeService)
         {
             _taskRepository = taskRepository;
             _publisherService = publisherService;
             _accessService = accessService;
             _nodeService = nodeService;
+            _logger = logger;
         }
 
         public async Task<ServiceResponse<JobBody>> CreateOrUpdateJobFromMessage<T>(Guid requestId, Guid accountId, T createOrUpdateJobBody, CancellationToken cancellationToken = default) where T : JobBodyRequest
@@ -154,10 +158,15 @@ namespace planner_content_service.App.Service
                 };
             }
 
+            var resultWithMetadata = result.ApplyNodeMetadata(nodeComplete.Body);
+
+            _logger.LogInformation($"Task created on node service with ID: {nodeComplete.Body.Id}, version: {nodeComplete.Body.Version}");
+            _logger.LogInformation($"Task created with ID: {resultWithMetadata.Id}, version: {resultWithMetadata.Version}");
+
             return new ServiceResponse<JobBody>
             {
                 StatusCode = HttpStatusCode.OK,
-                Body = result.ApplyNodeMetadata(nodeComplete.Body),
+                Body = resultWithMetadata,
                 IsSuccess = true
             };
         }
