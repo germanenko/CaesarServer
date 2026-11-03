@@ -81,6 +81,8 @@ namespace planner_content_service.App.Service
             {
                 var task = await UpdateTask(accountId, taskBody, cancellationToken);
 
+                task.Body.ApplyNodeMetadata(nodeComplete.Body);
+
                 return task;
             }
 
