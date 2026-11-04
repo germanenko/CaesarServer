@@ -250,7 +250,7 @@ namespace planner_chat_service.App.Service
                 var sessionsReceivedMessage = new List<Guid>();
                 foreach (var session in groupedSessions)
                 {
-                    if (await SendMessageToSession(session.Ws, SerializeObject(new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, Message = JsonSerializer.SerializeToElement(messageBody) }), messageType))
+                    if (await SendMessageToSession(session.Ws, SerializeObject(new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, MessageJson = JsonSerializer.Serialize(messageBody) }), messageType))
                         sessionsReceivedMessage.Add(session.SessionId);
                 }
 

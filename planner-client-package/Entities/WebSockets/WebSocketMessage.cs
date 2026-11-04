@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace planner_client_package.Entities.WebSockets
 {
+    [Serializable]
     public class WebSocketMessage
     {
         public MessageType MessageType { get; set; }
-        public JsonElement Message { get; set; }
+        public string MessageJson { get; set; }
     }
 }
