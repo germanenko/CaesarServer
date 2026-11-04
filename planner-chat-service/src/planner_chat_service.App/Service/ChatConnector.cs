@@ -209,6 +209,11 @@ namespace planner_chat_service.App.Service
                                 _logger.LogError(ex, $"Failed to send notification to account {x.AccountId}");
                             }
                         }
+
+
+                        var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId, Receivers = settingsArray.Select(x => x.AccountId).ToList() };
+
+                        await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged, false);
                     }
                     else
                     {
@@ -221,18 +226,12 @@ namespace planner_chat_service.App.Service
                 _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
             }
 
-            var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId };
-
-            await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged, false);
-
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, messageType);
 
-            var wsMessage = new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, MessageJson = JsonSerializer.Serialize(message) };
-
-            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, wsMessage);
+            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, message);
         }
 
-        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, WebSocketMessage messageBody)
+        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, MessageBody messageBody)
         {
             var messageSentToChatEvent = new MessageSentToChatEvent
             {

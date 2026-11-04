@@ -41,6 +41,7 @@ void ConfigureServices(IServiceCollection services)
     var sendNotificationExchange = GetEnvVar("RABBITMQ_SEND_NOTIFICATION");
     var scopeUpdatedExchange = GetEnvVar("RABBITMQ_SCOPE_UPDATED_EXCHANGE");
     var accessRevokedExchange = GetEnvVar("RABBITMQ_ACCESS_REVOKED_EXCHANGE");
+    var chatChangedExchange = GetEnvVar("RABBITMQ_CHAT_CHANGED_EXCHANGE");
 
     var jwtSecret = GetEnvVar("JWT_AUTH_SECRET");
     var jwtIssuer = GetEnvVar("JWT_AUTH_ISSUER");
@@ -133,7 +134,8 @@ void ConfigureServices(IServiceCollection services)
         messageSentToChatExchange,
         sendNotificationExchange,
         scopeUpdatedExchange,
-        accessRevokedExchange
+        accessRevokedExchange,
+        chatChangedExchange
     ));
 }
 

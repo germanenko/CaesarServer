@@ -9,5 +9,6 @@ namespace planner_client_package.Entities
     public class ChatChangedEvent
     {
         public Guid ChatId { get; set; }
+        public List<Guid> Members { get; set; }
     }
 }

@@ -1,3 +1,4 @@
+using FirebaseAdmin.Messaging;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -38,7 +39,8 @@ namespace planner_notify_service.Infrastructure.Service
             string messageSentToChatExchange,
             string sendNotificationExchange,
             string scopeUpdatedExchange,
-            string accessRevokedExchange)
+            string accessRevokedExchange,
+            string chatChangedExchange)
             : base(hostname, userName, password, prefix, logger)
         {
             _scopeFactory = serviceFactory;
@@ -49,6 +51,7 @@ namespace planner_notify_service.Infrastructure.Service
             AddQueue(sendNotificationExchange, SendNotification);
             AddQueue(scopeUpdatedExchange, HandleScopeUpdated);
             AddQueue(accessRevokedExchange, HandleAccessRevokedUpdated);
+            AddQueue(chatChangedExchange, HandleChatChanged);
 
             InitializeRabbitMQ();
         }
@@ -64,11 +67,15 @@ namespace planner_notify_service.Infrastructure.Service
                     Errors = new[] { "Ошибка сервера" }
                 };
 
+
+            var wsMessage = new WebSocketMessage() { MessageType = MessageType.ChatMessage, MessageJson = message };
+            var wsMessageBytes = SerializeObject(wsMessage);
+
             foreach (var accountId in result.AccountIds)
-                await _notificationService.SendMessageToSessions(accountId, result.Message);
+                await _notificationService.SendMessageToSessions(accountId, wsMessageBytes);
 
             foreach (var accountSession in result.AccountSessions)
-                await NotifySessions(result.Message, accountSession);
+                await NotifySessions(wsMessageBytes, accountSession);
 
             return new ServiceResponse<object>()
             {
@@ -166,6 +173,38 @@ namespace planner_notify_service.Infrastructure.Service
                 StatusCode = System.Net.HttpStatusCode.OK
             };
         }
+
+
+        private async Task<ServiceResponse<object>> HandleChatChanged(string message)
+        {
+            var result = JsonSerializer.Deserialize<planner_client_package.Entities.ChatChangedEvent>(message);
+            if (result == null)
+                return new ServiceResponse<object>()
+                {
+                    IsSuccess = false,
+                    StatusCode = System.Net.HttpStatusCode.InternalServerError,
+                    Errors = new[] { "Ошибка сервера" }
+                };
+
+            using var scope = _scopeFactory.CreateScope();
+            var notifyService = scope.ServiceProvider.GetRequiredService<INotifyService>();
+
+            var wsMessage = new WebSocketMessage()
+            {
+                MessageType = MessageType.ChatUpdated,
+                MessageJson = JsonSerializer.Serialize(new ChatUpdatedMessage() { ChatId = result.ChatId })
+            };
+
+            foreach (var userId in result.Receivers)
+                await _notificationService.SendMessageToSessions(userId, SerializeObject(wsMessage));
+
+            return new ServiceResponse<object>()
+            {
+                IsSuccess = true,
+                StatusCode = System.Net.HttpStatusCode.OK
+            };
+        }
+
 
         private async Task<AccountSessions?> NotifySessions(byte[] bytes, AccountSessions accountSessions)
         {
