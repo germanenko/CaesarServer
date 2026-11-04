@@ -226,10 +226,13 @@ namespace planner_chat_service.App.Service
             await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged, false);
 
             var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, messageType);
-            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, message);
+
+            var wsMessage = new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, MessageJson = JsonSerializer.Serialize(message) };
+
+            DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, wsMessage);
         }
 
-        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, MessageBody messageBody)
+        private void DeliverMessageToDisconnectedUsers(IEnumerable<Guid> accountIds, IEnumerable<AccountSessions> accountSessions, WebSocketMessage messageBody)
         {
             var messageSentToChatEvent = new MessageSentToChatEvent
             {
