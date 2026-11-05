@@ -126,12 +126,11 @@ namespace planner_node_service.Api.Controllers
 
         public async Task<IActionResult> GetScopesManifest(
             [FromHeader(Name = nameof(HttpRequestHeaders.Authorization))] string token,
-            [FromQuery] Guid scopeId,
             CancellationToken cancellationToken
         )
         {
             var tokenPayload = _jwtService.GetTokenPayload(token);
-            var result = await _nodeService.GetScopeManifest(tokenPayload.AccountId, scopeId);
+            var result = await _nodeService.GetScopesManifest(tokenPayload.AccountId);
             if (result.IsSuccess)
                 return StatusCode((int)result.StatusCode, new Response<List<EntityVersionBody>>() { Body = result.Body });
 
