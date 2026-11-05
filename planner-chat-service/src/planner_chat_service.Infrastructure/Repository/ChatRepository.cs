@@ -8,6 +8,7 @@ using planner_chat_service.Infrastructure.Data;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
 using planner_common_package.Enums;
+using planner_server_package.Users;
 
 namespace planner_chat_service.Infrastructure.Repository
 {
@@ -15,11 +16,13 @@ namespace planner_chat_service.Infrastructure.Repository
     {
         private readonly ChatDbContext _context;
         private readonly ILogger<ChatRepository> _logger;
+        private readonly IUserService _userService;
 
-        public ChatRepository(ChatDbContext context, ILogger<ChatRepository> logger)
+        public ChatRepository(ChatDbContext context, ILogger<ChatRepository> logger, IUserService userService)
         {
             _context = context;
             _logger = logger;
+            _userService = userService;
         }
 
         public async Task<ChatMessage?> AddMessageAsync(MessageType messageType, string content, Chat chat, Guid senderId, Guid messageId, Guid? senderDeviceId)
@@ -91,10 +94,15 @@ namespace planner_chat_service.Infrastructure.Repository
             await _context.ChatUserStates.AddAsync(chatUserState);
             await _context.SaveChangesAsync();
 
+            var partnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
+
             var chatBody = chat.ToNodeBody();
             chatBody.State = chatState.ToBody();
             chatBody.UserState = chatUserState.ToBody();
-            chatBody.PartnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
+
+            if (partnerId.HasValue)
+                chatBody.Partner = await _userService.GetUserData(partnerId.Value);
+
             chatBody.ChatSettings = chat.ChatSettings.FirstOrDefault(x => x.AccountId == accountId)?.ToBody();
 
             return chatBody;

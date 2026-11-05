@@ -5,6 +5,7 @@ using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_server_package;
+using planner_server_package.Users;
 using System.Collections.Generic;
 using System.Text.Json;
 
@@ -14,14 +15,16 @@ namespace planner_chat_service.App.Service
     {
         private readonly INodeRepository _nodeRepository;
         private readonly IChatRepository _chatRepository;
+        private readonly IUserService _userService;
         private readonly ILogger<NodeService> _logger;
 
         public NodeService(
-            INodeRepository nodeRepository, IChatRepository chatRepository, ILogger<NodeService> logger)
+            INodeRepository nodeRepository, IChatRepository chatRepository, ILogger<NodeService> logger, IUserService userService)
         {
             _nodeRepository = nodeRepository;
             _chatRepository = chatRepository;
             _logger = logger;
+            _userService = userService;
         }
 
         public async Task<ServiceResponse<IEnumerable<NodeBody>>> GetNodesByIds(Guid accountId, List<Guid> nodeIds)
@@ -54,7 +57,11 @@ namespace planner_chat_service.App.Service
                     chatBody.UserState = chatUserState.ToBody();
                     chatBody.ChatEdit = chatEdit?.ToBody();
                     chatBody.ChatSettings = chat.ChatSettings.FirstOrDefault(x => x.AccountId == accountId)?.ToBody();
-                    chatBody.PartnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
+
+                    var partnerId = chat.ChatSettings.FirstOrDefault(x => x.AccountId != accountId)?.AccountId;
+
+                    if (partnerId.HasValue)
+                        chatBody.Partner = await _userService.GetUserData(partnerId.Value);
 
                     chatBodies.Add(chatBody);
                 }

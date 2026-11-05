@@ -165,7 +165,7 @@ namespace planner_chat_service.App.Service
                 {
                     var user = await _userService.GetUserData(chat.ParticipantIds.FirstOrDefault());
                     chat.ImageUrl = user.UrlIcon;
-                    //chat.Profile = user;
+                    chat.Partner = user;
                     chat.Name = user.Nickname;
                 }
             }

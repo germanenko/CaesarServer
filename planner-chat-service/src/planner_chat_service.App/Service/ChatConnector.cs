@@ -211,7 +211,7 @@ namespace planner_chat_service.App.Service
                         }
 
 
-                        var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId, Receivers = settingsArray.Select(x => x.AccountId).ToList() };
+                        var chatChangedEvent = new ChatChangedEvent() { ChatId = message.Link.ParentId, Members = settingsArray.Select(x => x.AccountId).ToList() };
 
                         await _notifyService.Publish(chatChangedEvent, PublishEvent.ChatChanged, false);
                     }

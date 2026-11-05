@@ -195,7 +195,7 @@ namespace planner_notify_service.Infrastructure.Service
                 MessageJson = JsonSerializer.Serialize(new ChatUpdatedMessage() { ChatId = result.ChatId })
             };
 
-            foreach (var userId in result.Receivers)
+            foreach (var userId in result.Members)
                 await _notificationService.SendMessageToSessions(userId, SerializeObject(wsMessage));
 
             return new ServiceResponse<object>()
