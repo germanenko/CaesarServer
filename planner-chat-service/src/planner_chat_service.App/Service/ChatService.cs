@@ -13,6 +13,7 @@ using planner_server_package.Events;
 using planner_server_package.Events.Enums;
 using planner_server_package.RabbitMQ;
 using planner_server_package.Users;
+using System;
 using System.Net;
 using System.Net.WebSockets;
 
@@ -241,6 +242,12 @@ namespace planner_chat_service.App.Service
 
                 await _notifyService.Publish(messageEditedEvent, PublishEvent.MessageEdited);
 
+                ChatLobby? lobby = _chatConnectionService.GetConnections(message.ChatId.Value);
+
+                var activeSessions = lobby.ActiveSessions.Values.Where(s => s.AccountId != accountId).ToList();
+
+                await _chatConnector.SendMessage(activeSessions, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, message.ChatId.Value);
+
                 return new ServiceResponse<MessageBody>
                 {
                     StatusCode = HttpStatusCode.OK,
@@ -362,9 +369,9 @@ namespace planner_chat_service.App.Service
         public async Task<ServiceResponse<MessageBody>> SendMessage(
             Guid senderId, Guid? senderDeviceId, Guid receiverId, string content)
         {
-            var chat = await _chatRepository.GetPersonalChatAsync(senderId, receiverId);
+            var chatSettings = await _chatRepository.GetPersonalChatSettingsAsync(senderId, receiverId);
 
-            if (chat == null)
+            if (chatSettings == null)
             {
                 return new ServiceResponse<MessageBody>
                 {
@@ -374,22 +381,22 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid(), null);
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chatSettings.Chat, senderId, Guid.NewGuid(), null);
 
-            ChatLobby lobby = _chatConnectionService.GetConnections(chat.ChatId);
+            ChatLobby lobby = _chatConnectionService.GetConnections(chatSettings.ChatId);
 
-            if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
+            if (!_chatConnectionService.LobbyIsExist(chatSettings.ChatId))
             {
-                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chat.ChatId);
+                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chatSettings.ChatId);
                 var userIds = chatMemberships.Select(e => e.AccountId).ToList();
-                lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
+                lobby = _chatConnectionService.AddLobby(chatSettings.ChatId, userIds);
             }
 
             var messageBody = message.ToNodeBody();
 
-            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, messageBody, WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, messageBody, WebSocketMessageType.Text, lobby.AllChatUsers, chatSettings.ChatId);
 
-            _chatConnectionService.RemoveLobby(chat.ChatId);
+            _chatConnectionService.RemoveLobby(chatSettings.ChatId);
 
             return new ServiceResponse<MessageBody>
             {
@@ -402,9 +409,9 @@ namespace planner_chat_service.App.Service
         public async Task<ServiceResponse<MessageBody>> SendMessageToChat(
             Guid senderId, Guid? senderDeviceId, Guid chatId, string content)
         {
-            var chat = (await _chatRepository.GetChatSettingsAsync(chatId)).FirstOrDefault();
+            var chatSettings = (await _chatRepository.GetChatSettingsAsync(chatId)).FirstOrDefault();
 
-            if (chat == null)
+            if (chatSettings == null)
             {
                 return new ServiceResponse<MessageBody>
                 {
@@ -414,9 +421,9 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chat.Chat, senderId, Guid.NewGuid(), senderDeviceId);
+            var message = await _chatRepository.AddMessageAsync(MessageType.Mail, content, chatSettings.Chat, senderId, Guid.NewGuid(), senderDeviceId);
 
-            ChatLobby? lobby = _chatConnectionService.GetConnections(chat.ChatId);
+            ChatLobby? lobby = _chatConnectionService.GetConnections(chatSettings.ChatId);
 
             if (lobby == null)
             {
@@ -428,16 +435,16 @@ namespace planner_chat_service.App.Service
                 };
             }
 
-            if (!_chatConnectionService.LobbyIsExist(chat.ChatId))
+            if (!_chatConnectionService.LobbyIsExist(chatSettings.ChatId))
             {
-                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chat.ChatId);
+                var chatMemberships = await _chatRepository.GetChatSettingsAsync(chatSettings.ChatId);
                 var userIds = chatMemberships.Select(e => e.AccountId).ToList();
-                lobby = _chatConnectionService.AddLobby(chat.ChatId, userIds);
+                lobby = _chatConnectionService.AddLobby(chatSettings.ChatId, userIds);
             }
 
-            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chat.Chat);
+            await _chatConnector.SendMessage(lobby.ActiveSessions.Values, message.ToNodeBody(), WebSocketMessageType.Text, lobby.AllChatUsers, chatSettings.ChatId);
 
-            _chatConnectionService.RemoveLobby(chat.ChatId);
+            _chatConnectionService.RemoveLobby(chatSettings.ChatId);
 
             return new ServiceResponse<MessageBody>
             {

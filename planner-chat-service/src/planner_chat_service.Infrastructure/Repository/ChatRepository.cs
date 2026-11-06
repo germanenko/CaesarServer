@@ -55,7 +55,7 @@ namespace planner_chat_service.Infrastructure.Repository
 
         public async Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<ProfileBody> participants, CreateChatBody createChatBody, DateTime date)
         {
-            if (participants.Count != 2 || (await GetPersonalChatAsync(participants[0].Id, participants[1].Id) != null))
+            if (participants.Count != 2 || (await GetPersonalChatSettingsAsync(participants[0].Id, participants[1].Id) != null))
                 return null;
 
             var chat = new Chat
@@ -341,7 +341,7 @@ namespace planner_chat_service.Infrastructure.Repository
                 .ToListAsync();
         }
 
-        public async Task<ChatSettings?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId)
+        public async Task<ChatSettings?> GetPersonalChatSettingsAsync(Guid firstAccountId, Guid secondAccountId)
         {
             var query = _context.ChatSettings
                 .Include(e => e.Chat)
@@ -460,7 +460,7 @@ namespace planner_chat_service.Infrastructure.Repository
             }
 
             var message = await _context.ChatMessages
-                .FirstOrDefaultAsync(m => m.Id == updatedMessage.MessageId);
+                .Include(x => x.Chat).FirstOrDefaultAsync(m => m.Id == updatedMessage.MessageId);
 
             if (message == null)
             {

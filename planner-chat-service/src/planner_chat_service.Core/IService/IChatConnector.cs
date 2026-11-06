@@ -17,6 +17,6 @@ namespace planner_chat_service.Core.IService
             MessageBody message,
             WebSocketMessageType messageType,
             IEnumerable<Guid> accountIds,
-            Chat chat);
+            Guid chatId);
     }
 }

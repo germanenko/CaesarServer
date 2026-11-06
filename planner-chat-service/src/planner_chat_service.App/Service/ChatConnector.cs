@@ -136,14 +136,14 @@ namespace planner_chat_service.App.Service
                 var message = await _chatRepository.GetMessageAsync(messageId);
                 if (message != null)
                 {
-                    await SendMessage(sessions, message.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
+                    await SendMessage(sessions, message.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat.Id);
                     return message.SentAt;
                 }
             }
             else
             {
                 var chatMessage = await _chatRepository.AddMessageAsync(sentMessage.MessageType, sentMessage.Content, chat, accountId, sentMessage.Id, sentMessage.SenderDeviceId);
-                await SendMessage(sessions, chatMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat);
+                await SendMessage(sessions, chatMessage.ToNodeBody(), WebSocketMessageType.Text, allUserIds, chat.Id);
                 return chatMessage.SentAt;
             }
             //}
@@ -161,7 +161,7 @@ namespace planner_chat_service.App.Service
             MessageBody message,
             WebSocketMessageType messageType,
             IEnumerable<Guid> userIds,
-            Chat chat
+            Guid chatId
         )
         {
 
@@ -176,7 +176,7 @@ namespace planner_chat_service.App.Service
                 Dictionary<string, string> data = new Dictionary<string, string>()
                 {
                     { "type", NotificationType.ChatMessage.ToString() },
-                    { "chatId", chat.Id.ToString() },
+                    { "chatId", chatId.ToString() },
                     { "senderName", user.Nickname },
                     { "messageId", message.Id.ToString() },
                     { "message", message.Content },

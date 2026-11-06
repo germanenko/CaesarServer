@@ -23,7 +23,7 @@ namespace planner_chat_service.Core.IRepository
         Task<ChatState> GetOrCreateChatState(Guid chatId);
         Task<ChatUserState> GetOrCreateChatUserState(Guid accountId, Guid chatId);
         Task<ChatEdit?> GetLastChatEdit(Guid chatId);
-        Task<ChatSettings?> GetPersonalChatAsync(Guid firstAccountId, Guid secondAccountId);
+        Task<ChatSettings?> GetPersonalChatSettingsAsync(Guid firstAccountId, Guid secondAccountId);
         Task<ChatBody?> AddPersonalChatAsync(Guid accountId, List<ProfileBody> participants, CreateChatBody createChatBody, DateTime date);
         Task<ChatMessage?> UpdateMessage(Guid accountId, EditMessageBody message);
         Task<ChatMessage?> DeleteMessage(Guid accountId, Guid messageId);
