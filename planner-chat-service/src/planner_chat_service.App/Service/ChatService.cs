@@ -212,6 +212,8 @@ namespace planner_chat_service.App.Service
                 return new ServiceResponse<MessageBody>
                 {
                     StatusCode = HttpStatusCode.NotFound,
+                    PrimaryErrorCode = ErrorCode.NotFound,
+                    ErrorCodes = [ErrorCode.NotFound],
                     IsSuccess = false,
                     Errors = new[] { "Сообщения не существует" }
                 };
@@ -228,6 +230,8 @@ namespace planner_chat_service.App.Service
                     return new ServiceResponse<MessageBody>
                     {
                         StatusCode = HttpStatusCode.InternalServerError,
+                        PrimaryErrorCode = ErrorCode.Infrastructure,
+                        ErrorCodes = [ErrorCode.Infrastructure],
                         IsSuccess = false,
                         Errors = new[] { "Не удалось обновить сообщение" }
                     };
@@ -249,6 +253,8 @@ namespace planner_chat_service.App.Service
             {
                 StatusCode = HttpStatusCode.Forbidden,
                 IsSuccess = false,
+                PrimaryErrorCode = ErrorCode.WriteDenied,
+                ErrorCodes = [ErrorCode.WriteDenied],
                 Errors = new[] { "Нет доступа" }
             };
         }

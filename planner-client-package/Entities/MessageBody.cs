@@ -10,6 +10,7 @@ namespace planner_client_package.Entities
         public planner_common_package.Enums.MessageType MessageType { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
+        public DateTime? EditedAt { get; set; }
         public Guid SenderId { get; set; }
         public Guid? SenderDeviceId { get; set; }
         public bool HasBeenRead { get; set; }
