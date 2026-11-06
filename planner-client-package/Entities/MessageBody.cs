@@ -8,6 +8,7 @@ namespace planner_client_package.Entities
     public class MessageBody : NodeBody, IMessagePayload
     {
         public planner_common_package.Enums.MessageType MessageType { get; set; }
+        public long Seq { get; set; }
         public string Content { get; set; }
         public DateTime SentAt { get; set; } = DateTime.UtcNow;
         public DateTime? EditedAt { get; set; }
