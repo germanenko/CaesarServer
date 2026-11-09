@@ -74,7 +74,12 @@ namespace planner_chat_service.App.Service
 
                     var hiddenMessages = (await _chatRepository.GetUserHiddenMessagesForChat(accountId, chatMessage.ChatId.Value)).Select(x => x.ToNodeBody());
 
-                    messageBodies.RemoveAll(x => hiddenMessages.Contains(x));
+                    var hiddenIds = (await _chatRepository
+                        .GetUserHiddenMessagesForChat(accountId, chatMessage.ChatId.Value))
+                        .Select(x => x.Id)
+                        .ToHashSet();
+
+                    messageBodies.RemoveAll(x => hiddenIds.Contains(x.Id));
                 }
                 else
                 {
