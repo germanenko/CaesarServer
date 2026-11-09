@@ -308,7 +308,7 @@ namespace planner_chat_service.App.Service
 
                 var deletedWSMessage = new WebSocketMessage
                 {
-                    MessageKind = WebSocketMessageKind.ChatUpdated,
+                    MessageKind = WebSocketMessageKind.ChatMessageDeleted,
                     MessageJson = JsonSerializer.Serialize(new ChatMessageDeletedMessage(message.Id))
                 };
 
