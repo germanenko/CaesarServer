@@ -212,7 +212,7 @@ namespace planner_chat_service.Api.Controllers
 
         [HttpPut("api/chat/deleteMessageForMe"), Authorize]
         [SwaggerOperation("Удалить сообщение у меня")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(200, Type = typeof(Response<MessageBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> DeleteMessageForMe(
             [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
@@ -241,7 +241,7 @@ namespace planner_chat_service.Api.Controllers
 
         [HttpPut("api/chat/deleteMessage"), Authorize]
         [SwaggerOperation("Удалить сообщение у всех")]
-        [SwaggerResponse(200, Type = typeof(IEnumerable<MessageBody>))]
+        [SwaggerResponse(200, Type = typeof(Response<MessageBody>))]
         [SwaggerResponse(403)]
         public async Task<IActionResult> DeleteMessage(
             [FromHeader(Name = RequestHeader.RequestId)] Guid requestId,
