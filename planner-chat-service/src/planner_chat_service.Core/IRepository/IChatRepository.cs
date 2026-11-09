@@ -16,6 +16,7 @@ namespace planner_chat_service.Core.IRepository
         Task<AccountChatSession> CreateOrGetAccountChatSessionAsync(Guid sessionId, Guid chatSettingsId, DateTime dateLastViewing);
         Task<bool> UpdateLastViewingUserChatSession(AccountChatSession userChatSession, DateTime lastViewingDate);
         Task<List<ChatMessage>> GetMessagesAsync(Guid chatId, int count, int countSkipped, bool isDescending = true);
+        Task<List<ChatMessage>> GetUserHiddenMessagesForChat(Guid accountId, Guid chatId);
         Task<bool> UpdateLastViewingChatMembership(ChatSettings chatSetttings, DateTime lastViewingDate);
         Task CreateChatSettingsAsync(Guid taskId, List<Guid> accountIds);
         Task<List<ChatBody>> GetChatBodies(Guid accountId, Guid userSessionId, ChatType chatType);

@@ -341,6 +341,14 @@ namespace planner_chat_service.Infrastructure.Repository
                 .ToListAsync();
         }
 
+        public async Task<List<ChatMessage>> GetUserHiddenMessagesForChat(Guid accountId, Guid chatId)
+        {
+            return await _context.UserHiddenMessages
+                .Include(x => x.Message)
+                .Where(e => e.Message.ChatId == chatId && e.AccountId == accountId)
+                .Select(x => x.Message).ToListAsync();
+        }
+
         public async Task<ChatSettings?> GetPersonalChatSettingsAsync(Guid firstAccountId, Guid secondAccountId)
         {
             var query = _context.ChatSettings

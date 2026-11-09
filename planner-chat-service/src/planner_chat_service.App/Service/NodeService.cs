@@ -71,6 +71,10 @@ namespace planner_chat_service.App.Service
                 {
                     if (!chatMessage.IsDeleted)
                         messageBodies.Add(chatMessage.ToNodeBody());
+
+                    var hiddenMessages = (await _chatRepository.GetUserHiddenMessagesForChat(accountId, chatMessage.ChatId.Value)).Select(x => x.ToNodeBody());
+
+                    messageBodies.RemoveAll(x => hiddenMessages.Contains(x));
                 }
                 else
                 {
