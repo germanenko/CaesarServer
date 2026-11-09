@@ -68,7 +68,7 @@ namespace planner_notify_service.Infrastructure.Service
                 };
 
 
-            var wsMessage = new WebSocketMessage() { MessageType = MessageType.ChatMessage, MessageJson = message };
+            var wsMessage = new WebSocketMessage() { MessageKind = planner_common_package.Enums.WebSocketMessageKind.ChatMessage, MessageJson = message };
             var wsMessageBytes = SerializeObject(wsMessage);
 
             foreach (var accountId in result.AccountIds)
@@ -127,7 +127,7 @@ namespace planner_notify_service.Infrastructure.Service
 
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
-                MessageType = MessageType.ScopeUpdated,
+                MessageKind = planner_common_package.Enums.WebSocketMessageKind.ScopeUpdated,
                 MessageJson = JsonSerializer.Serialize(scopeUpdatedMessage)
             };
 
@@ -161,7 +161,7 @@ namespace planner_notify_service.Infrastructure.Service
 
             WebSocketMessage wsMessage = new WebSocketMessage()
             {
-                MessageType = MessageType.AccessRevoked,
+                MessageKind = planner_common_package.Enums.WebSocketMessageKind.AccessRevoked,
                 MessageJson = JsonSerializer.Serialize(accessRevokedMessage)
             };
 
@@ -191,7 +191,7 @@ namespace planner_notify_service.Infrastructure.Service
 
             var wsMessage = new WebSocketMessage()
             {
-                MessageType = MessageType.ChatUpdated,
+                MessageKind = planner_common_package.Enums.WebSocketMessageKind.ChatUpdated,
                 MessageJson = JsonSerializer.Serialize(new ChatUpdatedMessage() { ChatId = result.ChatId })
             };
 

@@ -5,6 +5,7 @@ using planner_chat_service.Core.IRepository;
 using planner_chat_service.Core.IService;
 using planner_client_package.Entities;
 using planner_client_package.Entities.Request;
+using planner_client_package.Entities.WebSockets;
 using planner_common_package.Enums;
 using planner_server_package;
 using planner_server_package.Access;
@@ -16,6 +17,7 @@ using planner_server_package.Users;
 using System;
 using System.Net;
 using System.Net.WebSockets;
+using System.Text.Json;
 
 namespace planner_chat_service.App.Service
 {
@@ -299,6 +301,18 @@ namespace planner_chat_service.App.Service
                 var messageEditedEvent = new MessageEditedEvent(message.Id, MessageState.Deleted);
 
                 await _notifyService.Publish(messageEditedEvent, PublishEvent.MessageEdited);
+
+                ChatLobby? lobby = _chatConnectionService.GetConnections(message.ChatId.Value);
+
+                var activeSessions = lobby.ActiveSessions.Values.Where(s => s.AccountId != accountId).ToList();
+
+                var deletedWSMessage = new WebSocketMessage
+                {
+                    MessageKind = WebSocketMessageKind.ChatUpdated,
+                    MessageJson = JsonSerializer.Serialize(new ChatMessageDeletedMessage(message.Id))
+                };
+
+                await _chatConnector.SendMessageToConnectedUsers(activeSessions, deletedWSMessage, WebSocketMessageKind.ChatMessageDeleted, WebSocketMessageType.Text);
 
                 return new ServiceResponse<MessageBody>
                 {

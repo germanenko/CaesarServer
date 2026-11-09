@@ -226,7 +226,7 @@ namespace planner_chat_service.App.Service
                 _logger.LogError(ex, "Failed to send notifications for user {SenderId}", message.SenderId);
             }
 
-            var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, messageType);
+            var userSessionsDeliveryMessage = await SendMessageToConnectedUsers(sessions, message, WebSocketMessageKind.ChatMessage, messageType);
 
             DeliverMessageToDisconnectedUsers(notConnectedAccountIds, userSessionsDeliveryMessage, message);
         }
@@ -243,7 +243,7 @@ namespace planner_chat_service.App.Service
             _notifyService.Publish(messageSentToChatEvent, PublishEvent.MessageSentToChat);
         }
 
-        private async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, MessageBody messageBody, WebSocketMessageType messageType)
+        public async Task<IEnumerable<AccountSessions>> SendMessageToConnectedUsers(IEnumerable<ChatSession> sessions, object messageBody, WebSocketMessageKind messageKind, WebSocketMessageType messageType)
         {
             var userSessionsDeliveryMessage = new List<AccountSessions>();
 
@@ -252,7 +252,7 @@ namespace planner_chat_service.App.Service
                 var sessionsReceivedMessage = new List<Guid>();
                 foreach (var session in groupedSessions)
                 {
-                    if (await SendMessageToSession(session.Ws, SerializeObject(new WebSocketMessage() { MessageType = planner_client_package.Entities.WebSockets.MessageType.ChatMessage, MessageJson = JsonSerializer.Serialize(messageBody) }), messageType))
+                    if (await SendMessageToSession(session.Ws, SerializeObject(new WebSocketMessage() { MessageKind = messageKind, MessageJson = JsonSerializer.Serialize(messageBody) }), messageType))
                         sessionsReceivedMessage.Add(session.SessionId);
                 }
 
