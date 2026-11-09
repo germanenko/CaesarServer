@@ -309,7 +309,7 @@ namespace planner_chat_service.App.Service
                 var deletedWSMessage = new WebSocketMessage
                 {
                     MessageKind = WebSocketMessageKind.ChatMessageDeleted,
-                    MessageJson = JsonSerializer.Serialize(new ChatMessageDeletedMessage(message.Id))
+                    MessageJson = JsonSerializer.Serialize(new ChatMessageDeletedMessage() { MessageId = message.Id })
                 };
 
                 await _chatConnector.SendMessageToConnectedUsers(activeSessions, deletedWSMessage, WebSocketMessageKind.ChatMessageDeleted, WebSocketMessageType.Text);

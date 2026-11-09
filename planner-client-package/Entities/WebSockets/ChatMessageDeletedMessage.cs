@@ -10,10 +10,5 @@ namespace planner_client_package.Entities.WebSockets
     public record ChatMessageDeletedMessage : IMessagePayload
     {
         public Guid MessageId { get; set; }
-
-        public ChatMessageDeletedMessage(Guid messageId)
-        {
-            MessageId = messageId;
-        }
     }
 }
