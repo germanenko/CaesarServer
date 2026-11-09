@@ -42,6 +42,7 @@ namespace planner_chat_service.App.Service
 
             var chatBodies = new List<ChatBody>();
             var messageBodies = new List<MessageBody>();
+            var others = new List<NodeBody>();
 
             foreach (var node in nodes)
             {
@@ -71,12 +72,13 @@ namespace planner_chat_service.App.Service
                     if (!chatMessage.IsDeleted)
                         messageBodies.Add(chatMessage.ToNodeBody());
                 }
+                else
+                {
+                    others.Add(node.ToNodeBody());
+                }
             }
 
-            var unidentified = nodes.Where(x => x is not Chat)
-                        .Select(x => x.ToNodeBody());
-
-            var result = unidentified.Concat(chatBodies).Concat(messageBodies);
+            var result = others.Concat(chatBodies).Concat(messageBodies);
 
             return new ServiceResponse<IEnumerable<NodeBody>>()
             {
