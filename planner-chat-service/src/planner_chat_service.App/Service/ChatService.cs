@@ -306,13 +306,7 @@ namespace planner_chat_service.App.Service
 
                 var activeSessions = lobby.ActiveSessions.Values.Where(s => s.AccountId != accountId).ToList();
 
-                var deletedWSMessage = new WebSocketMessage
-                {
-                    MessageKind = WebSocketMessageKind.ChatMessageDeleted,
-                    MessageJson = JsonSerializer.Serialize(new ChatMessageDeletedMessage() { MessageId = message.Id })
-                };
-
-                await _chatConnector.SendMessageToConnectedUsers(activeSessions, deletedWSMessage, WebSocketMessageKind.ChatMessageDeleted, WebSocketMessageType.Text);
+                await _chatConnector.SendMessageToConnectedUsers(activeSessions, new ChatMessageDeletedMessage() { MessageId = message.Id }, WebSocketMessageKind.ChatMessageDeleted, WebSocketMessageType.Text);
 
                 return new ServiceResponse<MessageBody>
                 {
