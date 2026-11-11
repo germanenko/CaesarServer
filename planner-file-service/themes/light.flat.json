@@ -3,6 +3,7 @@
   "name": "themes.light",
   "previewImage": "themes.light.preview",
   "extends": "base",
+  "selectable": true,
   "colors": {
     "color.text.primary": "#111827",
     "color.text.secondary": "#6B7280",

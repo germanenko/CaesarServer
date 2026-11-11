@@ -1,8 +1,9 @@
 {
   "id": "halloween",
-  "name": "themes.dark",
+  "name": "themes.halloween",
   "previewImage": "themes.dark.preview",
   "extends": "dark",
+  "selectable": true,
   "colors": {
     "color.text.primary": "#FFFFFF",
     "color.text.secondary": "#9CA3AF",

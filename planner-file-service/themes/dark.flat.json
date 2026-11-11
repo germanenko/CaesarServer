@@ -3,6 +3,7 @@
   "name": "themes.dark",
   "previewImage": "themes.dark.preview",
   "extends": "base",
+  "selectable": true,
   "colors": {
     "color.text.primary": "#FFFFFF",
     "color.text.secondary": "#9CA3AF",
