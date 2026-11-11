@@ -32,7 +32,7 @@
     "icon.navigation.others": "OthersIcon",
     "icon.themes.preview.dark": "DarkThemePreview",
     "icon.themes.preview.light": "LightThemePreview",
-    "icon.themes.preview.system": "SystemThemePreview",
+    "icon.themes.preview.system": "SystemThemePreview"
   },
   "typography": {
     "font.body.regular": {
