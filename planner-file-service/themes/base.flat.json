@@ -33,7 +33,8 @@
     "icon.navigation.others": "OthersIcon",
     "icon.themes.dark.preview": "DarkThemePreview",
     "icon.themes.light.preview": "LightThemePreview",
-    "icon.themes.system.preview": "SystemThemePreview"
+    "icon.themes.system.preview": "SystemThemePreview",
+    "icon.themes.halloween.preview": "HalloweenThemePreview"
   },
   "typography": {
     "font.body.regular": {
