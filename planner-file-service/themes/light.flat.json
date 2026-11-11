@@ -1,5 +1,7 @@
 {
   "id": "light",
+  "name": "themes.light",
+  "previewImage": "themes.light.preview",
   "extends": "base",
   "colors": {
     "color.text.primary": "#111827",
@@ -11,6 +13,8 @@
     "color.action.secondary": "#059669",
     "color.button.primary.background": "#FFFFFF",
     "color.button.primary.text": "#161A27",
+    "color.button.primary.outline": "#E3E3DF",
+    "color.button.primary.outline.selected": "#343E3514",
     "color.navigation.button.default": "#9AA7B6",
     "color.navigation.button.selected": "#3B82F6"
   },

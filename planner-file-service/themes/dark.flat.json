@@ -1,5 +1,7 @@
 {
   "id": "dark",
+  "name": "themes.dark",
+  "previewImage": "themes.dark.preview",
   "extends": "base",
   "colors": {
     "color.text.primary": "#FFFFFF",
@@ -9,8 +11,10 @@
     "color.header.fade": "#11182300",
     "color.action.primary": "#9AA7B6",
     "color.action.secondary": "#10B981",
-    "color.button.primary.background": "#3B82F6",
+    "color.button.primary.background": "#1B2430",
     "color.button.primary.text": "#FFFFFF",
+    "color.button.primary.outline": "#1E2939",
+    "color.button.primary.outline.selected": "#A1AAB7",
     "color.navigation.button.default": "#9AA7B6",
     "color.navigation.button.selected": "#3B82F6"
   },
