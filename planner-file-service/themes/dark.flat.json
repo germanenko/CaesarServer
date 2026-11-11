@@ -19,7 +19,9 @@
     "color.navigation.button.default": "#9AA7B6",
     "color.navigation.button.selected": "#3B82F6",
     "color.panel.background": "#141A22",
-    "color.panel.outline": "#1E2939"
+    "color.panel.outline": "#1E2939",
+    "color.text.fullAlpha": "#161A27",
+    "color.text.fade": "#161A2780"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
