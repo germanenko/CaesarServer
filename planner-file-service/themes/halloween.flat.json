@@ -1,23 +1,68 @@
 {
   "id": "halloween",
+  "name": "themes.dark",
+  "previewImage": "themes.dark.preview",
   "extends": "dark",
-  "values": {
-    "color.text.primary": "#FFE4B5",
+  "colors": {
+    "color.text.primary": "#FFFFFF",
     "color.text.secondary": "#9CA3AF",
-    "color.background.main": "#2F1B0F",
-    "color.action.primary": "#FF6B00",
-    "color.action.secondary": "#FFA500",
-    "color.button.primary.background": "#FF6B00",
-    "color.button.primary.text": "#FFE4B5",
+    "color.background.main": "#0B0F14",
+    "color.header": "#111823",
+    "color.header.fade": "#11182300",
+    "color.action.primary": "#9AA7B6",
+    "color.action.secondary": "#10B981",
+    "color.button.primary.background": "#1B2430",
+    "color.button.primary.text": "#FFFFFF",
+    "color.button.primary.outline": "#1E2939",
+    "color.button.primary.outline.selected": "#A1AAB7",
     "color.navigation.button.default": "#9AA7B6",
-    "color.navigation.button.selected": "#3B82F6",
-    "icon.action.search": "icon.missing",
-    "icon.action.settings": "icon.missing",
-    "icon.navigation.home": "icon.missing",
-    "icon.navigation.back": "icon.missing",
-    "font.body.regular": "font.default",
-    "font.body.bold": "font.default",
-    "font.heading.large": "font.default",
-    "font.heading.small": "font.default"
+    "color.navigation.button.selected": "#3B82F6"
+  },
+  "icons": {
+    "icon.action.search": "SearchIcon",
+    "icon.action.settings": "SettingsIcon",
+    "icon.navigation.home": "HomeIcon",
+    "icon.navigation.back": "BackIcon",
+    "icon.navigation.settings": "SettingsIcon",
+    "icon.navigation.analytics": "AnalyticsIcon",
+    "icon.navigation.chats": "ChatsIcon",
+    "icon.navigation.boards": "BoardsIcon",
+    "icon.navigation.tasks": "TasksIcon",
+    "icon.navigation.calendar": "CalendarIcon",
+    "icon.navigation.others": "OthersIcon"
+  },
+  "typography": {
+    "font.body.regular": {
+      "font": "Inter-Regular",
+      "size": 16,
+      "weight": 400,
+      "lineHeight": 1.5
+    },
+    "font.body.bold": {
+      "font": "Inter-Bold",
+      "size": 16,
+      "weight": 700,
+      "lineHeight": 1.5
+    },
+    "font.heading.large": {
+      "font": "Inter-ExtraBold",
+      "size": 32,
+      "weight": 600,
+      "lineHeight": 1.2
+    },
+    "font.heading.small": {
+      "font": "Inter-Light",
+      "size": 24,
+      "weight": 500,
+      "lineHeight": 1.3
+    }
+  },
+  "spacing": {
+    "spacing.primary": 12,
+    "spacing.secondary": 15
+  },
+  "radii": {
+    "radius.primary": 15,
+    "radius.secondary": 12
   }
 }
