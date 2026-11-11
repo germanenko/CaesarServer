@@ -30,7 +30,10 @@
     "icon.navigation.boards": "BoardsIcon",
     "icon.navigation.tasks": "TasksIcon",
     "icon.navigation.calendar": "CalendarIcon",
-    "icon.navigation.others": "OthersIcon"
+    "icon.navigation.others": "OthersIcon",
+    "icon.themes.dark.preview": "DarkThemePreview",
+    "icon.themes.light.preview": "LightThemePreview",
+    "icon.themes.system.preview": "SystemThemePreview"
   },
   "typography": {
     "font.body.regular": {
