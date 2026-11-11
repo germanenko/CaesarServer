@@ -1,7 +1,7 @@
 {
   "id": "halloween",
   "name": "themes.halloween",
-  "previewImage": "themes.dark.preview",
+  "previewImage": "icon.themes.dark.preview",
   "extends": "dark",
   "selectable": true,
   "colors": {

@@ -1,7 +1,7 @@
 {
   "id": "dark",
   "name": "themes.dark",
-  "previewImage": "themes.dark.preview",
+  "previewImage": "icon.themes.dark.preview",
   "extends": "base",
   "selectable": true,
   "colors": {

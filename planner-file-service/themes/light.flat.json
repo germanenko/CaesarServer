@@ -1,7 +1,7 @@
 {
   "id": "light",
   "name": "themes.light",
-  "previewImage": "themes.light.preview",
+  "previewImage": "icon.themes.light.preview",
   "extends": "base",
   "selectable": true,
   "colors": {
