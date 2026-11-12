@@ -39,7 +39,7 @@
     "icon.themes.light.preview": "LightThemePreview",
     "icon.themes.system.preview": "SystemThemePreview",
     "icon.themes.halloween.preview": "HalloweenThemePreview",
-    "icon.experienceProfile.child.preview": "СhildProfilePreview",
+    "icon.experienceProfile.child.preview": "KidsProfilePreview",
     "icon.experienceProfile.default.preview": "DefaultProfilePreview",
     "icon.experienceProfile.projectManager.preview": "BusinessProfilePreview"
   },
