@@ -38,7 +38,10 @@
     "icon.themes.dark.preview": "DarkThemePreview",
     "icon.themes.light.preview": "LightThemePreview",
     "icon.themes.system.preview": "SystemThemePreview",
-    "icon.themes.halloween.preview": "HalloweenThemePreview"
+    "icon.themes.halloween.preview": "HalloweenThemePreview",
+    "icon.experienceProfile.child.preview": "СhildProfilePreview",
+    "icon.experienceProfile.default.preview": "DefaultProfilePreview",
+    "icon.experienceProfile.projectManager.preview": "BusinessProfilePreview"
   },
   "typography": {
     "font.body.regular": {
