@@ -5,7 +5,7 @@
   "extends": "base",
   "selectable": true,
   "colors": {
-    "color.text.primary": "#111827",
+    "color.text.primary": "#33394D",
     "color.text.secondary": "#6B7280",
     "color.background.main": "#F3F4F6",
     "color.header": "#FFFFFF",
