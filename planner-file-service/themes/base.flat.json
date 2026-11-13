@@ -21,7 +21,9 @@
     "color.panel.background": "#FFFFFF",
     "color.panel.outline": "#E3E3DF",
     "color.text.fullAlpha": "#161A27",
-    "color.text.fade": "#161A2780"
+    "color.text.fade": "#161A2780",
+    "color.navigation.firstFloor": "#FFFFFF",
+    "color.navigation.secondFloor": "#EFEFEF"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
