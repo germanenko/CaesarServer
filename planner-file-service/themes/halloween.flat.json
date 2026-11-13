@@ -23,7 +23,8 @@
     "color.text.fullAlpha": "#FFFFFF",
     "color.text.fade": "#FFFFFF80",
     "color.navigation.firstFloor": "#111823",
-    "color.navigation.secondFloor": "#283952"
+    "color.navigation.secondFloor": "#283952",
+    "color.textField.field": "#262D3D"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
