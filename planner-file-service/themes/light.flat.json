@@ -38,7 +38,8 @@
     "color.calendar.selectedMonth": "#DBEAFE",
     "color.calendar.selectedDay": "#A8BDD6",
     "color.calendar.startDate": "#38BDF8",
-    "color.calendar.endDate": "#A78BFA"
+    "color.calendar.endDate": "#A78BFA",
+    "color.clock.periodView": "#A9FF9B80"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
