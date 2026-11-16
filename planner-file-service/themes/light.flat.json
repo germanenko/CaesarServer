@@ -26,7 +26,8 @@
     "color.navigation.secondFloor": "#EFEFEF",
     "color.textField.field": "#F1F3F7",
     "color.message.mine": "#B3E3F8",
-    "color.message.member": "#EFF2F6"
+    "color.message.member": "#EFF2F6",
+    "color.chat.sendButton": "#B3E3F8"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
