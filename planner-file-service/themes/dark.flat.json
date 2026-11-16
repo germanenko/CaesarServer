@@ -29,7 +29,8 @@
     "color.chat.sendButton": "#0EA5E9",
     "color.message.mine": "#0EA5E9",
     "color.message.member": "#262D3D",
-    "color.message.fade": "#0000000A"
+    "color.message.fade": "#0000000A",
+    "color.toggle.selected": "#155DFC"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
