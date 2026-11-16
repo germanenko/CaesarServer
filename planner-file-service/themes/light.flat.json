@@ -36,7 +36,9 @@
     "color.calendar.otherMonthDay": "#94A3B8",
     "color.calendar.defaultMonth": "#E2E8F0",
     "color.calendar.selectedMonth": "#DBEAFE",
-    "color.calendar.selectedDay": "#A8BDD6"
+    "color.calendar.selectedDay": "#A8BDD6",
+    "color.calendar.startDate": "#38BDF8",
+    "color.calendar.endDate": "#A78BFA"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
