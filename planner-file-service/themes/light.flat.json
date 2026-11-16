@@ -30,7 +30,10 @@
     "color.chat.sendButton": "#B3E3F8",
     "color.message.fade": "#0000000A",
     "color.toggle.selected": "#B3E3F8",
-    "color.text.backdrop": "#D3D3D3"
+    "color.text.backdrop": "#D3D3D3",
+    "color.calendar.defaultDay": "#E2E8F0",
+    "color.calendar.weekend": "#93C5FD",
+    "color.calendar.otherMonthDay": "#94A3B8"
   },
   "icons": {
     "icon.action.search": "SearchIcon",

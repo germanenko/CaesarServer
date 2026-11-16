@@ -30,7 +30,10 @@
     "color.message.mine": "#0EA5E9",
     "color.message.member": "#262D3D",
     "color.message.fade": "#0000000A",
-    "color.toggle.selected": "#155DFC"
+    "color.toggle.selected": "#155DFC",
+    "color.calendar.defaultDay": "#1B2430",
+    "color.calendar.weekend": "#213E65",
+    "color.calendar.otherMonthDay": "#212A35"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
