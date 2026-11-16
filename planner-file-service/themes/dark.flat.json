@@ -10,8 +10,8 @@
     "color.background.main": "#0B0F14",
     "color.header": "#111823",
     "color.header.fade": "#11182300",
-    "color.action.primary": "#9AA7B6",
-    "color.action.secondary": "#10B981",
+    "color.action.primary": "#F3F4F6",
+    "color.action.secondary": "#9AA7B6",
     "color.button.primary.background": "#1B2430",
     "color.button.primary.text": "#F3F4F6",
     "color.button.primary.outline": "#1E2939",
@@ -24,7 +24,12 @@
     "color.text.fade": "#FFFFFF80",
     "color.navigation.firstFloor": "#111823",
     "color.navigation.secondFloor": "#283952",
-    "color.textField.field": "#262D3D"
+    "color.textField.field": "#262D3D",
+    "color.text.backdrop": "#141A22",
+    "color.chat.sendButton": "#0EA5E9",
+    "color.message.mine": "#0EA5E9",
+    "color.message.member": "#262D3D",
+    "color.message.fade": "#0000000A"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
