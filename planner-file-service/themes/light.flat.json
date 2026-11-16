@@ -24,7 +24,9 @@
     "color.text.fade": "#161A2780",
     "color.navigation.firstFloor": "#FFFFFF",
     "color.navigation.secondFloor": "#EFEFEF",
-    "color.textField.field": "#F1F3F7"
+    "color.textField.field": "#F1F3F7",
+    "color.message.mine": "#B3E3F8",
+    "color.message.member": "#EFF2F6"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
