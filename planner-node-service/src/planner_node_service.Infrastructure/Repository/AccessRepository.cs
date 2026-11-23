@@ -172,6 +172,8 @@ namespace planner_node_service.Infrastructure.Repository
             if (userSubject == null)
             {
                 userSubject = (await _context.UserAccessSubjects.AddAsync(new UserAccessSubject() { AccountId = accountId })).Entity;
+
+                await _context.SaveChangesAsync();
             }
 
             return userSubject;
