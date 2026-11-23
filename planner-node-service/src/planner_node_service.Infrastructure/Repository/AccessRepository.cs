@@ -374,59 +374,55 @@ namespace planner_node_service.Infrastructure.Repository
 
         public async Task<List<AccessRuleBody>?> GetCommonAccessRules(Guid accountId)
         {
-            var userRules = _context.AccessRules
-                .Include(x => x.Subject)
-                .Where(ar =>
-                    ar.Subject is UserAccessSubject &&
-                    ((UserAccessSubject)ar.Subject).AccountId == accountId);
-
-            var groupRules = _context.AccessRules
-                .Include(x => x.Subject)
-                .Where(ar =>
-                    ar.Subject is GroupAccessSubject &&
-                    ((GroupAccessSubject)ar.Subject)
-                        .Members.Any(m => m.AccountId == accountId));
-
-            var accessRights = await userRules
-                .Union(groupRules)
+            var userSubjectIds = await _context.UserAccessSubjects
+                .Where(x => x.AccountId == accountId)
+                .Select(x => x.Id)
                 .ToListAsync();
 
-            var nodeIds = accessRights
+            var groupSubjectIds = await _context.GroupAccessSubjects
+                .Where(x => x.Members.Any(m => m.AccountId == accountId))
+                .Select(x => x.Id)
+                .ToListAsync();
+
+            var subjectIds = userSubjectIds
+                .Concat(groupSubjectIds)
+                .Distinct()
+                .ToList();
+
+            if (subjectIds.Count == 0)
+                return null;
+
+            var userRules = await _context.AccessRules
+                .Where(x => subjectIds.Contains(x.SubjectId))
+                .Include(x => x.Subject)
+                .ToListAsync();
+
+            var nodeIds = userRules
                 .Select(x => x.NodeId)
                 .Distinct()
                 .ToList();
 
-            var relatedRules = await _context.AccessRules
-                .Include(x => x.Subject)
-                .Where(ar => nodeIds.Contains(ar.NodeId))
-                .ToListAsync();
-
-            accessRights.AddRange(relatedRules);
-
-            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
-
-            if (!accessRights.Any())
+            if (nodeIds.Count == 0)
                 return null;
 
-            accessRights = accessRights.DistinctBy(x => x.Id).ToList();
+            var accessRights = await _context.AccessRules
+                .Where(x => nodeIds.Contains(x.NodeId))
+                .Include(x => x.Subject)
+                .ToListAsync();
 
-            var accessGroups = groupRules
-                .Select(x => x.Subject)
-                .OfType<GroupAccessSubject>()
-                .Distinct()
+            var ruleBodies = accessRights
+                .DistinctBy(x => x.Id)
+                .Select(x => x.ToBody())
                 .ToList();
-
-            var ruleBodies = accessRights.Select(x => x.ToBody()).ToList();
 
             var userIds = ruleBodies
                 .Select(x => (x.AccessSubject as UserAccessSubjectBody)?.AccountId)
-                .Where(x => x != null)
+                .Where(x => x.HasValue)
                 .Select(x => x!.Value)
                 .Distinct()
                 .ToList();
 
             var users = await _userService.GetUsersData(userIds);
-
             var userMap = users.ToDictionary(x => x.Id);
 
             foreach (var body in ruleBodies)
