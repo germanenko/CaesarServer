@@ -161,7 +161,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (nodeBody.Link != null)
             {
-                var scope = await _scopeRepository.GetNodeScope(nodeBody.Link.ParentId);
+                var scope = await _scopeRepository.GetNodeScopeAsync(nodeBody.Link.ParentId);
 
                 if (scope != null)
                 {
@@ -252,7 +252,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             if (node == null) return false;
 
-            var scope = await _scopeRepository.GetNodeScope(node.Id);
+            var scope = await _scopeRepository.GetNodeScopeAsync(node.Id);
 
             if (scope != null)
             {
@@ -388,8 +388,8 @@ namespace planner_node_service.Infrastructure.Repository
                 return null;
             }
 
-            var oldScope = await _scopeRepository.GetNodeScope(nodeId);
-            var newScope = await _scopeRepository.GetNodeScope(newParentId);
+            var oldScope = await _scopeRepository.GetNodeScopeAsync(nodeId);
+            var newScope = await _scopeRepository.GetNodeScopeAsync(newParentId);
 
             var oldParentId = nodeLink.ParentId;
 
@@ -438,7 +438,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             await RecalculatePositions(nodeLink, newPosition);
 
-            var scope = await _scopeRepository.GetNodeScope(nodeId);
+            var scope = await _scopeRepository.GetNodeScopeAsync(nodeId);
 
             if (scope != null)
                 await AddContentLog(scope.Id, nodeId);

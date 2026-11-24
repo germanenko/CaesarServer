@@ -34,7 +34,7 @@ namespace planner_node_service.Infrastructure.Repository
         }
 
         // Получение скоупа для ноды
-        public async Task<Node?> GetNodeScope(Guid nodeId)
+        public async Task<Node?> GetNodeScopeAsync(Guid nodeId)
         {
             var currentNodeId = nodeId;
 
@@ -64,7 +64,7 @@ namespace planner_node_service.Infrastructure.Repository
         // Получение версии скоупа для ноды
         public async Task<ContentLog?> GetScopeVersionByChildNode(Guid nodeId)
         {
-            var scope = await GetNodeScope(nodeId);
+            var scope = await GetNodeScopeAsync(nodeId);
 
             if (scope == null)
                 return null;
@@ -142,7 +142,7 @@ namespace planner_node_service.Infrastructure.Repository
             // Для каждой ноды, связанной с правилом доступа, определяем его Scope
             foreach (var node in ruleNodes)
             {
-                var scope = await GetNodeScope(node.Id);
+                var scope = await GetNodeScopeAsync(node.Id);
 
                 if (scope != null)
                     scopes.Add(scope);

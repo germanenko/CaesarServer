@@ -10,7 +10,7 @@ namespace planner_node_service.Core.IRepository
 {
     public interface IScopeRepository
     {
-        Task<Node?> GetNodeScope(Guid nodeId);
+        Task<Node?> GetNodeScopeAsync(Guid nodeId);
         Task<ContentLog?> GetScopeVersionByChildNode(Guid childNode);
         Task<AccessRule?> CheckScopeAccess(Guid accountId, Guid scopeId);
         Task<IEnumerable<Node>?> GetScopes(Guid accountId);

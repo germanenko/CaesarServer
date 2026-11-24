@@ -14,12 +14,14 @@ namespace planner_node_service.App.Service
     {
         private readonly IAccessRepository _accessRepository;
         private readonly INodeRepository _nodeRepository;
+        private readonly IScopeRepository _scopeRepository;
         private readonly IPublisherService _publisherService;
 
-        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository, IPublisherService publisherService)
+        public AccessService(IAccessRepository accessRepository, INodeRepository nodeRepository, IScopeRepository scopeRepository, IPublisherService publisherService)
         {
             _accessRepository = accessRepository;
             _nodeRepository = nodeRepository;
+            _scopeRepository = scopeRepository;
             _publisherService = publisherService;
         }
 
@@ -94,6 +96,15 @@ namespace planner_node_service.App.Service
                     StatusCode = HttpStatusCode.Forbidden,
                     Errors = new[] { "Доступ не выдан" }
                 };
+            }
+
+            var scope = await _scopeRepository.GetNodeScopeAsync(nodeId);
+
+            if (scope != null)
+            {
+                var scopeUpdated = new ScopeUpdatedEvent() { ScopeId = scope.Id, AccountIds = [granteeId] };
+
+                await _publisherService.Publish(scopeUpdated, PublishEvent.ScopeUpdated);
             }
 
             return new ServiceResponse<AccessRuleBody>()

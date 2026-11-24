@@ -48,7 +48,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             existing.Permission = permission;
 
-            var scope = await _scopeRepository.GetNodeScope(nodeId);
+            var scope = await _scopeRepository.GetNodeScopeAsync(nodeId);
 
             if (scope != null)
             {
@@ -85,7 +85,7 @@ namespace planner_node_service.Infrastructure.Repository
 
             _context.AccessRules.Add(accessRight);
 
-            var scope = await _scopeRepository.GetNodeScope(nodeId);
+            var scope = await _scopeRepository.GetNodeScopeAsync(nodeId);
 
             if (scope != null)
             {
@@ -132,7 +132,7 @@ namespace planner_node_service.Infrastructure.Repository
 
                 await _context.SaveChangesAsync();
 
-                var scope = await _scopeRepository.GetNodeScope(nodeId);
+                var scope = await _scopeRepository.GetNodeScopeAsync(nodeId);
 
                 if (scope != null)
                 {

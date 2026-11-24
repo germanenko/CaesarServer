@@ -443,7 +443,7 @@ namespace planner_node_service.App.Service
         // Получение манифеста Scope
         public async Task<ServiceResponse<List<EntityVersionBody>>> GetScopeManifest(Guid accountId, Guid scopeId)
         {
-            var scope = await _scopeRepository.GetNodeScope(scopeId);
+            var scope = await _scopeRepository.GetNodeScopeAsync(scopeId);
 
             if (scope == null)
             {
