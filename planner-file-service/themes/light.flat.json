@@ -40,7 +40,9 @@
     "color.calendar.startDate": "#38BDF8",
     "color.calendar.endDate": "#A78BFA",
     "color.clock.periodView": "#A9FF9B80",
-    "color.button.primary.inactive": "#EAEAEA"
+    "color.button.primary.inactive": "#F5F6F8",
+    "color.button.primary.hover": "#F2F4F7",
+    "color.button.primary.pressed": "#E4E8EE"
   },
   "icons": {
     "icon.action.search": "SearchIcon",
